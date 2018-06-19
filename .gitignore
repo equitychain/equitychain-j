@@ -1,0 +1,5 @@
+# Created by .ignore
+.idea
+*.iml
+*.log
+/target
