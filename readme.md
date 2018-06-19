@@ -1,5 +1,7 @@
 # Welcome to PassportJ
 
+[![pipeline status](http://hq88888888.i234.me:30000/BlockChain/PassportJ/badges/master/pipeline.svg)](http://hq88888888.i234.me:30000/BlockChain/PassportJ/commits/master)
+[![coverage report](http://hq88888888.i234.me:30000/BlockChain/PassportJ/badges/master/coverage.svg)](http://hq88888888.i234.me:30000/BlockChain/PassportJ/commits/master)
 
 # About
 PassportJ is a pure-Java implementation of the passport protocol. For high-level information about passport and its goals, visit [bcp.vip](http://bcp.vip).
