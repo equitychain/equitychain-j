@@ -3,6 +3,7 @@ package com.passport;
 
 import com.passport.config.taskconfig.TaskThreadPoolConfig4Client;
 import com.passport.config.taskconfig.TaskThreadPoolConfig4Server;
+import com.passport.config.zkconfig.ZooKeeperConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -16,7 +17,7 @@ import java.util.Arrays;
  * TODO: 2018/6/20  BlockChain Passport implement Java
  */
 @EnableAsync
-@EnableConfigurationProperties({TaskThreadPoolConfig4Server.class, TaskThreadPoolConfig4Client.class}) // 开启配置属性支持
+@EnableConfigurationProperties({TaskThreadPoolConfig4Server.class, TaskThreadPoolConfig4Client.class, ZooKeeperConfig.class}) // 开启配置属性支持
 @SpringBootApplication
 public class App {
   public static void main(String[] args) {

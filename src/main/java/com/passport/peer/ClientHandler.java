@@ -1,14 +1,26 @@
 package com.passport.peer;
 
-import com.google.gson.Gson;
+import com.passport.dto.RpcResponse;
 import com.passport.proto.PersonModel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
-public class ClientHandler extends SimpleChannelInboundHandler<PersonModel.Person> {
+import java.util.concurrent.ConcurrentMap;
+
+public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
+    /**
+     * 存放 请求编号 与 响应对象 之间的映射关系
+     */
+    private ConcurrentMap<String, RpcResponse> responseMap;
+
+    public ClientHandler(ConcurrentMap<String, RpcResponse> responseMap) {
+        this.responseMap = responseMap;
+    }
+
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, PersonModel.Person person) throws Exception {
-        System.out.println("客户端收的的信息是: " + new Gson().toJson(person));
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, RpcResponse response) throws Exception {
+        // 建立 请求编号 与 响应对象 之间的映射关系
+        responseMap.put(response.getRequestId(), response);
     }
 
     @Override
