@@ -8,8 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-import java.util.Arrays;
-
 
 /**
  * @author Aron wu
@@ -20,12 +18,6 @@ import java.util.Arrays;
 @SpringBootApplication
 public class App {
   public static void main(String[] args) {
-    //enable console?
-    if(Arrays.stream(args).anyMatch("console"::equalsIgnoreCase)){
-      System.getProperties().setProperty("spring.shell.interactive.enabled","true");
-    }else{
-      System.getProperties().setProperty("spring.shell.interactive.enabled","false");
-    }
     SpringApplication.run(App.class, args);
   }
 }
