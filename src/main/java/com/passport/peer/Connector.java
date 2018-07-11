@@ -1,9 +1,12 @@
 package com.passport.peer;
 
 import com.passport.annotations.RpcService;
-import com.passport.service.NodesService;
-import com.passport.service.impl.RpcClient;
+import com.passport.constant.NodeListConstant;
+import com.passport.utils.GsonUtils;
+import com.passport.zookeeper.ServiceRegistry;
 import org.apache.commons.collections4.MapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +15,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -22,14 +25,14 @@ import java.util.concurrent.TimeUnit;
  **/
 @Component
 public class Connector implements ApplicationContextAware, InitializingBean {
+    private static final Logger logger = LoggerFactory.getLogger(ServiceRegistry.class);
+
     @Autowired
     private ConnectAsync asyncTask;
     @Autowired
-    private RpcClient rpcClient;
+    private NodeListConstant nodeListConstant;
 
-    /**
-     * 存放服务名称与服务实例之间的映射关系
-     */
+    //存放服务名称与服务实例之间的映射关系
     private Map<String, Object> handlerMap = new HashMap<>();
 
     @Override
@@ -46,12 +49,16 @@ public class Connector implements ApplicationContextAware, InitializingBean {
     }
     @Override
     public void afterPropertiesSet() throws Exception {
-        asyncTask.startServer(handlerMap);
-        TimeUnit.SECONDS.sleep(5);
-        //asyncTask.startConnect();
-        NodesService nodesService = rpcClient.create(NodesService.class);
-        List<String> strings = nodesService.discoverNodes();
-        System.out.println(strings);
+        //启动服务并注册到discover节点
+        asyncTask.startServer();
 
+        TimeUnit.SECONDS.sleep(3);
+
+        //连接discover节点
+        Set<String> set = nodeListConstant.getAll();
+        logger.info("注册后从discover节点取到的地址列表：{}", GsonUtils.toJson(set));
+        for (String address : set) {
+            asyncTask.startConnect(address);
+        }
     }
 }

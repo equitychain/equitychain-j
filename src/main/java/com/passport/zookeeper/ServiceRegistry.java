@@ -1,13 +1,19 @@
 package com.passport.zookeeper;
 
-import com.passport.config.zkconfig.ZooKeeperConfig;
-import org.I0Itec.zkclient.ZkClient;
+import com.passport.constant.NodeListConstant;
+import com.passport.dto.ResultDto;
+import com.passport.utils.GsonUtils;
+import com.passport.utils.HttpUtils;
+import com.passport.utils.SHA1Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 服务注册
@@ -19,33 +25,33 @@ public class ServiceRegistry {
   private static final Logger logger = LoggerFactory.getLogger(ServiceRegistry.class);
 
   @Autowired
-  private ZooKeeperConfig zooKeeperConfig;
+  private NodeListConstant nodeListConstant;
 
-  private ZkClient zkClient;
+  @Value("${rpc.discoverUrl}")
+  private String discoverUrl;
 
-  @PostConstruct
-  public void init() {
-    //创建ZooKeeper客户端
-    zkClient = new ZkClient(zooKeeperConfig.getZkRegistryAddress(), zooKeeperConfig.getZkSessionTimeout(), zooKeeperConfig.getZkConnectionTimeout());
-    logger.debug("连接zookeeper成功");
-  }
+  public void register(String serviceAddress) {
+    //请求参数数据组装
+    Map<String, Object> msg = new HashMap<>();
+    msg.put("IP", serviceAddress);
 
-  public void register(String serviceName, String serviceAddress) {
-    //创建registry节点（持久）
-    String zkRegistryPath = zooKeeperConfig.getZkRegistryPath();
-    if (!zkClient.exists(zkRegistryPath)) {
-      zkClient.createPersistent(zkRegistryPath);
-      logger.debug("创建注册节点: {}", zkRegistryPath);
+    //请求参数签名后传输
+    Map<String, Object> data = new HashMap<>();
+    data.put("appno", "CIIiJYEa");
+    data.put("msg", GsonUtils.toJson(msg));
+    data.put("sign", SHA1Utils.encode("w48xOD1Lr3kRiJsc", GsonUtils.toJson(msg)));
+
+    //POST请求数据
+    String result = HttpUtils.doPost(discoverUrl, data);
+    ResultDto<List<String>> resultDto = new ResultDto<>();
+    resultDto = GsonUtils.fromJson(resultDto.getClass(), result);
+
+    //数据处理
+    if(resultDto.getCode() == 200){
+      //缓存到本地
+      List<String> list = resultDto.getData();
+      logger.info("注册时从discover节点取到的地址列表：{}", GsonUtils.toJson(list));
+      nodeListConstant.putAll(list);
     }
-    //创建service节点（持久）
-    String servicePath = zkRegistryPath + "/" + serviceName;
-    if (!zkClient.exists(servicePath)) {
-      zkClient.createPersistent(servicePath);
-      logger.debug("创建service节点: {}", servicePath);
-    }
-    //创建address节点（临时）
-    String addressPath = servicePath + "/address-";
-    String addressNode = zkClient.createEphemeralSequential(addressPath, serviceAddress);
-    logger.debug("创建address节点: {}", addressNode);
   }
 }

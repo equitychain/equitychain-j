@@ -16,4 +16,9 @@ public class NodesServiceImpl implements NodesService {
   public List<String> discoverNodes() {
     return null;
   }
+
+  @Override
+  public boolean nodeReg(String str) {
+    return false;
+  }
 }
