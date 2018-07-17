@@ -1,6 +1,8 @@
 package com.passport.peer;
 
-import com.passport.proto.PersonModel;
+import com.passport.heartbeat.HeartBeatClientHandler;
+import com.passport.heartbeat.HeartBeatServerHandler;
+import com.passport.proto.NettyMessage;
 import com.passport.zookeeper.ServiceRegistry;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
@@ -21,6 +23,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 多线程处理
@@ -33,6 +38,7 @@ public class ConnectAsync {
 
     @Autowired
     private ServiceRegistry serviceRegistry;
+    private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
     @Value("${rpc.serverPort}")
     private int serverPort;
@@ -57,10 +63,11 @@ public class ConnectAsync {
                             ChannelPipeline pipeline = sc.pipeline();
                             //将字节数组转换成Person对象和将Person对象转成字节数组,一共需要四个处理器
                             pipeline.addLast(new ProtobufVarint32FrameDecoder());
-                            pipeline.addLast(new ProtobufDecoder(PersonModel.Person.getDefaultInstance()));
+                            pipeline.addLast(new ProtobufDecoder(NettyMessage.Message.getDefaultInstance()));
                             pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
                             pipeline.addLast(new ProtobufEncoder());
                             pipeline.addLast(new ServerHandler());  // 处理 RPC 请求
+                            pipeline.addLast(new HeartBeatServerHandler());
                         }
                     })
                     //.option(ChannelOption.SO_BACKLOG, 1024);//设置tcp缓冲区
@@ -100,10 +107,11 @@ public class ConnectAsync {
                             ChannelPipeline pipeline = sc.pipeline();
                             //将字节数组转换成Person对象和将Person对象转成字节数组,一共需要四个处理器
                             pipeline.addLast(new ProtobufVarint32FrameDecoder());
-                            pipeline.addLast(new ProtobufDecoder(PersonModel.Person.getDefaultInstance()));
+                            pipeline.addLast(new ProtobufDecoder(NettyMessage.Message.getDefaultInstance()));
                             pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
                             pipeline.addLast(new ProtobufEncoder());
                             pipeline.addLast(new ClientHandler());
+                            pipeline.addLast(new HeartBeatClientHandler());
                         }
                     });
 
@@ -112,8 +120,18 @@ public class ConnectAsync {
             cf.channel().closeFuture().sync();
         }catch (Exception e){
 
-        }finally {
-            workgroup.shutdownGracefully();
+        } finally {
+            logger.info("失败发起重连操作");
+            try {
+                TimeUnit.SECONDS.sleep(1);
+                try {
+                    startConnect(address);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -1,0 +1,10 @@
+syntax = "proto3";
+option java_package = "com.passport.proto";
+option java_outer_classname = "MessageTypeEnum";
+
+enum MessageType {
+    DATA_REQ = 0;
+    DATA_RESP = 1;
+    HEARTBEAT_REQ = 2;
+    HEARTBEAT_RESP = 3;
+}

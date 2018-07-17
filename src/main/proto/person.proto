@@ -1,5 +1,5 @@
 syntax = "proto3";
-option java_package = "com.passport.protos";
+option java_package = "com.passport.proto";
 option java_outer_classname = "PersonModel";
 
 message Person {
