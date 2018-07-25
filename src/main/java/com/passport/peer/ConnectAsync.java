@@ -23,8 +23,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,7 +36,14 @@ public class ConnectAsync {
 
     @Autowired
     private ServiceRegistry serviceRegistry;
-    private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    @Autowired
+    private ClientHandler clientHandler;
+    @Autowired
+    private ServerHandler serverHandler;
+    @Autowired
+    private HeartBeatClientHandler heartBeatClientHandler;
+    @Autowired
+    private HeartBeatServerHandler heartBeatServerHandler;
 
     @Value("${rpc.serverPort}")
     private int serverPort;
@@ -66,8 +71,8 @@ public class ConnectAsync {
                             pipeline.addLast(new ProtobufDecoder(NettyMessage.Message.getDefaultInstance()));
                             pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
                             pipeline.addLast(new ProtobufEncoder());
-                            pipeline.addLast(new ServerHandler());  // 处理 RPC 请求
-                            pipeline.addLast(new HeartBeatServerHandler());
+                            pipeline.addLast(serverHandler);  // 处理 RPC 请求
+                            pipeline.addLast(heartBeatServerHandler);
                         }
                     })
                     //.option(ChannelOption.SO_BACKLOG, 1024);//设置tcp缓冲区
@@ -110,8 +115,8 @@ public class ConnectAsync {
                             pipeline.addLast(new ProtobufDecoder(NettyMessage.Message.getDefaultInstance()));
                             pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
                             pipeline.addLast(new ProtobufEncoder());
-                            pipeline.addLast(new ClientHandler());
-                            pipeline.addLast(new HeartBeatClientHandler());
+                            pipeline.addLast(clientHandler);
+                            pipeline.addLast(heartBeatClientHandler);
                         }
                     });
 

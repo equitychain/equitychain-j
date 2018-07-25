@@ -2,14 +2,14 @@ package com.passport.core;
 
 
 
-import java.math.BigInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
+import java.math.BigInteger;
 
-import static com.passport.constant.Constant.BYTE_HASH_LENGTH;
 import static com.passport.constant.Constant.BYTE_ADDRESS_LENGTH;
+import static com.passport.constant.Constant.BYTE_HASH_LENGTH;
 
 
 /**
@@ -42,8 +42,88 @@ public class Transaction {
 
   private byte[] extarData;
 
+  public Integer getNonce() {
+    return nonce;
+  }
+
+  public void setNonce(Integer nonce) {
+    this.nonce = nonce;
+  }
+
+  public byte[] getHash() {
+    return hash;
+  }
+
+  public void setHash(byte[] hash) {
+    this.hash = hash;
+  }
+
+  public byte[] getSignature() {
+    return signature;
+  }
+
+  public void setSignature(byte[] signature) {
+    this.signature = signature;
+  }
+
+  public byte[] getValue() {
+    return value;
+  }
+
+  public void setValue(byte[] value) {
+    this.value = value;
+  }
+
+  public byte[] getPayAddress() {
+    return payAddress;
+  }
+
+  public void setPayAddress(byte[] payAddress) {
+    this.payAddress = payAddress;
+  }
+
+  public byte[] getReceiptAddress() {
+    return receiptAddress;
+  }
+
+  public void setReceiptAddress(byte[] receiptAddress) {
+    this.receiptAddress = receiptAddress;
+  }
+
+  public byte[] getEggPrice() {
+    return eggPrice;
+  }
+
+  public void setEggPrice(byte[] eggPrice) {
+    this.eggPrice = eggPrice;
+  }
+
+  public byte[] getEggMax() {
+    return eggMax;
+  }
+
+  public void setEggMax(byte[] eggMax) {
+    this.eggMax = eggMax;
+  }
+
+  public byte[] getTime() {
+    return time;
+  }
+
+  public void setTime(byte[] time) {
+    this.time = time;
+  }
+
+  public byte[] getExtarData() {
+    return extarData;
+  }
+
+  public void setExtarData(byte[] extarData) {
+    this.extarData = extarData;
+  }
+
   public Transaction(Integer nonce, byte[] hash, byte[] signature, byte[] value, byte[] payAddress,
-      byte[] receiptAddress, byte[] eggPrice, byte[] eggMax, byte[] time, byte[] extarData) {
+                     byte[] receiptAddress, byte[] eggPrice, byte[] eggMax, byte[] time, byte[] extarData) {
     this.nonce = nonce;
     this.hash = hash;
     this.signature = signature;

@@ -1,38 +1,45 @@
 package com.passport.peer;
 
+import com.passport.msghandler.StrategyContext;
 import com.passport.proto.*;
 import com.passport.utils.GsonUtils;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@ChannelHandler.Sharable
+@Component
 public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Message> {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
+    private static ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+
+    public ChannelGroup getChannels() {
+        return channels;
+    }
+
+    @Autowired
+    private StrategyContext strategyContext;
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
-        logger.debug("客户端读到的数据是：{}"+GsonUtils.toJson(message));
-        ctx.fireChannelRead(message);
+        logger.info("client read data客户端读到的数据是：{}", GsonUtils.toJson(message));
+        strategyContext.handleRespMsgMain(ctx, message);
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        logger.info("客户端通道激活");
-        NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
+        logger.info("client channel active客户端通道激活");
 
-        NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
-        BlockMessage.Block.Builder blockBuilder = BlockMessage.Block.newBuilder();
-        blockBuilder.setBlockHeight(1000L);
-        blockBuilder.setBlockSize(1000);
-        blockBuilder.setTotalAmount(100L);
-        blockBuilder.setTotalFee(100);
-        dataBuilder.setBlock(blockBuilder);
-        dataBuilder.setDataType(DataTypeEnum.DataType.BLOCK_SYNC);
-
-        builder.setData(dataBuilder);
-        builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
-        ctx.channel().writeAndFlush(builder.build());
+        //保存连接的channel
+        channels.add(ctx.channel());
     }
 
     @Override

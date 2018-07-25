@@ -5,17 +5,21 @@ import com.passport.proto.MessageTypeEnum;
 import com.passport.proto.NettyData;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.GsonUtils;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+@ChannelHandler.Sharable
+@Component
 public class HeartBeatServerHandler extends SimpleChannelInboundHandler<NettyMessage.Message> {
     private static final Logger logger = LoggerFactory.getLogger(HeartBeatServerHandler.class);
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
-        logger.debug("心跳服务端读到的数据是：{}", GsonUtils.toJson(message));
+        logger.info("心跳服务端读到的数据是：{}", GsonUtils.toJson(message));
         //握手成功后发送定时心跳包
         if(message != null && message.getMessageType().equals(MessageTypeEnum.MessageType.HEARTBEAT_REQ)) {
             NettyMessage.Message heartBeat = buildHeatBeat();

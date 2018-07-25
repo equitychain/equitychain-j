@@ -16,7 +16,7 @@ public class MerkleTree {
     this.transactions = list;
   }
 
-  private List<byte[]> buildMerkleTree() {
+  public List<byte[]> buildMerkleTree() {
     // The Merkle root is based on a tree of hashes calculated from the transactions:
     //
     //     root

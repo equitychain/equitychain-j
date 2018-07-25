@@ -2,14 +2,18 @@ package com.passport.heartbeat;
 
 import com.passport.proto.*;
 import com.passport.utils.GsonUtils;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+@ChannelHandler.Sharable
+@Component
 public class HeartBeatClientHandler extends SimpleChannelInboundHandler<NettyMessage.Message> {
     private static final Logger logger = LoggerFactory.getLogger(HeartBeatServerHandler.class);
 
@@ -17,16 +21,16 @@ public class HeartBeatClientHandler extends SimpleChannelInboundHandler<NettyMes
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
-        logger.debug("心跳客户端读到的数据是：{}"+GsonUtils.toJson(message));
+        logger.info("心跳客户端读到的数据是：{}", GsonUtils.toJson(message));
         //握手成功后发送定时心跳包
         if(message != null && message.getMessageType().equals(MessageTypeEnum.MessageType.DATA_RESP)){
             heartBeat = ctx.executor().scheduleAtFixedRate(
                     new HeartBeatClientHandler.HeartBeatTask(ctx),
                     0,
-                    5000,
+                    10000,
                     TimeUnit.MILLISECONDS);
         }else if(message != null && message.getMessageType().equals(MessageTypeEnum.MessageType.HEARTBEAT_RESP)){
-            logger.info("收到心跳回复消息：{}" + GsonUtils.toJson(message));
+            logger.info("收到心跳回复消息：{}", GsonUtils.toJson(message));
         }else{
             ctx.fireChannelRead(message);
         }

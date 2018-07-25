@@ -1,5 +1,7 @@
 package com.passport.dto;
 
+import com.passport.enums.ResultEnum;
+
 /**
  * 客户端返回包装
  * @author 作者xujianfeng 
@@ -11,6 +13,11 @@ public class ResultDto<T> {
     private T data;//包装成功返回的数据
 
     public ResultDto() {
+    }
+
+    public ResultDto(ResultEnum resultEnum) {
+        this.code = resultEnum.getCode();
+        this.msg = resultEnum.getMessage();
     }
 
     public ResultDto(int code, String msg) {

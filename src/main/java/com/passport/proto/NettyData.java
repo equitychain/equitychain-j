@@ -97,7 +97,7 @@ public final class NettyData {
               if (block_ != null) {
                 subBuilder = block_.toBuilder();
               }
-              block_ = input.readMessage(BlockMessage.Block.PARSER, extensionRegistry);
+              block_ = input.readMessage(BlockMessage.Block.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom(block_);
                 block_ = subBuilder.buildPartial();
@@ -185,12 +185,6 @@ public final class NettyData {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (hasBlock()) {
-        if (!getBlock().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -491,11 +485,6 @@ public final class NettyData {
       }
 
       public final boolean isInitialized() {
-        if (hasBlock()) {
-          if (!getBlock().isInitialized()) {
-            return false;
-          }
-        }
         return true;
       }
 

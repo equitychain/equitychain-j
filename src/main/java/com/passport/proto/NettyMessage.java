@@ -165,12 +165,6 @@ public final class NettyMessage {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (hasData()) {
-        if (!getData().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -453,11 +447,6 @@ public final class NettyMessage {
       }
 
       public final boolean isInitialized() {
-        if (hasData()) {
-          if (!getData().isInitialized()) {
-            return false;
-          }
-        }
         return true;
       }
 

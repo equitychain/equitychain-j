@@ -11,4 +11,6 @@ public interface Constant {
   Integer BYTE_ADDRESS_LENGTH = 20;
   Integer STRING_ADDRESS_LENGTH = 40;
 
+  String TEST = "asd";
+
 }

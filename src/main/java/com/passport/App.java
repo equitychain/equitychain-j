@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 @EnableAsync
 @EnableConfigurationProperties({TaskThreadPoolConfig4Server.class, TaskThreadPoolConfig4Client.class}) // 开启配置属性支持
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.passport"})
 public class App {
   public static void main(String[] args) {
     SpringApplication.run(App.class, args);
