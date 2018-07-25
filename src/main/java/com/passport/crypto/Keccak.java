@@ -1,5 +1,7 @@
 package com.passport.crypto;
 
+import java.util.Arrays;
+
 /**
  * @author Wu Created by SKINK on 2018/7/17.
  */
@@ -61,17 +63,94 @@ public class Keccak extends AbstractDigest {
 
   @Override
   public Digest update(byte input) {
-    return null;
+    buffer[bufferLen] = input;
+    if (++bufferLen == blockLen) {
+      processBuffer();
+    }
+    return this;
   }
 
   @Override
   public Digest update(byte[] input, int off, int len) {
-    return null;
+    while (len > 0) {
+      int cpLen = Math.min(blockLen - bufferLen, len);
+      System.arraycopy(input, off, buffer, bufferLen, cpLen);
+      bufferLen += cpLen;
+      off += cpLen;
+      len -= cpLen;
+      if (bufferLen == blockLen) {
+        processBuffer();
+      }
+    }
+    return this;
   }
 
   @Override
   public byte[] digest() {
-    return new byte[0];
+    addPadding();
+    processBuffer();
+    byte[] tmp = new byte[length() * 8];
+    for (int i = 0; i < length(); i += 8) {
+      LittleEndian.encode(A[i >>> 3], tmp, i);
+    }
+    reset();
+    return Arrays.copyOf(tmp, length());
+  }
+
+  private void addPadding()
+  {
+    if (bufferLen + 1 == buffer.length) {
+      buffer[bufferLen] = (byte) 0x81;
+    } else {
+      buffer[bufferLen] = (byte) 0x01;
+      for (int i = bufferLen + 1; i < buffer.length - 1; i++) {
+        buffer[i] = 0;
+      }
+      buffer[buffer.length - 1] = (byte) 0x80;
+    }
+  }
+
+  private void processBuffer()
+  {
+    for (int i = 0; i < buffer.length; i += 8) {
+      A[i >>> 3] ^= LittleEndian.decodeLong(buffer, i);
+    }
+    keccakf();
+    bufferLen = 0;
+  }
+
+  private void keccakf()
+  {
+    for (int n = 0; n < 24; n++) {
+      round(n);
+    }
+  }
+
+  private void round(int n)
+  {
+    for (int x = 0; x < 5; x++) {
+      C[x] = A[index(x, 0)] ^ A[index(x, 1)] ^ A[index(x, 2)]
+          ^ A[index(x, 3)] ^ A[index(x, 4)];
+    }
+    for (int x = 0; x < 5; x++) {
+      D[x] = C[index(x - 1)] ^ rot(C[index(x + 1)], 1);
+      for (int y = 0; y < 5; y++) {
+        A[index(x, y)] ^= D[x];
+      }
+    }
+    for (int x = 0; x < 5; x++) {
+      for (int y = 0; y < 5; y++) {
+        int i = index(x, y);
+        B[index(y, x * 2 + 3 * y)] = rot(A[i], R[i]);
+      }
+    }
+    for (int x = 0; x < 5; x++) {
+      for (int y = 0; y < 5; y++) {
+        int i = index(x, y);
+        A[i] = B[i] ^ (~B[index(x + 1, y)] & B[index(x + 2, y)]);
+      }
+    }
+    A[0] ^= RC[n];
   }
 
   private long rot(long w, int r)
