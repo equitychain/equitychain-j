@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * spring上下文管理器
- * @author yangjian
  */
 @Component
 public class ApplicationContextProvider implements ApplicationContextAware {

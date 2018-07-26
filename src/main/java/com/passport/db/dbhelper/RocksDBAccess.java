@@ -1,6 +1,7 @@
 package com.passport.db.dbhelper;
 
 import com.google.common.base.Optional;
+import com.passport.core.Account;
 import com.passport.core.Block;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.*;
@@ -27,6 +28,8 @@ public class RocksDBAccess implements DBAccess {
 	public static final String LAST_BLOCK_HEIGHT = BLOCKS_BUCKET_PREFIX+"last_block";
 	//存放节点列表
 	private static final String CLIENT_NODES_LIST_KEY = "client-node-list";
+	//钱包数据存储hash桶前缀
+	public static final String WALLETS_BUCKET_PREFIX = "wallets_";
 
 	@Value("${db.dataDir}")
 	private String dataDir;
@@ -144,5 +147,31 @@ public class RocksDBAccess implements DBAccess {
 			ts.add((T) SerializeUtils.unSerialize(iterator.value()));
 		}
 		return ts;
+	}
+
+	@Override
+	public List<Account> listAccounts() {
+
+		List<Object> objects = seekByKey(WALLETS_BUCKET_PREFIX);
+		List<Account> accounts = new ArrayList<>();
+		for (Object o : objects) {
+			accounts.add((Account) o);
+		}
+		return accounts;
+	}
+
+	@Override
+	public boolean putAccount(Account account) {
+		return this.put(WALLETS_BUCKET_PREFIX + account.getAddress(), account);
+	}
+
+	@Override
+	public Optional<Account> getAccount(String address) {
+
+		Optional<Object> object = this.get(WALLETS_BUCKET_PREFIX + address);
+		if (object.isPresent()) {
+			return Optional.of((Account) object.get());
+		}
+		return Optional.absent();
 	}
 }

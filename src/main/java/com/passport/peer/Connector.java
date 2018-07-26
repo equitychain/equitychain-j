@@ -3,6 +3,7 @@ package com.passport.peer;
 import com.passport.constant.NodeListConstant;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
+import com.passport.proto.*;
 import com.passport.utils.GsonUtils;
 import com.passport.zookeeper.ServiceRegistry;
 import org.slf4j.Logger;
@@ -31,6 +32,8 @@ public class Connector implements InitializingBean {
     private NodeListConstant nodeListConstant;
     @Autowired
     private ApplicationContextProvider provider;
+    @Autowired
+    private ClientHandler clientHandler;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -54,5 +57,17 @@ public class Connector implements InitializingBean {
     @EventListener(ApplicationReadyEvent.class)
     public void fetchNextBlock() {
         provider.publishEvent(new SyncNextBlockEvent(0L));
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void fetchAccountList() {
+        //请求最新区块
+        NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
+        dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNTLIST_SYNC);
+
+        NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
+        builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
+        builder.setData(dataBuilder);
+        clientHandler.getChannels().writeAndFlush(builder.build());
     }
 }

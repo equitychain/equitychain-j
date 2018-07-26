@@ -1,8 +1,12 @@
 package com.passport.crypto;
 
 import com.google.gson.GsonBuilder;
+import sun.misc.BASE64Decoder;
 
 import java.security.*;
+import java.security.spec.ECGenParameterSpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 /**
@@ -58,7 +62,27 @@ public class ECDSAUtil {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
+	/**
+	 * 生成公钥私钥对
+	 * @return
+	 */
+	public static KeyPair generateKeyPair() {
+		try {
+			Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+			KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECDSA","BC");
+			SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+			ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
+			// Initialize the key generator and generate a KeyPair
+			keyGen.initialize(ecSpec, random); //256
+			KeyPair keyPair = keyGen.generateKeyPair();
+			// Set the public and private keys from the keyPair
+			return keyPair;
+		}catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	//Short hand helper to turn Object into a json string
 	public static String getJson(Object o) {
 		return new GsonBuilder().setPrettyPrinting().create().toJson(o);
@@ -72,4 +96,25 @@ public class ECDSAUtil {
 	public static String getStringFromKey(Key key) {
 		return Base64.getEncoder().encodeToString(key.getEncoded());
 	}
+
+	//根据字符串获取公钥
+	public static PublicKey getPublicKey(String key) throws Exception {
+		byte[] keyBytes;
+		keyBytes = (new BASE64Decoder()).decodeBuffer(key);
+		X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
+		KeyFactory keyFactory = KeyFactory.getInstance("ECDSA");
+		PublicKey publicKey = keyFactory.generatePublic(keySpec);
+		return publicKey;
+	}
+
+	//根据字符串获取私钥
+	public static PrivateKey getPrivateKey(String key) throws Exception {
+		byte[] keyBytes;
+		keyBytes = (new BASE64Decoder()).decodeBuffer(key);
+		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
+		KeyFactory keyFactory = KeyFactory.getInstance("ECDSA");
+		PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
+		return privateKey;
+	}
+
 }

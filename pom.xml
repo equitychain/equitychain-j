@@ -206,6 +206,11 @@
       <artifactId>kryo</artifactId>
       <version>4.0.1</version>
     </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>1.59</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -257,7 +262,7 @@
           <fork>true</fork>
         </configuration>
       </plugin>
-      <!--<plugin>
+      <plugin>
         <groupId>org.xolstice.maven.plugins</groupId>
         <artifactId>protobuf-maven-plugin</artifactId>
         <version>0.5.1</version>
@@ -274,7 +279,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>-->
+      </plugin>
     </plugins>
   </build>
 </project>

@@ -5,4 +5,5 @@ option java_outer_classname = "DataTypeEnum";
 enum DataType {
     HEART_BEAT = 0;
     BLOCK_SYNC = 1;
+    ACCOUNTLIST_SYNC = 2;
 }

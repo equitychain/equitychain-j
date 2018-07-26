@@ -27,6 +27,10 @@ public final class DataTypeEnum {
      * <code>BLOCK_SYNC = 1;</code>
      */
     BLOCK_SYNC(1),
+    /**
+     * <code>ACCOUNTLIST_SYNC = 2;</code>
+     */
+    ACCOUNTLIST_SYNC(2),
     UNRECOGNIZED(-1),
     ;
 
@@ -38,6 +42,10 @@ public final class DataTypeEnum {
      * <code>BLOCK_SYNC = 1;</code>
      */
     public static final int BLOCK_SYNC_VALUE = 1;
+    /**
+     * <code>ACCOUNTLIST_SYNC = 2;</code>
+     */
+    public static final int ACCOUNTLIST_SYNC_VALUE = 2;
 
 
     public final int getNumber() {
@@ -60,6 +68,7 @@ public final class DataTypeEnum {
       switch (value) {
         case 0: return HEART_BEAT;
         case 1: return BLOCK_SYNC;
+        case 2: return ACCOUNTLIST_SYNC;
         default: return null;
       }
     }
@@ -121,9 +130,10 @@ public final class DataTypeEnum {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\016DataType.proto**\n\010DataType\022\016\n\nHEART_BE" +
-      "AT\020\000\022\016\n\nBLOCK_SYNC\020\001B\"\n\022com.passport.pro" +
-      "toB\014DataTypeEnumb\006proto3"
+      "\n\016DataType.proto*@\n\010DataType\022\016\n\nHEART_BE" +
+      "AT\020\000\022\016\n\nBLOCK_SYNC\020\001\022\024\n\020ACCOUNTLIST_SYNC" +
+      "\020\002B\"\n\022com.passport.protoB\014DataTypeEnumb\006" +
+      "proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

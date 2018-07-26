@@ -1,6 +1,7 @@
 package com.passport.db.dbhelper;
 
 import com.google.common.base.Optional;
+import com.passport.core.Account;
 import com.passport.core.Block;
 
 import java.util.List;
@@ -84,4 +85,24 @@ public interface DBAccess {
 	 * @return
 	 */
 	<T> List<T> seekByKey(String keyPrefix);
+
+	/**
+	 * 获取账户列表
+	 * @return
+	 */
+	List<Account> listAccounts();
+
+	/**
+	 * 添加一个钱包账户
+	 * @param account
+	 * @return
+	 */
+	boolean putAccount(Account account);
+
+	/**
+	 * 获取指定的钱包账户
+	 * @param address
+	 * @return
+	 */
+	Optional<Account> getAccount(String address);
 }

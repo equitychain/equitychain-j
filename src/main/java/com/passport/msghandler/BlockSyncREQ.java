@@ -23,7 +23,6 @@ public class BlockSyncREQ extends Strategy {
     @Autowired
     private DBAccess dbAccess;
 
-    @Override
     public void handleReqMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块同步请求数据：{}", GsonUtils.toJson(message));
 

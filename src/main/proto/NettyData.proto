@@ -1,12 +1,13 @@
 syntax = "proto3";
 import "DataType.proto";
 import "BlockMessage.proto";
-import "google/protobuf/any.proto";
+import "AccountMessage.proto";
 option java_package = "com.passport.proto";
 option java_outer_classname = "NettyData";
 
 message Data {
     DataType dataType = 1;
     Block block = 2;
-    bool heartBeatState = 3;
+    repeated Account accounts = 3;
+    Account account = 4;
 }
