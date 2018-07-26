@@ -1,0 +1,53 @@
+package com.passport.listener;
+
+import com.google.common.base.Optional;
+import com.google.protobuf.ByteString;
+import com.passport.core.Account;
+import com.passport.core.Block;
+import com.passport.db.dbhelper.DBAccess;
+import com.passport.event.SyncAccountEvent;
+import com.passport.event.SyncNextBlockEvent;
+import com.passport.peer.ClientHandler;
+import com.passport.proto.*;
+import com.passport.utils.CastUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+
+/**
+ * 监听器新增账户事件
+ */
+@Component
+public class AccountEventListener {
+	private static Logger logger = LoggerFactory.getLogger(AccountEventListener.class);
+
+	@Autowired
+	private DBAccess dbAccess;
+	@Autowired
+	private ClientHandler clientHandler;
+
+	/**
+	 * 同步下一个区块
+	 * @param event
+	 */
+	@EventListener(SyncAccountEvent.class)
+	public void syncAccount(SyncAccountEvent event) {
+		Account account = (Account) event.getSource();
+
+		//把新增账户广播到其它节点
+		AccountMessage.Account.Builder accountBuilder = AccountMessage.Account.newBuilder();
+		accountBuilder.setAddress(ByteString.copyFrom(account.getAddress().getBytes()));
+		accountBuilder.setPrivateKey(ByteString.copyFrom(account.getPrivateKey().getBytes()));
+		accountBuilder.setBalance(ByteString.copyFrom(String.valueOf(account.getBalance()).getBytes()));
+
+		NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
+		dataBuilder.setDataType(DataTypeEnum.DataType.BLOCK_SYNC);
+
+		NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
+		builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
+		builder.setData(dataBuilder);
+		clientHandler.getChannels().writeAndFlush(builder.build());
+	}
+}
