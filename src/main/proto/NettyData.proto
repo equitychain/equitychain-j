@@ -2,6 +2,7 @@ syntax = "proto3";
 import "DataType.proto";
 import "BlockMessage.proto";
 import "AccountMessage.proto";
+import "TransactionMessage.proto";
 option java_package = "com.passport.proto";
 option java_outer_classname = "NettyData";
 
@@ -10,4 +11,5 @@ message Data {
     Block block = 2;
     repeated Account accounts = 3;
     Account account = 4;
+    Transaction transaction = 5;
 }

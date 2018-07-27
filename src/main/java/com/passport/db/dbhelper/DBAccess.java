@@ -3,6 +3,7 @@ package com.passport.db.dbhelper;
 import com.google.common.base.Optional;
 import com.passport.core.Account;
 import com.passport.core.Block;
+import com.passport.core.Transaction;
 
 import java.util.List;
 
@@ -105,4 +106,18 @@ public interface DBAccess {
 	 * @return
 	 */
 	Optional<Account> getAccount(String address);
+
+	/**
+	 * 添加一条流水记录
+	 * @param transaction
+	 * @return
+	 */
+	boolean putTransaction(Transaction transaction);
+
+	/**
+	 * 获取指定流水
+	 * @param txHash
+	 * @return
+	 */
+	Optional<Transaction> getTransaction(String txHash);
 }

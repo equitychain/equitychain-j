@@ -3,6 +3,7 @@ package com.passport.db.dbhelper;
 import com.google.common.base.Optional;
 import com.passport.core.Account;
 import com.passport.core.Block;
+import com.passport.core.Transaction;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.*;
 import org.slf4j.Logger;
@@ -30,6 +31,8 @@ public class RocksDBAccess implements DBAccess {
 	private static final String CLIENT_NODES_LIST_KEY = "client-node-list";
 	//钱包数据存储hash桶前缀
 	public static final String WALLETS_BUCKET_PREFIX = "wallets_";
+	//交易流水存储hash桶前缀
+	public static final String TRANSACTIONS_BUCKET_PREFIX = "transactions_";
 
 	@Value("${db.dataDir}")
 	private String dataDir;
@@ -171,6 +174,20 @@ public class RocksDBAccess implements DBAccess {
 		Optional<Object> object = this.get(WALLETS_BUCKET_PREFIX + address);
 		if (object.isPresent()) {
 			return Optional.of((Account) object.get());
+		}
+		return Optional.absent();
+	}
+
+	@Override
+	public boolean putTransaction(Transaction transaction) {
+		return this.put(TRANSACTIONS_BUCKET_PREFIX + transaction.getHash().toString(), transaction);
+	}
+
+	@Override
+	public Optional<Transaction> getTransaction(String txHash) {
+		Optional<Object> object = this.get(TRANSACTIONS_BUCKET_PREFIX + txHash);
+		if (object.isPresent()) {
+			return Optional.of((Transaction) object.get());
 		}
 		return Optional.absent();
 	}

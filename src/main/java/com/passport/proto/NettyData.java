@@ -76,6 +76,19 @@ public final class NettyData {
      * <code>.Account account = 4;</code>
      */
     AccountMessage.AccountOrBuilder getAccountOrBuilder();
+
+    /**
+     * <code>.Transaction transaction = 5;</code>
+     */
+    boolean hasTransaction();
+    /**
+     * <code>.Transaction transaction = 5;</code>
+     */
+    TransactionMessage.Transaction getTransaction();
+    /**
+     * <code>.Transaction transaction = 5;</code>
+     */
+    TransactionMessage.TransactionOrBuilder getTransactionOrBuilder();
   }
   /**
    * Protobuf type {@code Data}
@@ -155,6 +168,19 @@ public final class NettyData {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(account_);
                 account_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 42: {
+              TransactionMessage.Transaction.Builder subBuilder = null;
+              if (transaction_ != null) {
+                subBuilder = transaction_.toBuilder();
+              }
+              transaction_ = input.readMessage(TransactionMessage.Transaction.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(transaction_);
+                transaction_ = subBuilder.buildPartial();
               }
 
               break;
@@ -279,6 +305,27 @@ public final class NettyData {
       return getAccount();
     }
 
+    public static final int TRANSACTION_FIELD_NUMBER = 5;
+    private TransactionMessage.Transaction transaction_;
+    /**
+     * <code>.Transaction transaction = 5;</code>
+     */
+    public boolean hasTransaction() {
+      return transaction_ != null;
+    }
+    /**
+     * <code>.Transaction transaction = 5;</code>
+     */
+    public TransactionMessage.Transaction getTransaction() {
+      return transaction_ == null ? TransactionMessage.Transaction.getDefaultInstance() : transaction_;
+    }
+    /**
+     * <code>.Transaction transaction = 5;</code>
+     */
+    public TransactionMessage.TransactionOrBuilder getTransactionOrBuilder() {
+      return getTransaction();
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -303,6 +350,9 @@ public final class NettyData {
       if (account_ != null) {
         output.writeMessage(4, getAccount());
       }
+      if (transaction_ != null) {
+        output.writeMessage(5, getTransaction());
+      }
     }
 
     public int getSerializedSize() {
@@ -325,6 +375,10 @@ public final class NettyData {
       if (account_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, getAccount());
+      }
+      if (transaction_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getTransaction());
       }
       memoizedSize = size;
       return size;
@@ -355,6 +409,11 @@ public final class NettyData {
         result = result && getAccount()
             .equals(other.getAccount());
       }
+      result = result && (hasTransaction() == other.hasTransaction());
+      if (hasTransaction()) {
+        result = result && getTransaction()
+            .equals(other.getTransaction());
+      }
       return result;
     }
 
@@ -378,6 +437,10 @@ public final class NettyData {
       if (hasAccount()) {
         hash = (37 * hash) + ACCOUNT_FIELD_NUMBER;
         hash = (53 * hash) + getAccount().hashCode();
+      }
+      if (hasTransaction()) {
+        hash = (37 * hash) + TRANSACTION_FIELD_NUMBER;
+        hash = (53 * hash) + getTransaction().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -529,6 +592,12 @@ public final class NettyData {
           account_ = null;
           accountBuilder_ = null;
         }
+        if (transactionBuilder_ == null) {
+          transaction_ = null;
+        } else {
+          transaction_ = null;
+          transactionBuilder_ = null;
+        }
         return this;
       }
 
@@ -572,6 +641,11 @@ public final class NettyData {
           result.account_ = account_;
         } else {
           result.account_ = accountBuilder_.build();
+        }
+        if (transactionBuilder_ == null) {
+          result.transaction_ = transaction_;
+        } else {
+          result.transaction_ = transactionBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -649,6 +723,9 @@ public final class NettyData {
         }
         if (other.hasAccount()) {
           mergeAccount(other.getAccount());
+        }
+        if (other.hasTransaction()) {
+          mergeTransaction(other.getTransaction());
         }
         onChanged();
         return this;
@@ -1194,6 +1271,123 @@ public final class NettyData {
         }
         return accountBuilder_;
       }
+
+      private TransactionMessage.Transaction transaction_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder> transactionBuilder_;
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      public boolean hasTransaction() {
+        return transactionBuilder_ != null || transaction_ != null;
+      }
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      public TransactionMessage.Transaction getTransaction() {
+        if (transactionBuilder_ == null) {
+          return transaction_ == null ? TransactionMessage.Transaction.getDefaultInstance() : transaction_;
+        } else {
+          return transactionBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      public Builder setTransaction(TransactionMessage.Transaction value) {
+        if (transactionBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          transaction_ = value;
+          onChanged();
+        } else {
+          transactionBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      public Builder setTransaction(
+          TransactionMessage.Transaction.Builder builderForValue) {
+        if (transactionBuilder_ == null) {
+          transaction_ = builderForValue.build();
+          onChanged();
+        } else {
+          transactionBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      public Builder mergeTransaction(TransactionMessage.Transaction value) {
+        if (transactionBuilder_ == null) {
+          if (transaction_ != null) {
+            transaction_ =
+              TransactionMessage.Transaction.newBuilder(transaction_).mergeFrom(value).buildPartial();
+          } else {
+            transaction_ = value;
+          }
+          onChanged();
+        } else {
+          transactionBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      public Builder clearTransaction() {
+        if (transactionBuilder_ == null) {
+          transaction_ = null;
+          onChanged();
+        } else {
+          transaction_ = null;
+          transactionBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      public TransactionMessage.Transaction.Builder getTransactionBuilder() {
+
+        onChanged();
+        return getTransactionFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      public TransactionMessage.TransactionOrBuilder getTransactionOrBuilder() {
+        if (transactionBuilder_ != null) {
+          return transactionBuilder_.getMessageOrBuilder();
+        } else {
+          return transaction_ == null ?
+              TransactionMessage.Transaction.getDefaultInstance() : transaction_;
+        }
+      }
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder>
+          getTransactionFieldBuilder() {
+        if (transactionBuilder_ == null) {
+          transactionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder>(
+                  getTransaction(),
+                  getParentForChildren(),
+                  isClean());
+          transaction_ = null;
+        }
+        return transactionBuilder_;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -1258,11 +1452,13 @@ public final class NettyData {
   static {
     String[] descriptorData = {
       "\n\017NettyData.proto\032\016DataType.proto\032\022Block" +
-      "Message.proto\032\024AccountMessage.proto\"q\n\004D" +
-      "ata\022\033\n\010dataType\030\001 \001(\0162\t.DataType\022\025\n\005bloc" +
-      "k\030\002 \001(\0132\006.Block\022\032\n\010accounts\030\003 \003(\0132\010.Acco" +
-      "unt\022\031\n\007account\030\004 \001(\0132\010.AccountB\037\n\022com.pa" +
-      "ssport.protoB\tNettyDatab\006proto3"
+      "Message.proto\032\024AccountMessage.proto\032\030Tra" +
+      "nsactionMessage.proto\"\224\001\n\004Data\022\033\n\010dataTy" +
+      "pe\030\001 \001(\0162\t.DataType\022\025\n\005block\030\002 \001(\0132\006.Blo" +
+      "ck\022\032\n\010accounts\030\003 \003(\0132\010.Account\022\031\n\007accoun" +
+      "t\030\004 \001(\0132\010.Account\022!\n\013transaction\030\005 \001(\0132\014" +
+      ".TransactionB\037\n\022com.passport.protoB\tNett" +
+      "yDatab\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1278,16 +1474,18 @@ public final class NettyData {
           DataTypeEnum.getDescriptor(),
           BlockMessage.getDescriptor(),
           AccountMessage.getDescriptor(),
+          TransactionMessage.getDescriptor(),
         }, assigner);
     internal_static_Data_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_Data_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Data_descriptor,
-        new String[] { "DataType", "Block", "Accounts", "Account", });
+        new String[] { "DataType", "Block", "Accounts", "Account", "Transaction", });
     DataTypeEnum.getDescriptor();
     BlockMessage.getDescriptor();
     AccountMessage.getDescriptor();
+    TransactionMessage.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)
