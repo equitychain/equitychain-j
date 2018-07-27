@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * 账户
  * 处理区块web接口请求
- *
  * @author: xujianfeng
  * @create: 2018-07-23 15:41
  **/
@@ -25,12 +24,12 @@ public class AccountController {
     private DBAccess dbAccess;
 
     @GetMapping("/new")
-    public ResultDto mine(HttpServletRequest request) throws Exception {
+    public ResultDto newAccount(HttpServletRequest request) throws Exception {
         Account account = new Account();
         account.newAccount();
         boolean flag = dbAccess.putAccount(account);
         if (flag) {
-            return new ResultDto(ResultEnum.SUCESS.getCode(), account);
+            return new ResultDto(ResultEnum.SUCCESS.getCode(), account);
         }
         return new ResultDto(ResultEnum.SYS_ERROR);
     }

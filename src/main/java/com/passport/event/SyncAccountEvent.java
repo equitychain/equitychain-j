@@ -1,5 +1,6 @@
 package com.passport.event;
 
+import com.passport.core.Account;
 import org.springframework.context.ApplicationEvent;
 
 /**
@@ -7,7 +8,7 @@ import org.springframework.context.ApplicationEvent;
  */
 public class SyncAccountEvent extends ApplicationEvent {
 
-    public SyncAccountEvent(Long blockHeight) {
-        super(blockHeight);
+    public SyncAccountEvent(Account account) {
+        super(account);
     }
 }

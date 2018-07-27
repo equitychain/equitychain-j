@@ -3,8 +3,6 @@ package com.passport.msghandler;
 import com.google.common.base.Optional;
 import com.passport.core.Account;
 import com.passport.db.dbhelper.DBAccess;
-import com.passport.proto.AccountMessage;
-import com.passport.proto.NettyMessage;
 import com.passport.utils.GsonUtils;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;

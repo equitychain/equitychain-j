@@ -31,6 +31,14 @@ public final class DataTypeEnum {
      * <code>ACCOUNTLIST_SYNC = 2;</code>
      */
     ACCOUNTLIST_SYNC(2),
+    /**
+     * <code>ACCOUNT_SYNC = 3;</code>
+     */
+    ACCOUNT_SYNC(3),
+    /**
+     * <code>SEND_TRANSACTION = 4;</code>
+     */
+    SEND_TRANSACTION(4),
     UNRECOGNIZED(-1),
     ;
 
@@ -46,6 +54,14 @@ public final class DataTypeEnum {
      * <code>ACCOUNTLIST_SYNC = 2;</code>
      */
     public static final int ACCOUNTLIST_SYNC_VALUE = 2;
+    /**
+     * <code>ACCOUNT_SYNC = 3;</code>
+     */
+    public static final int ACCOUNT_SYNC_VALUE = 3;
+    /**
+     * <code>SEND_TRANSACTION = 4;</code>
+     */
+    public static final int SEND_TRANSACTION_VALUE = 4;
 
 
     public final int getNumber() {
@@ -69,6 +85,8 @@ public final class DataTypeEnum {
         case 0: return HEART_BEAT;
         case 1: return BLOCK_SYNC;
         case 2: return ACCOUNTLIST_SYNC;
+        case 3: return ACCOUNT_SYNC;
+        case 4: return SEND_TRANSACTION;
         default: return null;
       }
     }
@@ -130,9 +148,10 @@ public final class DataTypeEnum {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\016DataType.proto*@\n\010DataType\022\016\n\nHEART_BE" +
+      "\n\016DataType.proto*h\n\010DataType\022\016\n\nHEART_BE" +
       "AT\020\000\022\016\n\nBLOCK_SYNC\020\001\022\024\n\020ACCOUNTLIST_SYNC" +
-      "\020\002B\"\n\022com.passport.protoB\014DataTypeEnumb\006" +
+      "\020\002\022\020\n\014ACCOUNT_SYNC\020\003\022\024\n\020SEND_TRANSACTION" +
+      "\020\004B\"\n\022com.passport.protoB\014DataTypeEnumb\006" +
       "proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =

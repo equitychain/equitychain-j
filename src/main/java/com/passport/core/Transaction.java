@@ -4,7 +4,6 @@ package com.passport.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
 
@@ -136,26 +135,13 @@ public class Transaction {
     this.extarData = extarData;
   }
 
-
   public Transaction() {
 
   }
-
 
   private void validate(){
     if (this.hash.length != BYTE_HASH_LENGTH) logger.info("1");
     if(this.payAddress.length != BYTE_ADDRESS_LENGTH) logger.info("2");
     if(this.receiptAddress.length != BYTE_ADDRESS_LENGTH) logger.info("3");
-
-
   }
-
-
-  public static void main(String[] args) {
-    System.out.println("2b99ad7a885fa11e75d899925642ec4d2174afc5".length());
-    System.out.println(Hex.decode("2b99ad7a885fa11e75d899925642ec4d2174afc5").length);
-  }
-
-
-
 }

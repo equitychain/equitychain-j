@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * 区块
  * 处理区块web接口请求
  * @author: xujianfeng
  * @create: 2018-07-23 15:41
@@ -24,6 +25,6 @@ public class BlockController {
     @GetMapping("/mine")
     public ResultDto mine(HttpServletRequest request) throws Exception {
         dposMiner.mining();
-        return new ResultDto(ResultEnum.SUCESS);
+        return new ResultDto(ResultEnum.SUCCESS);
     }
 }

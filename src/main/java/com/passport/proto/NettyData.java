@@ -63,6 +63,19 @@ public final class NettyData {
      */
     AccountMessage.AccountOrBuilder getAccountsOrBuilder(
             int index);
+
+    /**
+     * <code>.Account account = 4;</code>
+     */
+    boolean hasAccount();
+    /**
+     * <code>.Account account = 4;</code>
+     */
+    AccountMessage.Account getAccount();
+    /**
+     * <code>.Account account = 4;</code>
+     */
+    AccountMessage.AccountOrBuilder getAccountOrBuilder();
   }
   /**
    * Protobuf type {@code Data}
@@ -131,6 +144,19 @@ public final class NettyData {
               }
               accounts_.add(
                   input.readMessage(AccountMessage.Account.parser(), extensionRegistry));
+              break;
+            }
+            case 34: {
+              AccountMessage.Account.Builder subBuilder = null;
+              if (account_ != null) {
+                subBuilder = account_.toBuilder();
+              }
+              account_ = input.readMessage(AccountMessage.Account.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(account_);
+                account_ = subBuilder.buildPartial();
+              }
+
               break;
             }
           }
@@ -232,6 +258,27 @@ public final class NettyData {
       return accounts_.get(index);
     }
 
+    public static final int ACCOUNT_FIELD_NUMBER = 4;
+    private AccountMessage.Account account_;
+    /**
+     * <code>.Account account = 4;</code>
+     */
+    public boolean hasAccount() {
+      return account_ != null;
+    }
+    /**
+     * <code>.Account account = 4;</code>
+     */
+    public AccountMessage.Account getAccount() {
+      return account_ == null ? AccountMessage.Account.getDefaultInstance() : account_;
+    }
+    /**
+     * <code>.Account account = 4;</code>
+     */
+    public AccountMessage.AccountOrBuilder getAccountOrBuilder() {
+      return getAccount();
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -253,6 +300,9 @@ public final class NettyData {
       for (int i = 0; i < accounts_.size(); i++) {
         output.writeMessage(3, accounts_.get(i));
       }
+      if (account_ != null) {
+        output.writeMessage(4, getAccount());
+      }
     }
 
     public int getSerializedSize() {
@@ -271,6 +321,10 @@ public final class NettyData {
       for (int i = 0; i < accounts_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, accounts_.get(i));
+      }
+      if (account_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, getAccount());
       }
       memoizedSize = size;
       return size;
@@ -296,6 +350,11 @@ public final class NettyData {
       }
       result = result && getAccountsList()
           .equals(other.getAccountsList());
+      result = result && (hasAccount() == other.hasAccount());
+      if (hasAccount()) {
+        result = result && getAccount()
+            .equals(other.getAccount());
+      }
       return result;
     }
 
@@ -315,6 +374,10 @@ public final class NettyData {
       if (getAccountsCount() > 0) {
         hash = (37 * hash) + ACCOUNTS_FIELD_NUMBER;
         hash = (53 * hash) + getAccountsList().hashCode();
+      }
+      if (hasAccount()) {
+        hash = (37 * hash) + ACCOUNT_FIELD_NUMBER;
+        hash = (53 * hash) + getAccount().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -460,6 +523,12 @@ public final class NettyData {
         } else {
           accountsBuilder_.clear();
         }
+        if (accountBuilder_ == null) {
+          account_ = null;
+        } else {
+          account_ = null;
+          accountBuilder_ = null;
+        }
         return this;
       }
 
@@ -498,6 +567,11 @@ public final class NettyData {
           result.accounts_ = accounts_;
         } else {
           result.accounts_ = accountsBuilder_.build();
+        }
+        if (accountBuilder_ == null) {
+          result.account_ = account_;
+        } else {
+          result.account_ = accountBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -572,6 +646,9 @@ public final class NettyData {
               accountsBuilder_.addAllMessages(other.accounts_);
             }
           }
+        }
+        if (other.hasAccount()) {
+          mergeAccount(other.getAccount());
         }
         onChanged();
         return this;
@@ -1000,6 +1077,123 @@ public final class NettyData {
         }
         return accountsBuilder_;
       }
+
+      private AccountMessage.Account account_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          AccountMessage.Account, AccountMessage.Account.Builder, AccountMessage.AccountOrBuilder> accountBuilder_;
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public boolean hasAccount() {
+        return accountBuilder_ != null || account_ != null;
+      }
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public AccountMessage.Account getAccount() {
+        if (accountBuilder_ == null) {
+          return account_ == null ? AccountMessage.Account.getDefaultInstance() : account_;
+        } else {
+          return accountBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public Builder setAccount(AccountMessage.Account value) {
+        if (accountBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          account_ = value;
+          onChanged();
+        } else {
+          accountBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public Builder setAccount(
+          AccountMessage.Account.Builder builderForValue) {
+        if (accountBuilder_ == null) {
+          account_ = builderForValue.build();
+          onChanged();
+        } else {
+          accountBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public Builder mergeAccount(AccountMessage.Account value) {
+        if (accountBuilder_ == null) {
+          if (account_ != null) {
+            account_ =
+              AccountMessage.Account.newBuilder(account_).mergeFrom(value).buildPartial();
+          } else {
+            account_ = value;
+          }
+          onChanged();
+        } else {
+          accountBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public Builder clearAccount() {
+        if (accountBuilder_ == null) {
+          account_ = null;
+          onChanged();
+        } else {
+          account_ = null;
+          accountBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public AccountMessage.Account.Builder getAccountBuilder() {
+
+        onChanged();
+        return getAccountFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public AccountMessage.AccountOrBuilder getAccountOrBuilder() {
+        if (accountBuilder_ != null) {
+          return accountBuilder_.getMessageOrBuilder();
+        } else {
+          return account_ == null ?
+              AccountMessage.Account.getDefaultInstance() : account_;
+        }
+      }
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          AccountMessage.Account, AccountMessage.Account.Builder, AccountMessage.AccountOrBuilder>
+          getAccountFieldBuilder() {
+        if (accountBuilder_ == null) {
+          accountBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              AccountMessage.Account, AccountMessage.Account.Builder, AccountMessage.AccountOrBuilder>(
+                  getAccount(),
+                  getParentForChildren(),
+                  isClean());
+          account_ = null;
+        }
+        return accountBuilder_;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -1064,11 +1258,11 @@ public final class NettyData {
   static {
     String[] descriptorData = {
       "\n\017NettyData.proto\032\016DataType.proto\032\022Block" +
-      "Message.proto\032\024AccountMessage.proto\"V\n\004D" +
+      "Message.proto\032\024AccountMessage.proto\"q\n\004D" +
       "ata\022\033\n\010dataType\030\001 \001(\0162\t.DataType\022\025\n\005bloc" +
       "k\030\002 \001(\0132\006.Block\022\032\n\010accounts\030\003 \003(\0132\010.Acco" +
-      "untB\037\n\022com.passport.protoB\tNettyDatab\006pr" +
-      "oto3"
+      "unt\022\031\n\007account\030\004 \001(\0132\010.AccountB\037\n\022com.pa" +
+      "ssport.protoB\tNettyDatab\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1090,7 +1284,7 @@ public final class NettyData {
     internal_static_Data_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Data_descriptor,
-        new String[] { "DataType", "Block", "Accounts", });
+        new String[] { "DataType", "Block", "Accounts", "Account", });
     DataTypeEnum.getDescriptor();
     BlockMessage.getDescriptor();
     AccountMessage.getDescriptor();

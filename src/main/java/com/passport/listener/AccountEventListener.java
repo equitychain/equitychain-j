@@ -1,15 +1,11 @@
 package com.passport.listener;
 
-import com.google.common.base.Optional;
 import com.google.protobuf.ByteString;
 import com.passport.core.Account;
-import com.passport.core.Block;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.SyncAccountEvent;
-import com.passport.event.SyncNextBlockEvent;
 import com.passport.peer.ClientHandler;
 import com.passport.proto.*;
-import com.passport.utils.CastUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +39,7 @@ public class AccountEventListener {
 		accountBuilder.setBalance(ByteString.copyFrom(String.valueOf(account.getBalance()).getBytes()));
 
 		NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
-		dataBuilder.setDataType(DataTypeEnum.DataType.BLOCK_SYNC);
+		dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNT_SYNC);
 
 		NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
 		builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);

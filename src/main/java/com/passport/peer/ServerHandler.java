@@ -1,7 +1,6 @@
 package com.passport.peer;
 
 import com.passport.msghandler.StrategyContext;
-import com.passport.proto.NettyMessage;
 import com.passport.utils.GsonUtils;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
