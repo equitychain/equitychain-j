@@ -2,6 +2,7 @@ package com.passport.peer;
 
 import com.passport.heartbeat.HeartBeatClientHandler;
 import com.passport.heartbeat.HeartBeatServerHandler;
+import com.passport.proto.NettyMessage;
 import com.passport.zookeeper.ServiceRegistry;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;

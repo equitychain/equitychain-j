@@ -50,7 +50,7 @@ public class MerkleTree {
     ArrayList<byte[]> tree = new ArrayList<>();
     // Start by adding all the hashes of the transactions as leaves of the tree.
     for (Transaction t : transactions) {
-      //tree.add(t.getHash().getBytes());
+      tree.add(t.getHash());
       //TODO:添加流水hash
     }
     // Offset in the list where the currently processed level starts.

@@ -1,5 +1,9 @@
 package com.passport.heartbeat;
 
+import com.passport.proto.DataTypeEnum;
+import com.passport.proto.MessageTypeEnum;
+import com.passport.proto.NettyData;
+import com.passport.proto.NettyMessage;
 import com.passport.utils.GsonUtils;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
