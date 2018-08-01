@@ -1,5 +1,7 @@
 package com.passport.core;
 
+import com.passport.utils.GsonUtils;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -49,9 +51,18 @@ public class MerkleTree {
     // t1 t2 t3 t4 t5 t5
     ArrayList<byte[]> tree = new ArrayList<>();
     // Start by adding all the hashes of the transactions as leaves of the tree.
-    for (Transaction t : transactions) {
-      tree.add(t.getHash());
-      //TODO:添加流水hash
+
+    for (Transaction transaction : transactions) {
+      //tree.add(t.getHash().getBytes());
+      Transaction trans = new Transaction();
+      trans.setPayAddress(transaction.getPayAddress());
+      trans.setReceiptAddress(transaction.getReceiptAddress());
+      trans.setValue(transaction.getValue());
+      trans.setExtarData(transaction.getExtarData());
+      trans.setTime(transaction.getTime());
+      String hash = GsonUtils.toJson(trans);
+
+      tree.add(hash.getBytes());
     }
     // Offset in the list where the currently processed level starts.
     int levelOffset = 0;
@@ -101,5 +112,4 @@ public class MerkleTree {
       throw new RuntimeException(e);
     }
   }
-
 }

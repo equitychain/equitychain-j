@@ -1,9 +1,8 @@
 package com.passport.core;
 
-import com.passport.crypto.ECDSAUtil;
+import com.passport.crypto.eth.ECKeyPair;
 
 import java.math.BigDecimal;
-import java.security.KeyPair;
 
 /**
  * 账户
@@ -25,10 +24,9 @@ public class Account {
         this.balance = balance;
     }
 
-    public void newAccount(){
-        KeyPair keyPair = ECDSAUtil.generateKeyPair();
-        this.address = ECDSAUtil.getStringFromKey(keyPair.getPublic());
-        this.privateKey = ECDSAUtil.getStringFromKey(keyPair.getPrivate());
+    public void newAccount(ECKeyPair keyPair){
+
+
         balance = BigDecimal.ZERO;
     }
 

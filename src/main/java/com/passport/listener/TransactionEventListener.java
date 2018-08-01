@@ -12,7 +12,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 /**
- * 监听器发送交易事件
+ * 监听器处理发送交易事件
  */
 @Component
 public class TransactionEventListener {

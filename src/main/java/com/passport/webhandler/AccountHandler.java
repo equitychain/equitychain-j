@@ -1,13 +1,25 @@
 package com.passport.webhandler;
 
 import com.passport.core.Account;
+import com.passport.crypto.eth.ECKeyPair;
+import com.passport.crypto.eth.WalletUtils;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.exception.CipherException;
 import com.passport.listener.ApplicationContextProvider;
+import com.passport.utils.CheckUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 @Component
 public class AccountHandler {
@@ -20,18 +32,26 @@ public class AccountHandler {
     @Autowired
     private ApplicationContextProvider provider;
 
+    @Value("${wallet.keystoreDir}")
+    private String walletDir;
+
     /**
      * 新增账号
      * @return 账号
      */
-    public Account newAccount(){
-        Account account = new Account();
-        account.newAccount();
-        if(dbAccess.putAccount(account)) {
-            Optional<Account> minerAccount = dbAccess.getMinerAccount();
-            if(!minerAccount.isPresent()){
-                dbAccess.putMinerAccount(account);
-            }
+    public Account newAccount(String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, CipherException, IOException {
+        if(CheckUtils.checkParamIfEmpty(password)){
+            return null;
+        }
+        File file = new File(walletDir);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+
+        //创建公私钥并生成keystore文件
+        ECKeyPair keyPair = WalletUtils.generateNewWalletFile(password, new File(walletDir), true);
+        Account account = new Account(keyPair.getAddress(), keyPair.exportPrivateKey(), BigDecimal.ZERO);
+        if (dbAccess.putAccount(account)) {
             return account;
         }
         return null;
