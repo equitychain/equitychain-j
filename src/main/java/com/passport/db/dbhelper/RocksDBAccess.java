@@ -33,6 +33,8 @@ public class RocksDBAccess implements DBAccess {
 	public static final String WALLETS_BUCKET_PREFIX = "wallets_";
 	//交易流水存储hash桶前缀
 	public static final String TRANSACTIONS_BUCKET_PREFIX = "transactions_";
+    //用户自己设置的挖矿账号
+    public static final String MINERACCOUNT = "miner-account";
 
 	@Value("${db.dataDir}")
 	private String dataDir;
@@ -190,5 +192,17 @@ public class RocksDBAccess implements DBAccess {
 			return Optional.of((Transaction) object.get());
 		}
 		return Optional.absent();
+	}
+
+	public Optional<Account> getMinerAccount(){
+	    Optional<Object> getMinerAccount = get(MINERACCOUNT);
+	    if(getMinerAccount.isPresent()){
+	        return Optional.of((Account) getMinerAccount.get());
+        }
+        return Optional.absent();
+    }
+
+    public boolean putMinerAccount(Account account){
+		return this.put(MINERACCOUNT, account);
 	}
 }
