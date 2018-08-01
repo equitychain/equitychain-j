@@ -6,6 +6,8 @@ import com.passport.core.Block;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
+import com.passport.proto.BlockMessage;
+import com.passport.proto.NettyMessage;
 import com.passport.utils.GsonUtils;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;

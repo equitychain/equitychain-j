@@ -55,12 +55,12 @@ public class Connector implements InitializingBean {
 
     //启动的时候自动开始区块同步
     @EventListener(ApplicationReadyEvent.class)
-    public void fetchNextBlock() {
+    public void syncNextBlock() {
         provider.publishEvent(new SyncNextBlockEvent(0L));
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    public void fetchAccountList() {
+    public void syncAccountList() {
         //请求最新区块
         NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
         dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNTLIST_SYNC);

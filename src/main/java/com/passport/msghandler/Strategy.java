@@ -1,5 +1,6 @@
 package com.passport.msghandler;
 
+import com.passport.proto.NettyMessage;
 import io.netty.channel.ChannelHandlerContext;
 
 /**

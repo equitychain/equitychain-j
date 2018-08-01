@@ -45,7 +45,7 @@ public class TransactionHandler {
 
         //2.支付地址、接收地址是否已经创建
         Optional<Account> accountPayOptional = dbAccess.getAccount(payAddress);
-        Optional<Account> accountReceiptOptional = dbAccess.getAccount(payAddress);
+        Optional<Account> accountReceiptOptional = dbAccess.getAccount(receiptAddress);
         if(!accountPayOptional.isPresent()){
             throw new CommonException(ResultEnum.ACCOUNT_NOT_EXISTS);
         }

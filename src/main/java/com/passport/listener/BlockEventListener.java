@@ -38,7 +38,7 @@ public class BlockEventListener {
 	 * @param event
 	 */
 	@EventListener(SyncNextBlockEvent.class)
-	public void fetchNextBlock(SyncNextBlockEvent event) {
+	public void syncNextBlock(SyncNextBlockEvent event) {
 		Long blockHeight = CastUtils.castLong(event.getSource());
 		if (blockHeight == 0) {
 			//取出本地存储的最新区块高度

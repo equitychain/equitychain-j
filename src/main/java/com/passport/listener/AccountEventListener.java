@@ -13,7 +13,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 /**
- * 监听器新增账户事件
+ * 监听器处理新增账户事件
  */
 @Component
 public class AccountEventListener {
@@ -25,7 +25,7 @@ public class AccountEventListener {
 	private ClientHandler clientHandler;
 
 	/**
-	 * 同步下一个区块
+	 * 同步账户
 	 * @param event
 	 */
 	@EventListener(SyncAccountEvent.class)
