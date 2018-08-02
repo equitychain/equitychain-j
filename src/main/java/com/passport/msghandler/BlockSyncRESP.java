@@ -57,18 +57,25 @@ public class BlockSyncRESP extends Strategy {
 
     //校验区块
     public boolean checkBlock(Block block, DBAccess dbAccess) {
-        //创世区块
-        if (block.getBlockHeight() == 1) {//比对计算出来的hash和传过来的hash是否一致 TODO
-            return Objects.equal(block.getBlockHeader().getHashMerkleRoot(), null);
+        Long blockHeight = block.getBlockHeight();
+
+        //创世区块，不需要校验和前一个区块的hash
+        if (blockHeight == 1) {//比对计算出来的hash和传过来的hash是否一致
+             return Objects.equal(block.getBlockHeader().getHash(), block.calculateFieldValueWithHash());
         }
 
-        Long blockHeight = block.getBlockHeight();
+        //后续区块
         if (blockHeight > 1) {
+            boolean flag = Objects.equal(block.getBlockHeader().getHash(), block.calculateFieldValueWithHash());
+            if(!flag){
+                return false;
+            }
+
             Optional<Block> prevBlock = dbAccess.getBlock(blockHeight - 1);
             if(prevBlock.isPresent()){
-                byte[] hashMerkleRoot = prevBlock.get().getBlockHeader().getHashMerkleRoot();
-                byte[] hashPrevBlock = block.getBlockHeader().getHashPrevBlock();
-                if (hashMerkleRoot.equals(hashPrevBlock)) {//前一个区块的hash和当前区块的前一个区块hash是否相等0
+                byte[] hashOfPrevBlock = prevBlock.get().getBlockHeader().getHash();//前一个区块hash
+                byte[] prevHashOfCurrentBlock = block.getBlockHeader().getHashPrevBlock();//当前区块的前一个区块hash
+                if (hashOfPrevBlock.equals(prevHashOfCurrentBlock)) {//前一个区块的hash和当前区块的前一个区块hash是否相等
                     return true;
                 }
             }
