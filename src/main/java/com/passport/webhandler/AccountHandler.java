@@ -7,6 +7,7 @@ import com.passport.db.dbhelper.DBAccess;
 import com.passport.exception.CipherException;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.utils.CheckUtils;
+import com.passport.utils.LockUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Optional;

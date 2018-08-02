@@ -17,7 +17,8 @@ public enum ResultEnum {
 	//***通用状态***
 
 	//***账户***
-	ACCOUNT_NOT_EXISTS(1001, "账户不存在");
+	ACCOUNT_NOT_EXISTS(1001, "账户不存在"),
+	ACCOUNT_IS_LOCKED(1002, "账户未解锁");
 	//***账户***
 
 	private int code;

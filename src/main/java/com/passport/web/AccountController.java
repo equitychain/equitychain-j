@@ -2,10 +2,13 @@ package com.passport.web;
 
 import com.passport.core.Account;
 import com.passport.crypto.eth.ECKeyPair;
+import com.passport.crypto.eth.WalletFile;
 import com.passport.crypto.eth.WalletUtils;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
+import com.passport.utils.LockUtil;
+import com.passport.utils.StoryFileUtil;
 import com.passport.webhandler.AccountHandler;
 import com.passport.utils.CheckUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,8 @@ import java.math.BigDecimal;
 public class AccountController {
     @Autowired
     AccountHandler accountHandler;
+    @Autowired
+    StoryFileUtil fileUtil;
 //    @Autowired
 //    DBAccess dbAccess;
 //    @Value("${wallet.keystoreDir}")
@@ -74,5 +79,24 @@ public class AccountController {
             }
         }
         return new ResultDto(ResultEnum.SYS_ERROR);
+    }
+
+    //解锁账号
+    @GetMapping("/unlock")
+    public ResultDto unlock(HttpServletRequest request) throws Exception {
+        String address = request.getParameter("address");
+        String time = request.getParameter("time");
+        String password = request.getParameter("password");
+        if(CheckUtils.checkParamIfEmpty(address,password)){
+            return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
+        }
+        fileUtil.flush();
+        boolean lock;
+        if(CheckUtils.checkParamIfEmpty(time)){
+            lock = LockUtil.unLockAddr(address,password,fileUtil);
+        }else{
+            lock = LockUtil.unLockAddr(address,password,fileUtil,Long.parseLong(time));
+        }
+        return new ResultDto(ResultEnum.SUCCESS.getCode(), lock);
     }
 }
