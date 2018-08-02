@@ -46,13 +46,14 @@ public class TransactionHandler {
         if(LockUtil.isUnlock(payAddress)) {
             //1.支付地址,接收地址是否合法 TODO 正则校验
 
+
             //2.支付地址、接收地址是否已经创建
             Optional<Account> accountPayOptional = dbAccess.getAccount(payAddress);
             Optional<Account> accountReceiptOptional = dbAccess.getAccount(receiptAddress);
-            if (!accountPayOptional.isPresent()) {
+            if(!accountPayOptional.isPresent()){
                 throw new CommonException(ResultEnum.ACCOUNT_NOT_EXISTS);
             }
-            if (!accountReceiptOptional.isPresent()) {
+            if(!accountReceiptOptional.isPresent()){
                 throw new CommonException(ResultEnum.ACCOUNT_NOT_EXISTS);
             }
 

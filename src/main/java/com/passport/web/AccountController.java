@@ -2,14 +2,20 @@ package com.passport.web;
 
 import com.passport.core.Account;
 import com.passport.crypto.eth.ECKeyPair;
+<<<<<<< HEAD
 import com.passport.crypto.eth.WalletFile;
+=======
+>>>>>>> test/dev
 import com.passport.crypto.eth.WalletUtils;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
+<<<<<<< HEAD
 import com.passport.utils.LockUtil;
 import com.passport.utils.StoryFileUtil;
 import com.passport.webhandler.AccountHandler;
+=======
+>>>>>>> test/dev
 import com.passport.utils.CheckUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +44,9 @@ public class AccountController {
 //    DBAccess dbAccess;
 //    @Value("${wallet.keystoreDir}")
 //    private String walletDir;
+
+    @Value("${wallet.keystoreDir}")
+    private String walletDir;
 
     @GetMapping("/new")
     public ResultDto newAccount(HttpServletRequest request) throws Exception {
