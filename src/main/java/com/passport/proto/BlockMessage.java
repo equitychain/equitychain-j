@@ -47,17 +47,28 @@ public final class BlockMessage {
     int getTransactionCount();
 
     /**
-     * <code>.Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 5;</code>
      */
-    boolean hasTransactions();
+    java.util.List<TransactionMessage.Transaction>
+        getTransactionsList();
     /**
-     * <code>.Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 5;</code>
      */
-    TransactionMessage.Transaction getTransactions();
+    TransactionMessage.Transaction getTransactions(int index);
     /**
-     * <code>.Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 5;</code>
      */
-    TransactionMessage.TransactionOrBuilder getTransactionsOrBuilder();
+    int getTransactionsCount();
+    /**
+     * <code>repeated .Transaction transactions = 5;</code>
+     */
+    java.util.List<? extends TransactionMessage.TransactionOrBuilder>
+        getTransactionsOrBuilderList();
+    /**
+     * <code>repeated .Transaction transactions = 5;</code>
+     */
+    TransactionMessage.TransactionOrBuilder getTransactionsOrBuilder(
+            int index);
   }
   /**
    * Protobuf type {@code Block}
@@ -74,6 +85,7 @@ public final class BlockMessage {
       blockSize_ = 0L;
       blockHeight_ = 0L;
       transactionCount_ = 0;
+      transactions_ = java.util.Collections.emptyList();
     }
 
     @Override
@@ -130,16 +142,12 @@ public final class BlockMessage {
               break;
             }
             case 42: {
-              TransactionMessage.Transaction.Builder subBuilder = null;
-              if (transactions_ != null) {
-                subBuilder = transactions_.toBuilder();
+              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+                transactions_ = new java.util.ArrayList<TransactionMessage.Transaction>();
+                mutable_bitField0_ |= 0x00000010;
               }
-              transactions_ = input.readMessage(TransactionMessage.Transaction.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(transactions_);
-                transactions_ = subBuilder.buildPartial();
-              }
-
+              transactions_.add(
+                  input.readMessage(TransactionMessage.Transaction.parser(), extensionRegistry));
               break;
             }
           }
@@ -150,6 +158,9 @@ public final class BlockMessage {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+          transactions_ = java.util.Collections.unmodifiableList(transactions_);
+        }
         makeExtensionsImmutable();
       }
     }
@@ -165,6 +176,7 @@ public final class BlockMessage {
               BlockMessage.Block.class, BlockMessage.Block.Builder.class);
     }
 
+    private int bitField0_;
     public static final int BLOCKSIZE_FIELD_NUMBER = 1;
     private long blockSize_;
     /**
@@ -214,24 +226,38 @@ public final class BlockMessage {
     }
 
     public static final int TRANSACTIONS_FIELD_NUMBER = 5;
-    private TransactionMessage.Transaction transactions_;
+    private java.util.List<TransactionMessage.Transaction> transactions_;
     /**
-     * <code>.Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 5;</code>
      */
-    public boolean hasTransactions() {
-      return transactions_ != null;
+    public java.util.List<TransactionMessage.Transaction> getTransactionsList() {
+      return transactions_;
     }
     /**
-     * <code>.Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 5;</code>
      */
-    public TransactionMessage.Transaction getTransactions() {
-      return transactions_ == null ? TransactionMessage.Transaction.getDefaultInstance() : transactions_;
+    public java.util.List<? extends TransactionMessage.TransactionOrBuilder>
+        getTransactionsOrBuilderList() {
+      return transactions_;
     }
     /**
-     * <code>.Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 5;</code>
      */
-    public TransactionMessage.TransactionOrBuilder getTransactionsOrBuilder() {
-      return getTransactions();
+    public int getTransactionsCount() {
+      return transactions_.size();
+    }
+    /**
+     * <code>repeated .Transaction transactions = 5;</code>
+     */
+    public TransactionMessage.Transaction getTransactions(int index) {
+      return transactions_.get(index);
+    }
+    /**
+     * <code>repeated .Transaction transactions = 5;</code>
+     */
+    public TransactionMessage.TransactionOrBuilder getTransactionsOrBuilder(
+        int index) {
+      return transactions_.get(index);
     }
 
     private byte memoizedIsInitialized = -1;
@@ -258,8 +284,8 @@ public final class BlockMessage {
       if (transactionCount_ != 0) {
         output.writeInt32(4, transactionCount_);
       }
-      if (transactions_ != null) {
-        output.writeMessage(5, getTransactions());
+      for (int i = 0; i < transactions_.size(); i++) {
+        output.writeMessage(5, transactions_.get(i));
       }
     }
 
@@ -284,9 +310,9 @@ public final class BlockMessage {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(4, transactionCount_);
       }
-      if (transactions_ != null) {
+      for (int i = 0; i < transactions_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, getTransactions());
+          .computeMessageSize(5, transactions_.get(i));
       }
       memoizedSize = size;
       return size;
@@ -315,11 +341,8 @@ public final class BlockMessage {
       }
       result = result && (getTransactionCount()
           == other.getTransactionCount());
-      result = result && (hasTransactions() == other.hasTransactions());
-      if (hasTransactions()) {
-        result = result && getTransactions()
-            .equals(other.getTransactions());
-      }
+      result = result && getTransactionsList()
+          .equals(other.getTransactionsList());
       return result;
     }
 
@@ -342,9 +365,9 @@ public final class BlockMessage {
       }
       hash = (37 * hash) + TRANSACTIONCOUNT_FIELD_NUMBER;
       hash = (53 * hash) + getTransactionCount();
-      if (hasTransactions()) {
+      if (getTransactionsCount() > 0) {
         hash = (37 * hash) + TRANSACTIONS_FIELD_NUMBER;
-        hash = (53 * hash) + getTransactions().hashCode();
+        hash = (53 * hash) + getTransactionsList().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -471,6 +494,7 @@ public final class BlockMessage {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
+          getTransactionsFieldBuilder();
         }
       }
       public Builder clear() {
@@ -488,10 +512,10 @@ public final class BlockMessage {
         transactionCount_ = 0;
 
         if (transactionsBuilder_ == null) {
-          transactions_ = null;
+          transactions_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000010);
         } else {
-          transactions_ = null;
-          transactionsBuilder_ = null;
+          transactionsBuilder_.clear();
         }
         return this;
       }
@@ -515,6 +539,8 @@ public final class BlockMessage {
 
       public BlockMessage.Block buildPartial() {
         BlockMessage.Block result = new BlockMessage.Block(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         result.blockSize_ = blockSize_;
         result.blockHeight_ = blockHeight_;
         if (blockHeaderBuilder_ == null) {
@@ -524,10 +550,15 @@ public final class BlockMessage {
         }
         result.transactionCount_ = transactionCount_;
         if (transactionsBuilder_ == null) {
+          if (((bitField0_ & 0x00000010) == 0x00000010)) {
+            transactions_ = java.util.Collections.unmodifiableList(transactions_);
+            bitField0_ = (bitField0_ & ~0x00000010);
+          }
           result.transactions_ = transactions_;
         } else {
           result.transactions_ = transactionsBuilder_.build();
         }
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -581,8 +612,31 @@ public final class BlockMessage {
         if (other.getTransactionCount() != 0) {
           setTransactionCount(other.getTransactionCount());
         }
-        if (other.hasTransactions()) {
-          mergeTransactions(other.getTransactions());
+        if (transactionsBuilder_ == null) {
+          if (!other.transactions_.isEmpty()) {
+            if (transactions_.isEmpty()) {
+              transactions_ = other.transactions_;
+              bitField0_ = (bitField0_ & ~0x00000010);
+            } else {
+              ensureTransactionsIsMutable();
+              transactions_.addAll(other.transactions_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.transactions_.isEmpty()) {
+            if (transactionsBuilder_.isEmpty()) {
+              transactionsBuilder_.dispose();
+              transactionsBuilder_ = null;
+              transactions_ = other.transactions_;
+              bitField0_ = (bitField0_ & ~0x00000010);
+              transactionsBuilder_ =
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getTransactionsFieldBuilder() : null;
+            } else {
+              transactionsBuilder_.addAllMessages(other.transactions_);
+            }
+          }
         }
         onChanged();
         return this;
@@ -609,6 +663,7 @@ public final class BlockMessage {
         }
         return this;
       }
+      private int bitField0_;
 
       private long blockSize_ ;
       /**
@@ -805,116 +860,239 @@ public final class BlockMessage {
         return this;
       }
 
-      private TransactionMessage.Transaction transactions_ = null;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder> transactionsBuilder_;
-      /**
-       * <code>.Transaction transactions = 5;</code>
-       */
-      public boolean hasTransactions() {
-        return transactionsBuilder_ != null || transactions_ != null;
+      private java.util.List<TransactionMessage.Transaction> transactions_ =
+        java.util.Collections.emptyList();
+      private void ensureTransactionsIsMutable() {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+          transactions_ = new java.util.ArrayList<TransactionMessage.Transaction>(transactions_);
+          bitField0_ |= 0x00000010;
+         }
       }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder> transactionsBuilder_;
+
       /**
-       * <code>.Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 5;</code>
        */
-      public TransactionMessage.Transaction getTransactions() {
+      public java.util.List<TransactionMessage.Transaction> getTransactionsList() {
         if (transactionsBuilder_ == null) {
-          return transactions_ == null ? TransactionMessage.Transaction.getDefaultInstance() : transactions_;
+          return java.util.Collections.unmodifiableList(transactions_);
         } else {
-          return transactionsBuilder_.getMessage();
+          return transactionsBuilder_.getMessageList();
         }
       }
       /**
-       * <code>.Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 5;</code>
        */
-      public Builder setTransactions(TransactionMessage.Transaction value) {
+      public int getTransactionsCount() {
+        if (transactionsBuilder_ == null) {
+          return transactions_.size();
+        } else {
+          return transactionsBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+       */
+      public TransactionMessage.Transaction getTransactions(int index) {
+        if (transactionsBuilder_ == null) {
+          return transactions_.get(index);
+        } else {
+          return transactionsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+       */
+      public Builder setTransactions(
+          int index, TransactionMessage.Transaction value) {
         if (transactionsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          transactions_ = value;
+          ensureTransactionsIsMutable();
+          transactions_.set(index, value);
           onChanged();
         } else {
-          transactionsBuilder_.setMessage(value);
+          transactionsBuilder_.setMessage(index, value);
         }
-
         return this;
       }
       /**
-       * <code>.Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 5;</code>
        */
       public Builder setTransactions(
+          int index, TransactionMessage.Transaction.Builder builderForValue) {
+        if (transactionsBuilder_ == null) {
+          ensureTransactionsIsMutable();
+          transactions_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          transactionsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+       */
+      public Builder addTransactions(TransactionMessage.Transaction value) {
+        if (transactionsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureTransactionsIsMutable();
+          transactions_.add(value);
+          onChanged();
+        } else {
+          transactionsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+       */
+      public Builder addTransactions(
+          int index, TransactionMessage.Transaction value) {
+        if (transactionsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureTransactionsIsMutable();
+          transactions_.add(index, value);
+          onChanged();
+        } else {
+          transactionsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+       */
+      public Builder addTransactions(
           TransactionMessage.Transaction.Builder builderForValue) {
         if (transactionsBuilder_ == null) {
-          transactions_ = builderForValue.build();
+          ensureTransactionsIsMutable();
+          transactions_.add(builderForValue.build());
           onChanged();
         } else {
-          transactionsBuilder_.setMessage(builderForValue.build());
+          transactionsBuilder_.addMessage(builderForValue.build());
         }
-
         return this;
       }
       /**
-       * <code>.Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 5;</code>
        */
-      public Builder mergeTransactions(TransactionMessage.Transaction value) {
+      public Builder addTransactions(
+          int index, TransactionMessage.Transaction.Builder builderForValue) {
         if (transactionsBuilder_ == null) {
-          if (transactions_ != null) {
-            transactions_ =
-              TransactionMessage.Transaction.newBuilder(transactions_).mergeFrom(value).buildPartial();
-          } else {
-            transactions_ = value;
-          }
+          ensureTransactionsIsMutable();
+          transactions_.add(index, builderForValue.build());
           onChanged();
         } else {
-          transactionsBuilder_.mergeFrom(value);
+          transactionsBuilder_.addMessage(index, builderForValue.build());
         }
-
         return this;
       }
       /**
-       * <code>.Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 5;</code>
+       */
+      public Builder addAllTransactions(
+          Iterable<? extends TransactionMessage.Transaction> values) {
+        if (transactionsBuilder_ == null) {
+          ensureTransactionsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, transactions_);
+          onChanged();
+        } else {
+          transactionsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
        */
       public Builder clearTransactions() {
         if (transactionsBuilder_ == null) {
-          transactions_ = null;
+          transactions_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000010);
           onChanged();
         } else {
-          transactions_ = null;
-          transactionsBuilder_ = null;
+          transactionsBuilder_.clear();
         }
-
         return this;
       }
       /**
-       * <code>.Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 5;</code>
        */
-      public TransactionMessage.Transaction.Builder getTransactionsBuilder() {
-
-        onChanged();
-        return getTransactionsFieldBuilder().getBuilder();
+      public Builder removeTransactions(int index) {
+        if (transactionsBuilder_ == null) {
+          ensureTransactionsIsMutable();
+          transactions_.remove(index);
+          onChanged();
+        } else {
+          transactionsBuilder_.remove(index);
+        }
+        return this;
       }
       /**
-       * <code>.Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 5;</code>
        */
-      public TransactionMessage.TransactionOrBuilder getTransactionsOrBuilder() {
-        if (transactionsBuilder_ != null) {
-          return transactionsBuilder_.getMessageOrBuilder();
-        } else {
-          return transactions_ == null ?
-              TransactionMessage.Transaction.getDefaultInstance() : transactions_;
+      public TransactionMessage.Transaction.Builder getTransactionsBuilder(
+          int index) {
+        return getTransactionsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+       */
+      public TransactionMessage.TransactionOrBuilder getTransactionsOrBuilder(
+          int index) {
+        if (transactionsBuilder_ == null) {
+          return transactions_.get(index);  } else {
+          return transactionsBuilder_.getMessageOrBuilder(index);
         }
       }
       /**
-       * <code>.Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 5;</code>
        */
-      private com.google.protobuf.SingleFieldBuilderV3<
+      public java.util.List<? extends TransactionMessage.TransactionOrBuilder>
+           getTransactionsOrBuilderList() {
+        if (transactionsBuilder_ != null) {
+          return transactionsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(transactions_);
+        }
+      }
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+       */
+      public TransactionMessage.Transaction.Builder addTransactionsBuilder() {
+        return getTransactionsFieldBuilder().addBuilder(
+            TransactionMessage.Transaction.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+       */
+      public TransactionMessage.Transaction.Builder addTransactionsBuilder(
+          int index) {
+        return getTransactionsFieldBuilder().addBuilder(
+            index, TransactionMessage.Transaction.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+       */
+      public java.util.List<TransactionMessage.Transaction.Builder>
+           getTransactionsBuilderList() {
+        return getTransactionsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder>
           getTransactionsFieldBuilder() {
         if (transactionsBuilder_ == null) {
-          transactionsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+          transactionsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder>(
-                  getTransactions(),
+                  transactions_,
+                  ((bitField0_ & 0x00000010) == 0x00000010),
                   getParentForChildren(),
                   isClean());
           transactions_ = null;
@@ -989,7 +1167,7 @@ public final class BlockMessage {
       "ck\022\021\n\tblockSize\030\001 \001(\003\022\023\n\013blockHeight\030\002 \001" +
       "(\003\022!\n\013blockHeader\030\003 \001(\0132\014.BlockHeader\022\030\n" +
       "\020transactionCount\030\004 \001(\005\022\"\n\014transactions\030" +
-      "\005 \001(\0132\014.TransactionB\"\n\022com.passport.prot" +
+      "\005 \003(\0132\014.TransactionB\"\n\022com.passport.prot" +
       "oB\014BlockMessageb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =

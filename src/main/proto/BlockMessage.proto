@@ -9,5 +9,5 @@ message Block {
     int64 blockHeight = 2;
     BlockHeader blockHeader = 3;
     int32 transactionCount = 4;
-    Transaction transactions = 5;
+    repeated Transaction transactions = 5;
 }

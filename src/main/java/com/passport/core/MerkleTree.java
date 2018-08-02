@@ -1,6 +1,7 @@
 package com.passport.core;
 
-import com.passport.utils.GsonUtils;
+import com.passport.crypto.eth.Hash;
+import com.passport.utils.rpc.SerializationUtil;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -59,9 +60,10 @@ public class MerkleTree {
       trans.setValue(transaction.getValue());
       trans.setExtarData(transaction.getExtarData());
       trans.setTime(transaction.getTime());
-      String hash = GsonUtils.toJson(trans);
+      trans.setSignature(transaction.getSignature());
+      trans.setHash(Hash.sha3(SerializationUtil.serialize(trans)));//使用keccak-256算法
 
-      tree.add(hash.getBytes());
+      tree.add(SerializationUtil.serialize(trans));
     }
     // Offset in the list where the currently processed level starts.
     int levelOffset = 0;

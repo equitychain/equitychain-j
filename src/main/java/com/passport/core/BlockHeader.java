@@ -1,5 +1,8 @@
 package com.passport.core;
 
+import com.passport.crypto.eth.Hash;
+import com.passport.utils.rpc.SerializationUtil;
+
 /**
  * 区块头信息
  * @author: xujianfeng
@@ -41,5 +44,13 @@ public class BlockHeader {
 
     public void setHash(byte[] hash) {
         this.hash = hash;
+    }
+
+    public void calculateHash () {
+        BlockHeader blockHeader = new BlockHeader();
+        blockHeader.setTimeStamp(this.timeStamp);
+        blockHeader.setHashPrevBlock(this.hashPrevBlock);
+        blockHeader.setHashMerkleRoot(this.hashMerkleRoot);
+        this.hash = Hash.sha3(SerializationUtil.serialize(blockHeader));
     }
 }

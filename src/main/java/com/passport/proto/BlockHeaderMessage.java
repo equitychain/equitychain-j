@@ -32,6 +32,11 @@ public final class BlockHeaderMessage {
      * <code>bytes hashMerkleRoot = 3;</code>
      */
     com.google.protobuf.ByteString getHashMerkleRoot();
+
+    /**
+     * <code>bytes hash = 4;</code>
+     */
+    com.google.protobuf.ByteString getHash();
   }
   /**
    * Protobuf type {@code BlockHeader}
@@ -48,6 +53,7 @@ public final class BlockHeaderMessage {
       timeStamp_ = 0L;
       hashPrevBlock_ = com.google.protobuf.ByteString.EMPTY;
       hashMerkleRoot_ = com.google.protobuf.ByteString.EMPTY;
+      hash_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @Override
@@ -88,6 +94,11 @@ public final class BlockHeaderMessage {
             case 26: {
 
               hashMerkleRoot_ = input.readBytes();
+              break;
+            }
+            case 34: {
+
+              hash_ = input.readBytes();
               break;
             }
           }
@@ -140,6 +151,15 @@ public final class BlockHeaderMessage {
       return hashMerkleRoot_;
     }
 
+    public static final int HASH_FIELD_NUMBER = 4;
+    private com.google.protobuf.ByteString hash_;
+    /**
+     * <code>bytes hash = 4;</code>
+     */
+    public com.google.protobuf.ByteString getHash() {
+      return hash_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -161,6 +181,9 @@ public final class BlockHeaderMessage {
       if (!hashMerkleRoot_.isEmpty()) {
         output.writeBytes(3, hashMerkleRoot_);
       }
+      if (!hash_.isEmpty()) {
+        output.writeBytes(4, hash_);
+      }
     }
 
     public int getSerializedSize() {
@@ -179,6 +202,10 @@ public final class BlockHeaderMessage {
       if (!hashMerkleRoot_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(3, hashMerkleRoot_);
+      }
+      if (!hash_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(4, hash_);
       }
       memoizedSize = size;
       return size;
@@ -202,6 +229,8 @@ public final class BlockHeaderMessage {
           .equals(other.getHashPrevBlock());
       result = result && getHashMerkleRoot()
           .equals(other.getHashMerkleRoot());
+      result = result && getHash()
+          .equals(other.getHash());
       return result;
     }
 
@@ -219,6 +248,8 @@ public final class BlockHeaderMessage {
       hash = (53 * hash) + getHashPrevBlock().hashCode();
       hash = (37 * hash) + HASHMERKLEROOT_FIELD_NUMBER;
       hash = (53 * hash) + getHashMerkleRoot().hashCode();
+      hash = (37 * hash) + HASH_FIELD_NUMBER;
+      hash = (53 * hash) + getHash().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -354,6 +385,8 @@ public final class BlockHeaderMessage {
 
         hashMerkleRoot_ = com.google.protobuf.ByteString.EMPTY;
 
+        hash_ = com.google.protobuf.ByteString.EMPTY;
+
         return this;
       }
 
@@ -379,6 +412,7 @@ public final class BlockHeaderMessage {
         result.timeStamp_ = timeStamp_;
         result.hashPrevBlock_ = hashPrevBlock_;
         result.hashMerkleRoot_ = hashMerkleRoot_;
+        result.hash_ = hash_;
         onBuilt();
         return result;
       }
@@ -428,6 +462,9 @@ public final class BlockHeaderMessage {
         }
         if (other.getHashMerkleRoot() != com.google.protobuf.ByteString.EMPTY) {
           setHashMerkleRoot(other.getHashMerkleRoot());
+        }
+        if (other.getHash() != com.google.protobuf.ByteString.EMPTY) {
+          setHash(other.getHash());
         }
         onChanged();
         return this;
@@ -538,6 +575,35 @@ public final class BlockHeaderMessage {
         onChanged();
         return this;
       }
+
+      private com.google.protobuf.ByteString hash_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes hash = 4;</code>
+       */
+      public com.google.protobuf.ByteString getHash() {
+        return hash_;
+      }
+      /**
+       * <code>bytes hash = 4;</code>
+       */
+      public Builder setHash(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+
+        hash_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes hash = 4;</code>
+       */
+      public Builder clearHash() {
+
+        hash_ = getDefaultInstance().getHash();
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -601,10 +667,11 @@ public final class BlockHeaderMessage {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\030BlockHeaderMessage.proto\"O\n\013BlockHeade" +
+      "\n\030BlockHeaderMessage.proto\"]\n\013BlockHeade" +
       "r\022\021\n\ttimeStamp\030\001 \001(\003\022\025\n\rhashPrevBlock\030\002 " +
-      "\001(\014\022\026\n\016hashMerkleRoot\030\003 \001(\014B(\n\022com.passp" +
-      "ort.protoB\022BlockHeaderMessageb\006proto3"
+      "\001(\014\022\026\n\016hashMerkleRoot\030\003 \001(\014\022\014\n\004hash\030\004 \001(" +
+      "\014B(\n\022com.passport.protoB\022BlockHeaderMess" +
+      "ageb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -623,7 +690,7 @@ public final class BlockHeaderMessage {
     internal_static_BlockHeader_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_BlockHeader_descriptor,
-        new String[] { "TimeStamp", "HashPrevBlock", "HashMerkleRoot", });
+        new String[] { "TimeStamp", "HashPrevBlock", "HashMerkleRoot", "Hash", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -1,5 +1,6 @@
 package com.passport.core;
 
+import com.passport.utils.rpc.SerializationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,5 +64,30 @@ public class Block {
 
   public void setBlockHeight(Long blockHeight) {
     this.blockHeight = blockHeight;
+  }
+
+  //计算block对象缺少的字段值,且返回区块hash
+  public byte[] calculateFieldValueWithHash(){
+    //生成merkleTree
+    MerkleTree merkleTree = new MerkleTree(transactions);
+    List<byte[]> bytes = merkleTree.buildMerkleTree();
+    //设置merkleRoot
+    if(bytes.size() > 0){
+      blockHeader.setHashMerkleRoot(bytes.get(bytes.size() - 1));
+    }
+
+    //生成区块hash
+    blockHeader.calculateHash();
+
+    //计算区块大小(除blockSize都需要计算)
+    Block block = new Block();
+    block.setBlockHeader(this.getBlockHeader());
+    block.setTransactionCount(this.getTransactionCount());
+    block.setTransactions(this.getTransactions());
+    block.setBlockHeight(this.getBlockHeight());
+    byte[] blockByte = SerializationUtil.serialize(block);
+    this.blockSize = Long.valueOf(blockByte.length);
+
+    return blockHeader.getHash();
   }
 }
