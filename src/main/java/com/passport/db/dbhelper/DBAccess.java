@@ -120,4 +120,8 @@ public interface DBAccess {
 	 * @return
 	 */
 	Optional<Transaction> getTransaction(String txHash);
+
+	Optional<Account> getMinerAccount();
+
+	boolean putMinerAccount(Account account);
 }

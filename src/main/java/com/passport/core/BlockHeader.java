@@ -13,6 +13,7 @@ public class BlockHeader {
     private byte[] hashPrevBlock;
     private byte[] hashMerkleRoot;
     private byte[] hash;
+    private byte[] version;
 
     public Long getTimeStamp() {
         return timeStamp;
@@ -44,6 +45,14 @@ public class BlockHeader {
 
     public void setHash(byte[] hash) {
         this.hash = hash;
+    }
+
+    public byte[] getVersion(){
+        return version;
+    }
+
+    public void setVersion(byte[] version) {
+        this.version = version;
     }
 
     public void calculateHash () {
