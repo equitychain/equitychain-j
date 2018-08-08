@@ -17,13 +17,18 @@ import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.LockUtil;
 import com.passport.utils.eth.ByteUtil;
+import org.rocksdb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.security.PrivateKey;
+import java.util.*;
+import java.util.Comparator;
 
 /**
  * 处理
@@ -33,12 +38,11 @@ import java.security.PrivateKey;
 @Component
 public class TransactionHandler {
     private static final Logger logger = LoggerFactory.getLogger(TransactionHandler.class);
-
     @Autowired
     private DBAccess dbAccess;
     @Autowired
     private ApplicationContextProvider provider;
-
+    private HashMap<byte[], BigDecimal> eggUsedTemp = new HashMap<>();
     /**
      * 发送交易，等待其它节点确认
      * @param payAddress
@@ -115,11 +119,12 @@ public class TransactionHandler {
      * @param currentBlock
      */
     public void exec(Block currentBlock) {
+        //需要清空，不然会冗余很多
+        eggUsedTemp.clear();
         for (Transaction transaction : currentBlock.getTransactions()) {
             String receiptAddress = new String(transaction.getReceiptAddress());//收款地址
             String payAddress = new String(transaction.getPayAddress());//付款地址
             BigDecimal valueBigDecimal = CastUtils.castBigDecimal(new String(transaction.getValue()));//交易金额
-
             //收款账户
             Optional<Account> receiptOptional = dbAccess.getAccount(receiptAddress);
             if (!receiptOptional.isPresent()) {//可能暂时没有同步过来，先构造一个Account对象
@@ -167,6 +172,62 @@ public class TransactionHandler {
             accountReceipt.setBalance(accountReceipt.getBalance().add(valueBigDecimal));
             dbAccess.putAccount(accountPay);
             dbAccess.putAccount(accountReceipt);
+
         }
+    }
+
+    //获取预估的流水集合 为什么是预估的，因为不知道在执行流水的时候会不会失败
+    public List<Transaction> getBlockTrans(List<Transaction> unconfirmTrans,BigDecimal blockMaxEgg){
+        List<Transaction> transactions = new ArrayList<>();
+        //排序 gasPrice大的排前面
+        Collections.sort(unconfirmTrans,new Comparator<Transaction>(){
+            @Override
+            public int compare(Transaction o1, Transaction o2) {
+                BigDecimal price1 = new BigDecimal(new String(o1.getEggPrice()));
+                BigDecimal price2 = new BigDecimal(new String(o2.getEggPrice()));
+                return price2.compareTo(price1);
+            }
+        });
+        for (Transaction tran : unconfirmTrans) {
+            //流水的gas消耗
+            BigDecimal eggUsed = getEggUsedByTrans(tran);
+            //只要流水的egg和区块的egg足够就能够进行打包
+            if(eggUsed.compareTo(BigDecimal.ZERO)> 0 && blockMaxEgg.compareTo(eggUsed)>=0 ){
+                System.out.println("======add======="+eggUsed);
+                transactions.add(tran);
+                eggUsedTemp.put(tran.getHash(),eggUsed);
+                blockMaxEgg = blockMaxEgg.subtract(eggUsed);
+                if(blockMaxEgg.compareTo(BigDecimal.ZERO) == 0){
+                    break;
+                }
+            }
+        }
+        return transactions;
+    }
+    //打包流水消耗的egg
+    public BigDecimal getEggUsedByTrans(Transaction transaction){
+        //TODO
+        //计算损耗egg，更新流水的eggUsed  注意，要确保流水的limit要大于或等于used
+        long begin = System.currentTimeMillis();
+        try {
+            Thread.sleep(3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        long end = System.currentTimeMillis();
+        BigDecimal eggUsed = new BigDecimal(new String(transaction.getEggUsed()));
+        BigDecimal eggMax = new BigDecimal(new String(transaction.getEggMax()));
+        BigDecimal curUse = new BigDecimal(end-begin);
+        if(eggMax.compareTo(eggUsed.add(curUse)) >= 0){
+            //消耗燃料
+            transaction.setEggUsed(eggUsed.add(curUse).toString().getBytes());
+            System.out.println("======test=======");
+            return curUse;
+        }else {
+            return BigDecimal.ZERO;
+        }
+    }
+    public BigDecimal getTempEggByHash(byte[] transHash){
+        return eggUsedTemp.get(transHash);
     }
 }

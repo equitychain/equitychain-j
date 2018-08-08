@@ -43,6 +43,9 @@ public class Transaction {
 
   private byte[] publicKey;
 
+  private byte[] eggUsed;
+  //流水状态（等待 0， 成功 1， 失败 2）
+  private Integer status;
 
   public Integer getNonce() {
     return nonce;
@@ -130,6 +133,22 @@ public class Transaction {
 
   public void setPublicKey(byte[] publicKey) {
     this.publicKey = publicKey;
+  }
+
+  public byte[] getEggUsed() {
+    return eggUsed;
+  }
+
+  public void setEggUsed(byte[] eggUsed) {
+    this.eggUsed = eggUsed;
+  }
+
+  public Integer getStatus() {
+    return status;
+  }
+
+  public void setStatus(Integer status) {
+    this.status = status;
   }
 
   public Transaction(Integer nonce, byte[] hash, byte[] signature, byte[] value, byte[] payAddress,

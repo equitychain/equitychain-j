@@ -70,8 +70,24 @@ public class MinerHandler {
         }
         //完成共识，打包交易流水
         List<Transaction> transactions = dbAccess.listUnconfirmTransactions();
-        transactions.forEach((Transaction trans) -> {
-            currentBlock.getTransactions().add(trans);
+//        transactions.forEach((Transaction trans) -> {
+//            currentBlock.getTransactions().add(trans);
+//        });
+        List<Transaction> blockTrans = transactionHandler.getBlockTrans(transactions,new BigDecimal(currentBlockHeader.getEggMax()));
+        blockTrans.forEach((tran)->{
+            //矿工费付给矿工  注意!无论流水是否成功被打包该矿工费是必须给的,因为已经扣了,
+            Transaction feeTrans = new Transaction();
+            feeTrans.setTime(ByteUtil.longToBytesNoLeadZeroes(System.currentTimeMillis()));
+            feeTrans.setExtarData("流水矿工费获得".getBytes());
+            BigDecimal valueDec = transactionHandler.getTempEggByHash(tran.getHash());
+            valueDec = valueDec == null?BigDecimal.ZERO:valueDec;
+            feeTrans.setValue(String.valueOf(valueDec).getBytes());
+            if(minerAccount.isPresent()){
+                feeTrans.setReceiptAddress(minerAccount.get().getAddress().getBytes());
+            }
+            //添加奖励和需要确认的流水
+            currentBlock.getTransactions().add(feeTrans);
+            currentBlock.getTransactions().add(tran);
         });
 
         //执行流水

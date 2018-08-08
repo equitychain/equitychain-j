@@ -14,6 +14,7 @@ public class BlockHeader {
     private byte[] hashMerkleRoot;
     private byte[] hash;
     private byte[] version;
+    private long eggMax;
 
     public Long getTimeStamp() {
         return timeStamp;
@@ -55,6 +56,13 @@ public class BlockHeader {
         this.version = version;
     }
 
+    public long getEggMax() {
+        return eggMax;
+    }
+
+    public void setEggMax(long eggMax) {
+        this.eggMax = eggMax;
+    }
 
     public void calculateHash () {
         BlockHeader blockHeader = new BlockHeader();
