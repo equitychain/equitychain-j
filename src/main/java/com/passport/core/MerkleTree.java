@@ -1,8 +1,5 @@
 package com.passport.core;
 
-import com.passport.crypto.eth.Hash;
-import com.passport.utils.rpc.SerializationUtil;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -54,17 +51,7 @@ public class MerkleTree {
     // Start by adding all the hashes of the transactions as leaves of the tree.
 
     for (Transaction transaction : transactions) {
-      //tree.add(t.getHash().getBytes());
-      Transaction trans = new Transaction();
-      trans.setPayAddress(transaction.getPayAddress());
-      trans.setReceiptAddress(transaction.getReceiptAddress());
-      trans.setValue(transaction.getValue());
-      trans.setExtarData(transaction.getExtarData());
-      trans.setTime(transaction.getTime());
-      trans.setSignature(transaction.getSignature());
-      trans.setHash(Hash.sha3(SerializationUtil.serialize(trans)));//使用keccak-256算法
-
-      tree.add(SerializationUtil.serialize(trans));
+      tree.add(transaction.getHash());
     }
     // Offset in the list where the currently processed level starts.
     int levelOffset = 0;

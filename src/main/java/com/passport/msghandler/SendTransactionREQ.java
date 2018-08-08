@@ -46,7 +46,7 @@ public class SendTransactionREQ extends Strategy {
             boolean flag = ECDSAUtil.verifyECDSASig(publicKey, transactionJson, transaction.getSignature().toByteArray());
             if(flag){
                 //放到交易流水里面
-                Optional<Transaction> transactionOptional = dbAccess.getTransaction(transaction.getHash().toString());
+                Optional<Transaction> transactionOptional = dbAccess.getUnconfirmTransaction(transaction.getHash().toString());
                 if(!transactionOptional.isPresent()){
                     trans.setHash(transaction.getHash().toByteArray());
                 }

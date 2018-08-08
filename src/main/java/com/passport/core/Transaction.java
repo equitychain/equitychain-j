@@ -41,6 +41,9 @@ public class Transaction {
 
   private byte[] extarData;
 
+  private byte[] publicKey;
+
+
   public Integer getNonce() {
     return nonce;
   }
@@ -119,6 +122,14 @@ public class Transaction {
 
   public void setExtarData(byte[] extarData) {
     this.extarData = extarData;
+  }
+
+  public byte[] getPublicKey() {
+    return publicKey;
+  }
+
+  public void setPublicKey(byte[] publicKey) {
+    this.publicKey = publicKey;
   }
 
   public Transaction(Integer nonce, byte[] hash, byte[] signature, byte[] value, byte[] payAddress,

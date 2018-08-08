@@ -1,8 +1,9 @@
 package com.passport.web;
 
+import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
-import com.passport.miner.DPOSMiner;
+import com.passport.webhandler.MinerHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,11 +21,13 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/chain")
 public class BlockController {
     @Autowired
-    private DPOSMiner dposMiner;
+    private MinerHandler minerHandler;
+    @Autowired
+    private DBAccess dbAccess;
 
     @GetMapping("/mine")
     public ResultDto mine(HttpServletRequest request) throws Exception {
-        dposMiner.mining();
+        minerHandler.mining();
         return new ResultDto(ResultEnum.SUCCESS);
     }
 }

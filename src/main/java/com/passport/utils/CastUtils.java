@@ -2,6 +2,8 @@ package com.passport.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
+
 /**
  * 转换工具
  * @author 作者xujianfeng 
@@ -15,7 +17,27 @@ public class CastUtils {
 	public static String castString(Object obj, String defaultValue){
 		return obj != null ? String.valueOf(obj) :defaultValue;
 	}
-	
+
+	public static BigDecimal castBigDecimal(Object obj){
+		return CastUtils.castBigDecimal(obj, BigDecimal.ZERO);
+	}
+
+	public static BigDecimal castBigDecimal(Object obj, BigDecimal defaultValue){
+		BigDecimal bigDecimalValue = defaultValue;
+		if(obj != null){
+			String strValue = castString(obj);
+			if(StringUtils.isNotEmpty(strValue)){
+				try {
+					bigDecimalValue = new BigDecimal(strValue);
+				} catch (NumberFormatException e) {
+					bigDecimalValue = defaultValue;
+				}
+			}
+		}
+
+		return bigDecimalValue;
+	}
+
 	public static double castDouble(Object obj){
 		return CastUtils.castDouble(obj, 0);
 	}

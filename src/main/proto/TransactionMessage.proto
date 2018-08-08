@@ -12,4 +12,5 @@ message Transaction {
     bytes eggMax = 7;
     int64 timeStamp = 8;
     bytes extarData = 9;
+    bytes publicKey = 10;
 }

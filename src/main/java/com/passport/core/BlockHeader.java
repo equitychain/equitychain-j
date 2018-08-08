@@ -54,6 +54,8 @@ public class BlockHeader {
     public void setVersion(byte[] version) {
         this.version = version;
     }
+
+
     public void calculateHash () {
         BlockHeader blockHeader = new BlockHeader();
         blockHeader.setTimeStamp(this.timeStamp);

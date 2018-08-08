@@ -108,18 +108,38 @@ public interface DBAccess {
 	Optional<Account> getAccount(String address);
 
 	/**
-	 * 添加一条流水记录
+	 * 添加一条未确认流水记录
 	 * @param transaction
 	 * @return
 	 */
-	boolean putTransaction(Transaction transaction);
+	boolean putUnconfirmTransaction(Transaction transaction);
 
 	/**
-	 * 获取指定流水
+	 * 获取指定未确认流水
 	 * @param txHash
 	 * @return
 	 */
-	Optional<Transaction> getTransaction(String txHash);
+	Optional<Transaction> getUnconfirmTransaction(String txHash);
+
+	/**
+	 * 未确认流水列表
+	 * @return
+	 */
+	public List<Transaction> listUnconfirmTransactions();
+
+	/**
+	 * 添加一条已确认流水记录
+	 * @param transaction
+	 * @return
+	 */
+	boolean putConfirmTransaction(Transaction transaction);
+
+	/**
+	 * 获取指定已确认流水
+	 * @param txHash
+	 * @return
+	 */
+	Optional<Transaction> getConfirmTransaction(String txHash);
 
 	Optional<Account> getMinerAccount();
 
