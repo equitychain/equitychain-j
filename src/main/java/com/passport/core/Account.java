@@ -1,7 +1,5 @@
 package com.passport.core;
 
-import com.passport.crypto.eth.ECKeyPair;
-
 import java.math.BigDecimal;
 
 /**
@@ -10,24 +8,24 @@ import java.math.BigDecimal;
  * @create: 2018-07-26 11:20
  **/
 public class Account {
-    private String address;//公钥
+    private String address;//地址
     private String privateKey;//私钥
     private BigDecimal balance;//余额
+    private String password;//交易密码
 
     public Account() {
 
+    }
+
+    public Account(String address, BigDecimal balance) {
+        this.address = address;
+        this.balance = balance;
     }
 
     public Account(String address, String privateKey, BigDecimal balance) {
         this.address = address;
         this.privateKey = privateKey;
         this.balance = balance;
-    }
-
-    public void newAccount(ECKeyPair keyPair){
-
-
-        balance = BigDecimal.ZERO;
     }
 
     public String getAddress() {
@@ -52,5 +50,13 @@ public class Account {
 
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

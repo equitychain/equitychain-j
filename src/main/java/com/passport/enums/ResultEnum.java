@@ -18,7 +18,10 @@ public enum ResultEnum {
 
 	//***账户***
 	ACCOUNT_NOT_EXISTS(1001, "账户不存在"),
-	ACCOUNT_IS_LOCKED(1002, "账户未解锁");
+	ACCOUNT_IS_LOCKED(1002, "账户未解锁"),
+	PASSWORD_WRONG(1003, "交易密码错误"),
+	ADDRESS_ILLEGAL(1004, "钱包地址不合法"),
+	BALANCE_NOTENOUGH(5, "钱包地址不合法");
 	//***账户***
 
 	private int code;

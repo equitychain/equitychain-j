@@ -31,8 +31,10 @@ public class RocksDBAccess implements DBAccess {
 	private static final String CLIENT_NODES_LIST_KEY = "client-node-list";
 	//钱包数据存储hash桶前缀
 	public static final String WALLETS_BUCKET_PREFIX = "wallets_";
-	//交易流水存储hash桶前缀
-	public static final String TRANSACTIONS_BUCKET_PREFIX = "transactions_";
+	//未确认交易流水存储hash桶前缀
+	public static final String UNCONFIRM_TRANSACTIONS_BUCKET_PREFIX = "unconfirm_transactions_";
+	//已确认交易流水存储hash桶前缀
+	public static final String CONFIRM_TRANSACTIONS_BUCKET_PREFIX = "confirm_transactions_";
     //用户自己设置的挖矿账号
     public static final String MINERACCOUNT = "miner-account";
 
@@ -181,13 +183,37 @@ public class RocksDBAccess implements DBAccess {
 	}
 
 	@Override
-	public boolean putTransaction(Transaction transaction) {
-		return this.put(TRANSACTIONS_BUCKET_PREFIX + transaction.getHash().toString(), transaction);
+	public boolean putUnconfirmTransaction(Transaction transaction) {
+		return this.put(UNCONFIRM_TRANSACTIONS_BUCKET_PREFIX + transaction.getHash(), transaction);
 	}
 
 	@Override
-	public Optional<Transaction> getTransaction(String txHash) {
-		Optional<Object> object = this.get(TRANSACTIONS_BUCKET_PREFIX + txHash);
+	public Optional<Transaction> getUnconfirmTransaction(String txHash) {
+		Optional<Object> object = this.get(UNCONFIRM_TRANSACTIONS_BUCKET_PREFIX + txHash);
+		if (object.isPresent()) {
+			return Optional.of((Transaction) object.get());
+		}
+		return Optional.absent();
+	}
+
+	@Override
+	public List<Transaction> listUnconfirmTransactions() {
+		List<Object> objects = seekByKey(UNCONFIRM_TRANSACTIONS_BUCKET_PREFIX);
+		List<Transaction> transactions = new ArrayList<>();
+		for (Object o : objects) {
+			transactions.add((Transaction) o);
+		}
+		return transactions;
+	}
+
+	@Override
+	public boolean putConfirmTransaction(Transaction transaction) {
+		return this.put(CONFIRM_TRANSACTIONS_BUCKET_PREFIX + transaction.getHash().toString(), transaction);
+	}
+
+	@Override
+	public Optional<Transaction> getConfirmTransaction(String txHash) {
+		Optional<Object> object = this.get(CONFIRM_TRANSACTIONS_BUCKET_PREFIX + txHash);
 		if (object.isPresent()) {
 			return Optional.of((Transaction) object.get());
 		}

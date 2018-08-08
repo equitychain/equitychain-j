@@ -62,6 +62,11 @@ public final class TransactionMessage {
      * <code>bytes extarData = 9;</code>
      */
     com.google.protobuf.ByteString getExtarData();
+
+    /**
+     * <code>bytes publicKey = 10;</code>
+     */
+    com.google.protobuf.ByteString getPublicKey();
   }
   /**
    * Protobuf type {@code Transaction}
@@ -84,6 +89,7 @@ public final class TransactionMessage {
       eggMax_ = com.google.protobuf.ByteString.EMPTY;
       timeStamp_ = 0L;
       extarData_ = com.google.protobuf.ByteString.EMPTY;
+      publicKey_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @Override
@@ -154,6 +160,11 @@ public final class TransactionMessage {
             case 74: {
 
               extarData_ = input.readBytes();
+              break;
+            }
+            case 82: {
+
+              publicKey_ = input.readBytes();
               break;
             }
           }
@@ -260,6 +271,15 @@ public final class TransactionMessage {
       return extarData_;
     }
 
+    public static final int PUBLICKEY_FIELD_NUMBER = 10;
+    private com.google.protobuf.ByteString publicKey_;
+    /**
+     * <code>bytes publicKey = 10;</code>
+     */
+    public com.google.protobuf.ByteString getPublicKey() {
+      return publicKey_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -298,6 +318,9 @@ public final class TransactionMessage {
       }
       if (!extarData_.isEmpty()) {
         output.writeBytes(9, extarData_);
+      }
+      if (!publicKey_.isEmpty()) {
+        output.writeBytes(10, publicKey_);
       }
     }
 
@@ -342,6 +365,10 @@ public final class TransactionMessage {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(9, extarData_);
       }
+      if (!publicKey_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(10, publicKey_);
+      }
       memoizedSize = size;
       return size;
     }
@@ -376,6 +403,8 @@ public final class TransactionMessage {
           == other.getTimeStamp());
       result = result && getExtarData()
           .equals(other.getExtarData());
+      result = result && getPublicKey()
+          .equals(other.getPublicKey());
       return result;
     }
 
@@ -405,6 +434,8 @@ public final class TransactionMessage {
           getTimeStamp());
       hash = (37 * hash) + EXTARDATA_FIELD_NUMBER;
       hash = (53 * hash) + getExtarData().hashCode();
+      hash = (37 * hash) + PUBLICKEY_FIELD_NUMBER;
+      hash = (53 * hash) + getPublicKey().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -552,6 +583,8 @@ public final class TransactionMessage {
 
         extarData_ = com.google.protobuf.ByteString.EMPTY;
 
+        publicKey_ = com.google.protobuf.ByteString.EMPTY;
+
         return this;
       }
 
@@ -583,6 +616,7 @@ public final class TransactionMessage {
         result.eggMax_ = eggMax_;
         result.timeStamp_ = timeStamp_;
         result.extarData_ = extarData_;
+        result.publicKey_ = publicKey_;
         onBuilt();
         return result;
       }
@@ -650,6 +684,9 @@ public final class TransactionMessage {
         }
         if (other.getExtarData() != com.google.protobuf.ByteString.EMPTY) {
           setExtarData(other.getExtarData());
+        }
+        if (other.getPublicKey() != com.google.protobuf.ByteString.EMPTY) {
+          setPublicKey(other.getPublicKey());
         }
         onChanged();
         return this;
@@ -934,6 +971,35 @@ public final class TransactionMessage {
         onChanged();
         return this;
       }
+
+      private com.google.protobuf.ByteString publicKey_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes publicKey = 10;</code>
+       */
+      public com.google.protobuf.ByteString getPublicKey() {
+        return publicKey_;
+      }
+      /**
+       * <code>bytes publicKey = 10;</code>
+       */
+      public Builder setPublicKey(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+
+        publicKey_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes publicKey = 10;</code>
+       */
+      public Builder clearPublicKey() {
+
+        publicKey_ = getDefaultInstance().getPublicKey();
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -997,13 +1063,13 @@ public final class TransactionMessage {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\030TransactionMessage.proto\"\261\001\n\013Transacti" +
+      "\n\030TransactionMessage.proto\"\304\001\n\013Transacti" +
       "on\022\014\n\004hash\030\001 \001(\014\022\021\n\tsignature\030\002 \001(\014\022\r\n\005v" +
       "alue\030\003 \001(\014\022\022\n\npayAddress\030\004 \001(\014\022\026\n\016receip" +
       "tAddress\030\005 \001(\014\022\020\n\010eggPrice\030\006 \001(\014\022\016\n\006eggM" +
       "ax\030\007 \001(\014\022\021\n\ttimeStamp\030\010 \001(\003\022\021\n\textarData" +
-      "\030\t \001(\014B(\n\022com.passport.protoB\022Transactio" +
-      "nMessageb\006proto3"
+      "\030\t \001(\014\022\021\n\tpublicKey\030\n \001(\014B(\n\022com.passpor" +
+      "t.protoB\022TransactionMessageb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1022,7 +1088,7 @@ public final class TransactionMessage {
     internal_static_Transaction_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Transaction_descriptor,
-        new String[] { "Hash", "Signature", "Value", "PayAddress", "ReceiptAddress", "EggPrice", "EggMax", "TimeStamp", "ExtarData", });
+        new String[] { "Hash", "Signature", "Value", "PayAddress", "ReceiptAddress", "EggPrice", "EggMax", "TimeStamp", "ExtarData", "PublicKey", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

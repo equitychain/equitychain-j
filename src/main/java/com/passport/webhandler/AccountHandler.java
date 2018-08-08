@@ -1,16 +1,14 @@
 package com.passport.webhandler;
 
+import com.google.common.base.Optional;
 import com.passport.core.Account;
 import com.passport.crypto.eth.ECKeyPair;
 import com.passport.crypto.eth.WalletUtils;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.exception.CipherException;
 import com.passport.listener.ApplicationContextProvider;
-import com.passport.utils.CheckUtils;
-import com.passport.utils.LockUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.common.base.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -41,9 +39,6 @@ public class AccountHandler {
      * @return 账号
      */
     public Account newAccount(String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, CipherException, IOException {
-        if(CheckUtils.checkParamIfEmpty(password)){
-            return null;
-        }
         File file = new File(walletDir);
         if (!file.exists()) {
             file.mkdir();
@@ -52,11 +47,13 @@ public class AccountHandler {
         //创建公私钥并生成keystore文件
         ECKeyPair keyPair = WalletUtils.generateNewWalletFile(password, new File(walletDir), true);
         Account account = new Account(keyPair.getAddress(), keyPair.exportPrivateKey(), BigDecimal.ZERO);
+        account.setPassword(password);
         if (dbAccess.putAccount(account)) {
             return account;
         }
         return null;
     }
+
     //用户设置挖矿账号
     public Account setMinerAccount(String address){
         Optional<Account> addAccount = dbAccess.getAccount(address);

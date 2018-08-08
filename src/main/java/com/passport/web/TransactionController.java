@@ -33,6 +33,7 @@ public class TransactionController {
         String receiptAddress = request.getParameter("receiptAddress");
         String value = request.getParameter("value");
         String extarData = request.getParameter("extarData");
+        String password = request.getParameter("password");
 
         //非空检验
         boolean flag = CheckUtils.checkParamIfEmpty(payAddress, receiptAddress, value, extarData);
@@ -40,7 +41,7 @@ public class TransactionController {
             return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
         }
 
-        Transaction transaction = transactionHandler.sendTransaction(payAddress, receiptAddress, value, extarData);
+        Transaction transaction = transactionHandler.sendTransaction(payAddress, receiptAddress, value, extarData, password);
         return new ResultDto(ResultEnum.SUCCESS.getCode(), transaction);
     }
 }
