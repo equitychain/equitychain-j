@@ -42,6 +42,7 @@ public class TransactionHandler {
     private DBAccess dbAccess;
     @Autowired
     private ApplicationContextProvider provider;
+    //todo 这是临时储存流水打包所消耗的egg，如果之后用多线程什么的这里需要进行更改储存方式
     private HashMap<byte[], BigDecimal> eggUsedTemp = new HashMap<>();
     /**
      * 发送交易，等待其它节点确认
@@ -176,10 +177,11 @@ public class TransactionHandler {
         }
     }
 
-    //获取预估的流水集合 为什么是预估的，因为不知道在执行流水的时候会不会失败
+    //获取需要打包的流水
     public List<Transaction> getBlockTrans(List<Transaction> unconfirmTrans,BigDecimal blockMaxEgg){
         List<Transaction> transactions = new ArrayList<>();
         //排序 gasPrice大的排前面
+        //todo 这里是根据利益最大化进行一个流水的筛选，要进行修改，这里我只根据eggPrice排
         Collections.sort(unconfirmTrans,new Comparator<Transaction>(){
             @Override
             public int compare(Transaction o1, Transaction o2) {
@@ -206,7 +208,7 @@ public class TransactionHandler {
     }
     //打包流水消耗的egg
     public BigDecimal getEggUsedByTrans(Transaction transaction){
-        //TODO
+        //TODO 这里的egg要那些参数计算，怎么计算
         //计算损耗egg，更新流水的eggUsed  注意，要确保流水的limit要大于或等于used
         long begin = System.currentTimeMillis();
         try {
@@ -220,6 +222,7 @@ public class TransactionHandler {
         BigDecimal curUse = new BigDecimal(end-begin);
         if(eggMax.compareTo(eggUsed.add(curUse)) >= 0){
             //消耗燃料
+            //todo 有个问题，就是未确认流水的已使用egg怎么让其他节点同步
             transaction.setEggUsed(eggUsed.add(curUse).toString().getBytes());
             System.out.println("======test=======");
             return curUse;

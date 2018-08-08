@@ -42,7 +42,8 @@ public class MinerHandler {
         BlockHeader currentBlockHeader = new BlockHeader();
         currentBlockHeader.setTimeStamp(System.currentTimeMillis());
         currentBlockHeader.setHashPrevBlock(prevBlock.getBlockHeader().getHash());
-
+        //todo 这里是设置区块最多能打包多少的流水egg消耗
+        currentBlockHeader.setEggMax(Long.parseLong("1000"));
         //创建挖矿奖励交易
         Transaction transaction = new Transaction();
         transaction.setTime(ByteUtil.longToBytesNoLeadZeroes(System.currentTimeMillis()));
