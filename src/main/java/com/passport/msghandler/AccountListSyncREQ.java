@@ -38,11 +38,11 @@ public class AccountListSyncREQ extends Strategy {
             builder.setAddress(ByteString.copyFrom(account.getAddress().getBytes()));
             builder.setPrivateKey(ByteString.copyFrom(account.getPrivateKey().getBytes()));
             builder.setBalance(ByteString.copyFrom(String.valueOf(account.getBalance()).getBytes()));
-            dataBuilder.addAccounts(builder);
+            dataBuilder.addAccounts(builder.build());
         }
 
         NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
-        builder.setData(dataBuilder);
+        builder.setData(dataBuilder.build());
         builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
         System.out.println(builder.getData().getAccountsList().size());
 

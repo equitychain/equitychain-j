@@ -15,7 +15,6 @@ import com.passport.exception.CommonException;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
-import com.passport.utils.LockUtil;
 import com.passport.utils.eth.ByteUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,34 +48,34 @@ public class TransactionHandler {
      */
     public Transaction sendTransaction(String payAddress, String receiptAddress, String value, String extarData, String password) throws CommonException {
         //判断是否解锁
-        if(LockUtil.isUnlock(payAddress)) {
+        //if(LockUtil.isUnlock(payAddress)) {
+        if(true) {
             //1.支付地址,接收地址是否合法 TODO 正则校验
-            if (!WalletUtils.isValidAddress(payAddress)) {
+            if (!WalletUtils.isValidAddress(payAddress) && !WalletUtils.isValidAddress(receiptAddress)) {
                 throw new CommonException(ResultEnum.ADDRESS_ILLEGAL);
             }
 
             //2.支付地址、接收地址是否已经创建、支付方交易密码是否正确
-            Account accountPay = null;
             Optional<Account> accountPayOptional = dbAccess.getAccount(payAddress);
             Optional<Account> accountReceiptOptional = dbAccess.getAccount(receiptAddress);
             if(!accountPayOptional.isPresent()){
                 throw new CommonException(ResultEnum.PASSWORD_WRONG);
-            }else{
-                accountPay = accountPayOptional.get();
-                if(!password.equals(accountPay.getPassword())){
-                    throw new CommonException(ResultEnum.ACCOUNT_NOT_EXISTS);
-                }
             }
-            if(!accountReceiptOptional.isPresent()){
+            Account accountPay = accountPayOptional.get();
+            if(!password.equals(accountPay.getPassword())){
                 throw new CommonException(ResultEnum.ACCOUNT_NOT_EXISTS);
             }
+
+            /*if(!accountReceiptOptional.isPresent()){
+                throw new CommonException(ResultEnum.ACCOUNT_NOT_EXISTS);
+            }*/
 
             //3.支付地址不在本节点创建，没有私钥文件，不能执行转账 TODO 修改私钥的保存形式
 
             //4.余额是否足够支付（使用account的余额还是最后一条确认流水检查余额是否足够支付）TODO
-            if(accountPay.getBalance().compareTo(CastUtils.castBigDecimal(value)) != -1){
+            /*if(accountPay.getBalance().compareTo(CastUtils.castBigDecimal(value)) == -1){
                 throw new CommonException(ResultEnum.BALANCE_NOTENOUGH);
-            }
+            }*/
 
             //5.使用支付方的私钥加密数据 TODO 构造签名数据
             Transaction transaction = new Transaction();
@@ -89,7 +88,7 @@ public class TransactionHandler {
             String transactionJson = GsonUtils.toJson(transaction);
             try {
                 //使用私钥签名数据
-                PrivateKey privateKey = ECDSAUtil.getPrivateKey(accountPay.getPrivateKey());
+                PrivateKey privateKey = Sign.privateKeyFromString(accountPay.getPrivateKey());
                 transaction.setSignature(ECDSAUtil.applyECDSASig(privateKey, transactionJson));
                 //设置交易公钥
                 Credentials credentials = Credentials.create(accountPay.getPrivateKey());

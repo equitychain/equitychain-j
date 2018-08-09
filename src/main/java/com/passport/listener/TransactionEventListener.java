@@ -35,11 +35,14 @@ public class TransactionEventListener {
 		transactionBuilder.setReceiptAddress(ByteString.copyFrom(transaction.getReceiptAddress()));
 		transactionBuilder.setValue(ByteString.copyFrom(transaction.getValue()));
 		transactionBuilder.setExtarData(ByteString.copyFrom(transaction.getExtarData()));
+		transactionBuilder.setTimeStamp(ByteString.copyFrom(transaction.getTime()));
 		transactionBuilder.setSignature(ByteString.copyFrom(transaction.getSignature()));
 		transactionBuilder.setHash(ByteString.copyFrom(transaction.getHash()));
+		transactionBuilder.setPublicKey(ByteString.copyFrom(transaction.getPublicKey()));
 
 		NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
 		dataBuilder.setDataType(DataTypeEnum.DataType.SEND_TRANSACTION);
+		dataBuilder.setTransaction(transactionBuilder.build());
 
 		NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
 		builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
