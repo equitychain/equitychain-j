@@ -82,6 +82,7 @@ public class BlockEventListener {
 		block.setTransactionCount(0);
 		block.setTransactions(new CopyOnWriteArrayList<Transaction>());
 		block.setBlockHeight(1L);
+		block.calculateFieldValueWithHash();
 
 		return block;
 	}
