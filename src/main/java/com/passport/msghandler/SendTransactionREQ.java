@@ -55,7 +55,9 @@ public class SendTransactionREQ extends Strategy {
                     flag = dbAccess.putUnconfirmTransaction(trans);
                     logger.info("交易流水不存在，放到未确认流水中，结果：" + flag);
                     Optional<Transaction> tmp = dbAccess.getUnconfirmTransaction(transaction.getHash().toString());
-                    logger.info(GsonUtils.toJson(tmp.get()));
+                    if(tmp.isPresent()) {
+                        logger.info(GsonUtils.toJson(tmp.get()));
+                    }
                 }
             }
         } catch (Exception e) {
