@@ -150,7 +150,7 @@ public class RocksDBAccess implements DBAccess {
 		ArrayList<T> ts = new ArrayList<>();
 		RocksIterator iterator = rocksDB.newIterator(new ReadOptions());
 		byte[] key = keyPrefix.getBytes();
-		for (iterator.seek(key); iterator.isValid(); iterator.next()) {
+		for (iterator.seek(key); iterator.isValid() && String.valueOf(iterator.key()).startsWith(keyPrefix); iterator.next()) {
 			ts.add((T) SerializeUtils.unSerialize(iterator.value()));
 		}
 		return ts;

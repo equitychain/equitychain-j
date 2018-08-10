@@ -116,7 +116,7 @@ public class TransactionHandler {
     public void exec(Block currentBlock) {
         for (Transaction transaction : currentBlock.getTransactions()) {
             String receiptAddress = new String(transaction.getReceiptAddress());//收款地址
-            String payAddress = new String(transaction.getPayAddress());//付款地址
+            byte[] payAddressByte = transaction.getPayAddress();//付款地址byte
             BigDecimal valueBigDecimal = CastUtils.castBigDecimal(new String(transaction.getValue()));//交易金额
 
             //收款账户
@@ -127,11 +127,12 @@ public class TransactionHandler {
             Account accountReceipt = receiptOptional.get();
 
             //无付款人则是挖矿奖励
-            if (payAddress == null) {
+            if (payAddressByte == null) {
                 accountReceipt.setBalance(accountReceipt.getBalance().add(valueBigDecimal));
                 dbAccess.putAccount(accountReceipt);
                 continue;
             }
+            String payAddress = new String(payAddressByte);//付款地址
 
             //验证签名
             //TODO 构造签名数据
