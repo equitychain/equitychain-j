@@ -98,8 +98,8 @@ public class MinerHandler {
             BigDecimal valueDec = transactionHandler.getTempEggByHash(tran.getHash());
             valueDec = valueDec == null?BigDecimal.ZERO:valueDec;
             feeTrans.setValue(String.valueOf(valueDec).getBytes());
-            if(minerAccount.isPresent()){
-                feeTrans.setReceiptAddress(minerAccount.get().getAddress().getBytes());
+            if(minerAccountOptional.isPresent()){
+                feeTrans.setReceiptAddress(minerAccountOptional.get().getAddress().getBytes());
             }
             //添加奖励和需要确认的流水
             currentBlock.getTransactions().add(feeTrans);
