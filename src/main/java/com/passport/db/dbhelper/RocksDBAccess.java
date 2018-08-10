@@ -151,9 +151,9 @@ public class RocksDBAccess implements DBAccess {
 		options.setPrefixSameAsStart(true);
 		RocksIterator iterator = rocksDB.newIterator(options);
 		byte[] key = keyPrefix.getBytes();
-//		for (iterator.seek(key); iterator.isValid(); iterator.next()) {
-//			if(!new String(iterator.key()).startsWith(keyPrefix)) continue;
-		for (iterator.seek(key); iterator.isValid() && String.valueOf(iterator.key()).startsWith(keyPrefix); iterator.next()) {
+		for (iterator.seek(key); iterator.isValid(); iterator.next()) {
+			if(!new String(iterator.key()).startsWith(keyPrefix)) continue;
+//		for (iterator.seek(key); iterator.isValid() && String.valueOf(iterator.key()).startsWith(keyPrefix); iterator.next()) {
 			ts.add((T) SerializeUtils.unSerialize(iterator.value()));
 		}
 		return ts;
