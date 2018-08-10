@@ -5,6 +5,7 @@ import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.proto.*;
 import com.passport.utils.GsonUtils;
+import com.passport.utils.HttpUtils;
 import com.passport.zookeeper.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,7 @@ public class Connector implements InitializingBean {
         //连接discover节点
         Set<String> set = nodeListConstant.getAll();
         logger.info("注册后从discover节点取到的地址列表：{}", GsonUtils.toJson(set));
-        String serviceAddress = InetAddress.getLocalHost().getHostAddress();
+        String serviceAddress = HttpUtils.getLocalHostLANAddress().getHostAddress();
         for (String address : set) {
             if(!address.equals(serviceAddress)){
                 asyncTask.startConnect(address);

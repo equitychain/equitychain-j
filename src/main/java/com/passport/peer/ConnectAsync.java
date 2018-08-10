@@ -3,6 +3,7 @@ package com.passport.peer;
 import com.passport.heartbeat.HeartBeatClientHandler;
 import com.passport.heartbeat.HeartBeatServerHandler;
 import com.passport.proto.NettyMessage;
+import com.passport.utils.HttpUtils;
 import com.passport.zookeeper.ServiceRegistry;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
@@ -23,6 +24,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -86,7 +89,7 @@ public class ConnectAsync {
             ChannelFuture f = b.bind(serverPort).sync();
 
             //注册RPC服务地址
-            String serviceAddress = InetAddress.getLocalHost().getHostAddress();
+            String serviceAddress = HttpUtils.getLocalHostLANAddress().getHostAddress();
             logger.info("节点向discover节点注册地址：{}", serviceAddress);
             serviceRegistry.register(serviceAddress);
 
