@@ -78,35 +78,49 @@ public class TransactionHandler {
             }*/
 
             //5.使用支付方的私钥加密数据 TODO 构造签名数据
-            Transaction transaction = new Transaction();
-            transaction.setPayAddress(payAddress.getBytes());
-            transaction.setReceiptAddress(receiptAddress.getBytes());
-            transaction.setValue(value.getBytes());
-            transaction.setExtarData(extarData.getBytes());
-            transaction.setTime(ByteUtil.longToBytesNoLeadZeroes(System.currentTimeMillis()));
-            //生成hash和生成签名sign使用的基础数据都应该一样
-            String transactionJson = GsonUtils.toJson(transaction);
-            try {
-                //使用私钥签名数据
-                PrivateKey privateKey = Sign.privateKeyFromString(accountPay.getPrivateKey());
-                transaction.setSignature(ECDSAUtil.applyECDSASig(privateKey, transactionJson));
-                //设置交易公钥
-                Credentials credentials = Credentials.create(accountPay.getPrivateKey());
-                transaction.setPublicKey(credentials.getEcKeyPair().getPublicKey().getEncoded());
-            } catch (Exception e) {
-                logger.error("处理私钥信息异常", e);
-                throw new CommonException(ResultEnum.SYS_ERROR);
-            }
+            Transaction transaction = generateTransaction(payAddress, receiptAddress, value, extarData, accountPay);
 
-            //6.计算交易hash
-            transaction.setHash(ECDSAUtil.applySha256(transactionJson).getBytes());
-
-            //7.发布广播交易事件
+            //6.发布广播交易事件
             provider.publishEvent(new SendTransactionEvent(transaction));
             return transaction;
         }else{
             throw new CommonException(ResultEnum.ACCOUNT_IS_LOCKED);
         }
+    }
+
+    /**
+     * 构造交易流水
+     * @param payAddress
+     * @param receiptAddress
+     * @param value
+     * @param extarData
+     * @param accountPay
+     * @return
+     */
+    public Transaction generateTransaction(String payAddress, String receiptAddress, String value, String extarData, Account accountPay) {
+        Transaction transaction = new Transaction();
+        transaction.setPayAddress(payAddress.getBytes());
+        transaction.setReceiptAddress(receiptAddress.getBytes());
+        transaction.setValue(value.getBytes());
+        transaction.setExtarData(extarData.getBytes());
+        transaction.setTime(ByteUtil.longToBytesNoLeadZeroes(System.currentTimeMillis()));
+        //生成hash和生成签名sign使用的基础数据都应该一样
+        String transactionJson = GsonUtils.toJson(transaction);
+        try {
+            //使用私钥签名数据
+            PrivateKey privateKey = Sign.privateKeyFromString(accountPay.getPrivateKey());
+            transaction.setSignature(ECDSAUtil.applyECDSASig(privateKey, transactionJson));
+            //设置交易公钥
+            Credentials credentials = Credentials.create(accountPay.getPrivateKey());
+            transaction.setPublicKey(credentials.getEcKeyPair().getPublicKey().getEncoded());
+        } catch (Exception e) {
+            logger.error("处理私钥信息异常", e);
+            throw new CommonException(ResultEnum.SYS_ERROR);
+        }
+        //计算交易hash
+        transaction.setHash(ECDSAUtil.applySha256(transactionJson).getBytes());
+
+        return transaction;
     }
 
     /**
