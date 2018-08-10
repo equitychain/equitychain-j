@@ -48,6 +48,9 @@ public class AccountController {
 
         Account account = accountHandler.newAccount(password);
         if(account != null){
+            //当挖矿账户不存在时设置为挖矿账户
+            accountHandler.setMinerAccountIfNotExists(account);
+
             return new ResultDto(ResultEnum.SUCCESS.getCode(), account);
         }
         return new ResultDto(ResultEnum.SYS_ERROR);
