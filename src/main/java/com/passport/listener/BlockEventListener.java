@@ -5,10 +5,12 @@ import com.passport.core.Block;
 import com.passport.core.BlockHeader;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.event.SyncBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.peer.ClientHandler;
 import com.passport.proto.*;
 import com.passport.utils.CastUtils;
+import com.passport.webhandler.BlockHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +34,11 @@ public class BlockEventListener {
 	private DBAccess dbAccess;
 	@Autowired
 	private ClientHandler clientHandler;
+	@Autowired
+	private BlockHandler blockHandler;
 
 	/**
-	 * 同步下一个区块
+	 * 同步下一个区块（被动获取）
 	 * @param event
 	 */
 	@EventListener(SyncNextBlockEvent.class)
@@ -61,7 +65,7 @@ public class BlockEventListener {
 		BlockMessage.Block.Builder blockBuilder = BlockMessage.Block.newBuilder();
 		blockBuilder.setBlockHeight(blockHeight+1);
 		NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
-		dataBuilder.setDataType(DataTypeEnum.DataType.BLOCK_SYNC);
+		dataBuilder.setDataType(DataTypeEnum.DataType.NEXT_BLOCK_SYNC);
 		dataBuilder.setBlock(blockBuilder.build());
 
 		NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
@@ -85,5 +89,27 @@ public class BlockEventListener {
 		block.calculateFieldValueWithHash();
 
 		return block;
+	}
+
+	/**
+	 * 同步区块到其它节点（主动广播）
+	 * @param event
+	 */
+	@EventListener(SyncBlockEvent.class)
+	public void syncBlock(SyncBlockEvent event) {
+		//广播区块数据到其它节点
+		Block block = (Block)event.getSource();
+
+		BlockMessage.Block.Builder blockBuilder = blockHandler.convertBlock2BlockMessage(block);
+
+		//构造区块同步响应消息
+		NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
+		dataBuilder.setDataType(DataTypeEnum.DataType.BLOCK_SYNC);
+		dataBuilder.setBlock(blockBuilder.build());
+
+		NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
+		builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
+		builder.setData(dataBuilder.build());
+		clientHandler.getChannels().writeAndFlush(builder.build());
 	}
 }

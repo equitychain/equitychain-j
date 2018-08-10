@@ -6,6 +6,8 @@ import com.passport.core.Block;
 import com.passport.core.BlockHeader;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.event.SyncBlockEvent;
+import com.passport.listener.ApplicationContextProvider;
 import com.passport.utils.eth.ByteUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,8 @@ public class MinerHandler {
     private DBAccess dbAccess;
     @Autowired
     private TransactionHandler transactionHandler;
+    @Autowired
+    private ApplicationContextProvider provider;
 
     public void mining() {
         Optional<Block> lastBlock = dbAccess.getLastBlock();
@@ -97,5 +101,7 @@ public class MinerHandler {
         //把新增的区块存储到本地
         dbAccess.putLastBlockHeight(prevBlock.getBlockHeight() + 1);
         dbAccess.putBlock(currentBlock);
+
+        provider.publishEvent(new SyncBlockEvent(currentBlock));
     }
 }

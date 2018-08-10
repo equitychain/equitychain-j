@@ -24,9 +24,9 @@ public final class DataTypeEnum {
      */
     HEART_BEAT(0),
     /**
-     * <code>BLOCK_SYNC = 1;</code>
+     * <code>NEXT_BLOCK_SYNC = 1;</code>
      */
-    BLOCK_SYNC(1),
+    NEXT_BLOCK_SYNC(1),
     /**
      * <code>ACCOUNTLIST_SYNC = 2;</code>
      */
@@ -39,6 +39,10 @@ public final class DataTypeEnum {
      * <code>SEND_TRANSACTION = 4;</code>
      */
     SEND_TRANSACTION(4),
+    /**
+     * <code>BLOCK_SYNC = 5;</code>
+     */
+    BLOCK_SYNC(5),
     UNRECOGNIZED(-1),
     ;
 
@@ -47,9 +51,9 @@ public final class DataTypeEnum {
      */
     public static final int HEART_BEAT_VALUE = 0;
     /**
-     * <code>BLOCK_SYNC = 1;</code>
+     * <code>NEXT_BLOCK_SYNC = 1;</code>
      */
-    public static final int BLOCK_SYNC_VALUE = 1;
+    public static final int NEXT_BLOCK_SYNC_VALUE = 1;
     /**
      * <code>ACCOUNTLIST_SYNC = 2;</code>
      */
@@ -62,6 +66,10 @@ public final class DataTypeEnum {
      * <code>SEND_TRANSACTION = 4;</code>
      */
     public static final int SEND_TRANSACTION_VALUE = 4;
+    /**
+     * <code>BLOCK_SYNC = 5;</code>
+     */
+    public static final int BLOCK_SYNC_VALUE = 5;
 
 
     public final int getNumber() {
@@ -83,10 +91,11 @@ public final class DataTypeEnum {
     public static DataType forNumber(int value) {
       switch (value) {
         case 0: return HEART_BEAT;
-        case 1: return BLOCK_SYNC;
+        case 1: return NEXT_BLOCK_SYNC;
         case 2: return ACCOUNTLIST_SYNC;
         case 3: return ACCOUNT_SYNC;
         case 4: return SEND_TRANSACTION;
+        case 5: return BLOCK_SYNC;
         default: return null;
       }
     }
@@ -148,11 +157,11 @@ public final class DataTypeEnum {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\016DataType.proto*h\n\010DataType\022\016\n\nHEART_BE" +
-      "AT\020\000\022\016\n\nBLOCK_SYNC\020\001\022\024\n\020ACCOUNTLIST_SYNC" +
-      "\020\002\022\020\n\014ACCOUNT_SYNC\020\003\022\024\n\020SEND_TRANSACTION" +
-      "\020\004B\"\n\022com.passport.protoB\014DataTypeEnumb\006" +
-      "proto3"
+      "\n\016DataType.proto*}\n\010DataType\022\016\n\nHEART_BE" +
+      "AT\020\000\022\023\n\017NEXT_BLOCK_SYNC\020\001\022\024\n\020ACCOUNTLIST" +
+      "_SYNC\020\002\022\020\n\014ACCOUNT_SYNC\020\003\022\024\n\020SEND_TRANSA" +
+      "CTION\020\004\022\016\n\nBLOCK_SYNC\020\005B\"\n\022com.passport." +
+      "protoB\014DataTypeEnumb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
