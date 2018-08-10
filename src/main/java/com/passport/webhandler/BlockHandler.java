@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+
 @Component
 public class BlockHandler {
     private static final Logger logger = LoggerFactory.getLogger(BlockHandler.class);
@@ -73,6 +75,7 @@ public class BlockHandler {
         block.setBlockHeader(blockHeader);
         block.setTransactionCount(blockMessage.getTransactionsCount());
         block.setBlockHeight(blockMessage.getBlockHeight());
+        block.setTransactions(new ArrayList<>());
         //区块流水记录
         blockMessage.getTransactionsList().forEach((TransactionMessage.Transaction trans) -> {
             Transaction transaction = new Transaction();
