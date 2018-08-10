@@ -114,14 +114,15 @@ public class BlockHandler {
         //设置包含在区块中的流水记录
         block.getTransactions().forEach((Transaction trans) -> {
             TransactionMessage.Transaction.Builder transactionBuilder = TransactionMessage.Transaction.newBuilder();
-            transactionBuilder.setHash(ByteString.copyFrom(trans.getHash()));
-            transactionBuilder.setSignature(ByteString.copyFrom(trans.getSignature()));
-            transactionBuilder.setValue(ByteString.copyFrom(trans.getSignature()));
-            transactionBuilder.setPayAddress(ByteString.copyFrom(trans.getPayAddress()));
+            if(trans.getPayAddress()!=null)transactionBuilder.setPayAddress(ByteString.copyFrom(trans.getPayAddress()));
             transactionBuilder.setReceiptAddress(ByteString.copyFrom(trans.getReceiptAddress()));
-            transactionBuilder.setEggPrice(ByteString.copyFrom(trans.getEggPrice()));
-            transactionBuilder.setEggMax(ByteString.copyFrom(trans.getEggMax()));
+            transactionBuilder.setValue(ByteString.copyFrom(trans.getValue()));
+            transactionBuilder.setExtarData(ByteString.copyFrom(trans.getExtarData()));
             transactionBuilder.setTimeStamp(ByteString.copyFrom(trans.getTime()));
+            transactionBuilder.setHash(ByteString.copyFrom(trans.getHash()));
+            if(trans.getSignature()!=null)transactionBuilder.setSignature(ByteString.copyFrom(trans.getSignature()));
+            if(trans.getEggPrice()!=null)transactionBuilder.setEggPrice(ByteString.copyFrom(trans.getEggPrice()));
+            if(trans.getEggMax()!=null)transactionBuilder.setEggMax(ByteString.copyFrom(trans.getEggMax()));
 
             blockBuilder.addTransactions(transactionBuilder.build());
         });
