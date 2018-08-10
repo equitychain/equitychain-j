@@ -45,7 +45,6 @@ public class RocksDBAccess implements DBAccess {
 
 	public RocksDBAccess() {
 	}
-
 	/**
 	 * 初始化RocksDB
 	 */
@@ -148,9 +147,12 @@ public class RocksDBAccess implements DBAccess {
 	@Override
 	public <T> List<T> seekByKey(String keyPrefix) {
 		ArrayList<T> ts = new ArrayList<>();
-		RocksIterator iterator = rocksDB.newIterator(new ReadOptions());
+		ReadOptions options = new ReadOptions();
+		options.setPrefixSameAsStart(true);
+		RocksIterator iterator = rocksDB.newIterator(options);
 		byte[] key = keyPrefix.getBytes();
 		for (iterator.seek(key); iterator.isValid(); iterator.next()) {
+			if(!new String(iterator.key()).startsWith(keyPrefix)) continue;
 			ts.add((T) SerializeUtils.unSerialize(iterator.value()));
 		}
 		return ts;
@@ -184,7 +186,7 @@ public class RocksDBAccess implements DBAccess {
 
 	@Override
 	public boolean putUnconfirmTransaction(Transaction transaction) {
-		return this.put(UNCONFIRM_TRANSACTIONS_BUCKET_PREFIX + transaction.getHash(), transaction);
+		return this.put(UNCONFIRM_TRANSACTIONS_BUCKET_PREFIX + new String(transaction.getHash()), transaction);
 	}
 
 	@Override
