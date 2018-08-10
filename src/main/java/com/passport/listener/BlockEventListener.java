@@ -62,11 +62,11 @@ public class BlockEventListener {
 		blockBuilder.setBlockHeight(blockHeight+1);
 		NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
 		dataBuilder.setDataType(DataTypeEnum.DataType.BLOCK_SYNC);
-		dataBuilder.setBlock(blockBuilder);
+		dataBuilder.setBlock(blockBuilder.build());
 
 		NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
 		builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
-		builder.setData(dataBuilder);
+		builder.setData(dataBuilder.build());
 		clientHandler.getChannels().writeAndFlush(builder.build());
 	}
 
@@ -82,6 +82,7 @@ public class BlockEventListener {
 		block.setTransactionCount(0);
 		block.setTransactions(new CopyOnWriteArrayList<Transaction>());
 		block.setBlockHeight(1L);
+		block.calculateFieldValueWithHash();
 
 		return block;
 	}

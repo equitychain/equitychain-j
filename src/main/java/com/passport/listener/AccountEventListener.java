@@ -40,10 +40,11 @@ public class AccountEventListener {
 
 		NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
 		dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNT_SYNC);
+		dataBuilder.setAccount(accountBuilder.build());
 
 		NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
 		builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
-		builder.setData(dataBuilder);
+		builder.setData(dataBuilder.build());
 		clientHandler.getChannels().writeAndFlush(builder.build());
 	}
 }

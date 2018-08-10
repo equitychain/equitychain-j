@@ -7,7 +7,6 @@ import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.proto.*;
 import com.passport.utils.GsonUtils;
-import com.passport.utils.eth.ByteUtil;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +44,7 @@ public class BlockSyncREQ extends Strategy {
             //构造区块
             BlockMessage.Block.Builder blockBuilder = BlockMessage.Block.newBuilder();
             blockBuilder.setBlockSize(block.getBlockSize());
-            blockBuilder.setBlockHeader(blockHeaderBuilder);
+            blockBuilder.setBlockHeader(blockHeaderBuilder.build());
             blockBuilder.setTransactionCount(block.getTransactionCount());
             blockBuilder.setBlockHeight(block.getBlockHeight());
             //设置包含在区块中的流水记录
@@ -58,18 +57,19 @@ public class BlockSyncREQ extends Strategy {
                 transactionBuilder.setReceiptAddress(ByteString.copyFrom(trans.getReceiptAddress()));
                 transactionBuilder.setEggPrice(ByteString.copyFrom(trans.getEggPrice()));
                 transactionBuilder.setEggMax(ByteString.copyFrom(trans.getEggMax()));
-                transactionBuilder.setTimeStamp(ByteUtil.byteArrayToLong(trans.getTime()));
+                transactionBuilder.setTimeStamp(ByteString.copyFrom(trans.getTime()));
 
-                blockBuilder.addTransactions(transactionBuilder);
+                blockBuilder.addTransactions(transactionBuilder.build());
             });
 
             //构造区块同步响应消息
             NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
             dataBuilder.setDataType(DataTypeEnum.DataType.BLOCK_SYNC);
-            dataBuilder.setBlock(blockBuilder);
+            dataBuilder.setBlock(blockBuilder.build());
+
             NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
-            builder.setData(dataBuilder);
             builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
+            builder.setData(dataBuilder.build());
             ctx.writeAndFlush(builder.build());
         }
     }

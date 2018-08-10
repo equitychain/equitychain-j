@@ -54,9 +54,9 @@ public final class TransactionMessage {
     com.google.protobuf.ByteString getEggMax();
 
     /**
-     * <code>int64 timeStamp = 8;</code>
+     * <code>bytes timeStamp = 8;</code>
      */
-    long getTimeStamp();
+    com.google.protobuf.ByteString getTimeStamp();
 
     /**
      * <code>bytes extarData = 9;</code>
@@ -87,7 +87,7 @@ public final class TransactionMessage {
       receiptAddress_ = com.google.protobuf.ByteString.EMPTY;
       eggPrice_ = com.google.protobuf.ByteString.EMPTY;
       eggMax_ = com.google.protobuf.ByteString.EMPTY;
-      timeStamp_ = 0L;
+      timeStamp_ = com.google.protobuf.ByteString.EMPTY;
       extarData_ = com.google.protobuf.ByteString.EMPTY;
       publicKey_ = com.google.protobuf.ByteString.EMPTY;
     }
@@ -152,9 +152,9 @@ public final class TransactionMessage {
               eggMax_ = input.readBytes();
               break;
             }
-            case 64: {
+            case 66: {
 
-              timeStamp_ = input.readInt64();
+              timeStamp_ = input.readBytes();
               break;
             }
             case 74: {
@@ -254,11 +254,11 @@ public final class TransactionMessage {
     }
 
     public static final int TIMESTAMP_FIELD_NUMBER = 8;
-    private long timeStamp_;
+    private com.google.protobuf.ByteString timeStamp_;
     /**
-     * <code>int64 timeStamp = 8;</code>
+     * <code>bytes timeStamp = 8;</code>
      */
-    public long getTimeStamp() {
+    public com.google.protobuf.ByteString getTimeStamp() {
       return timeStamp_;
     }
 
@@ -313,8 +313,8 @@ public final class TransactionMessage {
       if (!eggMax_.isEmpty()) {
         output.writeBytes(7, eggMax_);
       }
-      if (timeStamp_ != 0L) {
-        output.writeInt64(8, timeStamp_);
+      if (!timeStamp_.isEmpty()) {
+        output.writeBytes(8, timeStamp_);
       }
       if (!extarData_.isEmpty()) {
         output.writeBytes(9, extarData_);
@@ -357,9 +357,9 @@ public final class TransactionMessage {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(7, eggMax_);
       }
-      if (timeStamp_ != 0L) {
+      if (!timeStamp_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(8, timeStamp_);
+          .computeBytesSize(8, timeStamp_);
       }
       if (!extarData_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
@@ -399,8 +399,8 @@ public final class TransactionMessage {
           .equals(other.getEggPrice());
       result = result && getEggMax()
           .equals(other.getEggMax());
-      result = result && (getTimeStamp()
-          == other.getTimeStamp());
+      result = result && getTimeStamp()
+          .equals(other.getTimeStamp());
       result = result && getExtarData()
           .equals(other.getExtarData());
       result = result && getPublicKey()
@@ -430,8 +430,7 @@ public final class TransactionMessage {
       hash = (37 * hash) + EGGMAX_FIELD_NUMBER;
       hash = (53 * hash) + getEggMax().hashCode();
       hash = (37 * hash) + TIMESTAMP_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getTimeStamp());
+      hash = (53 * hash) + getTimeStamp().hashCode();
       hash = (37 * hash) + EXTARDATA_FIELD_NUMBER;
       hash = (53 * hash) + getExtarData().hashCode();
       hash = (37 * hash) + PUBLICKEY_FIELD_NUMBER;
@@ -579,7 +578,7 @@ public final class TransactionMessage {
 
         eggMax_ = com.google.protobuf.ByteString.EMPTY;
 
-        timeStamp_ = 0L;
+        timeStamp_ = com.google.protobuf.ByteString.EMPTY;
 
         extarData_ = com.google.protobuf.ByteString.EMPTY;
 
@@ -679,7 +678,7 @@ public final class TransactionMessage {
         if (other.getEggMax() != com.google.protobuf.ByteString.EMPTY) {
           setEggMax(other.getEggMax());
         }
-        if (other.getTimeStamp() != 0L) {
+        if (other.getTimeStamp() != com.google.protobuf.ByteString.EMPTY) {
           setTimeStamp(other.getTimeStamp());
         }
         if (other.getExtarData() != com.google.protobuf.ByteString.EMPTY) {
@@ -917,28 +916,31 @@ public final class TransactionMessage {
         return this;
       }
 
-      private long timeStamp_ ;
+      private com.google.protobuf.ByteString timeStamp_ = com.google.protobuf.ByteString.EMPTY;
       /**
-       * <code>int64 timeStamp = 8;</code>
+       * <code>bytes timeStamp = 8;</code>
        */
-      public long getTimeStamp() {
+      public com.google.protobuf.ByteString getTimeStamp() {
         return timeStamp_;
       }
       /**
-       * <code>int64 timeStamp = 8;</code>
+       * <code>bytes timeStamp = 8;</code>
        */
-      public Builder setTimeStamp(long value) {
+      public Builder setTimeStamp(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
 
         timeStamp_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>int64 timeStamp = 8;</code>
+       * <code>bytes timeStamp = 8;</code>
        */
       public Builder clearTimeStamp() {
 
-        timeStamp_ = 0L;
+        timeStamp_ = getDefaultInstance().getTimeStamp();
         onChanged();
         return this;
       }
@@ -1067,7 +1069,7 @@ public final class TransactionMessage {
       "on\022\014\n\004hash\030\001 \001(\014\022\021\n\tsignature\030\002 \001(\014\022\r\n\005v" +
       "alue\030\003 \001(\014\022\022\n\npayAddress\030\004 \001(\014\022\026\n\016receip" +
       "tAddress\030\005 \001(\014\022\020\n\010eggPrice\030\006 \001(\014\022\016\n\006eggM" +
-      "ax\030\007 \001(\014\022\021\n\ttimeStamp\030\010 \001(\003\022\021\n\textarData" +
+      "ax\030\007 \001(\014\022\021\n\ttimeStamp\030\010 \001(\014\022\021\n\textarData" +
       "\030\t \001(\014\022\021\n\tpublicKey\030\n \001(\014B(\n\022com.passpor" +
       "t.protoB\022TransactionMessageb\006proto3"
     };

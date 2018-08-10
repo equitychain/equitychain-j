@@ -54,7 +54,7 @@ public class AccountHandler {
         return null;
     }
 
-    //用户设置挖矿账号
+    //用户替换挖矿账号
     public Account setMinerAccount(String address){
         Optional<Account> addAccount = dbAccess.getAccount(address);
         if(addAccount.isPresent()){
@@ -65,4 +65,13 @@ public class AccountHandler {
         }
         return null;
     }
+
+    //用户设置默认挖矿账号（第一个创建的账户默认为挖矿账户）
+    public void setMinerAccountIfNotExists(Account account){
+        Optional<Account> minerAccount = dbAccess.getMinerAccount();
+        if(!minerAccount.isPresent()){
+            dbAccess.putMinerAccount(account);
+        }
+    }
+
 }
