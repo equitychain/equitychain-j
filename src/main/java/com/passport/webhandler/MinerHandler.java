@@ -94,6 +94,7 @@ public class MinerHandler {
 
         //把新增的区块存储到本地
         dbAccess.putLastBlockHeight(prevBlock.getBlockHeight() + 1);
+        currentBlock.calculateFieldValueWithHash();
         dbAccess.putBlock(currentBlock);
 
         provider.publishEvent(new SyncBlockEvent(currentBlock));
