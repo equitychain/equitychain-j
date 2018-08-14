@@ -13,7 +13,7 @@ public class AppTest
     @Test
     public void shouldAnswerWithTrue() throws Exception
     {
-        File file = new File("./keystore");
+        /*File file = new File("./keystore");
         if(!file.exists()){
             file.mkdir();
         }

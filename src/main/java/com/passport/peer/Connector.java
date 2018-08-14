@@ -43,7 +43,7 @@ public class Connector implements InitializingBean {
         //启动服务并注册到discover节点
         asyncTask.startServer();
 
-        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.SECONDS.sleep(3);
 
         //连接discover节点
         Set<String> set = nodeListConstant.getAll();

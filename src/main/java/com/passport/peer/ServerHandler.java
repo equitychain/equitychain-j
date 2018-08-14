@@ -17,8 +17,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
     @Autowired
-    private ChannelsManager channelsManager;
-    @Autowired
     private StrategyContext strategyContext;
 
     @Override
@@ -30,9 +28,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         logger.info("server channel active服务端通道激活");
-
-        //保存连接的channel
-        channelsManager.addChannel(ctx.channel());
     }
 
     @Override

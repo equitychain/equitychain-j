@@ -31,6 +31,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         logger.info("client channel active客户端通道激活");
 
+        logger.info("client channel id:"+ctx.channel().id().asLongText());
         //保存连接的channel
         channelsManager.addChannel(ctx.channel());
     }
