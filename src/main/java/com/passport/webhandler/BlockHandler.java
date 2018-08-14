@@ -32,7 +32,8 @@ public class BlockHandler {
     @Autowired
     private ApplicationContextProvider provider;
     //用来存储各个节点同步过来的区块
-    protected final ArrayBlockingQueue<List<Block>> blockQueue = new ArrayBlockingQueue(10);
+    //todo 这个队列是个有限队列，用来判断几个节点是否满了，至于多少个，需要更改
+    protected final ArrayBlockingQueue<List<Block>> blockQueue = new ArrayBlockingQueue(2);
     protected boolean padding = false;
     /**
      * 校验区块是否合法
@@ -72,12 +73,16 @@ public class BlockHandler {
             blocks.sort((block1,block2)->{
                 return block1.getBlockHeight().compareTo(block2.getBlockHeight());
             });
-            boolean add = blockQueue.offer(blocks);
+            List<Block> checkList = new ArrayList<>();
+            blockQueue.offer(blocks);
+            boolean add = blockQueue.offer(checkList);
             if(!add){
                 //满了，进行校验
                 padding = true;
                 //异步处理,不然其他的都在处于等待
                 synHandlerBlock();
+            }else{
+                blockQueue.remove(checkList);
             }
         }else{
             //todo 满了，正在处理
@@ -101,11 +106,14 @@ public class BlockHandler {
                         }
                         blockList.add(blocks);
                     }
+                    //存储可以同步的区块
                     List<Block> successBlocks = new ArrayList<>();
+                    // 遍历区块高度
                     for(int i = 0; i < blockSize; i++){
                         boolean isCheck = true;
                         byte[] markRoot = null;
                         byte[] hash = null;
+                        //遍历各节点的该高度的区块
                         for(int j = 0; j < blockList.size(); j ++) {
                             Block block = blockList.get(j).get(i);
                             //校验markRoot
@@ -216,11 +224,11 @@ public class BlockHandler {
         block.getTransactions().forEach((Transaction trans) -> {
             TransactionMessage.Transaction.Builder transactionBuilder = TransactionMessage.Transaction.newBuilder();
             if(trans.getPayAddress()!=null)transactionBuilder.setPayAddress(ByteString.copyFrom(trans.getPayAddress()));
-            transactionBuilder.setReceiptAddress(ByteString.copyFrom(trans.getReceiptAddress()));
-            transactionBuilder.setValue(ByteString.copyFrom(trans.getValue()));
-            transactionBuilder.setExtarData(ByteString.copyFrom(trans.getExtarData()));
-            transactionBuilder.setTimeStamp(ByteString.copyFrom(trans.getTime()));
-            transactionBuilder.setHash(ByteString.copyFrom(trans.getHash()));
+            if(trans.getReceiptAddress() != null) transactionBuilder.setReceiptAddress(ByteString.copyFrom(trans.getReceiptAddress()));
+            if(trans.getValue() != null) transactionBuilder.setValue(ByteString.copyFrom(trans.getValue()));
+            if(trans.getExtarData() != null) transactionBuilder.setExtarData(ByteString.copyFrom(trans.getExtarData()));
+            if(trans.getTime() != null) transactionBuilder.setTimeStamp(ByteString.copyFrom(trans.getTime()));
+            if(trans.getHash() != null) transactionBuilder.setHash(ByteString.copyFrom(trans.getHash()));
             if(trans.getSignature()!=null)transactionBuilder.setSignature(ByteString.copyFrom(trans.getSignature()));
             if(trans.getEggPrice()!=null)transactionBuilder.setEggPrice(ByteString.copyFrom(trans.getEggPrice()));
             if(trans.getEggMax()!=null)transactionBuilder.setEggMax(ByteString.copyFrom(trans.getEggMax()));

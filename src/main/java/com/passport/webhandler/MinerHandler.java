@@ -113,7 +113,6 @@ public class MinerHandler {
         dbAccess.putLastBlockHeight(prevBlock.getBlockHeight() + 1);
         currentBlock.calculateFieldValueWithHash();
         dbAccess.putBlock(currentBlock);
-        logger.info("挖矿打包区块，最新高度："+dbAccess.getLastBlockHeight().get().toString()+"   ===^v^===");
         provider.publishEvent(new SyncBlockEvent(currentBlock));
     }
 }

@@ -45,7 +45,6 @@ public class NextBlockSyncREQ extends Strategy {
         }else{
             return;
         }
-
         //构造区块同步响应消息
         NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
         dataBuilder.setDataType(DataTypeEnum.DataType.NEXT_BLOCK_SYNC);

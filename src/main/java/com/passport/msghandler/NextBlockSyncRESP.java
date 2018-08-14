@@ -49,12 +49,11 @@ public class NextBlockSyncRESP extends Strategy {
                 return;
             }
             //验证区块合法性
-            if (!blockHandler.checkBlock(blockLocal)) {
-                return;
-            }
+//            if (!blockHandler.checkBlock(blockLocal)) {
+//                return;
+//            }
             blockList.add(blockLocal);
         }
-        logger.info("区块同步，校验通过……===^v^===");
         try {
             blockHandler.addBlockQueue(blockList);
         } catch (InterruptedException e) {

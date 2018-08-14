@@ -60,7 +60,6 @@ public class BlockEventListener {
 				dbAccess.putLastBlockHeight(blockHeight);
 			}
 		}
-
 		//请求最新区块
 		BlockMessage.Block.Builder blockBuilder = BlockMessage.Block.newBuilder();
 		//那个区块开始
