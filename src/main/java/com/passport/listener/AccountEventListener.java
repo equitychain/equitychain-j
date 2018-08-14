@@ -2,9 +2,8 @@ package com.passport.listener;
 
 import com.google.protobuf.ByteString;
 import com.passport.core.Account;
-import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.SyncAccountEvent;
-import com.passport.peer.ClientHandler;
+import com.passport.peer.ChannelsManager;
 import com.passport.proto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +19,7 @@ public class AccountEventListener {
 	private static Logger logger = LoggerFactory.getLogger(AccountEventListener.class);
 
 	@Autowired
-	private DBAccess dbAccess;
-	@Autowired
-	private ClientHandler clientHandler;
+	private ChannelsManager channelsManager;
 
 	/**
 	 * 同步账户
@@ -45,6 +42,6 @@ public class AccountEventListener {
 		NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
 		builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
 		builder.setData(dataBuilder.build());
-		clientHandler.getChannels().writeAndFlush(builder.build());
+		channelsManager.getChannels().writeAndFlush(builder.build());
 	}
 }

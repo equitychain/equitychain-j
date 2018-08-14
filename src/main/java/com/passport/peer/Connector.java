@@ -6,7 +6,10 @@ import com.passport.core.Block;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
-import com.passport.proto.*;
+import com.passport.proto.DataTypeEnum;
+import com.passport.proto.MessageTypeEnum;
+import com.passport.proto.NettyData;
+import com.passport.proto.NettyMessage;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.HttpUtils;
 import com.passport.webhandler.BlockHandler;
@@ -19,7 +22,6 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.net.InetAddress;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -38,16 +40,14 @@ public class Connector implements InitializingBean {
     @Autowired
     private ApplicationContextProvider provider;
     @Autowired
-    private DBAccess dbAccess;
-    @Autowired
-    private ClientHandler clientHandler;
+    private ChannelsManager channelsManager;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         //启动服务并注册到discover节点
         asyncTask.startServer();
 
-        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.SECONDS.sleep(3);
 
         //连接discover节点
         Set<String> set = nodeListConstant.getAll();
@@ -75,6 +75,6 @@ public class Connector implements InitializingBean {
         NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
         builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
         builder.setData(dataBuilder);
-        clientHandler.getChannels().writeAndFlush(builder.build());
+        channelsManager.getChannels().writeAndFlush(builder.build());
     }
 }

@@ -3,7 +3,7 @@ package com.passport.listener;
 import com.google.protobuf.ByteString;
 import com.passport.core.Transaction;
 import com.passport.event.SendTransactionEvent;
-import com.passport.peer.ClientHandler;
+import com.passport.peer.ChannelsManager;
 import com.passport.proto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ public class TransactionEventListener {
 	private static Logger logger = LoggerFactory.getLogger(TransactionEventListener.class);
 
 	@Autowired
-	private ClientHandler clientHandler;
+	private ChannelsManager channelsManager;
 
 	/**
 	 * 广播交易记录到其它节点
@@ -47,6 +47,6 @@ public class TransactionEventListener {
 		NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
 		builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
 		builder.setData(dataBuilder);
-		clientHandler.getChannels().writeAndFlush(builder.build());
+		channelsManager.getChannels().writeAndFlush(builder.build());
 	}
 }
