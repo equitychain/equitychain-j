@@ -63,7 +63,10 @@ public class BlockEventListener {
 
 		//请求最新区块
 		BlockMessage.Block.Builder blockBuilder = BlockMessage.Block.newBuilder();
+		//那个区块开始
 		blockBuilder.setBlockHeight(blockHeight+1);
+		//todo 同步多少个高度
+		blockBuilder.setBlockSize(10l);
 		NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
 		dataBuilder.setDataType(DataTypeEnum.DataType.NEXT_BLOCK_SYNC);
 		dataBuilder.setBlock(blockBuilder.build());
