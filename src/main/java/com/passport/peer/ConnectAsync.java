@@ -44,6 +44,8 @@ public class ConnectAsync {
     private HeartBeatClientHandler heartBeatClientHandler;
     @Autowired
     private HeartBeatServerHandler heartBeatServerHandler;
+    @Autowired
+    private ChannelsManager channelsManager;
 
     @Value("${rpc.serverPort}")
     private int serverPort;
@@ -92,7 +94,7 @@ public class ConnectAsync {
 
             f.channel().closeFuture().sync();
         }catch (Exception e){
-
+            logger.error("与客户端连接断开", e);
         }finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
@@ -101,6 +103,7 @@ public class ConnectAsync {
 
     @Async("taskAsyncPool4Client")
     public void startConnect(String address) {
+        ChannelFuture cf = null;
         EventLoopGroup workgroup = new NioEventLoopGroup();
         try{
             Bootstrap b = new Bootstrap();
@@ -120,15 +123,18 @@ public class ConnectAsync {
                         }
                     });
 
-            ChannelFuture cf = b.connect(address, serverPort).sync();
+            cf = b.connect(address, serverPort).sync();
 
             cf.channel().closeFuture().sync();
         }catch (Exception e){
-
+            logger.error("与服务端连接断开", e);
         } finally {
+            logger.info("contains:"+channelsManager.getChannels().contains(cf.channel()));
+            logger.info("remove:"+channelsManager.getChannels().remove(cf.channel()));
+
             logger.info("失败发起重连操作");
             try {
-                TimeUnit.SECONDS.sleep(1);
+                TimeUnit.SECONDS.sleep(5);
                 try {
                     startConnect(address);
                 } catch (Exception e) {

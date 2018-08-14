@@ -26,4 +26,8 @@ public class ChannelsManager {
         channels.add(channel);
         logger.info("增加channel实例后，实例数量："+channels.size());
     }
+
+    public boolean remove(Channel channel){
+        return channels.remove(channel);
+    }
 }
