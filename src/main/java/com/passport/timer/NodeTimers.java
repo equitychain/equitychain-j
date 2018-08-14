@@ -6,7 +6,6 @@ import com.passport.zookeeper.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,7 +23,7 @@ public class NodeTimers {
     /**
      * 发现新节点的定时器
      */
-    @Scheduled(cron = "0/10 * * * * ?")
+    //@Scheduled(cron = "0/10 * * * * ?")
     public void findNodeList(){
         try {
             String ip = HttpUtils.getLocalHostLANAddress().getHostAddress();

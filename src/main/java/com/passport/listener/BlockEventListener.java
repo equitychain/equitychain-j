@@ -7,7 +7,7 @@ import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.SyncBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
-import com.passport.peer.ClientHandler;
+import com.passport.peer.ChannelsManager;
 import com.passport.proto.*;
 import com.passport.utils.CastUtils;
 import com.passport.webhandler.BlockHandler;
@@ -33,7 +33,7 @@ public class BlockEventListener {
 	@Autowired
 	private DBAccess dbAccess;
 	@Autowired
-	private ClientHandler clientHandler;
+	private ChannelsManager channelsManager;
 	@Autowired
 	private BlockHandler blockHandler;
 
@@ -71,7 +71,7 @@ public class BlockEventListener {
 		NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
 		builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
 		builder.setData(dataBuilder.build());
-		clientHandler.getChannels().writeAndFlush(builder.build());
+		channelsManager.getChannels().writeAndFlush(builder.build());
 	}
 
 	//创建创世块
@@ -110,6 +110,6 @@ public class BlockEventListener {
 		NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
 		builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
 		builder.setData(dataBuilder.build());
-		clientHandler.getChannels().writeAndFlush(builder.build());
+		channelsManager.getChannels().writeAndFlush(builder.build());
 	}
 }
