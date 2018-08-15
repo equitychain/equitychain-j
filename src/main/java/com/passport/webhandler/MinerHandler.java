@@ -113,7 +113,6 @@ public class MinerHandler {
         dbAccess.putLastBlockHeight(prevBlock.getBlockHeight() + 1);
         currentBlock.calculateFieldValueWithHash();
         dbAccess.putBlock(currentBlock);
-
         provider.publishEvent(new SyncBlockEvent(currentBlock));
     }
 }

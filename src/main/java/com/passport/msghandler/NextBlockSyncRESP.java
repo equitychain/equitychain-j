@@ -14,6 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+
 /**
  * 客户端处理区块同步响应
  * @author: xujianfeng
@@ -29,28 +33,37 @@ public class NextBlockSyncRESP extends Strategy {
     private ApplicationContextProvider provider;
     @Autowired
     private BlockHandler blockHandler;
-
     @Override
     public void handleRespMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块同步响应结果：{}", GsonUtils.toJson(message));
 
-        BlockMessage.Block block = message.getData().getBlock();
-        Block blockLocal = blockHandler.convertBlockMessage2Block(block);
+        //获取到同步的区块集合
+        List<BlockMessage.Block> blocks = message.getData().getBlocksList();
+        List<Block> blockList = new ArrayList<>();
+        for(BlockMessage.Block block : blocks) {
+//            BlockMessage.Block block = message.getData().getBlock();
+            Block blockLocal = blockHandler.convertBlockMessage2Block(block);
 
-        //本地是否已经存在此高度区块
-        if(dbAccess.getBlock(blockLocal.getBlockHeight()).isPresent()){
-            return;
+            //本地是否已经存在此高度区块
+            if (dbAccess.getBlock(blockLocal.getBlockHeight()).isPresent()) {
+                return;
+            }
+            //验证区块合法性
+//            if (!blockHandler.checkBlock(blockLocal)) {
+//                return;
+//            }
+            blockList.add(blockLocal);
         }
-        //验证区块合法性
-        if(!blockHandler.checkBlock(blockLocal)){
-            return;
+        try {
+            blockHandler.addBlockQueue(blockList);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
         //存储区块到本地
-        dbAccess.putBlock(blockLocal);
-        dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
+//        dbAccess.putBlock(blockLocal);
+//        dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
 
         //继续同步下一个区块
-        provider.publishEvent(new SyncNextBlockEvent(0L));
+//        provider.publishEvent(new SyncNextBlockEvent(0L));
     }
 }

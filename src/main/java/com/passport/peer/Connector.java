@@ -1,6 +1,9 @@
 package com.passport.peer;
 
+import com.google.common.base.Optional;
 import com.passport.constant.NodeListConstant;
+import com.passport.core.Block;
+import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.proto.DataTypeEnum;
@@ -9,6 +12,7 @@ import com.passport.proto.NettyData;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.HttpUtils;
+import com.passport.webhandler.BlockHandler;
 import com.passport.zookeeper.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

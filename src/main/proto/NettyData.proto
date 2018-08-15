@@ -10,6 +10,7 @@ message Data {
     DataType dataType = 1;
     Block block = 2;
     repeated Account accounts = 3;
-    Account account = 4;
-    Transaction transaction = 5;
+    repeated Block blocks = 4;
+    Account account = 5;
+    Transaction transaction = 6;
 }
