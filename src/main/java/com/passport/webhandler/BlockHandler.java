@@ -82,6 +82,7 @@ public class BlockHandler {
             transaction.setHash(trans.getHash().toByteArray());
             transaction.setSignature(trans.getSignature().toByteArray());
             transaction.setValue(trans.getValue().toByteArray());
+            transaction.setExtarData(trans.getExtarData().toByteArray());
             transaction.setPayAddress(trans.getPayAddress().toByteArray());
             transaction.setReceiptAddress(trans.getReceiptAddress().toByteArray());
             transaction.setEggPrice(trans.getEggPrice().toByteArray());
