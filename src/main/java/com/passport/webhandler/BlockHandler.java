@@ -3,6 +3,7 @@ package com.passport.webhandler;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.protobuf.ByteString;
+import com.passport.constant.Constant;
 import com.passport.core.Block;
 import com.passport.core.BlockHeader;
 import com.passport.core.MerkleTree;
@@ -11,15 +12,13 @@ import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.proto.*;
+import com.passport.utils.RawardUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -31,10 +30,7 @@ public class BlockHandler {
     private DBAccess dbAccess;
     @Autowired
     private ApplicationContextProvider provider;
-    //用来存储各个节点同步过来的区块
-    //todo 这个队列是个有限队列，用来判断几个节点是否满了，至于多少个，需要更改
-    protected final ArrayBlockingQueue<List<Block>> blockQueue = new ArrayBlockingQueue(2);
-    protected boolean padding = false;
+    public volatile boolean padding = false;
     /**
      * 校验区块是否合法
      * @param block
@@ -59,10 +55,27 @@ public class BlockHandler {
             if(prevBlock.isPresent()){
                 byte[] hashOfPrevBlock = prevBlock.get().getBlockHeader().getHash();//前一个区块hash
                 byte[] prevHashOfCurrentBlock = block.getBlockHeader().getHashPrevBlock();//当前区块的前一个区块hash
-                if (hashOfPrevBlock.equals(prevHashOfCurrentBlock)) {//前一个区块的hash和当前区块的前一个区块hash是否相等
-                    return true;
+                if (!hashOfPrevBlock.equals(prevHashOfCurrentBlock)) {//前一个区块的hash和当前区块的前一个区块hash是否相等
+                    return false;
                 }
             }
+            //奖励金额的判断
+            List<Transaction> transactions = block.getTransactions();
+            if(transactions == null || transactions.size() == 0){
+                return false;
+            }
+            //奖励金额的合法性判断
+            boolean reword = false;
+            for(Transaction tran : transactions) {
+                byte[] payAddr = tran.getPayAddress();
+                if (payAddr == null && tran.getExtarData() != null && Arrays.equals("挖矿奖励".getBytes(), tran.getExtarData())) {
+                    //奖励的流水
+                    byte[] value = tran.getValue();
+                    reword = RawardUtil.checkReward(blockHeight, value);
+                    break;
+                }
+            }
+            return reword;
         }
 
         return false;
@@ -73,16 +86,14 @@ public class BlockHandler {
             blocks.sort((block1,block2)->{
                 return block1.getBlockHeight().compareTo(block2.getBlockHeight());
             });
-            List<Block> checkList = new ArrayList<>();
-            blockQueue.offer(blocks);
-            boolean add = blockQueue.offer(checkList);
-            if(!add){
+            //添加到队列中
+            Constant.blockQueue.offer(blocks);
+            int size = Constant.blockQueue.size();
+            if(size == Constant.blockNodeCount){
                 //满了，进行校验
                 padding = true;
                 //异步处理,不然其他的都在处于等待
                 synHandlerBlock();
-            }else{
-                blockQueue.remove(checkList);
             }
         }else{
             //todo 满了，正在处理
@@ -94,56 +105,8 @@ public class BlockHandler {
             @Override
             public void run() {
                 try{
-
-                    //todo 校验  然后如果各个节点的区块高度不一致,则同步最低的那个
-                    Iterator<List<Block>> iterator = blockQueue.iterator();
-                    List<List<Block>> blockList = new ArrayList<>();
-                    int blockSize = -1;
-                    while (iterator.hasNext()){
-                        List<Block> blocks = iterator.next();
-                        if(blockSize == -1 || blockSize > blocks.size()){
-                            blockSize = blocks.size();
-                        }
-                        blockList.add(blocks);
-                    }
-                    //存储可以同步的区块
-                    List<Block> successBlocks = new ArrayList<>();
-                    // 遍历区块高度
-                    for(int i = 0; i < blockSize; i++){
-                        boolean isCheck = true;
-                        byte[] markRoot = null;
-                        byte[] hash = null;
-                        //遍历各节点的该高度的区块
-                        for(int j = 0; j < blockList.size(); j ++) {
-                            Block block = blockList.get(j).get(i);
-                            //校验markRoot
-                            MerkleTree tree = new MerkleTree(block.getTransactions());
-                            List<byte[]> treeBuild = tree.buildMerkleTree();
-                            byte[] calTree = treeBuild.get(treeBuild.size()-1);
-                            if(!Arrays.equals(calTree,block.getBlockHeader().getHashMerkleRoot())){
-                                //markRoot校验不通过
-                                return;
-                            }
-                            //校验节点间的数据是否吻合
-                            if(j == 0){
-                                markRoot = block.getBlockHeader().getHashMerkleRoot();
-                                hash = block.getBlockHeader().getHash();
-                            }else{
-                                if(!Arrays.equals(markRoot,block.getBlockHeader().getHashMerkleRoot()) || !Arrays.equals(hash,block.getBlockHeader().getHash())){
-                                    //节点间的校验不通过
-                                    isCheck = false;
-                                    break;
-                                }
-
-                            }
-                        }
-                        if(isCheck){
-                            successBlocks.add(blockList.get(0).get(i));
-                        }else{
-                            //todo 剩下的高度不进行添加 这里是break呢还是return？
-                            break;
-                        }
-                    }
+                    //todo 校验 目前是获取相同的区块高度
+                    Set<Block> successBlocks = getShareBlocks();
                     //存储区块到本地
                     for(Block blockLocal : successBlocks) {
                         dbAccess.putBlock(blockLocal);
@@ -156,10 +119,36 @@ public class BlockHandler {
                 }finally {
                     //更改状态
                     padding = false;
+                    //清空队列
+                    Constant.blockQueue.clear();
                 }
             }
         });
         handlerThread.start();
+    }
+    //检查各节点区块，取出共用的区块高度
+    protected Set<Block> getShareBlocks(){
+        Set<Block> list = new HashSet<>();
+        Iterator<List<Block>> iterator = Constant.blockQueue.iterator();
+        List<Block> baseBlocks = null;
+        //获取第一个节点的数据
+        if(iterator.hasNext()){
+            baseBlocks = iterator.next();
+        }else{
+            return list;
+        }
+        //某个节点的区块与其余节点的区块进行比较
+        while (iterator.hasNext()){
+            List<Block> blocks = iterator.next();
+            for(Block b : baseBlocks){
+                if(blocks.contains(b)){
+                    list.add(b);
+                }else{
+                    list.remove(b);
+                }
+            }
+        }
+        return list;
     }
     /**
      * protobuf block转成本地block

@@ -4,6 +4,7 @@ import com.passport.utils.rpc.SerializationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -89,5 +90,22 @@ public class Block {
     this.blockSize = Long.valueOf(blockByte.length);
 
     return blockHeader.getHash();
+  }
+  //之所以复写hashCode和equals，是因为list的contans方法，blockHandler里面的检查区块用到了
+  @Override
+  public int hashCode() {
+    return (int)(blockHeight%Integer.MAX_VALUE);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(obj==null || !(obj instanceof Block)){
+      return false;
+    }
+    Block block = (Block)obj;
+    return this.blockHeight == block.blockHeight
+            && Arrays.equals(this.blockHeader.getHash(),block.blockHeader.getHash())
+            && Arrays.equals(this.blockHeader.getHashMerkleRoot(),block.blockHeader.getHashMerkleRoot())
+            && Arrays.equals(this.blockHeader.getHashPrevBlock(),block.blockHeader.getHashPrevBlock());
   }
 }
