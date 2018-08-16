@@ -16,21 +16,19 @@ import com.passport.listener.ApplicationContextProvider;
 import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.eth.ByteUtil;
-import org.rocksdb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.security.PrivateKey;
 import java.util.*;
-import java.util.Comparator;
+import java.util.stream.Collectors;
 
 /**
  * 处理
+ *
  * @author: xujianfeng
  * @create: 2018-07-26 17:17
  **/
@@ -43,8 +41,10 @@ public class TransactionHandler {
     private ApplicationContextProvider provider;
     //todo 这是临时储存流水打包所消耗的egg，如果之后用多线程什么的这里需要进行更改储存方式
     private HashMap<byte[], BigDecimal> eggUsedTemp = new HashMap<>();
+
     /**
      * 发送交易，等待其它节点确认
+     *
      * @param payAddress
      * @param receiptAddress
      * @param value
@@ -63,11 +63,11 @@ public class TransactionHandler {
             //2.支付地址、接收地址是否已经创建、支付方交易密码是否正确
             Optional<Account> accountPayOptional = dbAccess.getAccount(payAddress);
             Optional<Account> accountReceiptOptional = dbAccess.getAccount(receiptAddress);
-            if(!accountPayOptional.isPresent()){
+            if (!accountPayOptional.isPresent()) {
                 throw new CommonException(ResultEnum.PASSWORD_WRONG);
             }
             Account accountPay = accountPayOptional.get();
-            if(!password.equals(accountPay.getPassword())){
+            if (!password.equals(accountPay.getPassword())) {
                 throw new CommonException(ResultEnum.ACCOUNT_NOT_EXISTS);
             }
 
@@ -88,13 +88,14 @@ public class TransactionHandler {
             //6.发布广播交易事件
             provider.publishEvent(new SendTransactionEvent(transaction));
             return transaction;
-        }else{
+        } else {
             throw new CommonException(ResultEnum.ACCOUNT_IS_LOCKED);
         }
     }
 
     /**
      * 构造交易流水
+     *
      * @param payAddress
      * @param receiptAddress
      * @param value
@@ -130,6 +131,7 @@ public class TransactionHandler {
 
     /**
      * 执行流水,
+     *
      * @param currentBlock
      */
     public void exec(Block currentBlock) {
@@ -192,15 +194,15 @@ public class TransactionHandler {
     }
 
     //获取需要打包的流水
-    public List<Transaction> getBlockTrans(List<Transaction> unconfirmTrans,BigDecimal blockMaxEgg){
+    public List<Transaction> getBlockTrans(List<Transaction> unconfirmTrans, BigDecimal blockMaxEgg) {
         List<Transaction> transactions = new ArrayList<>();
         //排序 gasPrice大的排前面
         //todo 这里是根据利益最大化进行一个流水的筛选，要进行修改，这里我只根据eggPrice排
-        Collections.sort(unconfirmTrans,new Comparator<Transaction>(){
+        Collections.sort(unconfirmTrans, new Comparator<Transaction>() {
             @Override
             public int compare(Transaction o1, Transaction o2) {
-                BigDecimal price1 = o1==null||o1.getEggPrice()==null?BigDecimal.ZERO:new BigDecimal(new String(o1.getEggPrice()));
-                BigDecimal price2 = o2==null||o2.getEggPrice()==null?BigDecimal.ZERO:new BigDecimal(new String(o2.getEggPrice()));
+                BigDecimal price1 = o1 == null || o1.getEggPrice() == null ? BigDecimal.ZERO : new BigDecimal(new String(o1.getEggPrice()));
+                BigDecimal price2 = o2 == null || o2.getEggPrice() == null ? BigDecimal.ZERO : new BigDecimal(new String(o2.getEggPrice()));
                 return price2.compareTo(price1);
             }
         });
@@ -208,20 +210,21 @@ public class TransactionHandler {
             //流水的gas消耗
             BigDecimal eggUsed = getEggUsedByTrans(tran);
             //只要流水的egg和区块的egg足够就能够进行打包
-            if(eggUsed.compareTo(BigDecimal.ZERO)> 0 && blockMaxEgg.compareTo(eggUsed)>=0 ){
-                System.out.println("======add======="+eggUsed);
+            if (eggUsed.compareTo(BigDecimal.ZERO) > 0 && blockMaxEgg.compareTo(eggUsed) >= 0) {
+                System.out.println("======add=======" + eggUsed);
                 transactions.add(tran);
-                eggUsedTemp.put(tran.getHash(),eggUsed);
+                eggUsedTemp.put(tran.getHash(), eggUsed);
                 blockMaxEgg = blockMaxEgg.subtract(eggUsed);
-                if(blockMaxEgg.compareTo(BigDecimal.ZERO) == 0){
+                if (blockMaxEgg.compareTo(BigDecimal.ZERO) == 0) {
                     break;
                 }
             }
         }
         return transactions;
     }
+
     //打包流水消耗的egg
-    public BigDecimal getEggUsedByTrans(Transaction transaction){
+    public BigDecimal getEggUsedByTrans(Transaction transaction) {
         //TODO 这里的egg要那些参数计算，怎么计算
         //计算损耗egg，更新流水的eggUsed  注意，要确保流水的limit要大于或等于used
         long begin = System.currentTimeMillis();
@@ -231,20 +234,38 @@ public class TransactionHandler {
             e.printStackTrace();
         }
         long end = System.currentTimeMillis();
-        BigDecimal eggUsed = new BigDecimal(transaction.getEggUsed()==null?"0":new String(transaction.getEggUsed()));
-        BigDecimal eggMax = new BigDecimal(transaction.getEggMax()==null?"0":new String(transaction.getEggMax()));
-        BigDecimal curUse = new BigDecimal(end-begin);
-        if(eggMax.compareTo(eggUsed.add(curUse)) >= 0){
+        BigDecimal eggUsed = new BigDecimal(transaction.getEggUsed() == null ? "0" : new String(transaction.getEggUsed()));
+        BigDecimal eggMax = new BigDecimal(transaction.getEggMax() == null ? "0" : new String(transaction.getEggMax()));
+        BigDecimal curUse = new BigDecimal(end - begin);
+        if (eggMax.compareTo(eggUsed.add(curUse)) >= 0) {
             //消耗燃料
             //todo 有个问题，就是未确认流水的已使用egg怎么让其他节点同步
             transaction.setEggUsed(eggUsed.add(curUse).toString().getBytes());
             System.out.println("======test=======");
             return curUse;
-        }else {
+        } else {
             return BigDecimal.ZERO;
         }
     }
-    public BigDecimal getTempEggByHash(byte[] transHash){
+
+    public BigDecimal getTempEggByHash(byte[] transHash) {
         return eggUsedTemp.get(transHash);
+    }
+
+    /**
+     * 已验证的区块中的流水和本地未确认流水进行匹配，如果本地未确认流水在区块中，则删除未确认流水
+     *
+     * @param blockLocal
+     */
+    public void matchUnConfirmTransactions(Block blockLocal) {
+        List<Transaction> transactions = blockLocal.getTransactions();
+        List<byte[]> hashBytes = transactions.stream().map(Transaction::getHash).collect(Collectors.toList());
+
+        List<Transaction> unconfirmTransactions = dbAccess.listUnconfirmTransactions();
+        unconfirmTransactions.forEach(untrans -> {
+            if(hashBytes.contains(untrans.getHash())){
+                //删除未确认流水，
+            }
+        });
     }
 }
