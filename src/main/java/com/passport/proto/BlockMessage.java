@@ -24,48 +24,53 @@ public final class BlockMessage {
     long getBlockSize();
 
     /**
-     * <code>int64 blockHeight = 2;</code>
+     * <code>int64 blockNumber = 2;</code>
+     */
+    long getBlockNumber();
+
+    /**
+     * <code>int64 blockHeight = 3;</code>
      */
     long getBlockHeight();
 
     /**
-     * <code>.BlockHeader blockHeader = 3;</code>
+     * <code>.BlockHeader blockHeader = 4;</code>
      */
     boolean hasBlockHeader();
     /**
-     * <code>.BlockHeader blockHeader = 3;</code>
+     * <code>.BlockHeader blockHeader = 4;</code>
      */
     BlockHeaderMessage.BlockHeader getBlockHeader();
     /**
-     * <code>.BlockHeader blockHeader = 3;</code>
+     * <code>.BlockHeader blockHeader = 4;</code>
      */
     BlockHeaderMessage.BlockHeaderOrBuilder getBlockHeaderOrBuilder();
 
     /**
-     * <code>int32 transactionCount = 4;</code>
+     * <code>int32 transactionCount = 5;</code>
      */
     int getTransactionCount();
 
     /**
-     * <code>repeated .Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 6;</code>
      */
     java.util.List<TransactionMessage.Transaction>
         getTransactionsList();
     /**
-     * <code>repeated .Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 6;</code>
      */
     TransactionMessage.Transaction getTransactions(int index);
     /**
-     * <code>repeated .Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 6;</code>
      */
     int getTransactionsCount();
     /**
-     * <code>repeated .Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 6;</code>
      */
     java.util.List<? extends TransactionMessage.TransactionOrBuilder>
         getTransactionsOrBuilderList();
     /**
-     * <code>repeated .Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 6;</code>
      */
     TransactionMessage.TransactionOrBuilder getTransactionsOrBuilder(
             int index);
@@ -83,6 +88,7 @@ public final class BlockMessage {
     }
     private Block() {
       blockSize_ = 0L;
+      blockNumber_ = 0L;
       blockHeight_ = 0L;
       transactionCount_ = 0;
       transactions_ = java.util.Collections.emptyList();
@@ -120,10 +126,15 @@ public final class BlockMessage {
             }
             case 16: {
 
+              blockNumber_ = input.readInt64();
+              break;
+            }
+            case 24: {
+
               blockHeight_ = input.readInt64();
               break;
             }
-            case 26: {
+            case 34: {
               BlockHeaderMessage.BlockHeader.Builder subBuilder = null;
               if (blockHeader_ != null) {
                 subBuilder = blockHeader_.toBuilder();
@@ -136,15 +147,15 @@ public final class BlockMessage {
 
               break;
             }
-            case 32: {
+            case 40: {
 
               transactionCount_ = input.readInt32();
               break;
             }
-            case 42: {
-              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+            case 50: {
+              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
                 transactions_ = new java.util.ArrayList<TransactionMessage.Transaction>();
-                mutable_bitField0_ |= 0x00000010;
+                mutable_bitField0_ |= 0x00000020;
               }
               transactions_.add(
                   input.readMessage(TransactionMessage.Transaction.parser(), extensionRegistry));
@@ -158,7 +169,7 @@ public final class BlockMessage {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+        if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
           transactions_ = java.util.Collections.unmodifiableList(transactions_);
         }
         makeExtensionsImmutable();
@@ -186,74 +197,83 @@ public final class BlockMessage {
       return blockSize_;
     }
 
-    public static final int BLOCKHEIGHT_FIELD_NUMBER = 2;
+    public static final int BLOCKNUMBER_FIELD_NUMBER = 2;
+    private long blockNumber_;
+    /**
+     * <code>int64 blockNumber = 2;</code>
+     */
+    public long getBlockNumber() {
+      return blockNumber_;
+    }
+
+    public static final int BLOCKHEIGHT_FIELD_NUMBER = 3;
     private long blockHeight_;
     /**
-     * <code>int64 blockHeight = 2;</code>
+     * <code>int64 blockHeight = 3;</code>
      */
     public long getBlockHeight() {
       return blockHeight_;
     }
 
-    public static final int BLOCKHEADER_FIELD_NUMBER = 3;
+    public static final int BLOCKHEADER_FIELD_NUMBER = 4;
     private BlockHeaderMessage.BlockHeader blockHeader_;
     /**
-     * <code>.BlockHeader blockHeader = 3;</code>
+     * <code>.BlockHeader blockHeader = 4;</code>
      */
     public boolean hasBlockHeader() {
       return blockHeader_ != null;
     }
     /**
-     * <code>.BlockHeader blockHeader = 3;</code>
+     * <code>.BlockHeader blockHeader = 4;</code>
      */
     public BlockHeaderMessage.BlockHeader getBlockHeader() {
       return blockHeader_ == null ? BlockHeaderMessage.BlockHeader.getDefaultInstance() : blockHeader_;
     }
     /**
-     * <code>.BlockHeader blockHeader = 3;</code>
+     * <code>.BlockHeader blockHeader = 4;</code>
      */
     public BlockHeaderMessage.BlockHeaderOrBuilder getBlockHeaderOrBuilder() {
       return getBlockHeader();
     }
 
-    public static final int TRANSACTIONCOUNT_FIELD_NUMBER = 4;
+    public static final int TRANSACTIONCOUNT_FIELD_NUMBER = 5;
     private int transactionCount_;
     /**
-     * <code>int32 transactionCount = 4;</code>
+     * <code>int32 transactionCount = 5;</code>
      */
     public int getTransactionCount() {
       return transactionCount_;
     }
 
-    public static final int TRANSACTIONS_FIELD_NUMBER = 5;
+    public static final int TRANSACTIONS_FIELD_NUMBER = 6;
     private java.util.List<TransactionMessage.Transaction> transactions_;
     /**
-     * <code>repeated .Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 6;</code>
      */
     public java.util.List<TransactionMessage.Transaction> getTransactionsList() {
       return transactions_;
     }
     /**
-     * <code>repeated .Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 6;</code>
      */
     public java.util.List<? extends TransactionMessage.TransactionOrBuilder>
         getTransactionsOrBuilderList() {
       return transactions_;
     }
     /**
-     * <code>repeated .Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 6;</code>
      */
     public int getTransactionsCount() {
       return transactions_.size();
     }
     /**
-     * <code>repeated .Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 6;</code>
      */
     public TransactionMessage.Transaction getTransactions(int index) {
       return transactions_.get(index);
     }
     /**
-     * <code>repeated .Transaction transactions = 5;</code>
+     * <code>repeated .Transaction transactions = 6;</code>
      */
     public TransactionMessage.TransactionOrBuilder getTransactionsOrBuilder(
         int index) {
@@ -275,17 +295,20 @@ public final class BlockMessage {
       if (blockSize_ != 0L) {
         output.writeInt64(1, blockSize_);
       }
+      if (blockNumber_ != 0L) {
+        output.writeInt64(2, blockNumber_);
+      }
       if (blockHeight_ != 0L) {
-        output.writeInt64(2, blockHeight_);
+        output.writeInt64(3, blockHeight_);
       }
       if (blockHeader_ != null) {
-        output.writeMessage(3, getBlockHeader());
+        output.writeMessage(4, getBlockHeader());
       }
       if (transactionCount_ != 0) {
-        output.writeInt32(4, transactionCount_);
+        output.writeInt32(5, transactionCount_);
       }
       for (int i = 0; i < transactions_.size(); i++) {
-        output.writeMessage(5, transactions_.get(i));
+        output.writeMessage(6, transactions_.get(i));
       }
     }
 
@@ -298,21 +321,25 @@ public final class BlockMessage {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(1, blockSize_);
       }
+      if (blockNumber_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(2, blockNumber_);
+      }
       if (blockHeight_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(2, blockHeight_);
+          .computeInt64Size(3, blockHeight_);
       }
       if (blockHeader_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getBlockHeader());
+          .computeMessageSize(4, getBlockHeader());
       }
       if (transactionCount_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, transactionCount_);
+          .computeInt32Size(5, transactionCount_);
       }
       for (int i = 0; i < transactions_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, transactions_.get(i));
+          .computeMessageSize(6, transactions_.get(i));
       }
       memoizedSize = size;
       return size;
@@ -332,6 +359,8 @@ public final class BlockMessage {
       boolean result = true;
       result = result && (getBlockSize()
           == other.getBlockSize());
+      result = result && (getBlockNumber()
+          == other.getBlockNumber());
       result = result && (getBlockHeight()
           == other.getBlockHeight());
       result = result && (hasBlockHeader() == other.hasBlockHeader());
@@ -356,6 +385,9 @@ public final class BlockMessage {
       hash = (37 * hash) + BLOCKSIZE_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getBlockSize());
+      hash = (37 * hash) + BLOCKNUMBER_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getBlockNumber());
       hash = (37 * hash) + BLOCKHEIGHT_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getBlockHeight());
@@ -501,6 +533,8 @@ public final class BlockMessage {
         super.clear();
         blockSize_ = 0L;
 
+        blockNumber_ = 0L;
+
         blockHeight_ = 0L;
 
         if (blockHeaderBuilder_ == null) {
@@ -513,7 +547,7 @@ public final class BlockMessage {
 
         if (transactionsBuilder_ == null) {
           transactions_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000020);
         } else {
           transactionsBuilder_.clear();
         }
@@ -542,6 +576,7 @@ public final class BlockMessage {
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         result.blockSize_ = blockSize_;
+        result.blockNumber_ = blockNumber_;
         result.blockHeight_ = blockHeight_;
         if (blockHeaderBuilder_ == null) {
           result.blockHeader_ = blockHeader_;
@@ -550,9 +585,9 @@ public final class BlockMessage {
         }
         result.transactionCount_ = transactionCount_;
         if (transactionsBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          if (((bitField0_ & 0x00000020) == 0x00000020)) {
             transactions_ = java.util.Collections.unmodifiableList(transactions_);
-            bitField0_ = (bitField0_ & ~0x00000010);
+            bitField0_ = (bitField0_ & ~0x00000020);
           }
           result.transactions_ = transactions_;
         } else {
@@ -603,6 +638,9 @@ public final class BlockMessage {
         if (other.getBlockSize() != 0L) {
           setBlockSize(other.getBlockSize());
         }
+        if (other.getBlockNumber() != 0L) {
+          setBlockNumber(other.getBlockNumber());
+        }
         if (other.getBlockHeight() != 0L) {
           setBlockHeight(other.getBlockHeight());
         }
@@ -616,7 +654,7 @@ public final class BlockMessage {
           if (!other.transactions_.isEmpty()) {
             if (transactions_.isEmpty()) {
               transactions_ = other.transactions_;
-              bitField0_ = (bitField0_ & ~0x00000010);
+              bitField0_ = (bitField0_ & ~0x00000020);
             } else {
               ensureTransactionsIsMutable();
               transactions_.addAll(other.transactions_);
@@ -629,7 +667,7 @@ public final class BlockMessage {
               transactionsBuilder_.dispose();
               transactionsBuilder_ = null;
               transactions_ = other.transactions_;
-              bitField0_ = (bitField0_ & ~0x00000010);
+              bitField0_ = (bitField0_ & ~0x00000020);
               transactionsBuilder_ =
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getTransactionsFieldBuilder() : null;
@@ -691,15 +729,41 @@ public final class BlockMessage {
         return this;
       }
 
+      private long blockNumber_ ;
+      /**
+       * <code>int64 blockNumber = 2;</code>
+       */
+      public long getBlockNumber() {
+        return blockNumber_;
+      }
+      /**
+       * <code>int64 blockNumber = 2;</code>
+       */
+      public Builder setBlockNumber(long value) {
+
+        blockNumber_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 blockNumber = 2;</code>
+       */
+      public Builder clearBlockNumber() {
+
+        blockNumber_ = 0L;
+        onChanged();
+        return this;
+      }
+
       private long blockHeight_ ;
       /**
-       * <code>int64 blockHeight = 2;</code>
+       * <code>int64 blockHeight = 3;</code>
        */
       public long getBlockHeight() {
         return blockHeight_;
       }
       /**
-       * <code>int64 blockHeight = 2;</code>
+       * <code>int64 blockHeight = 3;</code>
        */
       public Builder setBlockHeight(long value) {
 
@@ -708,7 +772,7 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>int64 blockHeight = 2;</code>
+       * <code>int64 blockHeight = 3;</code>
        */
       public Builder clearBlockHeight() {
 
@@ -721,13 +785,13 @@ public final class BlockMessage {
       private com.google.protobuf.SingleFieldBuilderV3<
           BlockHeaderMessage.BlockHeader, BlockHeaderMessage.BlockHeader.Builder, BlockHeaderMessage.BlockHeaderOrBuilder> blockHeaderBuilder_;
       /**
-       * <code>.BlockHeader blockHeader = 3;</code>
+       * <code>.BlockHeader blockHeader = 4;</code>
        */
       public boolean hasBlockHeader() {
         return blockHeaderBuilder_ != null || blockHeader_ != null;
       }
       /**
-       * <code>.BlockHeader blockHeader = 3;</code>
+       * <code>.BlockHeader blockHeader = 4;</code>
        */
       public BlockHeaderMessage.BlockHeader getBlockHeader() {
         if (blockHeaderBuilder_ == null) {
@@ -737,7 +801,7 @@ public final class BlockMessage {
         }
       }
       /**
-       * <code>.BlockHeader blockHeader = 3;</code>
+       * <code>.BlockHeader blockHeader = 4;</code>
        */
       public Builder setBlockHeader(BlockHeaderMessage.BlockHeader value) {
         if (blockHeaderBuilder_ == null) {
@@ -753,7 +817,7 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>.BlockHeader blockHeader = 3;</code>
+       * <code>.BlockHeader blockHeader = 4;</code>
        */
       public Builder setBlockHeader(
           BlockHeaderMessage.BlockHeader.Builder builderForValue) {
@@ -767,7 +831,7 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>.BlockHeader blockHeader = 3;</code>
+       * <code>.BlockHeader blockHeader = 4;</code>
        */
       public Builder mergeBlockHeader(BlockHeaderMessage.BlockHeader value) {
         if (blockHeaderBuilder_ == null) {
@@ -785,7 +849,7 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>.BlockHeader blockHeader = 3;</code>
+       * <code>.BlockHeader blockHeader = 4;</code>
        */
       public Builder clearBlockHeader() {
         if (blockHeaderBuilder_ == null) {
@@ -799,7 +863,7 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>.BlockHeader blockHeader = 3;</code>
+       * <code>.BlockHeader blockHeader = 4;</code>
        */
       public BlockHeaderMessage.BlockHeader.Builder getBlockHeaderBuilder() {
 
@@ -807,7 +871,7 @@ public final class BlockMessage {
         return getBlockHeaderFieldBuilder().getBuilder();
       }
       /**
-       * <code>.BlockHeader blockHeader = 3;</code>
+       * <code>.BlockHeader blockHeader = 4;</code>
        */
       public BlockHeaderMessage.BlockHeaderOrBuilder getBlockHeaderOrBuilder() {
         if (blockHeaderBuilder_ != null) {
@@ -818,7 +882,7 @@ public final class BlockMessage {
         }
       }
       /**
-       * <code>.BlockHeader blockHeader = 3;</code>
+       * <code>.BlockHeader blockHeader = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           BlockHeaderMessage.BlockHeader, BlockHeaderMessage.BlockHeader.Builder, BlockHeaderMessage.BlockHeaderOrBuilder>
@@ -836,13 +900,13 @@ public final class BlockMessage {
 
       private int transactionCount_ ;
       /**
-       * <code>int32 transactionCount = 4;</code>
+       * <code>int32 transactionCount = 5;</code>
        */
       public int getTransactionCount() {
         return transactionCount_;
       }
       /**
-       * <code>int32 transactionCount = 4;</code>
+       * <code>int32 transactionCount = 5;</code>
        */
       public Builder setTransactionCount(int value) {
 
@@ -851,7 +915,7 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>int32 transactionCount = 4;</code>
+       * <code>int32 transactionCount = 5;</code>
        */
       public Builder clearTransactionCount() {
 
@@ -863,9 +927,9 @@ public final class BlockMessage {
       private java.util.List<TransactionMessage.Transaction> transactions_ =
         java.util.Collections.emptyList();
       private void ensureTransactionsIsMutable() {
-        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+        if (!((bitField0_ & 0x00000020) == 0x00000020)) {
           transactions_ = new java.util.ArrayList<TransactionMessage.Transaction>(transactions_);
-          bitField0_ |= 0x00000010;
+          bitField0_ |= 0x00000020;
          }
       }
 
@@ -873,7 +937,7 @@ public final class BlockMessage {
           TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder> transactionsBuilder_;
 
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public java.util.List<TransactionMessage.Transaction> getTransactionsList() {
         if (transactionsBuilder_ == null) {
@@ -883,7 +947,7 @@ public final class BlockMessage {
         }
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public int getTransactionsCount() {
         if (transactionsBuilder_ == null) {
@@ -893,7 +957,7 @@ public final class BlockMessage {
         }
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public TransactionMessage.Transaction getTransactions(int index) {
         if (transactionsBuilder_ == null) {
@@ -903,7 +967,7 @@ public final class BlockMessage {
         }
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public Builder setTransactions(
           int index, TransactionMessage.Transaction value) {
@@ -920,7 +984,7 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public Builder setTransactions(
           int index, TransactionMessage.Transaction.Builder builderForValue) {
@@ -934,7 +998,7 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public Builder addTransactions(TransactionMessage.Transaction value) {
         if (transactionsBuilder_ == null) {
@@ -950,7 +1014,7 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public Builder addTransactions(
           int index, TransactionMessage.Transaction value) {
@@ -967,7 +1031,7 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public Builder addTransactions(
           TransactionMessage.Transaction.Builder builderForValue) {
@@ -981,7 +1045,7 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public Builder addTransactions(
           int index, TransactionMessage.Transaction.Builder builderForValue) {
@@ -995,7 +1059,7 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public Builder addAllTransactions(
           Iterable<? extends TransactionMessage.Transaction> values) {
@@ -1010,12 +1074,12 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public Builder clearTransactions() {
         if (transactionsBuilder_ == null) {
           transactions_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000020);
           onChanged();
         } else {
           transactionsBuilder_.clear();
@@ -1023,7 +1087,7 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public Builder removeTransactions(int index) {
         if (transactionsBuilder_ == null) {
@@ -1036,14 +1100,14 @@ public final class BlockMessage {
         return this;
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public TransactionMessage.Transaction.Builder getTransactionsBuilder(
           int index) {
         return getTransactionsFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public TransactionMessage.TransactionOrBuilder getTransactionsOrBuilder(
           int index) {
@@ -1053,7 +1117,7 @@ public final class BlockMessage {
         }
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public java.util.List<? extends TransactionMessage.TransactionOrBuilder>
            getTransactionsOrBuilderList() {
@@ -1064,14 +1128,14 @@ public final class BlockMessage {
         }
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public TransactionMessage.Transaction.Builder addTransactionsBuilder() {
         return getTransactionsFieldBuilder().addBuilder(
             TransactionMessage.Transaction.getDefaultInstance());
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public TransactionMessage.Transaction.Builder addTransactionsBuilder(
           int index) {
@@ -1079,7 +1143,7 @@ public final class BlockMessage {
             index, TransactionMessage.Transaction.getDefaultInstance());
       }
       /**
-       * <code>repeated .Transaction transactions = 5;</code>
+       * <code>repeated .Transaction transactions = 6;</code>
        */
       public java.util.List<TransactionMessage.Transaction.Builder>
            getTransactionsBuilderList() {
@@ -1092,7 +1156,7 @@ public final class BlockMessage {
           transactionsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder>(
                   transactions_,
-                  ((bitField0_ & 0x00000010) == 0x00000010),
+                  ((bitField0_ & 0x00000020) == 0x00000020),
                   getParentForChildren(),
                   isClean());
           transactions_ = null;
@@ -1163,12 +1227,13 @@ public final class BlockMessage {
   static {
     String[] descriptorData = {
       "\n\022BlockMessage.proto\032\030BlockHeaderMessage" +
-      ".proto\032\030TransactionMessage.proto\"\220\001\n\005Blo" +
-      "ck\022\021\n\tblockSize\030\001 \001(\003\022\023\n\013blockHeight\030\002 \001" +
-      "(\003\022!\n\013blockHeader\030\003 \001(\0132\014.BlockHeader\022\030\n" +
-      "\020transactionCount\030\004 \001(\005\022\"\n\014transactions\030" +
-      "\005 \003(\0132\014.TransactionB\"\n\022com.passport.prot" +
-      "oB\014BlockMessageb\006proto3"
+      ".proto\032\030TransactionMessage.proto\"\245\001\n\005Blo" +
+      "ck\022\021\n\tblockSize\030\001 \001(\003\022\023\n\013blockNumber\030\002 \001" +
+      "(\003\022\023\n\013blockHeight\030\003 \001(\003\022!\n\013blockHeader\030\004" +
+      " \001(\0132\014.BlockHeader\022\030\n\020transactionCount\030\005" +
+      " \001(\005\022\"\n\014transactions\030\006 \003(\0132\014.Transaction" +
+      "B\"\n\022com.passport.protoB\014BlockMessageb\006pr" +
+      "oto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1189,7 +1254,7 @@ public final class BlockMessage {
     internal_static_Block_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Block_descriptor,
-        new String[] { "BlockSize", "BlockHeight", "BlockHeader", "TransactionCount", "Transactions", });
+        new String[] { "BlockSize", "BlockNumber", "BlockHeight", "BlockHeader", "TransactionCount", "Transactions", });
     BlockHeaderMessage.getDescriptor();
     TransactionMessage.getDescriptor();
   }

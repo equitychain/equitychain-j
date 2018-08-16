@@ -6,8 +6,9 @@ option java_outer_classname = "BlockMessage";
 
 message Block {
     int64 blockSize = 1;
-    int64 blockHeight = 2;
-    BlockHeader blockHeader = 3;
-    int32 transactionCount = 4;
-    repeated Transaction transactions = 5;
+    int64 blockNumber = 2;
+    int64 blockHeight = 3;
+    BlockHeader blockHeader = 4;
+    int32 transactionCount = 5;
+    repeated Transaction transactions = 6;
 }

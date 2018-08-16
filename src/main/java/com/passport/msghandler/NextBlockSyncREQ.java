@@ -25,7 +25,7 @@ public class NextBlockSyncREQ extends Strategy {
     @Autowired
     private DBAccess dbAccess;
     @Autowired
-    private BlockHandler blockHandler;
+    private BlockHandler blockHdandler;
 
     public void handleReqMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块同步请求数据：{}", GsonUtils.toJson(message));
@@ -33,12 +33,19 @@ public class NextBlockSyncREQ extends Strategy {
         BlockMessage.Block blockInfo = message.getData().getBlock();
         //查询本地是否有此高度的区块
         long blockHeight = blockInfo.getBlockHeight();
-        long count = blockInfo.getBlockSize();
+        long count = blockInfo.getBlockNumber();
         Optional<Object> lastBlockHeight = dbAccess.getLastBlockHeight();
         //同步返回的区块数量
         if (lastBlockHeight.isPresent()) {
             long maxHeight = CastUtils.castLong(lastBlockHeight.get());
             if(maxHeight < blockHeight){
+                //todo 同步完了的
+                NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
+                dataBuilder.setDataType(DataTypeEnum.DataType.NEXT_BLOCK_SYNC);
+                NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
+                builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
+                builder.setData(dataBuilder.build());
+                ctx.writeAndFlush(builder.build());
                 return;
             }
             count = count > (maxHeight - blockHeight+1)?(maxHeight - blockHeight+1):count;
@@ -53,7 +60,7 @@ public class NextBlockSyncREQ extends Strategy {
             Optional<Block> blockOptional = dbAccess.getBlock(blockHeight+count-1);
             if (blockOptional.isPresent()) {
                 Block block = blockOptional.get();
-                BlockMessage.Block.Builder blockBuilder = blockHandler.convertBlock2BlockMessage(block);
+                BlockMessage.Block.Builder blockBuilder = blockHdandler.convertBlock2BlockMessage(block);
                 dataBuilder.addBlocks(blockBuilder);
             }
             count --;

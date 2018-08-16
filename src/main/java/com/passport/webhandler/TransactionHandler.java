@@ -28,13 +28,13 @@ import java.util.stream.Collectors;
 
 /**
  * 处理
- *
  * @author: xujianfeng
  * @create: 2018-07-26 17:17
  **/
 @Component
 public class TransactionHandler {
     private static final Logger logger = LoggerFactory.getLogger(TransactionHandler.class);
+    private static final int transSize = 100;
     @Autowired
     private DBAccess dbAccess;
     @Autowired
@@ -44,7 +44,6 @@ public class TransactionHandler {
 
     /**
      * 发送交易，等待其它节点确认
-     *
      * @param payAddress
      * @param receiptAddress
      * @param value
@@ -95,7 +94,6 @@ public class TransactionHandler {
 
     /**
      * 构造交易流水
-     *
      * @param payAddress
      * @param receiptAddress
      * @param value
@@ -131,7 +129,6 @@ public class TransactionHandler {
 
     /**
      * 执行流水,
-     *
      * @param currentBlock
      */
     public void exec(Block currentBlock) {
@@ -210,12 +207,12 @@ public class TransactionHandler {
             //流水的gas消耗
             BigDecimal eggUsed = getEggUsedByTrans(tran);
             //只要流水的egg和区块的egg足够就能够进行打包
-            if (eggUsed.compareTo(BigDecimal.ZERO) > 0 && blockMaxEgg.compareTo(eggUsed) >= 0) {
-                System.out.println("======add=======" + eggUsed);
+            if(eggUsed.compareTo(BigDecimal.ZERO)> 0 && blockMaxEgg.compareTo(eggUsed)>=0 && transactions.size() < transSize){
+                System.out.println("======add======="+eggUsed);
                 transactions.add(tran);
-                eggUsedTemp.put(tran.getHash(), eggUsed);
+                eggUsedTemp.put(tran.getHash(),eggUsed);
                 blockMaxEgg = blockMaxEgg.subtract(eggUsed);
-                if (blockMaxEgg.compareTo(BigDecimal.ZERO) == 0) {
+                if(blockMaxEgg.compareTo(BigDecimal.ZERO) == 0){
                     break;
                 }
             }

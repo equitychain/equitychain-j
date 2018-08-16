@@ -10,6 +10,7 @@ import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.SyncBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.utils.GsonUtils;
+import com.passport.utils.RawardUtil;
 import com.passport.utils.eth.ByteUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,7 @@ public class MinerHandler {
         //创建挖矿奖励交易
         Transaction transaction = new Transaction();
         transaction.setReceiptAddress(minerAccount.getAddress().getBytes());//奖励接收者是挖矿账号
-        transaction.setValue(String.valueOf(new BigDecimal("10")).getBytes());//TODO 挖矿奖励取值优化
+        transaction.setValue(String.valueOf(RawardUtil.getRewardByHeight(prevBlock.getBlockHeight() + 1).toString()).getBytes());//TODO 挖矿奖励取值优化
         transaction.setExtarData("挖矿奖励".getBytes());
         transaction.setTime(ByteUtil.longToBytesNoLeadZeroes(System.currentTimeMillis()));
         //生成hash和生成签名sign使用的基础数据都应该一样
@@ -86,9 +87,6 @@ public class MinerHandler {
         }
         //完成共识，打包交易流水
         List<Transaction> transactions = dbAccess.listUnconfirmTransactions();
-//        transactions.forEach((Transaction trans) -> {
-//            currentBlock.getTransactions().add(trans);
-//        });
         List<Transaction> blockTrans = transactionHandler.getBlockTrans(transactions,new BigDecimal(currentBlockHeader.getEggMax()));
         blockTrans.forEach((tran)->{
             //矿工费付给矿工  注意!无论流水是否成功被打包该矿工费是必须给的,因为已经扣了,

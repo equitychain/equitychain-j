@@ -36,9 +36,16 @@ public class NextBlockSyncRESP extends Strategy {
     @Override
     public void handleRespMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块同步响应结果：{}", GsonUtils.toJson(message));
-
+        if(blockHandler.padding){
+            //正在处理
+            return;
+        }
         //获取到同步的区块集合
         List<BlockMessage.Block> blocks = message.getData().getBlocksList();
+        if(blocks==null || blocks.size() == 0){
+            //同步完了，不进行广播，
+            return;
+        }
         List<Block> blockList = new ArrayList<>();
         for(BlockMessage.Block block : blocks) {
 //            BlockMessage.Block block = message.getData().getBlock();
