@@ -65,7 +65,8 @@ public class BlockHandler {
             boolean reword = false;
             for(Transaction tran : transactions) {
                 byte[] payAddr = tran.getPayAddress();
-                if (payAddr == null && tran.getExtarData() != null && Arrays.equals("挖矿奖励".getBytes(), tran.getExtarData())) {
+                byte[] compByt = "挖矿奖励".getBytes();
+                if ((payAddr == null||payAddr.length==0) && tran.getExtarData() != null && Arrays.equals(compByt, tran.getExtarData())) {
                     //奖励的流水
                     byte[] value = tran.getValue();
                     reword = RawardUtil.checkReward(blockHeight, value);
