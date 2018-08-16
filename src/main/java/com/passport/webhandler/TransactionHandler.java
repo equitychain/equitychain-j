@@ -1,6 +1,7 @@
 package com.passport.webhandler;
 
 import com.google.common.base.Optional;
+import com.passport.constant.Constant;
 import com.passport.core.Account;
 import com.passport.core.Block;
 import com.passport.core.Transaction;
@@ -37,7 +38,6 @@ import java.util.Comparator;
 @Component
 public class TransactionHandler {
     private static final Logger logger = LoggerFactory.getLogger(TransactionHandler.class);
-    private static final int transSize = 100;
     @Autowired
     private DBAccess dbAccess;
     @Autowired
@@ -209,7 +209,7 @@ public class TransactionHandler {
             //流水的gas消耗
             BigDecimal eggUsed = getEggUsedByTrans(tran);
             //只要流水的egg和区块的egg足够就能够进行打包
-            if(eggUsed.compareTo(BigDecimal.ZERO)> 0 && blockMaxEgg.compareTo(eggUsed)>=0 && transactions.size() < transSize){
+            if(eggUsed.compareTo(BigDecimal.ZERO)> 0 && blockMaxEgg.compareTo(eggUsed)>=0 && transactions.size() < Constant.TRANS_SIZE){
                 System.out.println("======add======="+eggUsed);
                 transactions.add(tran);
                 eggUsedTemp.put(tran.getHash(),eggUsed);

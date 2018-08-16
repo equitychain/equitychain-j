@@ -6,7 +6,6 @@ import com.google.protobuf.ByteString;
 import com.passport.constant.Constant;
 import com.passport.core.Block;
 import com.passport.core.BlockHeader;
-import com.passport.core.MerkleTree;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.SyncNextBlockEvent;
@@ -19,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class BlockHandler {
@@ -87,9 +84,9 @@ public class BlockHandler {
                 return block1.getBlockHeight().compareTo(block2.getBlockHeight());
             });
             //添加到队列中
-            Constant.blockQueue.offer(blocks);
-            int size = Constant.blockQueue.size();
-            if(size == Constant.blockNodeCount){
+            Constant.BLOCK_QUEUE.offer(blocks);
+            int size = Constant.BLOCK_QUEUE.size();
+            if(size == Constant.BLOCK_NODE_COUNT){
                 //满了，进行校验
                 padding = true;
                 //异步处理,不然其他的都在处于等待
@@ -120,7 +117,7 @@ public class BlockHandler {
                     //更改状态
                     padding = false;
                     //清空队列
-                    Constant.blockQueue.clear();
+                    Constant.BLOCK_QUEUE.clear();
                 }
             }
         });
@@ -129,7 +126,7 @@ public class BlockHandler {
     //检查各节点区块，取出共用的区块高度
     protected Set<Block> getShareBlocks(){
         Set<Block> list = new HashSet<>();
-        Iterator<List<Block>> iterator = Constant.blockQueue.iterator();
+        Iterator<List<Block>> iterator = Constant.BLOCK_QUEUE.iterator();
         List<Block> baseBlocks = null;
         //获取第一个节点的数据
         if(iterator.hasNext()){

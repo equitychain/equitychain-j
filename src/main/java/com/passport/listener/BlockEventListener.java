@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -42,7 +44,7 @@ public class BlockEventListener {
 	 * @param event
 	 */
 	@EventListener(SyncNextBlockEvent.class)
-	public void syncNextBlock(SyncNextBlockEvent event) {
+	public void syncNextBlock(SyncNextBlockEvent event) throws ParseException {
 		Long blockHeight = CastUtils.castLong(event.getSource());
 		if (blockHeight == 0) {
 			//取出本地存储的最新区块高度
@@ -77,11 +79,12 @@ public class BlockEventListener {
 	}
 
 	//创建创世块
-	private Block createGenesisBlock() {
+	private Block createGenesisBlock() throws ParseException {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		BlockHeader header = new BlockHeader();
 		header.setHashPrevBlock(hashPrevBlock.getBytes());
 		header.setHashMerkleRoot(hashMerkleRoot.getBytes());
-		header.setTimeStamp(System.currentTimeMillis());
+		header.setTimeStamp(format.parse("1900-01-01 00:00:00").getTime());
 
 		Block block = new Block();
 		block.setBlockHeader(header);
