@@ -200,6 +200,11 @@ public class RocksDBAccess implements DBAccess {
 	}
 
 	@Override
+	public void deleteUnconfirmTransaction(String txHash) {
+		delete(UNCONFIRM_TRANSACTIONS_BUCKET_PREFIX + txHash);
+	}
+
+	@Override
 	public List<Transaction> listUnconfirmTransactions() {
 		List<Object> objects = seekByKey(UNCONFIRM_TRANSACTIONS_BUCKET_PREFIX);
 		List<Transaction> transactions = new ArrayList<>();

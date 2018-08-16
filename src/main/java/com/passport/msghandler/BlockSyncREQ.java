@@ -1,8 +1,12 @@
 package com.passport.msghandler;
 
 import com.google.common.base.Optional;
+import com.passport.constant.Constant;
+import com.passport.constant.SyncFlag;
 import com.passport.core.Block;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.event.SyncNextBlockEvent;
+import com.passport.listener.ApplicationContextProvider;
 import com.passport.proto.BlockMessage;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.CastUtils;
@@ -34,11 +38,18 @@ public class BlockSyncREQ extends Strategy {
     private BlockHandler blockHandler;
     @Autowired
     private TransactionHandler transactionHandler;
+    @Autowired
+    private ApplicationContextProvider provider;
 
     private Lock lock = new ReentrantLock();
 
     public void handleReqMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块广播请求数据：{}", GsonUtils.toJson(message));
+        if(SyncFlag.isNextBlockSyncFlag()){
+            logger.info("正在主动同步区块，暂时不处理流水广播消息");
+            return;
+        }
+
         try {
             lock.lock();
             BlockMessage.Block block = message.getData().getBlock();
@@ -49,7 +60,15 @@ public class BlockSyncREQ extends Strategy {
                 return;
             }
             long lastBlockHeight = CastUtils.castLong(lastBlockHeightOptional.get());
-            if((lastBlockHeight + 1) != block.getBlockHeight()){//最后的区块高度+1=广播过来的区块高度，表示区块按顺序处理
+            long blockHeight = block.getBlockHeight();
+            if((lastBlockHeight + 1) != blockHeight){//最后的区块高度+1=广播过来的区块高度，表示区块按顺序处理
+                //如果本地高度和广播过来的区块高度差
+                if(blockHeight - lastBlockHeight >= Constant.BLOCK_HEIGHT_GAP){
+                    //修改主动同步标记
+                    SyncFlag.setNextBlockSyncFlag(true);
+                    //发布主动同步事件
+                    provider.publishEvent(new SyncNextBlockEvent(0L));
+                }
                 return;
             }
 

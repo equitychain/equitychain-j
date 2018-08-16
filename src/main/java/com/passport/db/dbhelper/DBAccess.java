@@ -122,6 +122,12 @@ public interface DBAccess {
 	Optional<Transaction> getUnconfirmTransaction(String txHash);
 
 	/**
+	 * 删除未确认流水
+	 * @param txHash
+	 */
+	void deleteUnconfirmTransaction(String txHash);
+
+	/**
 	 * 未确认流水列表
 	 * @return
 	 */

@@ -1,8 +1,8 @@
 package com.passport.msghandler;
 
+import com.passport.constant.SyncFlag;
 import com.passport.core.Block;
 import com.passport.db.dbhelper.DBAccess;
-import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.proto.BlockMessage;
 import com.passport.proto.NettyMessage;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * 客户端处理区块同步响应
@@ -44,6 +43,7 @@ public class NextBlockSyncRESP extends Strategy {
         List<BlockMessage.Block> blocks = message.getData().getBlocksList();
         if(blocks==null || blocks.size() == 0){
             //同步完了，不进行广播，
+            SyncFlag.setNextBlockSyncFlag(false);
             return;
         }
         List<Block> blockList = new ArrayList<>();

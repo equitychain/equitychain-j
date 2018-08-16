@@ -31,6 +31,5 @@ public interface Constant {
   // 区块最多打包的流水数量
   int TRANS_SIZE = 100;
 
-  String TEST = "asd";
-
+  Integer BLOCK_HEIGHT_GAP = 30;//本地区块和广播过来的区块高度差
 }

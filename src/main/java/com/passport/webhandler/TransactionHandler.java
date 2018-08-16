@@ -131,10 +131,10 @@ public class TransactionHandler {
      * 执行流水,
      * @param currentBlock
      */
-    public void exec(Block currentBlock) {
+    public void exec(List<Transaction> list) {
         //需要清空，不然会冗余很多
         eggUsedTemp.clear();
-        for (Transaction transaction : currentBlock.getTransactions()) {
+        for (Transaction transaction : list) {
             String receiptAddress = new String(transaction.getReceiptAddress());//收款地址
             byte[] payAddressByte = transaction.getPayAddress();//付款地址byte
             BigDecimal valueBigDecimal = CastUtils.castBigDecimal(new String(transaction.getValue()));//交易金额
@@ -255,14 +255,37 @@ public class TransactionHandler {
      * @param blockLocal
      */
     public void matchUnConfirmTransactions(Block blockLocal) {
+        //取区块流水列表
         List<Transaction> transactions = blockLocal.getTransactions();
         List<byte[]> hashBytes = transactions.stream().map(Transaction::getHash).collect(Collectors.toList());
 
+        //匹配区块流水和未确认流水
+        List<Transaction> matchTransactions = new ArrayList<>();
         List<Transaction> unconfirmTransactions = dbAccess.listUnconfirmTransactions();
-        unconfirmTransactions.forEach(untrans -> {
-            if(hashBytes.contains(untrans.getHash())){
-                //删除未确认流水，
+        for (Transaction untrans : unconfirmTransactions) {
+            if(untrans.getPayAddress() == null){//挖矿流水直接成功
+                matchTransactions.add(untrans);
+                continue;
             }
+            if(hashBytes.contains(untrans.getHash())){
+                matchTransactions.add(untrans);
+            }
+        }
+
+        //删除未确认流水
+        deleteUnconfirmTransactions(matchTransactions);
+
+        //执行流水
+        exec(matchTransactions);
+    }
+
+    /**
+     * 删除未确认流水
+     * @param matchTransactions 与区块流水匹配成功的未确认流水
+     */
+    private void deleteUnconfirmTransactions(List<Transaction> matchTransactions) {
+        matchTransactions.forEach(transaction -> {
+            dbAccess.deleteUnconfirmTransaction(transaction.getHash().toString());
         });
     }
 }
