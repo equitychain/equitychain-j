@@ -105,7 +105,7 @@ public class MinerHandler {
         });
 
         //执行流水
-        transactionHandler.exec(currentBlock);
+        transactionHandler.exec(currentBlock.getTransactions());
 
         //把新增的区块存储到本地
         dbAccess.putLastBlockHeight(prevBlock.getBlockHeight() + 1);

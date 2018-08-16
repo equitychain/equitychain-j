@@ -6,12 +6,13 @@ import com.google.protobuf.ByteString;
 import com.passport.constant.Constant;
 import com.passport.core.Block;
 import com.passport.core.BlockHeader;
-import com.passport.core.MerkleTree;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
-import com.passport.proto.*;
+import com.passport.proto.BlockHeaderMessage;
+import com.passport.proto.BlockMessage;
+import com.passport.proto.TransactionMessage;
 import com.passport.utils.RawardUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class BlockHandler {
@@ -111,6 +110,11 @@ public class BlockHandler {
                     for(Block blockLocal : successBlocks) {
                         dbAccess.putBlock(blockLocal);
                         dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
+
+                        //同时保存区块中的流水到已确认流水列表中
+                        blockLocal.getTransactions().forEach(transaction -> {
+                            dbAccess.putConfirmTransaction(transaction);
+                        });
                     }
                     //继续同步下组区块
                     provider.publishEvent(new SyncNextBlockEvent(0L));

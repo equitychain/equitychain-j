@@ -1,6 +1,7 @@
 package com.passport.msghandler;
 
 import com.google.common.base.Optional;
+import com.passport.constant.SyncFlag;
 import com.passport.core.Transaction;
 import com.passport.crypto.ECDSAUtil;
 import com.passport.crypto.eth.Sign;
@@ -31,6 +32,10 @@ public class SendTransactionREQ extends Strategy {
 
     public void handleReqMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理交易转账请求数据：{}", GsonUtils.toJson(message));
+        if(SyncFlag.isNextBlockSyncFlag()){
+            logger.info("正在主动同步区块，暂时不处理流水广播消息");
+            return;
+        }
 
         TransactionMessage.Transaction transaction = message.getData().getTransaction();
         Transaction trans = new Transaction();
