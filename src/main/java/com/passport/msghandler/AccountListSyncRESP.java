@@ -37,7 +37,8 @@ public class AccountListSyncRESP extends Strategy {
                 Account acc = new Account();
                 acc.setAddress(String.valueOf(account.getAddress()));
                 acc.setPrivateKey(String.valueOf(account.getPrivateKey().toString()));
-                acc.setBalance(new BigDecimal(String.valueOf(account.getBalance())));
+                byte[] balanceByte = account.getBalance().toByteArray();
+                acc.setBalance((balanceByte==null||balanceByte.length==0)?BigDecimal.ZERO:new BigDecimal(new String(balanceByte)));
                 boolean flag = dbAccess.putAccount(acc);
                 if(flag){
                     logger.info("同步账户列表地址{}成功", acc.getAddress());
