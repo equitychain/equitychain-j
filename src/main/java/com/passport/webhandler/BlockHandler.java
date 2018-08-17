@@ -142,16 +142,21 @@ public class BlockHandler {
         }else{
             return list;
         }
-        //某个节点的区块与其余节点的区块进行比较
-        while (iterator.hasNext()){
-            List<Block> blocks = iterator.next();
-            for(Block b : baseBlocks){
-                if(blocks.contains(b)){
-                    list.add(b);
-                }else{
-                    list.remove(b);
+        if(iterator.hasNext()) {
+            //某个节点的区块与其余节点的区块进行比较
+            while (iterator.hasNext()) {
+                List<Block> blocks = iterator.next();
+                for (Block b : baseBlocks) {
+                    if (blocks.contains(b)) {
+                        list.add(b);
+                    } else {
+                        list.remove(b);
+                    }
                 }
             }
+        }else{
+            //如果就只连接了一个节点，那就同步这个节点的区块
+            list.addAll(baseBlocks);
         }
         return list;
     }
