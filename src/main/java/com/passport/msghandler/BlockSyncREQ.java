@@ -43,7 +43,7 @@ public class BlockSyncREQ extends Strategy {
 
     private Lock lock = new ReentrantLock();
 
-    public void handleReqMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
+    public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块广播请求数据：{}", GsonUtils.toJson(message));
         if(SyncFlag.isNextBlockSyncFlag()){
             logger.info("正在主动同步区块，暂时不处理流水广播消息");
@@ -62,8 +62,10 @@ public class BlockSyncREQ extends Strategy {
             long lastBlockHeight = CastUtils.castLong(lastBlockHeightOptional.get());
             long blockHeight = block.getBlockHeight();
             if((lastBlockHeight + 1) != blockHeight){//最后的区块高度+1=广播过来的区块高度，表示区块按顺序处理
+                logger.info("本地区块最新高度和广播过来的区块高度相差!=1");
                 //如果本地高度和广播过来的区块高度差
                 if(blockHeight - lastBlockHeight >= Constant.BLOCK_HEIGHT_GAP){
+                    logger.info("本地区块最新高度和广播过来的区块高度相差>=30");
                     //修改主动同步标记
                     SyncFlag.setNextBlockSyncFlag(true);
                     //发布主动同步事件

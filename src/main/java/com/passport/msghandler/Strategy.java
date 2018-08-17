@@ -10,6 +10,12 @@ import io.netty.channel.ChannelHandlerContext;
  **/
 public abstract class Strategy {
     /**
+     * 处理请求消息
+     * @param message
+     */
+    void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message){}
+
+    /**
      * 服务端处理请求消息
      * @param message
      */
