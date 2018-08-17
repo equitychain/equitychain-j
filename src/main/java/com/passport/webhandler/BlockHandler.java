@@ -204,7 +204,7 @@ public class BlockHandler {
         //构造区块头
         BlockHeaderMessage.BlockHeader.Builder blockHeaderBuilder = BlockHeaderMessage.BlockHeader.newBuilder();
         blockHeaderBuilder.setTimeStamp(block.getBlockHeader().getTimeStamp());
-        blockHeaderBuilder.setHashPrevBlock(ByteString.copyFrom(block.getBlockHeader().getHashMerkleRoot()));
+        blockHeaderBuilder.setHashPrevBlock(ByteString.copyFrom(block.getBlockHeader().getHashPrevBlock()));
         blockHeaderBuilder.setHashMerkleRoot(ByteString.copyFrom(block.getBlockHeader().getHashMerkleRoot()));
         blockHeaderBuilder.setHash(ByteString.copyFrom(block.getBlockHeader().getHash()));
 

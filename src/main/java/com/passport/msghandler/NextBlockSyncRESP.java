@@ -33,7 +33,7 @@ public class NextBlockSyncRESP extends Strategy {
     @Autowired
     private BlockHandler blockHandler;
     @Override
-    public void handleRespMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
+    public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块同步响应结果：{}", GsonUtils.toJson(message));
         if(blockHandler.padding){
             //正在处理

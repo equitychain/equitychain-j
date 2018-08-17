@@ -24,7 +24,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
         logger.info("client read data客户端读到的数据是：{}", GsonUtils.toJson(message));
-        strategyContext.handleRespMsgMain(ctx, message);
+        strategyContext.handleMsgMain(ctx, message);
     }
 
     @Override

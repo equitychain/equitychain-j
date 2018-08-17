@@ -28,6 +28,22 @@ public class StrategyContext {
     }
 
     /**
+     * 请求消息入口
+     * @param ctx
+     * @param message
+     */
+    public void handleMsgMain(ChannelHandlerContext ctx, NettyMessage.Message message) {
+        System.out.println(message.getMessageType());
+        System.out.println(message.getData().getDataType());
+        Strategy strategy = strategyMap.get(message.getMessageType()+"_"+message.getData().getDataType());
+        if(strategy != null){
+            strategy.handleMsg(ctx, message);
+        }else{
+            ctx.fireChannelRead(message);
+        }
+    }
+
+    /**
      * 应用请求消息路由到handleReqMsg
      * @param message
      */

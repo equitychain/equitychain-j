@@ -27,7 +27,7 @@ public class NextBlockSyncREQ extends Strategy {
     @Autowired
     private BlockHandler blockHdandler;
 
-    public void handleReqMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
+    public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块同步请求数据：{}", GsonUtils.toJson(message));
 
         BlockMessage.Block blockInfo = message.getData().getBlock();
