@@ -45,7 +45,7 @@ public class BlockHandler {
 
         //后续区块
         if (blockHeight > 1) {
-            boolean flag = Objects.equal(block.getBlockHeader().getHash(), block.calculateFieldValueWithHash());
+            boolean flag = Arrays.equals(block.getBlockHeader().getHash(), block.calculateFieldValueWithHash());
             if(!flag){
                 return false;
             }
@@ -54,7 +54,7 @@ public class BlockHandler {
             if(prevBlock.isPresent()){
                 byte[] hashOfPrevBlock = prevBlock.get().getBlockHeader().getHash();//前一个区块hash
                 byte[] prevHashOfCurrentBlock = block.getBlockHeader().getHashPrevBlock();//当前区块的前一个区块hash
-                if (!hashOfPrevBlock.equals(prevHashOfCurrentBlock)) {//前一个区块的hash和当前区块的前一个区块hash是否相等
+                if (!Arrays.equals(hashOfPrevBlock,prevHashOfCurrentBlock)) {//前一个区块的hash和当前区块的前一个区块hash是否相等
                     return false;
                 }
             }
@@ -205,7 +205,7 @@ public class BlockHandler {
         //构造区块头
         BlockHeaderMessage.BlockHeader.Builder blockHeaderBuilder = BlockHeaderMessage.BlockHeader.newBuilder();
         blockHeaderBuilder.setTimeStamp(block.getBlockHeader().getTimeStamp());
-        blockHeaderBuilder.setHashPrevBlock(ByteString.copyFrom(block.getBlockHeader().getHashMerkleRoot()));
+        blockHeaderBuilder.setHashPrevBlock(ByteString.copyFrom(block.getBlockHeader().getHashPrevBlock()));
         blockHeaderBuilder.setHashMerkleRoot(ByteString.copyFrom(block.getBlockHeader().getHashMerkleRoot()));
         blockHeaderBuilder.setHash(ByteString.copyFrom(block.getBlockHeader().getHash()));
 
