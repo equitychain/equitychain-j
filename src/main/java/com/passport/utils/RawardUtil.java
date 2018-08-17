@@ -8,11 +8,11 @@ public class RawardUtil {
     //计算区块奖励算法
     public static BigDecimal getRewardByHeight(long height){
         //那个周期
-        long cycleIndex = height/Constant.cycle;
+        long cycleIndex = height/Constant.CYCLE;
         //奖励衰减公式
         //衰减倍数
         BigDecimal factor = new BigDecimal(Math.pow(Constant.multiple,Double.parseDouble(cycleIndex+"")));
-        BigDecimal reward = Constant.baseReward.multiply(factor);
+        BigDecimal reward = Constant.BASE_REWARD.multiply(factor);
         return reward;
     }
     //校验高度的奖励

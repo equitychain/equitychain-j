@@ -45,7 +45,7 @@ public class BlockHandler {
 
         //后续区块
         if (blockHeight > 1) {
-            boolean flag = Objects.equal(block.getBlockHeader().getHash(), block.calculateFieldValueWithHash());
+            boolean flag = Arrays.equals(block.getBlockHeader().getHash(), block.calculateFieldValueWithHash());
             if(!flag){
                 return false;
             }
@@ -54,7 +54,7 @@ public class BlockHandler {
             if(prevBlock.isPresent()){
                 byte[] hashOfPrevBlock = prevBlock.get().getBlockHeader().getHash();//前一个区块hash
                 byte[] prevHashOfCurrentBlock = block.getBlockHeader().getHashPrevBlock();//当前区块的前一个区块hash
-                if (!hashOfPrevBlock.equals(prevHashOfCurrentBlock)) {//前一个区块的hash和当前区块的前一个区块hash是否相等
+                if (!Arrays.equals(hashOfPrevBlock,prevHashOfCurrentBlock)) {//前一个区块的hash和当前区块的前一个区块hash是否相等
                     return false;
                 }
             }
@@ -67,7 +67,8 @@ public class BlockHandler {
             boolean reword = false;
             for(Transaction tran : transactions) {
                 byte[] payAddr = tran.getPayAddress();
-                if (payAddr == null && tran.getExtarData() != null && Arrays.equals("挖矿奖励".getBytes(), tran.getExtarData())) {
+                byte[] compByt = "挖矿奖励".getBytes();
+                if ((payAddr == null||payAddr.length==0) && tran.getExtarData() != null && Arrays.equals(compByt, tran.getExtarData())) {
                     //奖励的流水
                     byte[] value = tran.getValue();
                     reword = RawardUtil.checkReward(blockHeight, value);
@@ -86,9 +87,9 @@ public class BlockHandler {
                 return block1.getBlockHeight().compareTo(block2.getBlockHeight());
             });
             //添加到队列中
-            Constant.blockQueue.offer(blocks);
-            int size = Constant.blockQueue.size();
-            if(size == Constant.blockNodeCount){
+            Constant.BLOCK_QUEUE.offer(blocks);
+            int size = Constant.BLOCK_QUEUE.size();
+            if(size == Constant.BLOCK_NODE_COUNT){
                 //满了，进行校验
                 padding = true;
                 //异步处理,不然其他的都在处于等待
@@ -124,7 +125,7 @@ public class BlockHandler {
                     //更改状态
                     padding = false;
                     //清空队列
-                    Constant.blockQueue.clear();
+                    Constant.BLOCK_QUEUE.clear();
                 }
             }
         });
@@ -133,7 +134,7 @@ public class BlockHandler {
     //检查各节点区块，取出共用的区块高度
     protected Set<Block> getShareBlocks(){
         Set<Block> list = new HashSet<>();
-        Iterator<List<Block>> iterator = Constant.blockQueue.iterator();
+        Iterator<List<Block>> iterator = Constant.BLOCK_QUEUE.iterator();
         List<Block> baseBlocks = null;
         //获取第一个节点的数据
         if(iterator.hasNext()){
