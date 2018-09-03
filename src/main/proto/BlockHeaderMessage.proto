@@ -1,0 +1,10 @@
+syntax = "proto3";
+option java_package = "com.passport.proto";
+option java_outer_classname = "BlockHeaderMessage";
+
+message BlockHeader {
+  int64 timeStamp = 1;
+  bytes hashPrevBlock = 2;
+  bytes hashMerkleRoot = 3;
+  bytes hash = 4;
+}

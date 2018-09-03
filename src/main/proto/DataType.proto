@@ -1,0 +1,12 @@
+syntax = "proto3";
+option java_package = "com.passport.proto";
+option java_outer_classname = "DataTypeEnum";
+
+enum DataType {
+  HEART_BEAT = 0;
+  NEXT_BLOCK_SYNC = 1;
+  ACCOUNTLIST_SYNC = 2;
+  ACCOUNT_SYNC = 3;
+  SEND_TRANSACTION = 4;
+  BLOCK_SYNC = 5;
+}

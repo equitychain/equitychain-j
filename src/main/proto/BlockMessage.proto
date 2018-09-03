@@ -1,0 +1,13 @@
+syntax = "proto3";
+import "BlockHeaderMessage.proto";
+import "TransactionMessage.proto";
+option java_package = "com.passport.proto";
+option java_outer_classname = "BlockMessage";
+
+message Block {
+  int64 blockSize = 1;
+  int64 blockHeight = 2;
+  BlockHeader blockHeader = 3;
+  int32 transactionCount = 4;
+  repeated Transaction transactions = 5;
+}

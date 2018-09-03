@@ -1,0 +1,16 @@
+syntax = "proto3";
+option java_package = "com.passport.proto";
+option java_outer_classname = "TransactionMessage";
+
+message Transaction {
+  bytes hash = 1;
+  bytes signature = 2;
+  bytes value = 3;
+  bytes payAddress = 4;
+  bytes receiptAddress = 5;
+  bytes eggPrice = 6;
+  bytes eggMax = 7;
+  bytes timeStamp = 8;
+  bytes extarData = 9;
+  bytes publicKey = 10;
+}

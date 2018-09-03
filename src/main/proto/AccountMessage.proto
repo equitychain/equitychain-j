@@ -1,0 +1,9 @@
+syntax = "proto3";
+option java_package = "com.passport.proto";
+option java_outer_classname = "AccountMessage";
+
+message Account {
+  bytes address = 1;
+  bytes privateKey = 2;
+  bytes balance = 3;
+}

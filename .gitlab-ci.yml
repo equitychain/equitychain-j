@@ -1,0 +1,29 @@
+image: maven:3-jdk-8
+
+stages:
+  - build
+  - test
+  - deploy
+
+job_build:
+  stage: build
+  script:
+    - mvn clean package
+  only:
+    - master
+  tags:
+    - first
+
+job_test:
+  stage: test
+  script:
+    - mvn test
+  tags:
+    - first
+
+job_deploy:
+  stage: deploy
+  script:
+    - echo "deploy over..."
+  tags:
+    - first
