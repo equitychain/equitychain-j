@@ -1,24 +1,30 @@
 package com.passport.webhandler;
 
 import com.google.common.base.Optional;
+import com.passport.constant.Constant;
 import com.passport.core.Account;
+import com.passport.core.GenesisBlockInfo;
+import com.passport.core.Transaction;
+import com.passport.core.Trustee;
 import com.passport.crypto.eth.ECKeyPair;
 import com.passport.crypto.eth.WalletUtils;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.exception.CipherException;
 import com.passport.listener.ApplicationContextProvider;
+import com.passport.utils.GsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class AccountHandler {
@@ -34,11 +40,22 @@ public class AccountHandler {
     @Value("${wallet.keystoreDir}")
     private String walletDir;
 
+    @Autowired
+    private TransactionHandler transactionHandler;
+
     /**
      * 新增账号
      * @return 账号
      */
     public Account newAccount(String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, CipherException, IOException {
+        Account account = generateAccount(password);
+        if (dbAccess.putAccount(account)) {
+            return account;
+        }
+        return null;
+    }
+
+    private Account generateAccount(String password) throws CipherException, IOException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         File file = new File(walletDir);
         if (!file.exists()) {
             file.mkdir();
@@ -48,10 +65,7 @@ public class AccountHandler {
         ECKeyPair keyPair = WalletUtils.generateNewWalletFile(password, new File(walletDir), true);
         Account account = new Account(keyPair.getAddress(), keyPair.exportPrivateKey(), BigDecimal.ZERO);
         account.setPassword(password);
-        if (dbAccess.putAccount(account)) {
-            return account;
-        }
-        return null;
+        return account;
     }
 
     //用户替换挖矿账号
@@ -74,4 +88,40 @@ public class AccountHandler {
         }
     }
 
+    /**
+     * 初始化受托人
+     */
+    public void generateTrustees(){
+        GenesisBlockInfo genesisBlockInfo = new GenesisBlockInfo();
+        List<Account> accounts = new ArrayList<>();
+        List<Transaction> transactions = new ArrayList<>();
+        List<Trustee> trustees = new ArrayList<>();
+        for (int i = 0; i < Constant.TRUSTEES_INIT_NUM; i++) {
+            try {
+                //创建账户
+                Account account = generateAccount("123456");
+                dbAccess.putAccount(account);
+                accounts.add(new Account(account.getAddress(), account.getBalance()));//不保存私钥
+
+                //创建注册为受托人交易
+                Transaction transaction = transactionHandler.generateTransaction(account.getAddress(), null, "0", "", account);
+                transactions.add(transaction);
+
+                //把新增的受托人放到受托人列表
+                Trustee trustee = new Trustee(account.getAddress(), 0L, 0f, new BigDecimal(0));
+                trustees.add(trustee);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        genesisBlockInfo.setAccounts(accounts);
+        genesisBlockInfo.setTransactions(transactions);
+        genesisBlockInfo.setTrustees(trustees);
+        //在项目下生成json文件
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(Constant.GENESIS_PATH))) {
+            writer.write(GsonUtils.toJson(genesisBlockInfo));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

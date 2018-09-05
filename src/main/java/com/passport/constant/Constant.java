@@ -1,6 +1,7 @@
 package com.passport.constant;
 
 import com.passport.core.Block;
+import com.passport.utils.DateUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -32,4 +33,16 @@ public interface Constant {
   int TRANS_SIZE = 100;
 
   Integer BLOCK_HEIGHT_GAP = 30;//本地区块和广播过来的区块高度差
+
+  Integer BLOCK_SYNC_PERTIME = 50;//一次主动同步的区块数
+
+  Integer TRUSTEES_INIT_NUM = 11;//受托人初始化的人数
+
+  Long GENESIS_BLOCK_TIMESTAMP = DateUtils.formatStringDate("2018-09-01 00:00:00").getTime();//创世区块时间
+
+  String GENESIS_PATH = "./genesis.json";//创世文件
+
+  BigDecimal FEE_4_REGISTER_TRUSTEE = new BigDecimal(100);//注册成为受托人资金
+  BigDecimal FEE_4_REGISTER_VOTER = new BigDecimal(10);//注册成为投票人资产
+  Integer CHANCE_4_VOTER = 10;//投票人总投票数
 }

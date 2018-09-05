@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.passport.core.Account;
 import com.passport.core.Block;
 import com.passport.core.Transaction;
+import com.passport.core.Trustee;
 
 import java.util.List;
 
@@ -150,4 +151,17 @@ public interface DBAccess {
 	Optional<Account> getMinerAccount();
 
 	boolean putMinerAccount(Account account);
+
+	/**
+	 * 添加一个受托人
+	 * @param account
+	 * @return
+	 */
+	boolean putTrustee(Trustee trustee);
+
+	/**
+	 * 获取受托人列表
+	 * @return
+	 */
+	List<Trustee> listTrustees();
 }

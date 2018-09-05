@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.passport.core.Account;
 import com.passport.core.Block;
 import com.passport.core.Transaction;
+import com.passport.core.Trustee;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.*;
 import org.slf4j.Logger;
@@ -238,5 +239,15 @@ public class RocksDBAccess implements DBAccess {
 
     public boolean putMinerAccount(Account account){
 		return this.put(MINERACCOUNT, account);
+	}
+
+	@Override
+	public boolean putTrustee(Trustee trustee) {
+		return false;
+	}
+
+	@Override
+	public List<Trustee> listTrustees() {
+		return null;
 	}
 }

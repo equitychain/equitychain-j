@@ -104,7 +104,7 @@ public class TransactionHandler {
     public Transaction generateTransaction(String payAddress, String receiptAddress, String value, String extarData, Account accountPay) {
         Transaction transaction = new Transaction();
         transaction.setPayAddress(payAddress.getBytes());
-        transaction.setReceiptAddress(receiptAddress.getBytes());
+        transaction.setReceiptAddress(receiptAddress == null?null:receiptAddress.getBytes());
         transaction.setValue(value.getBytes());
         transaction.setExtarData(extarData.getBytes());
         transaction.setTime(ByteUtil.longToBytesNoLeadZeroes(System.currentTimeMillis()));

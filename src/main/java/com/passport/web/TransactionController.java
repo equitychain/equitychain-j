@@ -42,6 +42,7 @@ public class TransactionController {
         }
 
         Transaction transaction = transactionHandler.sendTransaction(payAddress, receiptAddress, value, extarData, password);
+
         return new ResultDto(ResultEnum.SUCCESS.getCode(), transaction);
     }
 }
