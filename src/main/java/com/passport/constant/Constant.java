@@ -24,7 +24,7 @@ public interface Constant {
   ArrayBlockingQueue<List<Block>> BLOCK_QUEUE = new ArrayBlockingQueue(BLOCK_NODE_COUNT);
 
   //初始奖励金额
-  BigDecimal BASE_REWARD = new BigDecimal("100");
+  BigDecimal BASE_REWARD = new BigDecimal("10");
   //金额衰减周期  高度
   int CYCLE = 100;
   //衰减倍数
@@ -43,6 +43,8 @@ public interface Constant {
   String GENESIS_PATH = "./genesis.json";//创世文件
 
   BigDecimal FEE_4_REGISTER_TRUSTEE = new BigDecimal(100);//注册成为受托人资金
+
   BigDecimal FEE_4_REGISTER_VOTER = new BigDecimal(10);//注册成为投票人资产
+
   Integer CHANCE_4_VOTER = 10;//投票人总投票数
 }

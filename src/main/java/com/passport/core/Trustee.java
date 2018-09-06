@@ -12,15 +12,16 @@ public class Trustee {
     private Long votes;//得票数
     private Float generateRate;//成功生成区块比率
     private BigDecimal income;//收入
-
+    private Integer status;//0撤消1正常
     public Trustee() {
     }
 
-    public Trustee(String address, Long votes, Float generateRate, BigDecimal income) {
+    public Trustee(String address, Long votes, Float generateRate, BigDecimal income, Integer status) {
         this.address = address;
         this.votes = votes;
         this.generateRate = generateRate;
         this.income = income;
+        this.status = status;
     }
 
     public String getAddress() {
@@ -53,5 +54,13 @@ public class Trustee {
 
     public void setIncome(BigDecimal income) {
         this.income = income;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }

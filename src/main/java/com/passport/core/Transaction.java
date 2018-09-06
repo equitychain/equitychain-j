@@ -44,6 +44,9 @@ public class Transaction {
   private byte[] publicKey;
 
   private byte[] eggUsed;
+
+  private byte[] tradeType;//交易类型
+  private byte[] blockHeight;//已确认流水打包到哪个区块
   //流水状态（等待 0， 成功 1， 失败 2）
   private Integer status;
 
@@ -149,6 +152,22 @@ public class Transaction {
 
   public void setStatus(Integer status) {
     this.status = status;
+  }
+
+  public byte[] getTradeType() {
+    return tradeType;
+  }
+
+  public void setTradeType(byte[] tradeType) {
+    this.tradeType = tradeType;
+  }
+
+  public byte[] getBlockHeight() {
+    return blockHeight;
+  }
+
+  public void setBlockHeight(byte[] blockHeight) {
+    this.blockHeight = blockHeight;
   }
 
   public Transaction(Integer nonce, byte[] hash, byte[] signature, byte[] value, byte[] payAddress,

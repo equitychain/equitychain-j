@@ -21,7 +21,11 @@ public enum ResultEnum {
 	ACCOUNT_IS_LOCKED(1002, "账户未解锁"),
 	PASSWORD_WRONG(1003, "交易密码错误"),
 	ADDRESS_ILLEGAL(1004, "钱包地址不合法"),
-	BALANCE_NOTENOUGH(5, "钱包地址不合法");
+	BALANCE_NOTENOUGH(1005, "余额不足"),
+	TRADETYPE_NOTFOUND(1006, "交易类型不存在"),
+	TRADEAMOUNT_ILLEGAL(1007, "交易金额不合法"),
+	TRUSTEE_EXISTS(1008, "委托人已注册"),
+	VOTER_EXISTS(1009, "投票人已注册");
 	//***账户***
 
 	private int code;

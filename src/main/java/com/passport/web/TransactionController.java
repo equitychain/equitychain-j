@@ -31,9 +31,10 @@ public class TransactionController {
     public ResultDto send(HttpServletRequest request) throws Exception {
         String payAddress = request.getParameter("payAddress");
         String receiptAddress = request.getParameter("receiptAddress");
-            String value = request.getParameter("value");
+        String value = request.getParameter("value");
         String extarData = request.getParameter("extarData");
         String password = request.getParameter("password");
+        String tradeType = request.getParameter("tradeType");
 
         //非空检验
         boolean flag = CheckUtils.checkParamIfEmpty(payAddress, receiptAddress, value, extarData);
@@ -41,8 +42,7 @@ public class TransactionController {
             return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
         }
 
-        Transaction transaction = transactionHandler.sendTransaction(payAddress, receiptAddress, value, extarData, password);
-
+        Transaction transaction = transactionHandler.sendTransaction(payAddress, receiptAddress, value, extarData, password, tradeType);
         return new ResultDto(ResultEnum.SUCCESS.getCode(), transaction);
     }
 }

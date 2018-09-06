@@ -2,15 +2,14 @@ package com.passport.webhandler;
 
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
-import com.passport.core.Account;
-import com.passport.core.Block;
-import com.passport.core.Transaction;
+import com.passport.core.*;
 import com.passport.crypto.ECDSAUtil;
 import com.passport.crypto.eth.Credentials;
 import com.passport.crypto.eth.Sign;
 import com.passport.crypto.eth.WalletUtils;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.enums.ResultEnum;
+import com.passport.enums.TransactionTypeEnum;
 import com.passport.event.SendTransactionEvent;
 import com.passport.exception.CommonException;
 import com.passport.listener.ApplicationContextProvider;
@@ -48,12 +47,19 @@ public class TransactionHandler {
      * @param receiptAddress
      * @param value
      * @param extarData
+     * @param tradeType 交易类型
      * @return
      */
-    public Transaction sendTransaction(String payAddress, String receiptAddress, String value, String extarData, String password) throws CommonException {
+    public Transaction sendTransaction(String payAddress, String receiptAddress, String value, String extarData, String password, String tradeType) throws CommonException {
         //判断是否解锁
         //if(LockUtil.isUnlock(payAddress)) {
         if(true) {
+            //0.验证交易类型是否存在，交易类型对应的金额是否合法，是否已经注册过受托人或者投票人
+            CommonException commonException = check4AllTradeType(tradeType, value, payAddress);
+            if (commonException != null){
+                throw commonException;
+            }
+
             //1.支付地址,接收地址是否合法 TODO 正则校验
             if (!WalletUtils.isValidAddress(payAddress) && !WalletUtils.isValidAddress(receiptAddress)) {
                 throw new CommonException(ResultEnum.ADDRESS_ILLEGAL);
@@ -83,13 +89,76 @@ public class TransactionHandler {
 
             //5.使用支付方的私钥加密数据 TODO 构造签名数据
             Transaction transaction = generateTransaction(payAddress, receiptAddress, value, extarData, accountPay);
+            transaction.setTradeType(TransactionTypeEnum.TRANSFER.toString().getBytes());
 
-            //6.发布广播交易事件
+            //6.放到自己的未确认流水中
+            dbAccess.putUnconfirmTransaction(transaction);
+
+            //7.发布广播交易事件
             provider.publishEvent(new SendTransactionEvent(transaction));
             return transaction;
         } else {
             throw new CommonException(ResultEnum.ACCOUNT_IS_LOCKED);
         }
+    }
+
+    /**
+     * 检查特定交易类型的交易金额是否合法
+     * @param tradeType
+     * @param value
+     * @return
+     */
+    public CommonException checkValue4AllTradeType(String tradeType, String value) {
+        TransactionTypeEnum transactionTypeEnum = TransactionTypeEnum.statusOf(tradeType);
+        if(transactionTypeEnum == null){
+            return new CommonException(ResultEnum.TRADETYPE_NOTFOUND);
+        }
+        if(TransactionTypeEnum.TRUSTEE_REGISTER.getDesc().equals(transactionTypeEnum.getDesc())){
+            if(new BigDecimal(value).compareTo(Constant.FEE_4_REGISTER_TRUSTEE) != 0){
+                return new CommonException(ResultEnum.TRADEAMOUNT_ILLEGAL);
+            }
+        }else if(TransactionTypeEnum.VOTER_REGISTER.getDesc().equals(transactionTypeEnum.getDesc())){
+            if(new BigDecimal(value).compareTo(Constant.FEE_4_REGISTER_VOTER) != 0){
+                return new CommonException(ResultEnum.TRADEAMOUNT_ILLEGAL);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 检查特定交易类型的交易金额是否合法
+     * @param tradeType
+     * @param value
+     * @return
+     */
+    public CommonException check4AllTradeType(String tradeType, String value, String payAddress) {
+        CommonException commonException = checkValue4AllTradeType(tradeType, value);
+        if(commonException != null){
+            return commonException;
+        }
+
+        TransactionTypeEnum transactionTypeEnum = TransactionTypeEnum.statusOf(tradeType);
+        if(TransactionTypeEnum.TRUSTEE_REGISTER.getDesc().equals(transactionTypeEnum.getDesc())){
+            //判断是否已经是委托人
+            Optional<Trustee> trusteeOptional = dbAccess.getTrustee(payAddress);
+            if(trusteeOptional.isPresent()){
+                Trustee trustee = trusteeOptional.get();
+                if(trustee.getStatus() == 1){
+                    return new CommonException(ResultEnum.TRUSTEE_EXISTS);
+                }
+            }
+        }else if(TransactionTypeEnum.VOTER_REGISTER.getDesc().equals(transactionTypeEnum.getDesc())){
+            //判断是否已经是投票人
+            Optional<Voter> voterOptional = dbAccess.getVoter(payAddress);
+            if(voterOptional.isPresent()){
+                Voter Voter = voterOptional.get();
+                if(Voter.getStatus() == 1){
+                    return new CommonException(ResultEnum.VOTER_EXISTS);
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

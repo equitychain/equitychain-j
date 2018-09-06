@@ -9,6 +9,7 @@ import com.passport.core.Trustee;
 import com.passport.crypto.eth.ECKeyPair;
 import com.passport.crypto.eth.WalletUtils;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.enums.TransactionTypeEnum;
 import com.passport.exception.CipherException;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.utils.GsonUtils;
@@ -105,10 +106,12 @@ public class AccountHandler {
 
                 //创建注册为受托人交易
                 Transaction transaction = transactionHandler.generateTransaction(account.getAddress(), null, "0", "", account);
+                transaction.setTradeType(TransactionTypeEnum.TRUSTEE_REGISTER.toString().getBytes());
+                transaction.setBlockHeight("1".getBytes());
                 transactions.add(transaction);
 
                 //把新增的受托人放到受托人列表
-                Trustee trustee = new Trustee(account.getAddress(), 0L, 0f, new BigDecimal(0));
+                Trustee trustee = new Trustee(account.getAddress(), 0L, 0f, new BigDecimal(0), 1);
                 trustees.add(trustee);
             } catch (Exception e) {
                 e.printStackTrace();
