@@ -6,9 +6,11 @@ import com.passport.core.Transaction;
 import com.passport.crypto.ECDSAUtil;
 import com.passport.crypto.eth.Sign;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.exception.CommonException;
 import com.passport.proto.NettyMessage;
 import com.passport.proto.TransactionMessage;
 import com.passport.utils.GsonUtils;
+import com.passport.webhandler.TransactionHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,8 @@ public class SendTransactionREQ extends Strategy {
 
     @Autowired
     private DBAccess dbAccess;
+    @Autowired
+    private TransactionHandler transactionHandler;
 
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理交易转账请求数据：{}", GsonUtils.toJson(message));
@@ -51,9 +55,15 @@ public class SendTransactionREQ extends Strategy {
             PublicKey publicKey = Sign.publicKeyFromByte(transaction.getPublicKey().toByteArray());
             boolean flag = ECDSAUtil.verifyECDSASig(publicKey, transactionJson, transaction.getSignature().toByteArray());
             if (flag) {
-                //放到交易流水里面
+                //放到未确认交易流水里面
                 Optional<Transaction> transactionOptional = dbAccess.getUnconfirmTransaction(transaction.getHash().toString());
                 if (!transactionOptional.isPresent()) {
+                    //特殊流水校验
+                    CommonException commonException = transactionHandler.checkValue4AllTradeType(new String(trans.getTradeType()), new String(trans.getValue()));
+                    if (commonException != null){
+                        return;
+                    }
+
                     trans.setHash(transaction.getHash().toByteArray());
                     trans.setSignature(transaction.getSignature().toByteArray());
                     trans.setPublicKey(transaction.getPublicKey().toByteArray());

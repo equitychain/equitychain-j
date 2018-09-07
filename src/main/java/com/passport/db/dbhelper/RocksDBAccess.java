@@ -1,8 +1,7 @@
 package com.passport.db.dbhelper;
 
 import com.google.common.base.Optional;
-import com.passport.core.Account;
-import com.passport.core.Block;
+import com.passport.core.*;
 import com.passport.core.Transaction;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.*;
@@ -37,6 +36,12 @@ public class RocksDBAccess implements DBAccess {
 	public static final String CONFIRM_TRANSACTIONS_BUCKET_PREFIX = "confirm_transactions_";
     //用户自己设置的挖矿账号
     public static final String MINERACCOUNT = "miner-account";
+	//委托人hash桶前缀
+	public static final String TRUSTEES_BUCKET_PREFIX = "trustee_";
+	//投票人hash桶前缀
+	public static final String VOTERS_BUCKET_PREFIX = "voter_";
+	//投票记录hash桶前缀
+	public static final String VOTE_RECORD_BUCKET_PREFIX = "vote_record_";
 
 	@Value("${db.dataDir}")
 	private String dataDir;
@@ -238,5 +243,70 @@ public class RocksDBAccess implements DBAccess {
 
     public boolean putMinerAccount(Account account){
 		return this.put(MINERACCOUNT, account);
+	}
+
+	@Override
+	public boolean putTrustee(Trustee trustee) {
+		return this.put(TRUSTEES_BUCKET_PREFIX + trustee.getAddress(), trustee);
+	}
+
+	@Override
+	public List<Trustee> listTrustees() {
+		List<Object> objects = seekByKey(TRUSTEES_BUCKET_PREFIX);
+		List<Trustee> trustees = new ArrayList<>();
+		for (Object o : objects) {
+			trustees.add((Trustee) o);
+		}
+		return trustees;
+	}
+
+	@Override
+	public boolean putVoter(Voter voter) {
+		return this.put(VOTERS_BUCKET_PREFIX + voter.getAddress(), voter);
+	}
+
+	@Override
+	public List<Voter> listVoters() {
+		List<Object> objects = seekByKey(VOTERS_BUCKET_PREFIX);
+		List<Voter> voters = new ArrayList<>();
+		for (Object o : objects) {
+			voters.add((Voter) o);
+		}
+		return voters;
+	}
+
+	@Override
+	public boolean putVoteRecord(VoteRecord voteRecord) {
+		return this.put(VOTE_RECORD_BUCKET_PREFIX + voteRecord.getAddress(), voteRecord);
+	}
+
+	@Override
+	public List<VoteRecord> listVoteRecords() {
+		List<Object> objects = seekByKey(VOTERS_BUCKET_PREFIX);
+		List<VoteRecord> voteRecords = new ArrayList<>();
+		for (Object o : objects) {
+			voteRecords.add((VoteRecord) o);
+		}
+		return voteRecords;
+	}
+
+	@Override
+	public Optional<Trustee> getTrustee(String address) {
+
+		Optional<Object> object = this.get(TRUSTEES_BUCKET_PREFIX + address);
+		if (object.isPresent()) {
+			return Optional.of((Trustee) object.get());
+		}
+		return Optional.absent();
+	}
+
+	@Override
+	public Optional<Voter> getVoter(String address) {
+
+		Optional<Object> object = this.get(VOTERS_BUCKET_PREFIX + address);
+		if (object.isPresent()) {
+			return Optional.of((Voter) object.get());
+		}
+		return Optional.absent();
 	}
 }

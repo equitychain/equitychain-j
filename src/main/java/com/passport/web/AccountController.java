@@ -69,6 +69,12 @@ public class AccountController {
         return new ResultDto(ResultEnum.SYS_ERROR);
     }
 
+    @GetMapping("/generateGenesis")
+    public ResultDto generateGenesis(HttpServletRequest request) throws Exception {
+        accountHandler.generateTrustees();
+        return new ResultDto(ResultEnum.SUCCESS);
+    }
+
     //解锁账号
     @GetMapping("/unlock")
     public ResultDto unlock(HttpServletRequest request) throws Exception {

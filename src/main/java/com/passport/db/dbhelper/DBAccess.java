@@ -1,9 +1,7 @@
 package com.passport.db.dbhelper;
 
 import com.google.common.base.Optional;
-import com.passport.core.Account;
-import com.passport.core.Block;
-import com.passport.core.Transaction;
+import com.passport.core.*;
 
 import java.util.List;
 
@@ -150,4 +148,57 @@ public interface DBAccess {
 	Optional<Account> getMinerAccount();
 
 	boolean putMinerAccount(Account account);
+
+	/**
+	 * 添加一个受托人
+	 * @param trustee
+	 * @return
+	 */
+	boolean putTrustee(Trustee trustee);
+
+	/**
+	 * 获取指定的委托人
+	 * @param address
+	 * @return
+	 */
+	Optional<Trustee> getTrustee(String address);
+
+	/**
+	 * 获取受托人列表
+	 * @return
+	 */
+	List<Trustee> listTrustees();
+
+	/**
+	 * 添加一个投票人
+	 * @param voter
+	 * @return
+	 */
+	boolean putVoter(Voter voter);
+
+	/**
+	 * 获取指定的投票人
+	 * @param address
+	 * @return
+	 */
+	Optional<Voter> getVoter(String address);
+
+	/**
+	 * 获取投票人列表
+	 * @return
+	 */
+	List<Voter> listVoters();
+
+	/**
+	 * 添加一条投票记录
+	 * @param voteRecord
+	 * @return
+	 */
+	boolean putVoteRecord(VoteRecord voteRecord);
+
+	/**
+	 * 获取投票记录列表
+	 * @return
+	 */
+	List<VoteRecord> listVoteRecords();
 }
