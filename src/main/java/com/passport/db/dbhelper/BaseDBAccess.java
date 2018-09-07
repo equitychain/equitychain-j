@@ -363,4 +363,228 @@ public abstract class BaseDBAccess implements DBAccess {
             }
         }
     }
+    public <T> ArrayList<T> getDtoOrderByHandle(int pageCount, int pageNumber, ColumnFamilyHandle indexHandle,List<ColumnFamilyHandle> shaixuanHands,List<byte[]> vals, ColumnFamilyHandle overAndNextHandle, Class<T> tClass, String keyFiledName, int orderByType, int flushSize, int dtoType) throws Exception {
+        long begin = System.currentTimeMillis();
+        int beginItem = pageCount*(pageNumber-1)+1;
+        int endItem = pageCount*pageNumber;
+        //区间的移动
+        int keysIndex = 1;
+        //block[]的索引
+        int curIndex = 0;
+        //key时间戳的区间
+        //区间的开始
+        int itemTempIndex = 1;
+        //区间的结束
+        int itemIndex = 0;
+        ArrayList<T> tList = new ArrayList<>(pageCount);
+        while(true) {
+            //得到排序后的key
+            byte[][] keys = testIndexPaixu(flushSize, keysIndex,overAndNextHandle,orderByType);
+            if(keys == null || keys.length == 0 || Arrays.equals(keys,new byte[flushSize][])){
+                break;
+            }
+            keysIndex ++;
+            boolean ok = false;
+            //遍历各个时间戳的高度集合
+            for (int i = 0; i < keys.length; i++) {
+                byte[] suoyinKey = keys[i];
+                if(suoyinKey == null) {
+                    continue;
+                }
+                Set<byte[]> shaixuanSet = getSuoyinValue(indexHandle, suoyinKey);
+                if(shaixuanSet == null || shaixuanSet.size() == 0){
+                    continue;
+                }
+                //筛选集合
+                Set<byte[]> heightList = new HashSet<>();
+                for (byte[] bytes : shaixuanSet) {
+                    boolean add = true;
+                    for (int k =0; k < shaixuanHands.size(); k ++) {
+                        ColumnFamilyHandle handle = shaixuanHands.get(k);
+                        byte[] val = rocksDB.get(handle,bytes);
+                        if(!Arrays.equals(val,vals.get(k))){
+                            add = false;
+                            break;
+                        }
+                    }
+                    if(add){
+                        heightList.add(bytes);
+                    }
+                }
+                if(heightList == null || heightList.size() == 0){
+                    continue;
+                }
+                itemIndex += heightList.size();
+                //记录set中需要获取的那些
+                int curSetBeginIndex = -1;
+                int curSetEndIndex = -1;
+                //判断区间位置,那些区间的数据是需要的
+                if (itemIndex < beginItem) {
+                    //还没到开始
+                    itemTempIndex = itemIndex+1;
+                    continue;
+                } else if (itemIndex >= beginItem && itemIndex <= endItem) {
+                    if (itemTempIndex < beginItem) {
+                        //set中部分是需要的,部分是不需要的
+                        curSetBeginIndex = beginItem-itemTempIndex;
+                        curSetEndIndex = itemIndex - itemTempIndex;
+                    } else if (itemTempIndex >= beginItem) {
+                        //set中全部都是需要的
+                        curSetBeginIndex = 0;
+                        curSetEndIndex = itemIndex-itemTempIndex;
+                    }
+                } else {
+                    if (itemTempIndex < beginItem) {
+                        //set中部分是需要的
+                        curSetBeginIndex = beginItem - itemTempIndex;
+                        curSetEndIndex = endItem - itemTempIndex;
+                    } else if (itemTempIndex >= beginItem && itemTempIndex <= endItem) {
+                        //set中部分是需要的
+                        curSetBeginIndex = 0;
+                        curSetEndIndex = endItem - itemTempIndex;
+                    } else {
+                        //完了  全都是不需要的
+                        ok = true;
+                    }
+                }
+                itemTempIndex = itemIndex+1;
+                if(ok){
+                    break;
+                }
+                if(curSetBeginIndex == -1 || curSetEndIndex == -1){
+                    continue;
+                }else{
+                    //todo 排序方式是以long类型排序
+                    byte[][] paixuHeight = null;
+                    if(dtoType == 0) {
+                        paixuHeight = paixuLong(heightList);
+                    }else {
+                        paixuHeight = paixuTransTest(heightList);
+                    }
+                    //循环需要的元素进行添加
+                    for(int index = curSetBeginIndex; index <= curSetEndIndex; index ++){
+                        byte[] heightByt = paixuHeight[index];
+                        T tObj = getObj(keyFiledName, new String(heightByt), tClass);
+                        tList.add(curIndex,tObj);
+                        curIndex++;
+                        if (curIndex == pageCount) {
+                            break;
+                        }
+                    }
+                }
+            }
+            //当页填满了
+            if (curIndex == pageCount || ok) {
+                break;
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("查询耗时:"+(end-begin));
+        return tList;
+    }
+    /**
+     *
+     * @param flushSize            缓存大小
+     * @param fushIndex            缓存位置
+     * @param overAndNextHandle   关系的handle   handleMap.get(getColName("blockHeightIndex","overAndNext"))
+     * @param orderType            排序类型       0升序,1降序
+     * @return
+     * @throws RocksDBException
+     */
+    public byte[][] testIndexPaixu(int flushSize,int fushIndex,ColumnFamilyHandle overAndNextHandle,int orderType) throws RocksDBException {
+        int begin = flushSize*(fushIndex-1)+1;
+        int end = flushSize*fushIndex;
+        //先获取最大值
+        RocksIterator iterator = rocksDB.newIterator(overAndNextHandle);
+        byte[] tempTime = null;
+        byte[] tempTimeValue = null;
+        for(iterator.seekToFirst();iterator.isValid();iterator.next()){
+            byte[] value = iterator.value();
+            if(value != null && !"".equals(value)){
+                JSONObject valueObj = JSONObject.parseObject(new String(value));
+                String overTime = "";
+                if(orderType == 0) {
+                    overTime = valueObj.getString("over");
+                }else{
+                    overTime = valueObj.getString("next");
+                }
+                if(overTime == null || "".equals(overTime)){
+                    tempTime = iterator.key();
+                    tempTimeValue = iterator.value();
+                }
+            }
+        }
+        byte[][] result = new byte[flushSize][];
+        if(tempTime == null){
+            return result;
+        }
+        int curIndex = 1;
+        int resultIndex = 0;
+        while(true){
+            JSONObject tempObj = JSONObject.parseObject(new String(tempTimeValue));
+            String next = "";
+            if(orderType == 0) {
+                next = tempObj.getString("next");
+            }else{
+                next = tempObj.getString("over");
+            }
+
+            if(curIndex >= begin && curIndex <= end){
+                if(resultIndex >= result.length){
+                    break;
+                }
+                result[resultIndex] = tempTime;
+                resultIndex ++;
+            }else if (curIndex > end){
+                break;
+            }
+            if(next == null || "".equals(next)){
+                break;
+            }
+            tempTime = next.getBytes();
+            tempTimeValue = rocksDB.get(overAndNextHandle,tempTime);
+            curIndex ++;
+        }
+        return result;
+    }
+    public byte[][] paixuLong(Set<byte[]> heightSet){
+        byte[][] result = new byte[heightSet.size()][];
+        result = heightSet.toArray(result);
+        for (int i = 0; i < result.length; i ++){
+            byte[] cur = result[i];
+            long curHeight = Long.parseLong(new String(cur));
+            for (int j = i+1; j < result.length;j ++){
+                byte[] place = result[j];
+                long placeHeight = Long.parseLong(new String(place));
+                if(placeHeight > curHeight){
+                    byte[] temp = result[i];
+                    result[i] = result[j];
+                    result[j] = temp;
+                    cur = result[i];
+                    curHeight = Long.parseLong(new String(cur));
+                }
+            }
+        }
+        return result;
+    }
+    public byte[][] paixuTransTest(Set<byte[]> heightSet){
+        byte[][] result = new byte[heightSet.size()][];
+        result = heightSet.toArray(result);
+        for (int i = 0; i < result.length; i ++){
+            byte[] cur = result[i];
+            long curHeight = Long.parseLong(new String(cur).substring("hash==".length()));
+            for (int j = i+1; j < result.length;j ++){
+                byte[] place = result[j];
+                long placeHeight = Long.parseLong(new String(place).substring("hash==".length()));
+                if(placeHeight > curHeight){
+                    byte[] temp = result[i];
+                    result[i] = result[j];
+                    result[j] = temp;
+                    cur = result[i];
+                    curHeight = Long.parseLong(new String(cur).substring("hash==".length()));
+                }
+            }
+        }
+        return result;
+    }
 }

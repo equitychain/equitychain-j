@@ -1,8 +1,7 @@
 package com.passport.db.dbhelper;
 
 import com.google.common.base.Optional;
-import com.passport.core.Account;
-import com.passport.core.Block;
+import com.passport.core.*;
 import com.passport.core.Transaction;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.*;
@@ -329,5 +328,45 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public boolean putMinerAccount(Account account) {
         return false;
+    }
+
+    @Override
+    public boolean putTrustee(Trustee trustee) {
+        return false;
+    }
+
+    @Override
+    public Optional<Trustee> getTrustee(String address) {
+        return null;
+    }
+
+    @Override
+    public List<Trustee> listTrustees() {
+        return null;
+    }
+
+    @Override
+    public boolean putVoter(Voter voter) {
+        return false;
+    }
+
+    @Override
+    public Optional<Voter> getVoter(String address) {
+        return null;
+    }
+
+    @Override
+    public List<Voter> listVoters() {
+        return null;
+    }
+
+    @Override
+    public boolean putVoteRecord(VoteRecord voteRecord) {
+        return false;
+    }
+
+    @Override
+    public List<VoteRecord> listVoteRecords() {
+        return null;
     }
 }
