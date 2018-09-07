@@ -1,5 +1,8 @@
 package com.passport.core;
 
+import com.passport.annotations.EntityClaz;
+import com.passport.annotations.FaildClaz;
+import com.passport.annotations.KeyField;
 import com.passport.utils.rpc.SerializationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,13 +13,19 @@ import java.util.List;
 /**
  * @author Wu Created by SKINK on 2018/6/20.
  */
+@EntityClaz(name = "block")
 public class Block {
   private static Logger logger = LoggerFactory.getLogger(Block.class);
-
+  @FaildClaz(name = "blockSize",type = Long.class)
   private Long blockSize;//区块大小
+  @FaildClaz(name = "blockHeader",type = BlockHeader.class)
   BlockHeader blockHeader;//区块头信息
+  @FaildClaz(name = "transactionCount",type = Integer.class)
   private Integer transactionCount;//交易流水数量
+  @FaildClaz(name = "transactions",type = List.class,genericParadigm = Transaction.class)
   List<Transaction> transactions;//交易流水
+  @KeyField
+  @FaildClaz(name = "blockHeight",type = Long.class)
   private Long blockHeight;
 
   public static Logger getLogger() {
