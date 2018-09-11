@@ -1,5 +1,6 @@
 package com.passport.db.dbhelper;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.base.Optional;
 import com.passport.core.*;
 import com.passport.core.Transaction;
@@ -20,9 +21,10 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Value("${db.dataDir}")
     private String dataDir;
 
-    public BaseDBRocksImpl(){
+    public BaseDBRocksImpl() {
 
     }
+
     @Override
     @PostConstruct
     protected void initDB() {
@@ -34,76 +36,104 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             }
             List<String> fields = new ArrayList<>();
             //TODO 添加dto的字节码
-            fields.addAll(getClassCols(new Account().getClass()));
+            fields.addAll(getClassCols(new Transaction().getClass()));
             fields.addAll(getClassCols(new Block().getClass()));
-            try{
-                rocksDB = RocksDB.open(new Options().setCreateIfMissing(true),dataDir);
+            try {
+                rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), dataDir);
                 System.out.println("========create fields=========");
                 //添加默认的列族
-                handleMap.put("default",rocksDB.getDefaultColumnFamily());
-                for(String field : fields) {
+                handleMap.put("default", rocksDB.getDefaultColumnFamily());
+                for (String field : fields) {
                     ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(field.getBytes());
                     ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
-                    handleMap.put(field,handle);
-                    System.out.println("====field:"+field);
+                    handleMap.put(field, handle);
+                    System.out.println("====field:" + field);
                 }
                 //todo 索引的添加
                 //索引分类
-//                String suoyinStr = getColName("transcationTime","index");
-//                ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(suoyinStr.getBytes());
-//                ColumnFamilyHandle suoyinHeight = rocksDB.createColumnFamily(descriptor);
-//                handleMap.put(suoyinStr,suoyinHeight);
-                //索引关系
-//                String suoyin_indexStr = getColName("transcationTimeIndex","overAndNext");
-//                ColumnFamilyDescriptor descriptor1 = new ColumnFamilyDescriptor(suoyin_indexStr.getBytes());
-//                ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor1);
-//                handleMap.put(suoyin_indexStr,handle);
+                //流水时间索引
+                String suoyinStr = getColName("transcationTime", "index");
+                ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(suoyinStr.getBytes());
+                ColumnFamilyHandle suoyinHeight = rocksDB.createColumnFamily(descriptor);
+                handleMap.put(suoyinStr, suoyinHeight);
+                //区块高度索引
+                String blockHeight = getColName("blockHeight", "index");
+                ColumnFamilyDescriptor blockHeightDescriptor = new ColumnFamilyDescriptor(blockHeight.getBytes());
+                ColumnFamilyHandle blockHeightHandle = rocksDB.createColumnFamily(blockHeightDescriptor);
+                handleMap.put(blockHeight, blockHeightHandle);
 
-                //索引分类
-                String blockSuoy = getColName("blockSize","index");
-                ColumnFamilyDescriptor descriptora = new ColumnFamilyDescriptor(blockSuoy.getBytes());
-                ColumnFamilyHandle suoyinHeight1 = rocksDB.createColumnFamily(descriptora);
-                handleMap.put(blockSuoy,suoyinHeight1);
                 //索引关系
-                String blockIndex = getColName("blockSizeIndex","overAndNext");
-                ColumnFamilyDescriptor descriptor2 = new ColumnFamilyDescriptor(blockIndex.getBytes());
-                ColumnFamilyHandle suoyinHeightd = rocksDB.createColumnFamily(descriptor2);
-                handleMap.put(blockIndex,suoyinHeightd);
+                String suoyin_indexStr = getColName("transcationTimeIndex", "overAndNext");
+                ColumnFamilyDescriptor descriptor1 = new ColumnFamilyDescriptor(suoyin_indexStr.getBytes());
+                ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor1);
+                handleMap.put(suoyin_indexStr, handle);
+                //区块高度关系
+                String blockNextHeight = getColName("blockHeightIndex", "overAndNext");
+                ColumnFamilyDescriptor blockHeightIndexDescriptor = new ColumnFamilyDescriptor(blockNextHeight.getBytes());
+                ColumnFamilyHandle blockHeightNextHand = rocksDB.createColumnFamily(blockHeightIndexDescriptor);
+                handleMap.put(blockNextHeight, blockHeightNextHand);
+
                 //todo 存量数据的索引put  测试数据
-//                for(int i = 300000 ;i < 500000; i ++) {
+//                for (int i = 1; i < 10000; i++) {
 //                    Block block = new Block();
-//                    block.setBlockHeight(Long.parseLong(""+i));
-//                    block.setBlockSize(Long.parseLong("10"+i%1000));
+//                    block.setBlockHeight(Long.parseLong("" + i));
+//                    block.setBlockSize(Long.parseLong("10" + i % 1000));
+//                    block.setTransactionCount(0);
 //                    addObj(block);
-//                    putSuoyinKey(handleMap.get(getColName("blockSize","index")),(block.getBlockSize()+"").getBytes(),(block.getBlockHeight()+"").getBytes());
-//
-//                    putOverAndNext(handleMap.get(getColName("blockSizeIndex","overAndNext")),(block.getBlockSize()+"").getBytes());
+//                    putSuoyinKey(handleMap.get(getColName("blockHeight", "index")), (block.getBlockHeight() + "").getBytes(), (block.getBlockHeight() + "").getBytes());
+//                    putOverAndNext(handleMap.get(getColName("blockHeightIndex", "overAndNext")), (block.getBlockHeight() + "").getBytes());
 //                }
-            }catch ( Exception e) {
+
+//                for (int i = 1; i < 10000; i++) {
+//                    Transaction transaction =new Transaction();
+//                    transaction.setHash((i+"").getBytes());
+//                    transaction.setTime((i+"").getBytes());
+//                    transaction.setEggMax(("test"+i%1000).getBytes());
+//                    transaction.setSignature("xxx".getBytes());
+//                    addObj(transaction);
+//                    putSuoyinKey(handleMap.get(getColName("transcationTime", "index")), transaction.getTime(), transaction.getHash());
+//
+//                    putOverAndNext(handleMap.get(getColName("transcationTimeIndex", "overAndNext")), transaction.getTime());
+//                }
+            } catch (Exception e) {
                 //列集合
                 List<ColumnFamilyDescriptor> descriptorList = new ArrayList<>();
                 ColumnFamilyDescriptor defaultDescriptor = new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY);
                 descriptorList.add(defaultDescriptor);
                 System.out.println("========load fields=========");
-                for(String s : fields){
+                for (String s : fields) {
                     ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(s.getBytes());
                     descriptorList.add(descriptor);
-                    System.out.println("====field:"+s);
+                    System.out.println("====field:" + s);
                 }
                 //todo 加载已创建的索引列族
-//                descriptorList.add(new ColumnFamilyDescriptor(getColName("blockTime","index").getBytes()));
-//                descriptorList.add(new ColumnFamilyDescriptor(getColName("blockTimeIndex","overAndNext").getBytes()));
-//                descriptorList.add(new ColumnFamilyDescriptor(getColName("transcationTime","index").getBytes()));
-//                descriptorList.add(new ColumnFamilyDescriptor(getColName("transcationTimeIndex","overAndNext").getBytes()));
+                descriptorList.add(new ColumnFamilyDescriptor(getColName("transcationTime", "index").getBytes()));
+                descriptorList.add(new ColumnFamilyDescriptor(getColName("blockHeight", "index").getBytes()));
+                descriptorList.add(new ColumnFamilyDescriptor(getColName("transcationTimeIndex", "overAndNext").getBytes()));
+                descriptorList.add(new ColumnFamilyDescriptor(getColName("blockHeightIndex", "overAndNext").getBytes()));
                 //打开数据库
                 List<ColumnFamilyHandle> handleList = new ArrayList<>();
                 rocksDB = RocksDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
                 handleList.forEach((handler) -> {
                     String name = new String(handler.getName());
-                    handleMap.put(name,handler);
+                    handleMap.put(name, handler);
                 });
             }
-        }catch(Exception e){
+            // 查询测试
+//           List<Block> blocks = blockPagination(10, 1, 0);
+//            System.out.println("=========查询成功blocks========"+JSON.toJSONString(blocks));
+//            List<String> screens = new ArrayList<>();
+//            screens.add("eggMax");
+//            List<byte[]> vals = new ArrayList<>();
+//            vals.add(("test"+423).getBytes());
+//            List<Transaction> transactionList = transactionPagination(10, 1, 0,screens,vals);
+//            for (Transaction t : transactionList){
+//                System.out.println("jiaoyan:"+new String(t.getHash()));
+//                System.out.println("jiaoyan:"+new String(t.getTime()));
+//                System.out.println("jiaoyan:"+new String(t.getSignature()));
+//                System.out.println("jiaoyan:"+new String(t.getEggMax()));
+//            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -111,6 +141,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     /**
      * 放置最后一个区块高度，过期
      * 插入区块时会自动的
+     *
      * @param lastBlock
      * @return
      */
@@ -122,15 +153,15 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     public Optional<Object> getLastBlockHeight() {
-        ColumnFamilyHandle handle = handleMap.get(getColName("block","blockHeight"));
+        ColumnFamilyHandle handle = handleMap.get(getColName("block", "blockHeight"));
         RocksIterator heightIter = rocksDB.newIterator(handle);
         Long height = 0l;
-        for (heightIter.seekToFirst();heightIter.isValid();heightIter.next()){
-            if(heightIter.key() == null){
+        for (heightIter.seekToFirst(); heightIter.isValid(); heightIter.next()) {
+            if (heightIter.key() == null) {
                 continue;
             }
             Long curHeight = Long.parseLong(new String(heightIter.key()));
-            if(curHeight > height){
+            if (curHeight > height) {
                 height = curHeight;
             }
         }
@@ -151,7 +182,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public Optional<Block> getBlock(Object blockHeight) {
         try {
-            Block block = getObj("blockHeight",blockHeight.toString(),Block.class);
+            Block block = getObj("blockHeight", blockHeight.toString(), Block.class);
             return Optional.of(block);
         } catch (Exception e) {
             e.printStackTrace();
@@ -162,9 +193,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public Optional<Block> getLastBlock() {
         Optional heightOpti = getLastBlockHeight();
-        if(heightOpti.isPresent()) {
-            Long height = (Long)heightOpti.get();
-            if(height != null) {
+        if (heightOpti.isPresent()) {
+            Long height = (Long) heightOpti.get();
+            if (height != null) {
                 return getBlock(height);
             }
         }
@@ -175,7 +206,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public Optional<List<String>> getNodeList() {
         try {
             byte[] objByt = rocksDB.get(CLIENT_NODES_LIST_KEY.getBytes());
-            if(objByt != null) {
+            if (objByt != null) {
                 List<String> nodeList = (List<String>) SerializeUtils.unSerialize(objByt);
                 if (nodeList != null) {
                     return Optional.of(nodeList);
@@ -190,7 +221,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public boolean putNodeList(List<String> nodes) {
         try {
-            rocksDB.put(CLIENT_NODES_LIST_KEY.getBytes(),SerializeUtils.serialize(nodes));
+            rocksDB.put(CLIENT_NODES_LIST_KEY.getBytes(), SerializeUtils.serialize(nodes));
             return true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -202,7 +233,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Deprecated
     public boolean put(String key, Object value) {
         try {
-            rocksDB.put(key.getBytes(),SerializeUtils.serialize(value));
+            rocksDB.put(key.getBytes(), SerializeUtils.serialize(value));
             return true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -215,7 +246,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public Optional<Object> get(String key) {
         try {
             byte[] objByt = rocksDB.get(key.getBytes());
-            if(objByt != null){
+            if (objByt != null) {
                 Optional.of(SerializeUtils.unSerialize(objByt));
             }
         } catch (RocksDBException e) {
@@ -245,7 +276,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         RocksIterator iterator = rocksDB.newIterator(options);
         byte[] key = keyPrefix.getBytes();
         for (iterator.seek(key); iterator.isValid(); iterator.next()) {
-            if(!new String(iterator.key()).startsWith(keyPrefix)) continue;
+            if (!new String(iterator.key()).startsWith(keyPrefix)) continue;
             ts.add((T) SerializeUtils.unSerialize(iterator.value()));
         }
         return ts;
@@ -253,13 +284,13 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     public List<Account> listAccounts() {
-        RocksIterator accountIter = rocksDB.newIterator(handleMap.get(getColName("account","address")));
+        RocksIterator accountIter = rocksDB.newIterator(handleMap.get(getColName("account", "address")));
         ArrayList<Account> accounts = new ArrayList<>();
-        for (accountIter.seekToFirst();accountIter.isValid();accountIter.next()){
+        for (accountIter.seekToFirst(); accountIter.isValid(); accountIter.next()) {
             String address = new String(accountIter.key());
             try {
-                Account account = getObj("address",address,Account.class);
-                if(account != null){
+                Account account = getObj("address", address, Account.class);
+                if (account != null) {
                     accounts.add(account);
                 }
             } catch (Exception e) {
@@ -283,7 +314,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public Optional<Account> getAccount(String address) {
         try {
-            return Optional.of(getObj("address",address,Account.class));
+            return Optional.of(getObj("address", address, Account.class));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -369,4 +400,33 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public List<VoteRecord> listVoteRecords() {
         return null;
     }
+
+    @Override
+    public List<Block> blockPagination(int pageCount, int pageNumber, int orderByType) throws Exception {
+        ColumnFamilyHandle indexHandle = handleMap.get(getColName("blockHeight", "index"));
+        ColumnFamilyHandle overAndNextHandle = handleMap.get(getColName("blockHeightIndex", "overAndNext"));
+        List<Block> blocks = super.getDtoOrderByHandle(pageCount, pageNumber, indexHandle, null, null, overAndNextHandle, Block.class, "blockHeight", orderByType, 150, 0);
+        return blocks;
+    }
+
+    @Override
+    public List<Transaction> transactionPagination(int pageCount, int pageNumber, int orderByType, List<String> screens, List<byte[]> screenVals) {
+        List<ColumnFamilyHandle> screenHanles = new ArrayList<>();
+        if (screens != null && screenVals != null) {
+            for (int i = 0; i < screens.size(); i++) {
+                screenHanles.add(handleMap.get(getColName("transaction", screens.get(i))));
+            }
+        }
+        if(screenVals == null){
+            screenVals = new ArrayList<>();
+        }
+        try {
+            return getDtoOrderByHandle(pageCount, pageNumber, handleMap.get(getColName("transcationTime", "index"))
+                    , screenHanles, screenVals, handleMap.get(getColName("transcationTimeIndex", "overAndNext")), Transaction.class, "hash", orderByType, 150, 0);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+
 }

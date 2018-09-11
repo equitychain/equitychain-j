@@ -19,6 +19,7 @@ import java.util.List;
  *
  */
 //@Component
+/*
 public class RocksDBAccess implements DBAccess {
 	static Logger logger = LoggerFactory.getLogger(RocksDBAccess.class);
 
@@ -50,9 +51,11 @@ public class RocksDBAccess implements DBAccess {
 
 	public RocksDBAccess() {
 	}
-	/**
+	*/
+/**
 	 * 初始化RocksDB
-	 */
+	 *//*
+
 //	@PostConstruct
 	public void initRocksDB() {
 		try {
@@ -310,3 +313,4 @@ public class RocksDBAccess implements DBAccess {
 		return Optional.absent();
 	}
 }
+*/
