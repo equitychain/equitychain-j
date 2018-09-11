@@ -2,6 +2,9 @@ package com.passport.core;
 
 
 
+import com.passport.annotations.EntityClaz;
+import com.passport.annotations.FaildClaz;
+import com.passport.annotations.KeyField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,40 +17,49 @@ import static com.passport.constant.Constant.BYTE_HASH_LENGTH;
 /**
  * @author Wu Created by SKINK on 2018/6/20.
  */
+@EntityClaz(name = "transaction")
 public class Transaction {
 
   private static Logger logger = LoggerFactory.getLogger(Transaction.class);
   private static final BigInteger DEFAULT_EGG_PRICE = new BigInteger("100000000");
   private static final BigInteger DEFAULT_EGG_AMOUNT = new BigInteger("18000");
 
+  @FaildClaz(name = "nonce",type = Integer.class)
   private Integer nonce;
 
   //32 byte
+  @KeyField
+  @FaildClaz(name = "hash",type = byte[].class)
   private byte[] hash;
-
+  @FaildClaz(name = "signature",type = byte[].class)
   private byte[] signature;
-
+  @FaildClaz(name = "value",type = byte[].class)
   private byte[] value;
-
+  @FaildClaz(name = "payAddress",type = byte[].class)
   private byte[] payAddress;
 
+  @FaildClaz(name = "receiptAddress",type = byte[].class)
   private byte[] receiptAddress;
-
+  @FaildClaz(name = "eggPrice",type = byte[].class)
   private byte[] eggPrice;
-
+  @FaildClaz(name = "eggMax",type = byte[].class)
   private byte[] eggMax;
-
+  @FaildClaz(name = "time",type = byte[].class)
   private byte[] time;
 
+  @FaildClaz(name = "extarData",type = byte[].class)
   private byte[] extarData;
 
+  @FaildClaz(name = "publicKey",type = byte[].class)
   private byte[] publicKey;
 
+  @FaildClaz(name = "eggUsed",type = byte[].class)
   private byte[] eggUsed;
 
   private byte[] tradeType;//交易类型
   private byte[] blockHeight;//已确认流水打包到哪个区块
   //流水状态（等待 0， 成功 1， 失败 2）
+  @FaildClaz(name = "status",type = byte[].class)
   private Integer status;
 
   public Integer getNonce() {

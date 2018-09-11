@@ -124,19 +124,28 @@ public class BlockHandler {
             public void run() {
                 try{
                     //todo 校验 目前是获取相同的区块高度
-                    Set<Block> successBlocks = getShareBlocks();
+                    List<Block> successBlocks = getShareBlocks();
                     //存储区块到本地
                     for(Block blockLocal : successBlocks) {
-                        dbAccess.getLastBlockHeight();
-                        dbAccess.putBlock(blockLocal);
-                        dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
+                        Optional<Object> optHeigth = dbAccess.getLastBlockHeight();
+                        if(optHeigth.isPresent()) {
+                            Long height = (Long)optHeigth.get();
+                            if(height != null) {
+                                if((blockLocal.getBlockHeight() - height) == 1) {
+                                    dbAccess.putBlock(blockLocal);
+                                    dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
 
-                        //同时保存区块中的流水到已确认流水列表中
-                        blockLocal.getTransactions().forEach(transaction -> {
-                            dbAccess.putConfirmTransaction(transaction);
-                        });
-
-                        transactionHandler.exec(blockLocal.getTransactions());
+                                    //同时保存区块中的流水到已确认流水列表中
+                                    blockLocal.getTransactions().forEach(transaction -> {
+                                        dbAccess.putConfirmTransaction(transaction);
+                                    });
+                                }
+                            }else{
+                                break;
+                            }
+                        }else{
+                            break;
+                        }
                     }
                     //继续同步下组区块
                     provider.publishEvent(new SyncNextBlockEvent(0L));
@@ -152,29 +161,52 @@ public class BlockHandler {
         });
         handlerThread.start();
     }
-    //检查各节点区块，取出共用的区块高度
-    protected Set<Block> getShareBlocks(){
-        Set<Block> list = new HashSet<>();
+    //检查各节点区块，取出共用的区块高度 并是连续的
+    protected List<Block> getShareBlocks(){
         Iterator<List<Block>> iterator = Constant.BLOCK_QUEUE.iterator();
         List<Block> baseBlocks = null;
         //获取第一个节点的数据
         if(iterator.hasNext()){
-            baseBlocks = iterator.next();
-        }else{
-            return list;
-        }
-        //某个节点的区块与其余节点的区块进行比较
-        while (iterator.hasNext()){
             List<Block> blocks = iterator.next();
-            for(Block b : baseBlocks){
-                if(blocks.contains(b)){
-                    list.add(b);
+            baseBlocks = new ArrayList<>();
+            //连续
+            for (int i = 0; i < blocks.size(); i ++){
+                if(i == 0){
+                    baseBlocks.add(blocks.get(i));
                 }else{
-                    list.remove(b);
+                    Block b1 = blocks.get(i);
+                    Block b2 = blocks.get(i-1);
+                    if(b1.getBlockHeight()-b2.getBlockHeight() == 1){
+                        baseBlocks.add(blocks.get(i));
+                    }else {
+                        break;
+                    }
+                }
+            }
+        }else{
+            return new ArrayList<>();
+        }
+        if(iterator.hasNext()) {
+            //某个节点的区块与其余节点的区块进行比较
+            while (iterator.hasNext()) {
+                List<Block> blocks = iterator.next();
+                //判断哪个高度不一致,不一致的以下全部丢弃,只保留公共的/连续的
+                int subIndex = 0;
+                for (int i = 0; i < baseBlocks.size(); i ++) {
+                    Block hasBlock = baseBlocks.get(i);
+                    if(blocks.contains(hasBlock)){
+                        subIndex = i;
+                        break;
+                    }
+                }
+                if(subIndex != 0){
+                    for(int j = subIndex ; j < baseBlocks.size(); j ++) {
+                        baseBlocks.remove(j);
+                    }
                 }
             }
         }
-        return list;
+        return baseBlocks;
     }
     /**
      * protobuf block转成本地block

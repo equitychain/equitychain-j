@@ -18,7 +18,8 @@ import java.util.List;
 /**
  *
  */
-@Component
+//@Component
+/*
 public class RocksDBAccess implements DBAccess {
 	static Logger logger = LoggerFactory.getLogger(RocksDBAccess.class);
 
@@ -50,10 +51,12 @@ public class RocksDBAccess implements DBAccess {
 
 	public RocksDBAccess() {
 	}
-	/**
+	*/
+/**
 	 * 初始化RocksDB
-	 */
-	@PostConstruct
+	 *//*
+
+//	@PostConstruct
 	public void initRocksDB() {
 		try {
 			//如果数据库路径不存在，则创建路径
@@ -310,3 +313,4 @@ public class RocksDBAccess implements DBAccess {
 		return Optional.absent();
 	}
 }
+*/

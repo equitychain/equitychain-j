@@ -201,4 +201,23 @@ public interface DBAccess {
 	 * @return
 	 */
 	List<VoteRecord> listVoteRecords();
+
+	/**
+	 * 区块分页查询
+	 * @param pageCount：每页记录数
+	 * @param pageNumber：页码
+	 * @param orderByType：排序类型
+	 * @return
+	 */
+	List<Block> blockPagination(int pageCount, int pageNumber, int orderByType) throws Exception;
+	/**
+	 * 交易流水分页查询
+	 * @param pageCount：每页记录数
+	 * @param pageNumber：页码
+	 * @param orderByType：排序类型
+	 * @param screens      筛选字段
+	 * @param  screenVals  筛选字段对应的值
+	 * @return
+	 */
+	List<Transaction> transactionPagination(int pageCount, int pageNumber, int orderByType,List<String> screens,List<byte[]> screenVals);
 }
