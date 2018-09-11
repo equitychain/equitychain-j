@@ -42,34 +42,4 @@ public class StrategyContext {
             ctx.fireChannelRead(message);
         }
     }
-
-    /**
-     * 应用请求消息路由到handleReqMsg
-     * @param message
-     */
-    public void handleReqMsgMain(ChannelHandlerContext ctx, NettyMessage.Message message) {
-        System.out.println(message.getMessageType());
-        System.out.println(message.getData().getDataType());
-        Strategy strategy = strategyMap.get(message.getMessageType()+"_"+message.getData().getDataType());
-        if(strategy != null){
-            strategy.handleReqMsg(ctx, message);
-        }else{
-            ctx.fireChannelRead(message);
-        }
-    }
-
-    /**
-     * 应用响应消息路由到handleRespMsg
-     * @param message
-     */
-    public void handleRespMsgMain(ChannelHandlerContext ctx, NettyMessage.Message message) {
-        System.out.println(message.getMessageType());
-        System.out.println(message.getData().getDataType());
-        Strategy strategy = strategyMap.get(message.getMessageType()+"_"+message.getData().getDataType());
-        if(strategy != null){
-            strategy.handleRespMsg(ctx, message);
-        }else{
-            ctx.fireChannelRead(message);
-        }
-    }
 }

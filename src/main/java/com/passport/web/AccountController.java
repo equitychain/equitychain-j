@@ -3,6 +3,8 @@ package com.passport.web;
 import com.passport.core.Account;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
+import com.passport.transactionhandler.TransactionStrategy;
+import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.CheckUtils;
 import com.passport.utils.LockUtil;
 import com.passport.utils.StoryFileUtil;
@@ -33,12 +35,14 @@ public class AccountController {
 //    @Value("${wallet.keystoreDir}")
 //    private String walletDir;
 
+    @Autowired
+    TransactionStrategyContext transactionStrategyContext;
+
     @Value("${wallet.keystoreDir}")
     private String walletDir;
 
     @GetMapping("/new")
     public ResultDto newAccount(HttpServletRequest request) throws Exception {
-
         String password = request.getParameter("password");
         //非空检验
         boolean flag = CheckUtils.checkParamIfEmpty(password);

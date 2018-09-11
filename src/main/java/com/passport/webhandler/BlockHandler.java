@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Component
@@ -29,7 +30,24 @@ public class BlockHandler {
     private DBAccess dbAccess;
     @Autowired
     private ApplicationContextProvider provider;
+    @Autowired
+    private TransactionHandler transactionHandler;
     public volatile boolean padding = false;
+
+    /**
+     * 根据区块高度获取出块奖励，每年递减，第6年及以后奖励恒定
+     * @param blockHeight
+     * @return
+     */
+    public BigDecimal getReward(Long blockHeight){
+        Long index = blockHeight/Constant.BLOCK_DISTANCE;
+        if(index > Constant.REWARD_ARRAY.length-1){
+            return Constant.REWARD_ARRAY[Constant.REWARD_ARRAY.length-1];
+        }else{
+            return Constant.REWARD_ARRAY[index.intValue()];
+        }
+    }
+
     /**
      * 校验区块是否合法
      * @param block

@@ -1,29 +1,39 @@
 package com.passport.core;
 
 /**
- * 投票人
+ * 投票记录
  * @author: xujianfeng
  * @create: 2018-09-06 11:45
  **/
 public class VoteRecord {
-    private String address;//钱包地址
-    private Integer voteNum;//可用投票数
+    private String payAddress;//投票人钱包地址
+    private String receiptAddress;//受托人钱包地址
+    private Integer voteNum;//投票数,默认一次只可投一票
     private Integer status;//0撤消1正常
     public VoteRecord(){
 
     }
-    public VoteRecord(String address, Integer voteNum, Integer status){
-        this.address = address;
+    public VoteRecord(String payAddress, String receiptAddress, Integer voteNum, Integer status){
+        this.payAddress = payAddress;
+        this.receiptAddress = receiptAddress;
         this.voteNum = voteNum;
         this.status = status;
     }
 
-    public String getAddress() {
-        return address;
+    public String getPayAddress() {
+        return payAddress;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setPayAddress(String payAddress) {
+        this.payAddress = payAddress;
+    }
+
+    public String getReceiptAddress() {
+        return receiptAddress;
+    }
+
+    public void setReceiptAddress(String receiptAddress) {
+        this.receiptAddress = receiptAddress;
     }
 
     public Integer getVoteNum() {

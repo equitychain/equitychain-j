@@ -47,4 +47,8 @@ public interface Constant {
   BigDecimal FEE_4_REGISTER_VOTER = new BigDecimal(10);//注册成为投票人资产
 
   Integer CHANCE_4_VOTER = 10;//投票人总投票数
+
+  Integer BLOCK_DISTANCE = 3000000;//按10秒出一个区块，一个出块量360*24*365，一年约产生3000000个区块
+  //每年出块奖励递减
+  BigDecimal[] REWARD_ARRAY = {new BigDecimal(10), new BigDecimal(8), new BigDecimal(6), new BigDecimal(4), new BigDecimal(2), new BigDecimal(1)};
 }

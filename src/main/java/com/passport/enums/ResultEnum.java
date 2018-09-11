@@ -25,7 +25,9 @@ public enum ResultEnum {
 	TRADETYPE_NOTFOUND(1006, "交易类型不存在"),
 	TRADEAMOUNT_ILLEGAL(1007, "交易金额不合法"),
 	TRUSTEE_EXISTS(1008, "委托人已注册"),
-	VOTER_EXISTS(1009, "投票人已注册");
+	TRUSTEE_NOTEXISTS(1009, "委托人不存在"),
+	VOTER_EXISTS(1010, "投票人已注册"),
+	VOTER_NOTEXISTS(1011, "投票人不存在");
 	//***账户***
 
 	private int code;
