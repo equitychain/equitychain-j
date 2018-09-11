@@ -13,6 +13,8 @@ import com.passport.enums.TransactionTypeEnum;
 import com.passport.event.SendTransactionEvent;
 import com.passport.exception.CommonException;
 import com.passport.listener.ApplicationContextProvider;
+import com.passport.transactionhandler.TransactionStrategy;
+import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.eth.ByteUtil;
@@ -40,6 +42,8 @@ public class TransactionHandler {
     private ApplicationContextProvider provider;
     //todo 这是临时储存流水打包所消耗的egg，如果之后用多线程什么的这里需要进行更改储存方式
     private HashMap<byte[], BigDecimal> eggUsedTemp = new HashMap<>();
+    @Autowired
+    private TransactionStrategyContext transactionStrategyContext;
 
     /**
      * 发送交易，等待其它节点确认
@@ -55,7 +59,7 @@ public class TransactionHandler {
         //if(LockUtil.isUnlock(payAddress)) {
         if(true) {
             //0.验证交易类型是否存在，交易类型对应的金额是否合法，是否已经注册过受托人或者投票人
-            CommonException commonException = check4AllTradeType(tradeType, value, payAddress);
+            CommonException commonException = check4AllTradeType(tradeType, value, payAddress, receiptAddress);
             if (commonException != null){
                 throw commonException;
             }
@@ -67,34 +71,27 @@ public class TransactionHandler {
 
             //2.支付地址、接收地址是否已经创建、支付方交易密码是否正确
             Optional<Account> accountPayOptional = dbAccess.getAccount(payAddress);
-            Optional<Account> accountReceiptOptional = dbAccess.getAccount(receiptAddress);
             if (!accountPayOptional.isPresent()) {
-                throw new CommonException(ResultEnum.PASSWORD_WRONG);
+                throw new CommonException(ResultEnum.ACCOUNT_NOT_EXISTS);
             }
             Account accountPay = accountPayOptional.get();
             if (!password.equals(accountPay.getPassword())) {
-                throw new CommonException(ResultEnum.ACCOUNT_NOT_EXISTS);
+                throw new CommonException(ResultEnum.PASSWORD_WRONG);
             }
 
-            /*if(!accountReceiptOptional.isPresent()){
-                throw new CommonException(ResultEnum.ACCOUNT_NOT_EXISTS);
-            }*/
-
-            //3.支付地址不在本节点创建，没有私钥文件，不能执行转账 TODO 修改私钥的保存形式
-
-            //4.余额是否足够支付（使用account的余额还是最后一条确认流水检查余额是否足够支付）TODO
-            /*if(accountPay.getBalance().compareTo(CastUtils.castBigDecimal(value)) == -1){
+            //3.余额是否足够支付（使用account的余额还是最后一条确认流水检查余额是否足够支付）TODO
+            if(accountPay.getBalance().compareTo(CastUtils.castBigDecimal(value)) == -1){
                 throw new CommonException(ResultEnum.BALANCE_NOTENOUGH);
-            }*/
+            }
 
-            //5.使用支付方的私钥加密数据 TODO 构造签名数据
+            //4.使用支付方的私钥加密数据 TODO 构造签名数据
             Transaction transaction = generateTransaction(payAddress, receiptAddress, value, extarData, accountPay);
-            transaction.setTradeType(TransactionTypeEnum.TRANSFER.toString().getBytes());
+            transaction.setTradeType(TransactionTypeEnum.statusOf(tradeType).getDesc().getBytes());
 
-            //6.放到自己的未确认流水中
+            //5.放到本地未确认流水中
             dbAccess.putUnconfirmTransaction(transaction);
 
-            //7.发布广播交易事件
+            //6.发布广播交易事件
             provider.publishEvent(new SendTransactionEvent(transaction));
             return transaction;
         } else {
@@ -103,7 +100,7 @@ public class TransactionHandler {
     }
 
     /**
-     * 检查特定交易类型的交易金额是否合法
+     * 检查特定交易类型的交易金额是否合法，防止余额不足的操作进入链中
      * @param tradeType
      * @param value
      * @return
@@ -131,30 +128,38 @@ public class TransactionHandler {
      * @param value
      * @return
      */
-    public CommonException check4AllTradeType(String tradeType, String value, String payAddress) {
+    public CommonException check4AllTradeType(String tradeType, String value, String payAddress, String receiptAddress) {
         CommonException commonException = checkValue4AllTradeType(tradeType, value);
         if(commonException != null){
             return commonException;
         }
 
         TransactionTypeEnum transactionTypeEnum = TransactionTypeEnum.statusOf(tradeType);
-        if(TransactionTypeEnum.TRUSTEE_REGISTER.getDesc().equals(transactionTypeEnum.getDesc())){
-            //判断是否已经是委托人
+        if(TransactionTypeEnum.TRUSTEE_REGISTER.getDesc().equals(transactionTypeEnum.getDesc())){//已是委托人则不能重复注册
             Optional<Trustee> trusteeOptional = dbAccess.getTrustee(payAddress);
-            if(trusteeOptional.isPresent()){
-                Trustee trustee = trusteeOptional.get();
-                if(trustee.getStatus() == 1){
-                    return new CommonException(ResultEnum.TRUSTEE_EXISTS);
-                }
+            if(trusteeOptional.isPresent() && trusteeOptional.get().getStatus() == 1){
+                return new CommonException(ResultEnum.TRUSTEE_EXISTS);
             }
-        }else if(TransactionTypeEnum.VOTER_REGISTER.getDesc().equals(transactionTypeEnum.getDesc())){
-            //判断是否已经是投票人
+        }else if(TransactionTypeEnum.TRUSTEE_CANNEL.getDesc().equals(transactionTypeEnum.getDesc())){//只有受托人才能发起取消注册
+            Optional<Trustee> trusteeOptional = dbAccess.getTrustee(payAddress);
+            if(!trusteeOptional.isPresent() || trusteeOptional.get().getStatus() == 0){
+                return new CommonException(ResultEnum.TRUSTEE_NOTEXISTS);
+            }
+        }else if(TransactionTypeEnum.VOTER_REGISTER.getDesc().equals(transactionTypeEnum.getDesc())){//已是投票人则不能重复注册
             Optional<Voter> voterOptional = dbAccess.getVoter(payAddress);
-            if(voterOptional.isPresent()){
-                Voter Voter = voterOptional.get();
-                if(Voter.getStatus() == 1){
-                    return new CommonException(ResultEnum.VOTER_EXISTS);
-                }
+            if(voterOptional.isPresent() && voterOptional.get().getStatus() == 1){
+                return new CommonException(ResultEnum.VOTER_EXISTS);
+            }
+        }else if(TransactionTypeEnum.VOTER_CANNEL.getDesc().equals(transactionTypeEnum.getDesc())){//只有投票人才能发起取消注册
+            Optional<Voter> voterOptional = dbAccess.getVoter(payAddress);
+            if(!voterOptional.isPresent() || voterOptional.get().getStatus() == 0){
+                return new CommonException(ResultEnum.VOTER_NOTEXISTS);
+            }
+        }else if(TransactionTypeEnum.VOTE.getDesc().equals(transactionTypeEnum.getDesc())){//只能给受托人投票
+            //给受托人投票，需判断受托人是否存在
+            Optional<Trustee> trusteeOptional = dbAccess.getTrustee(receiptAddress);
+            if(!trusteeOptional.isPresent() || trusteeOptional.get().getStatus() == 0){
+                return new CommonException(ResultEnum.TRUSTEE_NOTEXISTS);
             }
         }
 
@@ -197,65 +202,17 @@ public class TransactionHandler {
     }
 
     /**
-     * 执行流水,
-     * @param currentBlock
+     * 执行已确认流水
+     * @param list
      */
     public void exec(List<Transaction> list) {
         //需要清空，不然会冗余很多
         eggUsedTemp.clear();
         for (Transaction transaction : list) {
-            String receiptAddress = new String(transaction.getReceiptAddress());//收款地址
-            byte[] payAddressByte = transaction.getPayAddress();//付款地址byte
-            BigDecimal valueBigDecimal = CastUtils.castBigDecimal(new String(transaction.getValue()));//交易金额
-            //收款账户
-            Optional<Account> receiptOptional = dbAccess.getAccount(receiptAddress);
-            if (!receiptOptional.isPresent()) {//可能暂时没有同步过来，先构造一个Account对象
-                receiptOptional = Optional.of(new Account(receiptAddress, BigDecimal.ZERO));
+            TransactionStrategy transactionStrategy = transactionStrategyContext.getTransactionStrategy(new String(transaction.getTradeType()));
+            if(transactionStrategy != null){
+                transactionStrategy.handleTransaction(transaction);
             }
-            Account accountReceipt = receiptOptional.get();
-
-            //无付款人则是挖矿奖励
-            if (payAddressByte == null) {
-                accountReceipt.setBalance(accountReceipt.getBalance().add(valueBigDecimal));
-                dbAccess.putAccount(accountReceipt);
-                continue;
-            }
-            String payAddress = new String(payAddressByte);//付款地址
-
-            //验证签名
-            //TODO 构造签名数据
-            Transaction trans = new Transaction();
-            trans.setPayAddress(transaction.getPayAddress());
-            trans.setReceiptAddress(transaction.getReceiptAddress());
-            trans.setValue(transaction.getValue());
-            trans.setExtarData(transaction.getExtarData());
-            trans.setTime(transaction.getTime());
-            //生成hash和生成签名sign使用的基础数据都应该一样 TODO 使用多语言开发时应使用同样的序列化算法
-            String transactionJson = GsonUtils.toJson(trans);
-            try {
-                boolean flag = Sign.verify(transaction.getPublicKey(), new String(transaction.getSignature()), transactionJson);
-                if (!flag) {
-                    logger.info("交易验签不通过");
-                    continue;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            //账户转账
-            Optional<Account> payOptional = dbAccess.getAccount(payAddress);
-            Account accountPay = payOptional.get();
-            //验证账户余额
-            if (accountPay.getBalance().compareTo(valueBigDecimal) == -1) {
-                logger.info("余额不足");
-                continue;
-            }
-
-            accountPay.setBalance(accountPay.getBalance().subtract(valueBigDecimal));
-            accountReceipt.setBalance(accountReceipt.getBalance().add(valueBigDecimal));
-            dbAccess.putAccount(accountPay);
-            dbAccess.putAccount(accountReceipt);
-
         }
     }
 
@@ -343,6 +300,11 @@ public class TransactionHandler {
 
         //删除未确认流水
         deleteUnconfirmTransactions(matchTransactions);
+
+        //匹配成功的流水放到已确认流水列表
+        matchTransactions.forEach(transaction -> {
+            dbAccess.putConfirmTransaction(transaction);
+        });
 
         //执行流水
         exec(matchTransactions);

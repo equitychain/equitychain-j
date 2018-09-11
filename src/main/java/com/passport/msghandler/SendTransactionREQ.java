@@ -59,8 +59,12 @@ public class SendTransactionREQ extends Strategy {
                 Optional<Transaction> transactionOptional = dbAccess.getUnconfirmTransaction(transaction.getHash().toString());
                 if (!transactionOptional.isPresent()) {
                     //特殊流水校验
-                    CommonException commonException = transactionHandler.checkValue4AllTradeType(new String(trans.getTradeType()), new String(trans.getValue()));
-                    if (commonException != null){
+                    CommonException commonException = transactionHandler.check4AllTradeType(
+                            new String(transaction.getTradeType().toByteArray()),
+                            new String(transaction.getValue().toByteArray()),
+                            new String(transaction.getPayAddress().toByteArray()),
+                            new String(transaction.getReceiptAddress().toByteArray()));
+                    if(commonException != null){
                         return;
                     }
 
