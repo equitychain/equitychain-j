@@ -6,10 +6,7 @@ import com.passport.annotations.EntityClaz;
 import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
 import com.passport.utils.SerializeUtils;
-import org.rocksdb.ColumnFamilyHandle;
-import org.rocksdb.RocksDB;
-import org.rocksdb.RocksDBException;
-import org.rocksdb.RocksIterator;
+import org.rocksdb.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -646,4 +643,39 @@ public abstract class BaseDBAccess implements DBAccess {
         }
         return result;
     }
+
+
+    // transaction start
+    protected Snapshot snapshot;
+
+    protected Set<String> KeysSet;
+
+    public void setSnapshot(Snapshot snapshot) {
+        this.snapshot = snapshot;
+    }
+
+    public Set<String> getKeysSet() {
+        return KeysSet;
+    }
+
+    public void setKeysSet(Set<String> keysSet) {
+        KeysSet = keysSet;
+    }
+
+    public Snapshot getCurrentSnapshot() {
+        return rocksDB.getSnapshot();
+    }
+
+    public void close() {
+        //在一个事务的最后调用该方法,由切面决定调用时间(当事务注解的方法完成的时候执行)
+        //关闭DB对象实例,情况Keyset,快照
+        //todo 接下来还要加入清空实例化对象文件, 记录keySet对象的实例化对象文件之后如果事务正确执行完毕, 则清除该文件,如果执行过程中出现 问题,则在启动的时候逐一回复, 逐一回复的会后应从linkedList最后开始一次恢复
+        rocksDB.close();
+        setKeysSet(new HashSet());
+        setSnapshot(null);
+
+    }
+    // transaction end
+
+
 }

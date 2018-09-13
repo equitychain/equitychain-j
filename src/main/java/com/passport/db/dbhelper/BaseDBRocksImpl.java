@@ -2,6 +2,7 @@ package com.passport.db.dbhelper;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Optional;
+import com.passport.annotations.RocksTransaction;
 import com.passport.core.*;
 import com.passport.core.Transaction;
 import com.passport.utils.SerializeUtils;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class BaseDBRocksImpl extends BaseDBAccess {
@@ -20,6 +23,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     private static final String CLIENT_NODES_LIST_KEY = "client-node-list";
     @Value("${db.dataDir}")
     private String dataDir;
+
+
 
     public BaseDBRocksImpl() {
 
@@ -146,7 +151,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
      * @return
      */
     @Override
-    @Deprecated
     public boolean putLastBlockHeight(Object lastBlock) {
         return true;
     }
@@ -230,7 +234,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    @Deprecated
+    @RocksTransaction
     public boolean put(String key, Object value) {
         try {
             rocksDB.put(key.getBytes(), SerializeUtils.serialize(value));
@@ -242,7 +246,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    @Deprecated
+
     public Optional<Object> get(String key) {
         try {
             byte[] objByt = rocksDB.get(key.getBytes());
@@ -256,7 +260,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    @Deprecated
     public boolean delete(String key) {
         try {
             rocksDB.delete(key.getBytes());
@@ -268,7 +271,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    @Deprecated
     public <T> List<T> seekByKey(String keyPrefix) {
         ArrayList<T> ts = new ArrayList<>();
         ReadOptions options = new ReadOptions();
@@ -417,7 +419,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 screenHanles.add(handleMap.get(getColName("transaction", screens.get(i))));
             }
         }
-        if(screenVals == null){
+        if (screenVals == null) {
             screenVals = new ArrayList<>();
         }
         try {
