@@ -18,6 +18,13 @@ import java.util.List;
 public class BaseDBRocksImpl extends BaseDBAccess {
     //存放节点列表
     private static final String CLIENT_NODES_LIST_KEY = "client-node-list";
+    private static final String SUFFIX_INDEX = "index";
+    private static final String SUFFIX_RELA = "overAndNext";
+    private static final String MINERACCOUNT = "miner_account";
+    //block-Height 索引列族名
+    private static final String BLOCK_HEIGHT_COLNAME="block-height-index";
+    private static final String BLOCK_HEIGHT_RELA_COLNAME="block-height-overAndNext";
+    //
     @Value("${db.dataDir}")
     private String dataDir;
 
@@ -73,28 +80,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 ColumnFamilyHandle blockHeightNextHand = rocksDB.createColumnFamily(blockHeightIndexDescriptor);
                 handleMap.put(blockNextHeight, blockHeightNextHand);
 
-                //todo 存量数据的索引put  测试数据
-//                for (int i = 1; i < 10000; i++) {
-//                    Block block = new Block();
-//                    block.setBlockHeight(Long.parseLong("" + i));
-//                    block.setBlockSize(Long.parseLong("10" + i % 1000));
-//                    block.setTransactionCount(0);
-//                    addObj(block);
-//                    putSuoyinKey(handleMap.get(getColName("blockHeight", "index")), (block.getBlockHeight() + "").getBytes(), (block.getBlockHeight() + "").getBytes());
-//                    putOverAndNext(handleMap.get(getColName("blockHeightIndex", "overAndNext")), (block.getBlockHeight() + "").getBytes());
-//                }
 
-//                for (int i = 1; i < 10000; i++) {
-//                    Transaction transaction =new Transaction();
-//                    transaction.setHash((i+"").getBytes());
-//                    transaction.setTime((i+"").getBytes());
-//                    transaction.setEggMax(("test"+i%1000).getBytes());
-//                    transaction.setSignature("xxx".getBytes());
-//                    addObj(transaction);
-//                    putSuoyinKey(handleMap.get(getColName("transcationTime", "index")), transaction.getTime(), transaction.getHash());
-//
-//                    putOverAndNext(handleMap.get(getColName("transcationTimeIndex", "overAndNext")), transaction.getTime());
-//                }
             } catch (Exception e) {
                 //列集合
                 List<ColumnFamilyDescriptor> descriptorList = new ArrayList<>();
@@ -119,6 +105,28 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                     handleMap.put(name, handler);
                 });
             }
+            //todo 存量数据的索引put  测试数据
+//            for (int i = 0; i < 300000; i++) {
+//                Block block = new Block();
+//                block.setBlockHeight(Long.parseLong("" + i));
+//                block.setBlockSize(Long.parseLong("10" + i));
+//                block.setTransactionCount(0);
+//                addObj(block);
+//                putSuoyinKey(handleMap.get(getColName("blockHeight", "index")), (block.getBlockHeight() + "").getBytes(), (block.getBlockHeight() + "").getBytes());
+//                putOverAndNext(handleMap.get(getColName("blockHeightIndex", "overAndNext")), (block.getBlockHeight() + "").getBytes());
+//            }
+                for (int i = 0; i < 3000000; i++) {
+                    Transaction transaction =new Transaction();
+                    transaction.setHash((i+"").getBytes());
+                    transaction.setTime((""+(1530740510951l+1000*10*(i))).getBytes());
+                    transaction.setEggMax(("test"+i%1000).getBytes());
+                    transaction.setSignature("xxx".getBytes());
+                    addObj(transaction);
+                    putSuoyinKey(handleMap.get(getColName("transcationTime", "index")), transaction.getTime(), transaction.getHash());
+
+                    putOverAndNext(handleMap.get(getColName("transcationTimeIndex", "overAndNext")), transaction.getTime());
+                }
+            System.out.println("========测试数据添加完毕==========");
             // 查询测试
 //           List<Block> blocks = blockPagination(10, 1, 0);
 //            System.out.println("=========查询成功blocks========"+JSON.toJSONString(blocks));
@@ -126,13 +134,21 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 //            screens.add("eggMax");
 //            List<byte[]> vals = new ArrayList<>();
 //            vals.add(("test"+423).getBytes());
-//            List<Transaction> transactionList = transactionPagination(10, 1, 0,screens,vals);
-//            for (Transaction t : transactionList){
-//                System.out.println("jiaoyan:"+new String(t.getHash()));
-//                System.out.println("jiaoyan:"+new String(t.getTime()));
-//                System.out.println("jiaoyan:"+new String(t.getSignature()));
-//                System.out.println("jiaoyan:"+new String(t.getEggMax()));
-//            }
+
+            RocksIterator countIt = rocksDB.newIterator(handleMap.get(getColName("transaction","hash")));
+            RocksIterator timeQuIt = rocksDB.newIterator(handleMap.get(getColName("transcationTimeIndex","overAndNext")));
+            int count = 0;
+            int quCount = 0;
+            for(countIt.seekToFirst();countIt.isValid();countIt.next()){
+                count ++;
+            }
+            for (timeQuIt.seekToFirst();timeQuIt.isValid();timeQuIt.next()){
+                quCount ++;
+            }
+            long begin = System.currentTimeMillis();
+            List<Transaction> transactionList = transactionPagination(100, 30000, 0,null,null);
+            long end = System.currentTimeMillis();
+            System.out.println("耗时："+(end-begin)+"   集合大小："+transactionList.size()+"  总数据："+count+"  区间数："+quCount);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -172,6 +188,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public boolean putBlock(Block block) {
         try {
             addObj(block);
+            //todo 区块的索引数据添加，要那些字段加索引
+            putSuoyinKey(handleMap.get(getColName(BLOCK_HEIGHT_COLNAME, SUFFIX_INDEX)), block.getBlockHeight().toString().getBytes(), block.getBlockHeight().toString().getBytes());
+            putOverAndNext(handleMap.get(getColName(BLOCK_HEIGHT_RELA_COLNAME, SUFFIX_RELA)), block.getBlockHeight().toString().getBytes());
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -221,6 +240,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public boolean putNodeList(List<String> nodes) {
         try {
+
             rocksDB.put(CLIENT_NODES_LIST_KEY.getBytes(), SerializeUtils.serialize(nodes));
             return true;
         } catch (RocksDBException e) {
@@ -304,6 +324,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public boolean putAccount(Account account) {
         try {
             addObj(account);
+            //todo 要加那些字段作为索引
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -323,32 +344,87 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     public boolean putUnconfirmTransaction(Transaction transaction) {
+        try {
+            byte[] blockHeight = transaction.getBlockHeight();
+            if(blockHeight == null || blockHeight.length == 0) {
+                addObj(transaction);
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     @Override
     public Optional<Transaction> getUnconfirmTransaction(String txHash) {
-        return null;
+        try {
+            Transaction transaction = getObj("hash",txHash,Transaction.class);
+            if(transaction != null){
+                if(transaction.getBlockHeight() == null || transaction.getBlockHeight().length == 0){
+                    return Optional.of(transaction);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Optional.absent();
     }
 
     @Override
     public void deleteUnconfirmTransaction(String txHash) {
-
+//        Optional<Transaction> optionalTran = getUnconfirmTransaction(txHash);
+//        if(optionalTran.isPresent()){
+//
+//        }
     }
 
     @Override
     public List<Transaction> listUnconfirmTransactions() {
-        return null;
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("transaction","hash")));
+        List<Transaction> transactions = new ArrayList<>();
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            String hash = new String(iterator.key());
+            try {
+                Transaction transaction = getObj("hash",hash,Transaction.class);
+                if(transaction.getBlockHeight() == null || transaction.getBlockHeight().length == 0){
+                    transactions.add(transaction);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return transactions;
     }
 
     @Override
     public boolean putConfirmTransaction(Transaction transaction) {
+        try {
+            byte[] blockHeight = transaction.getBlockHeight();
+            Optional<Block> blockOptional = getBlock(new String(blockHeight));
+            if(blockOptional != null && blockOptional.isPresent()){
+                addObj(transaction);
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     @Override
     public Optional<Transaction> getConfirmTransaction(String txHash) {
-        return null;
+        try {
+            Transaction transaction = getObj("hash",txHash,Transaction.class);
+            if(transaction != null){
+                if(transaction.getBlockHeight() != null && transaction.getBlockHeight().length > 0){
+                    return Optional.of(transaction);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Optional.absent();
     }
 
     @Override
@@ -402,15 +478,18 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    public List<Block> blockPagination(int pageCount, int pageNumber, int orderByType) throws Exception {
-        ColumnFamilyHandle indexHandle = handleMap.get(getColName("blockHeight", "index"));
-        ColumnFamilyHandle overAndNextHandle = handleMap.get(getColName("blockHeightIndex", "overAndNext"));
-        List<Block> blocks = super.getDtoOrderByHandle(pageCount, pageNumber, indexHandle, null, null, overAndNextHandle, Block.class, "blockHeight", orderByType, 150, 0);
-        return blocks;
+    public List<VoteRecord> listVoteRecords(String address, String type) {
+        return null;
     }
 
     @Override
-    public List<Transaction> transactionPagination(int pageCount, int pageNumber, int orderByType, List<String> screens, List<byte[]> screenVals) {
+    public List<Block> blockPagination(int pageCount, int pageNumber, int orderByType) throws Exception {
+
+        return null;
+    }
+
+    @Override
+    public List<Transaction> transactionPagination(int pageCount, int pageNumber, int orderByType, List<String> screens, List<byte[][]> screenVals) {
         List<ColumnFamilyHandle> screenHanles = new ArrayList<>();
         if (screens != null && screenVals != null) {
             for (int i = 0; i < screens.size(); i++) {
@@ -422,10 +501,36 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         }
         try {
             return getDtoOrderByHandle(pageCount, pageNumber, handleMap.get(getColName("transcationTime", "index"))
-                    , screenHanles, screenVals, handleMap.get(getColName("transcationTimeIndex", "overAndNext")), Transaction.class, "hash", orderByType, 150, 0);
+                    , screenHanles, screenVals,0, handleMap.get(getColName("transcationTimeIndex", "overAndNext")),
+                    Transaction.class, "hash", orderByType, 150, 0,handleMap.get(getColName("transaction","time")));
         } catch (Exception e) {
             return new ArrayList<>();
         }
+    }
+
+    @Override
+    public List<Transaction> getTransactionByAddress(int pageCount, int pageNumber, int orderByType, String address) {
+        List<ColumnFamilyHandle> screenHands = new ArrayList<>();
+        screenHands.add(handleMap.get(getColName("transaction","payAddress")));
+        screenHands.add(handleMap.get(getColName("transaction","receiptAddress")));
+        List<byte[][]> vals = new ArrayList<>();
+        byte[][] val = new byte[1][];
+        val[0] = address.getBytes();
+        vals.add(val);
+        vals.add(val);
+        try {
+            return getDtoOrderByHandle(pageCount,pageNumber,handleMap.get(getColName("transcationTime", "index")),
+                    screenHands,vals,1,handleMap.get(getColName("transcationTimeIndex", "overAndNext")),
+                    Transaction.class,"hash",orderByType,300,0,handleMap.get(getColName("transaction","time")));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<Transaction> getNewBlocksTransactions(int pageCount, int pageNumber) {
+        return null;
     }
 
 
