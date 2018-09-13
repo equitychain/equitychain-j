@@ -201,7 +201,13 @@ public interface DBAccess {
 	 * @return
 	 */
 	List<VoteRecord> listVoteRecords();
-
+	/**
+	 * 根据 投票人/受托人 获取投票记录列表
+	 * @param   address   投票人/受托人的地址
+	 * @param   type      投票人/受托人的类型，是根据那个
+	 * @return  返回需要的投票集合
+	 */
+	List<VoteRecord> listVoteRecords(String address, String type);
 	/**
 	 * 区块分页查询
 	 * @param pageCount：每页记录数
@@ -219,5 +225,9 @@ public interface DBAccess {
 	 * @param  screenVals  筛选字段对应的值
 	 * @return
 	 */
-	List<Transaction> transactionPagination(int pageCount, int pageNumber, int orderByType,List<String> screens,List<byte[]> screenVals);
+	List<Transaction> transactionPagination(int pageCount, int pageNumber, int orderByType,List<String> screens,List<byte[][]> screenVals);
+
+	List<Transaction> getTransactionByAddress(int pageCount, int pageNumber, int orderByType,String address);
+
+	List<Transaction> getNewBlocksTransactions(int pageCount, int pageNumber);
 }
