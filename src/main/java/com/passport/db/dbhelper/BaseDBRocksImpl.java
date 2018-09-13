@@ -7,6 +7,7 @@ import com.passport.core.*;
 import com.passport.core.Transaction;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -28,8 +29,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     private static final String BLOCK_HEIGHT_COLNAME="block-height-index";
     private static final String BLOCK_HEIGHT_RELA_COLNAME="block-height-overAndNext";
     //
-    @Value("${db.dataDir}")
-    private String dataDir;
 
 
 
@@ -39,124 +38,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     @PostConstruct
-    protected void initDB() {
-        try {
-            //数据库目录不存在就创建
-            File directory = new File(System.getProperty("user.dir") + "/" + dataDir);
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
-            List<String> fields = new ArrayList<>();
-            //TODO 添加dto的字节码
-            fields.addAll(getClassCols(new Transaction().getClass()));
-            fields.addAll(getClassCols(new Block().getClass()));
-            try {
-                rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), dataDir);
-                System.out.println("========create fields=========");
-                //添加默认的列族
-                handleMap.put("default", rocksDB.getDefaultColumnFamily());
-                for (String field : fields) {
-                    ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(field.getBytes());
-                    ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
-                    handleMap.put(field, handle);
-                    System.out.println("====field:" + field);
-                }
-                //todo 索引的添加
-                //索引分类
-                //流水时间索引
-                String suoyinStr = getColName("transcationTime", "index");
-                ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(suoyinStr.getBytes());
-                ColumnFamilyHandle suoyinHeight = rocksDB.createColumnFamily(descriptor);
-                handleMap.put(suoyinStr, suoyinHeight);
-                //区块高度索引
-                String blockHeight = getColName("blockHeight", "index");
-                ColumnFamilyDescriptor blockHeightDescriptor = new ColumnFamilyDescriptor(blockHeight.getBytes());
-                ColumnFamilyHandle blockHeightHandle = rocksDB.createColumnFamily(blockHeightDescriptor);
-                handleMap.put(blockHeight, blockHeightHandle);
-
-                //索引关系
-                String suoyin_indexStr = getColName("transcationTimeIndex", "overAndNext");
-                ColumnFamilyDescriptor descriptor1 = new ColumnFamilyDescriptor(suoyin_indexStr.getBytes());
-                ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor1);
-                handleMap.put(suoyin_indexStr, handle);
-                //区块高度关系
-                String blockNextHeight = getColName("blockHeightIndex", "overAndNext");
-                ColumnFamilyDescriptor blockHeightIndexDescriptor = new ColumnFamilyDescriptor(blockNextHeight.getBytes());
-                ColumnFamilyHandle blockHeightNextHand = rocksDB.createColumnFamily(blockHeightIndexDescriptor);
-                handleMap.put(blockNextHeight, blockHeightNextHand);
-
-
-            } catch (Exception e) {
-                //列集合
-                List<ColumnFamilyDescriptor> descriptorList = new ArrayList<>();
-                ColumnFamilyDescriptor defaultDescriptor = new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY);
-                descriptorList.add(defaultDescriptor);
-                System.out.println("========load fields=========");
-                for (String s : fields) {
-                    ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(s.getBytes());
-                    descriptorList.add(descriptor);
-                    System.out.println("====field:" + s);
-                }
-                //todo 加载已创建的索引列族
-                descriptorList.add(new ColumnFamilyDescriptor(getColName("transcationTime", "index").getBytes()));
-                descriptorList.add(new ColumnFamilyDescriptor(getColName("blockHeight", "index").getBytes()));
-                descriptorList.add(new ColumnFamilyDescriptor(getColName("transcationTimeIndex", "overAndNext").getBytes()));
-                descriptorList.add(new ColumnFamilyDescriptor(getColName("blockHeightIndex", "overAndNext").getBytes()));
-                //打开数据库
-                List<ColumnFamilyHandle> handleList = new ArrayList<>();
-                rocksDB = RocksDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
-                handleList.forEach((handler) -> {
-                    String name = new String(handler.getName());
-                    handleMap.put(name, handler);
-                });
-            }
-            //todo 存量数据的索引put  测试数据
-//            for (int i = 0; i < 300000; i++) {
-//                Block block = new Block();
-//                block.setBlockHeight(Long.parseLong("" + i));
-//                block.setBlockSize(Long.parseLong("10" + i));
-//                block.setTransactionCount(0);
-//                addObj(block);
-//                putSuoyinKey(handleMap.get(getColName("blockHeight", "index")), (block.getBlockHeight() + "").getBytes(), (block.getBlockHeight() + "").getBytes());
-//                putOverAndNext(handleMap.get(getColName("blockHeightIndex", "overAndNext")), (block.getBlockHeight() + "").getBytes());
-//            }
-                for (int i = 0; i < 3000000; i++) {
-                    Transaction transaction =new Transaction();
-                    transaction.setHash((i+"").getBytes());
-                    transaction.setTime((""+(1530740510951l+1000*10*(i))).getBytes());
-                    transaction.setEggMax(("test"+i%1000).getBytes());
-                    transaction.setSignature("xxx".getBytes());
-                    addObj(transaction);
-                    putSuoyinKey(handleMap.get(getColName("transcationTime", "index")), transaction.getTime(), transaction.getHash());
-
-                    putOverAndNext(handleMap.get(getColName("transcationTimeIndex", "overAndNext")), transaction.getTime());
-                }
-            System.out.println("========测试数据添加完毕==========");
-            // 查询测试
-//           List<Block> blocks = blockPagination(10, 1, 0);
-//            System.out.println("=========查询成功blocks========"+JSON.toJSONString(blocks));
-//            List<String> screens = new ArrayList<>();
-//            screens.add("eggMax");
-//            List<byte[]> vals = new ArrayList<>();
-//            vals.add(("test"+423).getBytes());
-
-            RocksIterator countIt = rocksDB.newIterator(handleMap.get(getColName("transaction","hash")));
-            RocksIterator timeQuIt = rocksDB.newIterator(handleMap.get(getColName("transcationTimeIndex","overAndNext")));
-            int count = 0;
-            int quCount = 0;
-            for(countIt.seekToFirst();countIt.isValid();countIt.next()){
-                count ++;
-            }
-            for (timeQuIt.seekToFirst();timeQuIt.isValid();timeQuIt.next()){
-                quCount ++;
-            }
-            long begin = System.currentTimeMillis();
-            List<Transaction> transactionList = transactionPagination(100, 30000, 0,null,null);
-            long end = System.currentTimeMillis();
-            System.out.println("耗时："+(end-begin)+"   集合大小："+transactionList.size()+"  总数据："+count+"  区间数："+quCount);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected void initDB(){
+        super.initDB();
     }
 
     /**
@@ -276,6 +159,22 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             e.printStackTrace();
         }
         return Optional.absent();
+    }
+
+    @Override
+    public Optional<Object> get(String columnFamily,String key) {
+        byte[] objByt = new byte[100];
+        try {
+            objByt = rocksDB.get(super.handleMap.get(columnFamily),key.getBytes());
+//            if (objByt != null) {
+//                Optional.of(SerializeUtils.unSerialize(objByt));
+
+        } catch (RocksDBException e) {
+//            e.printStackTrace();
+        }
+//        return Optional.absent();
+        System.out.println(new String(objByt)+"-----------!");
+        return null;
     }
 
     @Override

@@ -10,10 +10,12 @@ import com.passport.core.Trustee;
 import com.passport.crypto.eth.ECKeyPair;
 import com.passport.crypto.eth.WalletUtils;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.db.transaction.RocksdbTransaction;
 import com.passport.enums.TransactionTypeEnum;
 import com.passport.exception.CipherException;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.utils.GsonUtils;
+import org.rocksdb.RocksDBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,8 @@ public class AccountHandler {
 
     @Autowired
     private DBAccess dbAccess;
-
+    @Autowired
+    private RocksdbTransaction rocksDBTr;
     //广播event用的
     @Autowired
     private ApplicationContextProvider provider;
@@ -46,10 +49,12 @@ public class AccountHandler {
     private TransactionHandler transactionHandler;
 
     @RocksTransaction
-    public void test(){
-        for(int i = 0;i<1000;i++){
-            dbAccess.put(i+"",i);
-        }
+    public void test() throws RocksDBException {
+//        for(int i = 0;i<10;i++){
+//            rocksDBTr.add("gg".getBytes(),"4".getBytes());
+////            if(i==9) throw new RocksDBException("shib");
+//        }
+        System.out.println(dbAccess.get("gg"));
     }
     /**
      * 新增账号

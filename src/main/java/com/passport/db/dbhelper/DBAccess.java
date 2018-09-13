@@ -71,6 +71,14 @@ public interface DBAccess {
 	 */
 	Optional<Object> get(String key);
 
+    /**
+     * 获取某一条指定的数据(通过列族)
+     * @param columFamily
+     * @param key
+     * @return
+     */
+    Optional<Object> get(String columFamily ,String key);
+
 	/**
 	 * 删除一条数据
 	 * @param key

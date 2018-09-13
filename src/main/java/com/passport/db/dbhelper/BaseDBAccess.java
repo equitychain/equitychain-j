@@ -1,13 +1,18 @@
 package com.passport.db.dbhelper;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.passport.annotations.EntityClaz;
 import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
+import com.passport.annotations.RocksTransaction;
+import com.passport.core.Block;
+import com.passport.db.transaction.RocksdbTransaction;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -16,11 +21,145 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public abstract class BaseDBAccess implements DBAccess {
+    @Autowired
+    public RocksdbTransaction transaction;
     protected RocksDB rocksDB;
+    @Value("${db.dataDir}")
+    private String dataDir;
     //列的handler
     protected final Map<String, ColumnFamilyHandle> handleMap = new HashMap<>();
     protected final Set<Class> dtoClasses = new HashSet<>();
-    protected abstract void initDB();
+    protected void initDB(){
+        try {
+            //数据库目录不存在就创建
+            File directory = new File(System.getProperty("user.dir") + "/" + dataDir);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            List<String> fields = new ArrayList<>();
+            //TODO 添加dto的字节码
+            fields.addAll(getClassCols(new com.passport.core.Transaction().getClass()));
+            fields.addAll(getClassCols(new Block().getClass()));
+            try {
+                rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), dataDir);
+                System.out.println("========create fields=========");
+                //添加默认的列族
+                handleMap.put("default", rocksDB.getDefaultColumnFamily());
+                for (String field : fields) {
+                    ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(field.getBytes());
+                    ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
+                    handleMap.put(field, handle);
+                    System.out.println("====field:" + field);
+                }
+                //todo 索引的添加
+                //索引分类
+                //流水时间索引
+                String suoyinStr = getColName("transcationTime", "index");
+                ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(suoyinStr.getBytes());
+                ColumnFamilyHandle suoyinHeight = rocksDB.createColumnFamily(descriptor);
+                handleMap.put(suoyinStr, suoyinHeight);
+                //区块高度索引
+                String blockHeight = getColName("blockHeight", "index");
+                ColumnFamilyDescriptor blockHeightDescriptor = new ColumnFamilyDescriptor(blockHeight.getBytes());
+                ColumnFamilyHandle blockHeightHandle = rocksDB.createColumnFamily(blockHeightDescriptor);
+                handleMap.put(blockHeight, blockHeightHandle);
+
+                //索引关系
+                String suoyin_indexStr = getColName("transcationTimeIndex", "overAndNext");
+                ColumnFamilyDescriptor descriptor1 = new ColumnFamilyDescriptor(suoyin_indexStr.getBytes());
+                ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor1);
+                handleMap.put(suoyin_indexStr, handle);
+                //区块高度关系
+                String blockNextHeight = getColName("blockHeightIndex", "overAndNext");
+                ColumnFamilyDescriptor blockHeightIndexDescriptor = new ColumnFamilyDescriptor(blockNextHeight.getBytes());
+                ColumnFamilyHandle blockHeightNextHand = rocksDB.createColumnFamily(blockHeightIndexDescriptor);
+                handleMap.put(blockNextHeight, blockHeightNextHand);
+
+
+            } catch (Exception e) {
+                //列集合
+                List<ColumnFamilyDescriptor> descriptorList = new ArrayList<>();
+                ColumnFamilyDescriptor defaultDescriptor = new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY);
+                descriptorList.add(defaultDescriptor);
+                System.out.println("========load fields=========");
+                for (String s : fields) {
+                    ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(s.getBytes());
+                    descriptorList.add(descriptor);
+                    System.out.println("====field:" + s);
+                }
+                //todo 加载已创建的索引列族
+                descriptorList.add(new ColumnFamilyDescriptor(getColName("transcationTime", "index").getBytes()));
+                descriptorList.add(new ColumnFamilyDescriptor(getColName("blockHeight", "index").getBytes()));
+                descriptorList.add(new ColumnFamilyDescriptor(getColName("transcationTimeIndex", "overAndNext").getBytes()));
+                descriptorList.add(new ColumnFamilyDescriptor(getColName("blockHeightIndex", "overAndNext").getBytes()));
+                descriptorList.add(new ColumnFamilyDescriptor("co".getBytes()));
+                descriptorList.add(new ColumnFamilyDescriptor("co2".getBytes()));
+                //打开数据库
+                List<ColumnFamilyHandle> handleList = new ArrayList<>();
+                rocksDB = RocksDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
+                handleList.forEach((handler) -> {
+                    String name = new String(handler.getName());
+                    handleMap.put(name, handler);
+                });
+            }
+            /**
+             * 初始化事务类
+             * **/
+            if(rocksDB!=null){
+                transaction.setRocksDB(rocksDB);
+                transaction.setHandleMap(handleMap);
+                transaction.initRocksDB();
+
+            }
+
+            //todo 存量数据的索引put  测试数据
+//            for (int i = 0; i < 300000; i++) {
+//                Block block = new Block();
+//                block.setBlockHeight(Long.parseLong("" + i));
+//                block.setBlockSize(Long.parseLong("10" + i));
+//                block.setTransactionCount(0);
+//                addObj(block);
+//                putSuoyinKey(handleMap.get(getColName("blockHeight", "index")), (block.getBlockHeight() + "").getBytes(), (block.getBlockHeight() + "").getBytes());
+//                putOverAndNext(handleMap.get(getColName("blockHeightIndex", "overAndNext")), (block.getBlockHeight() + "").getBytes());
+//            }
+//            for (int i = 0; i < 3000000; i++) {
+//                com.passport.core.Transaction transaction =new com.passport.core.Transaction();
+//                transaction.setHash((i+"").getBytes());
+//                transaction.setTime((""+(1530740510951l+1000*10*(i))).getBytes());
+//                transaction.setEggMax(("test"+i%1000).getBytes());
+//                transaction.setSignature("xxx".getBytes());
+//                addObj(transaction);
+//                putSuoyinKey(handleMap.get(getColName("transcationTime", "index")), transaction.getTime(), transaction.getHash());
+//
+//                putOverAndNext(handleMap.get(getColName("transcationTimeIndex", "overAndNext")), transaction.getTime());
+//            }
+            System.out.println("========测试数据添加完毕==========");
+            // 查询测试
+//           List<Block> blocks = blockPagination(10, 1, 0);
+//            System.out.println("=========查询成功blocks========"+JSON.toJSONString(blocks));
+//            List<String> screens = new ArrayList<>();
+//            screens.add("eggMax");
+//            List<byte[]> vals = new ArrayList<>();
+//            vals.add(("test"+423).getBytes());
+
+//            RocksIterator countIt = rocksDB.newIterator(handleMap.get(getColName("transaction","hash")));
+//            RocksIterator timeQuIt = rocksDB.newIterator(handleMap.get(getColName("transcationTimeIndex","overAndNext")));
+//            int count = 0;
+//            int quCount = 0;
+//            for(countIt.seekToFirst();countIt.isValid();countIt.next()){
+//                count ++;
+//            }
+//            for (timeQuIt.seekToFirst();timeQuIt.isValid();timeQuIt.next()){
+//                quCount ++;
+//            }
+//            long begin = System.currentTimeMillis();
+//            List<Transaction> transactionList = transactionPagination(100, 30000, 0,null,null);
+//            long end = System.currentTimeMillis();
+//            System.out.println("耗时："+(end-begin)+"   集合大小："+transactionList.size()+"  总数据："+count+"  区间数："+quCount);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 解析获取类里的所有有注解的field名和类名的拼接
