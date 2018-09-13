@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,6 +42,13 @@ public class AccountController {
     @Value("${wallet.keystoreDir}")
     private String walletDir;
 
+
+
+    @GetMapping("/test")
+    public @ResponseBody Object test() throws Exception {
+        accountHandler.test();
+        return "sdfasdf";
+    }
     @GetMapping("/new")
     public ResultDto newAccount(HttpServletRequest request) throws Exception {
         String password = request.getParameter("password");

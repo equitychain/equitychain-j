@@ -1,6 +1,7 @@
 package com.passport.webhandler;
 
 import com.google.common.base.Optional;
+import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.core.Account;
 import com.passport.core.GenesisBlockInfo;
@@ -44,6 +45,12 @@ public class AccountHandler {
     @Autowired
     private TransactionHandler transactionHandler;
 
+    @RocksTransaction
+    public void test(){
+        for(int i = 0;i<1000;i++){
+            dbAccess.put(i+"",i);
+        }
+    }
     /**
      * 新增账号
      * @return 账号

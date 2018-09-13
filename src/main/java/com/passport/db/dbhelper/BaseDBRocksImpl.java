@@ -234,9 +234,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    @RocksTransaction
     public boolean put(String key, Object value) {
         try {
+            KeysSet.add(key);//存储key到文件
             rocksDB.put(key.getBytes(), SerializeUtils.serialize(value));
             return true;
         } catch (RocksDBException e) {
@@ -246,7 +246,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-
     public Optional<Object> get(String key) {
         try {
             byte[] objByt = rocksDB.get(key.getBytes());

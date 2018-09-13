@@ -648,7 +648,7 @@ public abstract class BaseDBAccess implements DBAccess {
     // transaction start
     protected Snapshot snapshot;
 
-    protected Set<String> KeysSet;
+    protected Set<String> KeysSet = new HashSet<>();
 
     public void setSnapshot(Snapshot snapshot) {
         this.snapshot = snapshot;
