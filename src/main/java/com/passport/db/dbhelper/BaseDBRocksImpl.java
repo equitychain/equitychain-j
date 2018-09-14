@@ -21,13 +21,7 @@ import java.util.List;
 public class BaseDBRocksImpl extends BaseDBAccess {
     //存放节点列表
     private static final String CLIENT_NODES_LIST_KEY = "client-node-list";
-    private static final String SUFFIX_INDEX = "index";
-    private static final String SUFFIX_RELA = "overAndNext";
     private static final String MINERACCOUNT = "miner_account";
-    //block-Height 索引列族名
-    private static final String BLOCK_HEIGHT_COLNAME="block-height-index";
-    private static final String BLOCK_HEIGHT_RELA_COLNAME="block-height-overAndNext";
-    //
     @Value("${db.dataDir}")
     private String dataDir;
 
@@ -133,8 +127,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         try {
             addObj(block);
             //todo 区块的索引数据添加，要那些字段加索引
-            putSuoyinKey(handleMap.get(getColName(BLOCK_HEIGHT_COLNAME, SUFFIX_INDEX)), block.getBlockHeight().toString().getBytes(), block.getBlockHeight().toString().getBytes());
-            putOverAndNext(handleMap.get(getColName(BLOCK_HEIGHT_RELA_COLNAME, SUFFIX_RELA)), block.getBlockHeight().toString().getBytes());
+//            putSuoyinKey(handleMap.get(getColName(BLOCK_HEIGHT_COLNAME, SUFFIX_INDEX)), block.getBlockHeight().toString().getBytes(), block.getBlockHeight().toString().getBytes());
+//            putOverAndNext(handleMap.get(getColName(BLOCK_HEIGHT_RELA_COLNAME, SUFFIX_RELA)), block.getBlockHeight().toString().getBytes());
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -416,8 +410,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             screenVals = new ArrayList<>();
         }
         try {
-            return getDtoOrderByHandle(pageCount, pageNumber, handleMap.get(getColName("transcationTime", "index"))
-                    , screenHanles, screenVals,0, handleMap.get(getColName("transcationTimeIndex", "overAndNext")),
+            return getDtoOrderByHandle(pageCount, pageNumber, handleMap.get(IndexColumnNames.TRANSTIMEINDEX.indexName)
+                    , screenHanles, screenVals,0, handleMap.get(IndexColumnNames.TRANSTIMEINDEX.overAndNextName),
                     Transaction.class, "hash", orderByType, 150, 0,handleMap.get(getColName("transaction","time")));
         } catch (Exception e) {
             return new ArrayList<>();
@@ -435,8 +429,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         vals.add(val);
         vals.add(val);
         try {
-            return getDtoOrderByHandle(pageCount,pageNumber,handleMap.get(getColName("transcationTime", "index")),
-                    screenHands,vals,1,handleMap.get(getColName("transcationTimeIndex", "overAndNext")),
+            return getDtoOrderByHandle(pageCount,pageNumber,handleMap.get(IndexColumnNames.TRANSTIMEINDEX.indexName),
+                    screenHands,vals,1,handleMap.get(IndexColumnNames.TRANSTIMEINDEX.overAndNextName),
                     Transaction.class,"hash",orderByType,300,0,handleMap.get(getColName("transaction","time")));
         } catch (Exception e) {
             e.printStackTrace();
@@ -463,10 +457,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         vals.add(val);
         try {
             return getDtoOrderByHandle(pageCount,pageNumber,
-                    handleMap.get(getColName("transactionBlockHeight","index")),
+                    handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.indexName),
                     screenHandles,vals,0,
-                    handleMap.get(getColName(
-                            "transactionBlockHeight","overAndNext")),Transaction.class,
+                    handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.overAndNextName),Transaction.class,
                     "hash",0,300,0,
                     handleMap.get(getColName("transaction","blockHeight")));
         } catch (Exception e) {
@@ -488,8 +481,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             screens = new ArrayList<>();
         }
         try {
-            return getDtoOrderByHandle(pageCount, pageNumber, handleMap.get(getColName("trusteeVotes", "index"))
-                    , screenHanles, screenVals,0, handleMap.get(getColName("trusteeVotesIndex", "overAndNext")), Trustee.class, "votes", orderByType, 100, 0,
+            return getDtoOrderByHandle(pageCount, pageNumber, handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName)
+                    , screenHanles, screenVals,0, handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.overAndNextName), Trustee.class, "votes", orderByType, 100, 0,
                     handleMap.get(getColName("trustee", "votes")));
         } catch (Exception e) {
             e.printStackTrace();

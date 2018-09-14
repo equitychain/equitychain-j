@@ -3,6 +3,8 @@ package com.passport.db.dbhelper;
 import org.rocksdb.ColumnFamilyDescriptor;
 
 public enum IndexColumnNames {
+    TRANSTIMEINDEX("transactionTime-index","transactionTime-overAndNext"),
+    TRUSTEEVOTESINDEX("trusteeVotes-index","trusteeVotes-overAndNext"),
     TRANSBLOCKHEIGHTINDEX("transactionBlockHeight-index","transactionBlockHeight-overAndNext");
     protected String indexName;
     protected String overAndNextName;
