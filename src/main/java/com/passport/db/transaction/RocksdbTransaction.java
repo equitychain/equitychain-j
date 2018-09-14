@@ -126,6 +126,9 @@ public class RocksdbTransaction {
         ColumnFamilyHandle columnFamilyHandle= handleMap.get(columnFamily)!=null?handleMap.get(columnFamily):
                 rocksDB.createColumnFamily(new ColumnFamilyDescriptor(columnFamily.getBytes()));
         rocksDB.put(columnFamilyHandle,key, value);
+        if (columnFamilyHandle == null) {
+            handleMap.put(columnFamily, columnFamilyHandle);
+        }
         return true;
     }
 
@@ -141,6 +144,9 @@ public class RocksdbTransaction {
                 rocksDB.createColumnFamily(new ColumnFamilyDescriptor(columnFamily.getBytes()));
 //        backup();//备份该次操作的key
         rocksDB.delete(columnFamilyHandle,key);
+        if (columnFamilyHandle == null) {
+            handleMap.put(columnFamily, columnFamilyHandle);
+        }
         return true;
     }
 
