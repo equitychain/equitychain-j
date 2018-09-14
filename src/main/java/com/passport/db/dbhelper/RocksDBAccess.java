@@ -19,7 +19,7 @@ import java.util.List;
  *
  */
 //@Component
-/*
+
 public class RocksDBAccess implements DBAccess {
 	static Logger logger = LoggerFactory.getLogger(RocksDBAccess.class);
 
@@ -51,10 +51,10 @@ public class RocksDBAccess implements DBAccess {
 
 	public RocksDBAccess() {
 	}
-	*/
+
 /**
 	 * 初始化RocksDB
-	 *//*
+	 */
 
 //	@PostConstruct
 	public void initRocksDB() {
@@ -280,7 +280,7 @@ public class RocksDBAccess implements DBAccess {
 
 	@Override
 	public boolean putVoteRecord(VoteRecord voteRecord) {
-		return this.put(VOTE_RECORD_BUCKET_PREFIX + voteRecord.getAddress(), voteRecord);
+		return this.put(VOTE_RECORD_BUCKET_PREFIX + voteRecord.getPayAddress()+voteRecord.getReceiptAddress(), voteRecord);
 	}
 
 	@Override
@@ -291,6 +291,39 @@ public class RocksDBAccess implements DBAccess {
 			voteRecords.add((VoteRecord) o);
 		}
 		return voteRecords;
+	}
+
+	@Override
+	public List<VoteRecord> listVoteRecords(String address, String type) {
+		List<Object> objects = seekByKey(VOTERS_BUCKET_PREFIX);
+		List<VoteRecord> voteRecords = new ArrayList<>();
+		for (Object o : objects) {
+			VoteRecord voteRecord = (VoteRecord) o;
+			if(address != null && type != null){
+				if((type.equals("payAddress") && address.equals(voteRecord.getPayAddress()))
+						|| (type.equals("receiptAddress") && address.equals(voteRecord.getReceiptAddress()))){
+					voteRecords.add(voteRecord);
+				}
+			}else {
+				voteRecords.add(voteRecord);
+			}
+		}
+		return voteRecords;
+	}
+
+	@Override
+	public List<Block> blockPagination(int pageCount, int pageNumber, int orderByType) throws Exception {
+		return null;
+	}
+
+	@Override
+	public List<Transaction> transactionPagination(int pageCount, int pageNumber, int orderByType, List<String> screens, List<byte[][]> screenVals) {
+		return null;
+	}
+
+	@Override
+	public List<Transaction> getTransactionByAddress(int pageCount, int pageNumber, int orderByType, String address) {
+		return null;
 	}
 
 	@Override
@@ -313,4 +346,4 @@ public class RocksDBAccess implements DBAccess {
 		return Optional.absent();
 	}
 }
-*/
+

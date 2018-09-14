@@ -2,9 +2,7 @@ package com.passport.transactionhandler;
 
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
-import com.passport.core.Account;
-import com.passport.core.Transaction;
-import com.passport.core.Voter;
+import com.passport.core.*;
 import com.passport.db.dbhelper.DBAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 处理投票人撤消注册
@@ -24,7 +23,7 @@ public class VoterCannelHandler extends TransactionStrategy {
 
     @Autowired
     private DBAccess dbAccess;
-
+    //撤销投票
     @Override
     protected void handle(Transaction transaction) {
         String payAddress = new String(transaction.getPayAddress());
@@ -45,6 +44,23 @@ public class VoterCannelHandler extends TransactionStrategy {
                 if (flag) {
                     account.setBalance(result);
                     dbAccess.putAccount(account);
+                    //撤消相对应的投票
+                    List<VoteRecord> voteRecords = dbAccess.listVoteRecords(payAddress,"payAddress");
+                    if(voteRecords != null){
+                        for (VoteRecord voteRecord : voteRecords){
+                            //撤销投票
+                            voteRecord.setStatus(0);
+                            dbAccess.putVoteRecord(voteRecord);
+                            int number = voteRecord.getVoteNum();
+                            String receiptAddr = voteRecord.getReceiptAddress();
+                            Optional<Trustee> trusteeOptional = dbAccess.getTrustee(receiptAddr);
+                            if(trusteeOptional.isPresent()){
+                                Trustee trustee = trusteeOptional.get();
+                                trustee.setVotes(trustee.getVotes()-number);
+                                dbAccess.putTrustee(trustee);
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -1,18 +1,31 @@
 package com.passport.core;
 
+import com.passport.annotations.EntityClaz;
+import com.passport.annotations.FaildClaz;
+import com.passport.annotations.KeyField;
+
 import java.math.BigDecimal;
 
 /**
  * 受托人（候选人）
+ *
  * @author: xujianfeng
  * @create: 2018-09-05 11:54
  **/
+@EntityClaz(name = "trustee")
 public class Trustee {
+    @KeyField
+    @FaildClaz(name = "address", type = String.class)
     private String address;//钱包地址
+    @FaildClaz(name = "votes", type = Long.class)
     private Long votes;//得票数
+    @FaildClaz(name = "generateRate", type = Float.class)
     private Float generateRate;//成功生成区块比率
+    @FaildClaz(name = "income", type = BigDecimal.class)
     private BigDecimal income;//收入
+    @FaildClaz(name = "status", type = Integer.class)
     private Integer status;//0撤消1正常
+
     public Trustee() {
     }
 
