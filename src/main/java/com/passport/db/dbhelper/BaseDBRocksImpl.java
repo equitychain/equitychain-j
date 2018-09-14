@@ -11,7 +11,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.math.BigDecimal;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Component
@@ -45,6 +48,10 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             //TODO 添加dto的字节码
             fields.addAll(getClassCols(new Transaction().getClass()));
             fields.addAll(getClassCols(new Block().getClass()));
+            fields.addAll(getClassCols(new Trustee().getClass()));
+            dtoClasses.add(new Transaction().getClass());
+            dtoClasses.add(new Block().getClass());
+            dtoClasses.add(new Trustee().getClass());
             try {
                 rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), dataDir);
                 System.out.println("========create fields=========");
@@ -88,8 +95,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 ColumnFamilyDescriptor descriptor3 = new ColumnFamilyDescriptor(transactionBlockHeightOve.getBytes());
                 ColumnFamilyHandle handle2 = rocksDB.createColumnFamily(descriptor3);
                 handleMap.put(transactionBlockHeightOve,handle2);
-
-
 
             } catch (Exception e) {
                 //列集合
@@ -161,6 +166,69 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             List<Transaction> transactionList = transactionPagination(100, 30000, 0,null,null);
             long end = System.currentTimeMillis();
             System.out.println("耗时："+(end-begin)+"   集合大小："+transactionList.size()+"  总数据："+count+"  区间数："+quCount);
+            /*int index = 0;
+            for (int i = 1; i <= 600 * 10000; i++) {
+                Transaction transaction = new Transaction();
+                transaction.setHash((i + "").getBytes());
+                if (i % 360 * 1000 == 0) {
+                    index++;
+                }
+                long time = System.currentTimeMillis() + index * 3600 * 1000;
+                transaction.setTime((time + "").getBytes());
+                transaction.setEggMax(("test" + i).getBytes());
+                transaction.setSignature("xxx".getBytes());
+                addObj(transaction);
+                putSuoyinKey(handleMap.get(getColName("transcationTime", "index")), transaction.getTime(), transaction.getHash());
+                putOverAndNext(handleMap.get(getColName("transcationTimeIndex", "overAndNext")), transaction.getTime());
+                System.out.println(i);
+            }
+            List<String> screens = new ArrayList<>();
+            screens.add("eggMax");
+            List<byte[]> vals = new ArrayList<>();
+            vals.add(("test" + 100).getBytes());
+            long t1 = System.currentTimeMillis();
+            List<Transaction> transactionList = transactionPagination(100, 1, 0, null, null);
+            long t2 = System.currentTimeMillis();
+            System.out.println("transactionList.TIME:" + (t2 - t1));
+            System.out.println("transactionList.size:" + transactionList.size());
+            RocksIterator countIt = rocksDB.newIterator(handleMap.get(getColName("transaction", "hash")));
+            RocksIterator timeQuIt = rocksDB.newIterator(handleMap.get(getColName("transcationTimeIndex", "overAndNext")));
+            int count = 0;
+            int quCount = 0;
+            for (countIt.seekToFirst(); countIt.isValid(); countIt.next()) {
+                count++;
+            }
+            for (timeQuIt.seekToFirst(); timeQuIt.isValid(); timeQuIt.next()) {
+                quCount++;
+            }
+            System.out.println("集合大小：" + transactionList.size() + "  总数据：" + count + "  区间数：" + quCount);*/
+
+
+            //测试
+          String keyIndex = getColName("trusteeVotes", "index");
+            String keyOverAndNext = getColName("trusteeVotesIndex", "overAndNext");
+            ColumnFamilyHandle columnFamilyHandleIndex = rocksDB.createColumnFamily(new ColumnFamilyDescriptor(keyIndex.getBytes()));
+            ColumnFamilyHandle columnFamilyHandleOverAndNext = rocksDB.createColumnFamily(new ColumnFamilyDescriptor(keyOverAndNext.getBytes()));
+            handleMap.put(keyIndex, columnFamilyHandleIndex);
+            handleMap.put(keyOverAndNext, columnFamilyHandleOverAndNext);
+              for (int i = 1; i <= 1000; i++) {
+                Trustee trustee = new Trustee();
+                trustee.setAddress(i + "0x0000000000000");
+                trustee.setGenerateRate(0.1f);
+                trustee.setIncome(BigDecimal.ONE);
+                trustee.setStatus(1);
+                trustee.setVotes(new Long(i));
+                addObj(trustee);
+                //添加索引
+                putSuoyinKey(handleMap.get(keyIndex), (trustee.getVotes() + "").getBytes(), trustee.getAddress().getBytes());
+                putOverAndNext(handleMap.get(keyOverAndNext), (trustee.getVotes() + "").getBytes());
+                System.out.println(i);
+            }
+            List<Trustee> trustees = trusteePagination(101, 1, 0, null, null);
+            System.out.println("trustees.size:" + trustees.size());
+            for (Trustee trustee : trustees) {
+                System.out.println("trustee:" + JSON.toJSONString(trustee));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -495,9 +563,18 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    public List<Block> blockPagination(int pageCount, int pageNumber, int orderByType) throws Exception {
-
-        return null;
+    public List<Block> blockPagination(int pageCount, int pageNumber) throws Exception {
+        List<Block> blocks = new ArrayList<>();
+        Optional<Object> curHeightOpt = getLastBlockHeight();
+        if(curHeightOpt.isPresent() && (long)curHeightOpt.get() > 0) {
+            long curHeight = (long)curHeightOpt.get();
+            long end = curHeight-pageCount * (pageNumber - 1);
+            long begin = curHeight-pageCount * pageNumber+1;
+            for (long cur = end; cur >= begin; cur++) {
+                blocks.add(getObj("blockHeight", "" + cur, Block.class));
+            }
+        }
+        return blocks;
     }
 
     @Override
@@ -508,7 +585,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 screenHanles.add(handleMap.get(getColName("transaction", screens.get(i))));
             }
         }
-        if(screenVals == null){
+        if (screenVals == null) {
             screenVals = new ArrayList<>();
         }
         try {
@@ -570,6 +647,26 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             return new ArrayList<>();
         }
     }
-
-
+    public List<Trustee> trusteePagination(int pageCount, int pageNumber, int orderByType, List<String> screens, List<byte[][]> screenVals) {
+        List<ColumnFamilyHandle> screenHanles = new ArrayList<>();
+        if (screens != null && screenVals != null) {
+            for (int i = 0; i < screens.size(); i++) {
+                screenHanles.add(handleMap.get(getColName("transaction", screens.get(i))));
+            }
+        }
+        if (screenVals == null) {
+            screenVals = new ArrayList<>();
+        }
+        if(screens == null){
+            screens = new ArrayList<>();
+        }
+        try {
+            return getDtoOrderByHandle(pageCount, pageNumber, handleMap.get(getColName("trusteeVotes", "index"))
+                    , screenHanles, screenVals,0, handleMap.get(getColName("trusteeVotesIndex", "overAndNext")), Trustee.class, "votes", orderByType, 100, 0,
+                    handleMap.get(getColName("trustee", "votes")));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
 }

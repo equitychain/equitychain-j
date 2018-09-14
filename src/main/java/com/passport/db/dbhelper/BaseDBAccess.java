@@ -83,7 +83,7 @@ public abstract class BaseDBAccess implements DBAccess {
             for (Field f : fields) {
                 f.setAccessible(true);
                 byte[] key = keyField.get(obj).toString().getBytes();
-                if(keyField.getType() == byte[].class) {
+                if (keyField.getType() == byte[].class) {
                     key = (byte[]) keyField.get(obj);
                 }
                 //判断字段是否有字段注解，只解析有字段注解
@@ -98,7 +98,7 @@ public abstract class BaseDBAccess implements DBAccess {
                         rocksDB.put(handle, key, value);
                     } else if (faildClaz.type() == long.class || faildClaz.type() == Long.class
                             || faildClaz.type() == int.class || faildClaz.type() == Integer.class
-                            || faildClaz.type() == String.class || faildClaz.type() == BigDecimal.class) {
+                            || faildClaz.type() == String.class || faildClaz.type() == BigDecimal.class || faildClaz.type() == float.class || faildClaz.type() == Float.class) {
                         String fieldValue = f.get(obj).toString();
                         String fieldName = faildClaz.name();
                         ColumnFamilyHandle handle = handleMap.get(getColName(className, fieldName));
@@ -191,10 +191,10 @@ public abstract class BaseDBAccess implements DBAccess {
                         Field field = dtoClazz.getDeclaredField(keyField);
                         field.setAccessible(true);
                         Class typeClass = field.getType();
-                        if(typeClass == String.class) {
+                        if (typeClass == String.class) {
                             field.set(t, fieldValue);
-                        }else if(typeClass == byte[].class){
-                            field.set(t,fieldValue.getBytes());
+                        } else if (typeClass == byte[].class) {
+                            field.set(t, fieldValue.getBytes());
                         }
                     }
                     return;
@@ -207,6 +207,8 @@ public abstract class BaseDBAccess implements DBAccess {
                     FaildClaz faildClaz = field.getDeclaredAnnotation(FaildClaz.class);
                     if (faildClaz.type() == byte[].class) {
                         field.set(t, value);
+                    } else if (faildClaz.type() == float.class || faildClaz.type() == Float.class) {
+                        field.set(t, Float.parseFloat(new String(value)));
                     } else if (faildClaz.type() == long.class || faildClaz.type() == Long.class) {
                         field.set(t, Long.parseLong(new String(value)));
                     } else if (faildClaz.type() == int.class || faildClaz.type() == Integer.class) {
@@ -581,6 +583,7 @@ public abstract class BaseDBAccess implements DBAccess {
                     byte[][] paixuHeight = null;
                     if (dtoType == 0) {
                         paixuHeight = longOrder(heightList,orderByFieldHandle);
+
                     } else {
                         //todo 这里是不同排序方式
                     }
@@ -702,10 +705,11 @@ public abstract class BaseDBAccess implements DBAccess {
                     result[i] = result[j];
                     result[j] = temp;
                     cur = result[i];
-                    curVal = Long.parseLong(new String(cur));
+                    curVal =  Long.parseLong(new String(rocksDB.get(orderbyHandle,cur)));
                 }
             }
         }
         return result;
     }
+
 }
