@@ -36,7 +36,9 @@ public interface Constant {
 
   Integer BLOCK_SYNC_PERTIME = 50;//一次主动同步的区块数
 
-  Integer TRUSTEES_INIT_NUM = 11;//受托人初始化的人数
+  Integer TRUSTEES_INIT_NUM = 101;//受托人初始化的人数
+
+  Integer BLOCK_GENERATE_TIMEGAP = 10;//每个区块生成时间间隔
 
   Long GENESIS_BLOCK_TIMESTAMP = DateUtils.formatStringDate("2018-09-01 00:00:00").getTime();//创世区块时间
 
