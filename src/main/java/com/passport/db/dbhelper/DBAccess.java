@@ -2,6 +2,7 @@ package com.passport.db.dbhelper;
 
 import com.google.common.base.Optional;
 import com.passport.core.*;
+import org.rocksdb.ColumnFamilyHandle;
 
 import java.util.List;
 
@@ -9,6 +10,51 @@ import java.util.List;
  *
  */
 public interface DBAccess {
+
+	/**
+	 * 往数据库添加|更新一条数据
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	boolean put(byte[] key, byte[] value);
+
+	/**
+	 * 往数据库添加|更新一条数据,指定列族
+	 * @param columnFamilyHandle
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	boolean putByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle, byte[] key, byte[] value);
+
+	/**
+	 * 获取某一条指定的数据
+	 * @param key
+	 * @return
+	 */
+	byte[] get(byte[] key);
+
+	/**
+	 * 获取指定列族的value
+	 * @param columnFamilyHandle
+	 * @param key
+	 * @return
+	 */
+	byte[] getByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle,byte[] key);
+
+	/**
+	 * 删除一条数据
+	 * @param key
+	 * @return
+	 */
+	boolean delete(byte[] key);
+	/**
+	 * 删除一条数据
+	 * @param key
+	 * @return
+	 */
+	boolean deleteByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle,byte[] key);
 
 	/**
 	 * 更新最新一个区块的Hash值
@@ -55,28 +101,6 @@ public interface DBAccess {
 	 * @return
 	 */
 	boolean putNodeList(List<String> nodes);
-
-	/**
-	 * 往数据库添加|更新一条数据
-	 * @param key
-	 * @param value
-	 * @return
-	 */
-	boolean put(String key, Object value);
-
-	/**
-	 * 获取某一条指定的数据
-	 * @param key
-	 * @return
-	 */
-	Optional<Object> get(String key);
-
-	/**
-	 * 删除一条数据
-	 * @param key
-	 * @return
-	 */
-	boolean delete(String key);
 
 	/**
 	 * 根据前缀搜索
