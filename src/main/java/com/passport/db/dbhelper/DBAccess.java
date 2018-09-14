@@ -220,4 +220,15 @@ public interface DBAccess {
 	 * @return
 	 */
 	List<Transaction> transactionPagination(int pageCount, int pageNumber, int orderByType,List<String> screens,List<byte[]> screenVals);
+	/**
+	 * 委托人分页查询
+	 * @param pageCount：每页记录数
+	 * @param pageNumber：页码
+	 * @param orderByType：排序类型
+	 * @param screens      筛选字段
+	 * @param  screenVals  筛选字段对应的值
+	 * @return
+	 */
+	List<Trustee> trusteePagination(int pageCount, int pageNumber, int orderByType,List<String> screens,List<byte[]> screenVals);
+
 }
