@@ -45,6 +45,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 directory.mkdirs();
             }
             List<String> fields = new ArrayList<>();
+            IndexColumnNames[] indexColumnNames = IndexColumnNames.values();
             //TODO 添加dto的字节码
             fields.addAll(getClassCols(new Transaction().getClass()));
             fields.addAll(getClassCols(new Block().getClass()));
@@ -63,39 +64,12 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                     handleMap.put(field, handle);
                     System.out.println("====field:" + field);
                 }
-                //todo 索引的添加
-                //索引分类
-                //流水时间索引
-                String suoyinStr = getColName("transcationTime", "index");
-                ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(suoyinStr.getBytes());
-                ColumnFamilyHandle suoyinHeight = rocksDB.createColumnFamily(descriptor);
-                handleMap.put(suoyinStr, suoyinHeight);
-                //区块高度索引
-                String blockHeight = getColName("blockHeight", "index");
-                ColumnFamilyDescriptor blockHeightDescriptor = new ColumnFamilyDescriptor(blockHeight.getBytes());
-                ColumnFamilyHandle blockHeightHandle = rocksDB.createColumnFamily(blockHeightDescriptor);
-                handleMap.put(blockHeight, blockHeightHandle);
-
-                //索引关系
-                String suoyin_indexStr = getColName("transcationTimeIndex", "overAndNext");
-                ColumnFamilyDescriptor descriptor1 = new ColumnFamilyDescriptor(suoyin_indexStr.getBytes());
-                ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor1);
-                handleMap.put(suoyin_indexStr, handle);
-                //区块高度关系
-                String blockNextHeight = getColName("blockHeightIndex", "overAndNext");
-                ColumnFamilyDescriptor blockHeightIndexDescriptor = new ColumnFamilyDescriptor(blockNextHeight.getBytes());
-                ColumnFamilyHandle blockHeightNextHand = rocksDB.createColumnFamily(blockHeightIndexDescriptor);
-                handleMap.put(blockNextHeight, blockHeightNextHand);
-
-                String transactionBlockHeight = getColName("transactionBlockHeight","index");
-                String transactionBlockHeightOve = getColName("transactionBlockHeight","overAndNext");
-                ColumnFamilyDescriptor descriptor2 = new ColumnFamilyDescriptor(transactionBlockHeight.getBytes());
-                ColumnFamilyHandle handle1 = rocksDB.createColumnFamily(descriptor2);
-                handleMap.put(transactionBlockHeight,handle1);
-                ColumnFamilyDescriptor descriptor3 = new ColumnFamilyDescriptor(transactionBlockHeightOve.getBytes());
-                ColumnFamilyHandle handle2 = rocksDB.createColumnFamily(descriptor3);
-                handleMap.put(transactionBlockHeightOve,handle2);
-
+                for(IndexColumnNames columnNames : indexColumnNames){
+                    ColumnFamilyHandle indexNameHandle = rocksDB.createColumnFamily(columnNames.getIndexName());
+                    ColumnFamilyHandle indexOverHandle = rocksDB.createColumnFamily(columnNames.getOverAndNextName());
+                    handleMap.put(columnNames.indexName, indexNameHandle);
+                    handleMap.put(columnNames.overAndNextName,indexOverHandle);
+                }
             } catch (Exception e) {
                 //列集合
                 List<ColumnFamilyDescriptor> descriptorList = new ArrayList<>();
@@ -107,13 +81,10 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                     descriptorList.add(descriptor);
                     System.out.println("====field:" + s);
                 }
-                //todo 加载已创建的索引列族
-                descriptorList.add(new ColumnFamilyDescriptor(getColName("transcationTime", "index").getBytes()));
-                descriptorList.add(new ColumnFamilyDescriptor(getColName("blockHeight", "index").getBytes()));
-                descriptorList.add(new ColumnFamilyDescriptor(getColName("transcationTimeIndex", "overAndNext").getBytes()));
-                descriptorList.add(new ColumnFamilyDescriptor(getColName("blockHeightIndex", "overAndNext").getBytes()));
-                descriptorList.add(new ColumnFamilyDescriptor(getColName("transactionBlockHeight","index").getBytes()));
-                descriptorList.add(new ColumnFamilyDescriptor(getColName("transactionBlockHeight","overAndNext").getBytes()));
+                for(IndexColumnNames names : indexColumnNames){
+                    descriptorList.add(names.getIndexName());
+                    descriptorList.add(names.getOverAndNextName());
+                }
                 //打开数据库
                 List<ColumnFamilyHandle> handleList = new ArrayList<>();
                 rocksDB = RocksDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
@@ -121,113 +92,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                     String name = new String(handler.getName());
                     handleMap.put(name, handler);
                 });
-            }
-            //todo 存量数据的索引put  测试数据
-//            for (int i = 0; i < 300000; i++) {
-//                Block block = new Block();
-//                block.setBlockHeight(Long.parseLong("" + i));
-//                block.setBlockSize(Long.parseLong("10" + i));
-//                block.setTransactionCount(0);
-//                addObj(block);
-//                putSuoyinKey(handleMap.get(getColName("blockHeight", "index")), (block.getBlockHeight() + "").getBytes(), (block.getBlockHeight() + "").getBytes());
-//                putOverAndNext(handleMap.get(getColName("blockHeightIndex", "overAndNext")), (block.getBlockHeight() + "").getBytes());
-//            }
-                for (int i = 0; i < 3000000; i++) {
-                    Transaction transaction =new Transaction();
-                    transaction.setHash((i+"").getBytes());
-                    transaction.setTime((""+(1530740510951l+1000*10*(i))).getBytes());
-                    transaction.setEggMax(("test"+i%1000).getBytes());
-                    transaction.setSignature("xxx".getBytes());
-                    addObj(transaction);
-                    putSuoyinKey(handleMap.get(getColName("transcationTime", "index")), transaction.getTime(), transaction.getHash());
-
-                    putOverAndNext(handleMap.get(getColName("transcationTimeIndex", "overAndNext")), transaction.getTime());
-                }
-            System.out.println("========测试数据添加完毕==========");
-            // 查询测试
-//           List<Block> blocks = blockPagination(10, 1, 0);
-//            System.out.println("=========查询成功blocks========"+JSON.toJSONString(blocks));
-//            List<String> screens = new ArrayList<>();
-//            screens.add("eggMax");
-//            List<byte[]> vals = new ArrayList<>();
-//            vals.add(("test"+423).getBytes());
-
-            RocksIterator countIt = rocksDB.newIterator(handleMap.get(getColName("transaction","hash")));
-            RocksIterator timeQuIt = rocksDB.newIterator(handleMap.get(getColName("transcationTimeIndex","overAndNext")));
-            int count = 0;
-            int quCount = 0;
-            for(countIt.seekToFirst();countIt.isValid();countIt.next()){
-                count ++;
-            }
-            for (timeQuIt.seekToFirst();timeQuIt.isValid();timeQuIt.next()){
-                quCount ++;
-            }
-            long begin = System.currentTimeMillis();
-            List<Transaction> transactionList = transactionPagination(100, 30000, 0,null,null);
-            long end = System.currentTimeMillis();
-            System.out.println("耗时："+(end-begin)+"   集合大小："+transactionList.size()+"  总数据："+count+"  区间数："+quCount);
-            /*int index = 0;
-            for (int i = 1; i <= 600 * 10000; i++) {
-                Transaction transaction = new Transaction();
-                transaction.setHash((i + "").getBytes());
-                if (i % 360 * 1000 == 0) {
-                    index++;
-                }
-                long time = System.currentTimeMillis() + index * 3600 * 1000;
-                transaction.setTime((time + "").getBytes());
-                transaction.setEggMax(("test" + i).getBytes());
-                transaction.setSignature("xxx".getBytes());
-                addObj(transaction);
-                putSuoyinKey(handleMap.get(getColName("transcationTime", "index")), transaction.getTime(), transaction.getHash());
-                putOverAndNext(handleMap.get(getColName("transcationTimeIndex", "overAndNext")), transaction.getTime());
-                System.out.println(i);
-            }
-            List<String> screens = new ArrayList<>();
-            screens.add("eggMax");
-            List<byte[]> vals = new ArrayList<>();
-            vals.add(("test" + 100).getBytes());
-            long t1 = System.currentTimeMillis();
-            List<Transaction> transactionList = transactionPagination(100, 1, 0, null, null);
-            long t2 = System.currentTimeMillis();
-            System.out.println("transactionList.TIME:" + (t2 - t1));
-            System.out.println("transactionList.size:" + transactionList.size());
-            RocksIterator countIt = rocksDB.newIterator(handleMap.get(getColName("transaction", "hash")));
-            RocksIterator timeQuIt = rocksDB.newIterator(handleMap.get(getColName("transcationTimeIndex", "overAndNext")));
-            int count = 0;
-            int quCount = 0;
-            for (countIt.seekToFirst(); countIt.isValid(); countIt.next()) {
-                count++;
-            }
-            for (timeQuIt.seekToFirst(); timeQuIt.isValid(); timeQuIt.next()) {
-                quCount++;
-            }
-            System.out.println("集合大小：" + transactionList.size() + "  总数据：" + count + "  区间数：" + quCount);*/
-
-
-            //测试
-          String keyIndex = getColName("trusteeVotes", "index");
-            String keyOverAndNext = getColName("trusteeVotesIndex", "overAndNext");
-            ColumnFamilyHandle columnFamilyHandleIndex = rocksDB.createColumnFamily(new ColumnFamilyDescriptor(keyIndex.getBytes()));
-            ColumnFamilyHandle columnFamilyHandleOverAndNext = rocksDB.createColumnFamily(new ColumnFamilyDescriptor(keyOverAndNext.getBytes()));
-            handleMap.put(keyIndex, columnFamilyHandleIndex);
-            handleMap.put(keyOverAndNext, columnFamilyHandleOverAndNext);
-              for (int i = 1; i <= 1000; i++) {
-                Trustee trustee = new Trustee();
-                trustee.setAddress(i + "0x0000000000000");
-                trustee.setGenerateRate(0.1f);
-                trustee.setIncome(BigDecimal.ONE);
-                trustee.setStatus(1);
-                trustee.setVotes(new Long(i));
-                addObj(trustee);
-                //添加索引
-                putSuoyinKey(handleMap.get(keyIndex), (trustee.getVotes() + "").getBytes(), trustee.getAddress().getBytes());
-                putOverAndNext(handleMap.get(keyOverAndNext), (trustee.getVotes() + "").getBytes());
-                System.out.println(i);
-            }
-            List<Trustee> trustees = trusteePagination(101, 1, 0, null, null);
-            System.out.println("trustees.size:" + trustees.size());
-            for (Trustee trustee : trustees) {
-                System.out.println("trustee:" + JSON.toJSONString(trustee));
             }
         } catch (Exception e) {
             e.printStackTrace();

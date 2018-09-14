@@ -614,7 +614,7 @@ public abstract class BaseDBAccess implements DBAccess {
      *
      * @param flushSize         缓存大小
      * @param fushIndex         缓存位置
-     * @param overAndNextHandle 关系的handle   handleMap.get(getColName("blockHeightIndex","overAndNext"))
+     * @param overAndNextHandle 关系的handle
      * @param orderType         排序类型       1升序,0降序
      * @return
      * @throws RocksDBException
