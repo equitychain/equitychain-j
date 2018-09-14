@@ -97,6 +97,13 @@ public abstract class BaseDBAccess implements DBAccess {
             }
         }
     }
+    protected String getClassNameByClass(Class claz){
+        if(claz.isAnnotationPresent(EntityClaz.class)){
+            EntityClaz entityClaz = (EntityClaz) claz.getAnnotation(EntityClaz.class);
+            return entityClaz.name();
+        }
+        return null;
+    }
     protected String getKeyFieldByClass(Class claz){
         if(claz.isAnnotationPresent(EntityClaz.class)){
             Field[] fields = claz.getDeclaredFields();
@@ -463,8 +470,6 @@ public abstract class BaseDBAccess implements DBAccess {
 
     /**
      *
-     * @param className
-     * @param keyFiledName
      * @param fields
      * @param values
      * @param screenTypes           0 =     1 >=     2 <=
@@ -477,7 +482,8 @@ public abstract class BaseDBAccess implements DBAccess {
      * @return
      * @throws Exception
      */
-    public <T> List<T> getDtoListByField(String className,String keyFiledName,List<String> fields, List<byte[]> values,List<Integer> screenTypes, Class<T> tClass,ColumnFamilyHandle overAndNextHandle, ColumnFamilyHandle indexHandle,ColumnFamilyHandle orderByFieldHandle,int orderByType) throws Exception{
+    public <T> List<T> getDtoListByField(List<String> fields, List<byte[]> values,List<Integer> screenTypes, Class<T> tClass,ColumnFamilyHandle overAndNextHandle, ColumnFamilyHandle indexHandle,ColumnFamilyHandle orderByFieldHandle,int orderByType) throws Exception{
+        String className = getClassNameByClass(tClass);
         int flushSize = 300;
         //段判断筛选的字和字段对应的值是否匹配
         if (fields != null && values != null && screenTypes != null) {
@@ -584,6 +590,7 @@ public abstract class BaseDBAccess implements DBAccess {
                     continue;
                 }
                 byte[][] paixuHeight = longOrder(heightList, orderByFieldHandle);
+                String keyFiledName = getKeyFieldByClass(tClass);
                 for(byte[] heightByt : paixuHeight){
                     T tObj = getObj(keyFiledName, new String(heightByt), tClass);
                     tList.add(tObj);

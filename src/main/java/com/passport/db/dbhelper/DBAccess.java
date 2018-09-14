@@ -239,7 +239,9 @@ public interface DBAccess {
      *                    screenType      0 =     1 >=     2 <=
 	 * @return  返回需要的投票集合
 	 */
-	List<VoteRecord> listVoteRecords(String address, String type,long time, int screenType);
+    List<VoteRecord> listVoteRecords(String address, String type,long time, int screenType);
+
+    List<VoteRecord> listVoteRecords(String address, String typee);
 	/**
 	 * 区块分页查询
 	 * @param pageCount：每页记录数
@@ -298,11 +300,12 @@ public interface DBAccess {
      * @param indexHandle              排序索引的indexhandle
      * @param orderByFieldHandle       排序字段的handle
      * @param orderType                 排序类型  1升序,0降序
+     * @param screenType                0 =     1 >=     2 <=
      * @param <T>                       dto
      * @return                             list
      * @throws Exception
      */
-	<T> List<T> getDtoListByField(String className,String keyFieldName,List<String> fields, List<byte[]> values,List<Integer> screenType, Class<T> tClass,ColumnFamilyHandle overAndNextHandle,ColumnFamilyHandle indexHandle,ColumnFamilyHandle orderByFieldHandle, int orderType)throws Exception;
+	<T> List<T> getDtoListByField(List<String> fields, List<byte[]> values,List<Integer> screenType, Class<T> tClass,ColumnFamilyHandle overAndNextHandle,ColumnFamilyHandle indexHandle,ColumnFamilyHandle orderByFieldHandle, int orderType)throws Exception;
 
     /**
      * @param pageCount         分页的每页条数
