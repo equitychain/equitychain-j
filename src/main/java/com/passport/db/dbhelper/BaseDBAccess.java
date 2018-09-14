@@ -99,7 +99,7 @@ public abstract class BaseDBAccess implements DBAccess {
                         byte[] value = (byte[]) f.get(obj);
                         String fieldName = faildClaz.name();
                         ColumnFamilyHandle handle = handleMap.get(getColName(className, fieldName));
-                        put(key, value);
+                        putByColumnFamilyHandle(handle,key, value);
                     } else if (faildClaz.type() == long.class || faildClaz.type() == Long.class
                             || faildClaz.type() == int.class || faildClaz.type() == Integer.class
                             || faildClaz.type() == String.class || faildClaz.type() == BigDecimal.class || faildClaz.type() == float.class || faildClaz.type() == Float.class) {
