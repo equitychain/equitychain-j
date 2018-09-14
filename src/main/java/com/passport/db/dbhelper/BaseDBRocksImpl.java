@@ -329,43 +329,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         return false;
     }
 
-    @Override
-    @Deprecated
-    public boolean put(String key, Object value) {
-        try {
-            rocksDB.put(key.getBytes(), SerializeUtils.serialize(value));
-            return true;
-        } catch (RocksDBException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    @Override
-    @Deprecated
-    public Optional<Object> get(String key) {
-        try {
-            byte[] objByt = rocksDB.get(key.getBytes());
-            if (objByt != null) {
-                Optional.of(SerializeUtils.unSerialize(objByt));
-            }
-        } catch (RocksDBException e) {
-            e.printStackTrace();
-        }
-        return Optional.absent();
-    }
-
-    @Override
-    @Deprecated
-    public boolean delete(String key) {
-        try {
-            rocksDB.delete(key.getBytes());
-            return true;
-        } catch (RocksDBException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 
     @Override
     @Deprecated
