@@ -161,30 +161,19 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     public Optional<List<String>> getNodeList() {
-        try {
-            byte[] objByt = rocksDB.get(CLIENT_NODES_LIST_KEY.getBytes());
-            if (objByt != null) {
-                List<String> nodeList = (List<String>) SerializeUtils.unSerialize(objByt);
-                if (nodeList != null) {
-                    return Optional.of(nodeList);
-                }
+        byte[] objByt = get(CLIENT_NODES_LIST_KEY.getBytes());
+        if (objByt != null) {
+            List<String> nodeList = (List<String>) SerializeUtils.unSerialize(objByt);
+            if (nodeList != null) {
+                return Optional.of(nodeList);
             }
-        } catch (RocksDBException e) {
-            e.printStackTrace();
         }
         return Optional.absent();
     }
 
     @Override
     public boolean putNodeList(List<String> nodes) {
-        try {
-
-            rocksDB.put(CLIENT_NODES_LIST_KEY.getBytes(), SerializeUtils.serialize(nodes));
-            return true;
-        } catch (RocksDBException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return put(CLIENT_NODES_LIST_KEY.getBytes(), SerializeUtils.serialize(nodes));
     }
 
 
@@ -247,7 +236,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public boolean putUnconfirmTransaction(Transaction transaction) {
         try {
             byte[] blockHeight = transaction.getBlockHeight();
-            if(blockHeight == null || blockHeight.length == 0) {
+            if (blockHeight == null || blockHeight.length == 0) {
                 addObj(transaction);
                 return true;
             }
@@ -260,9 +249,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public Optional<Transaction> getUnconfirmTransaction(String txHash) {
         try {
-            Transaction transaction = getObj("hash",txHash,Transaction.class);
-            if(transaction != null){
-                if(transaction.getBlockHeight() == null || transaction.getBlockHeight().length == 0){
+            Transaction transaction = getObj("hash", txHash, Transaction.class);
+            if (transaction != null) {
+                if (transaction.getBlockHeight() == null || transaction.getBlockHeight().length == 0) {
                     return Optional.of(transaction);
                 }
             }
@@ -282,13 +271,13 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     public List<Transaction> listUnconfirmTransactions() {
-        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("transaction","hash")));
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("transaction", "hash")));
         List<Transaction> transactions = new ArrayList<>();
-        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             String hash = new String(iterator.key());
             try {
-                Transaction transaction = getObj("hash",hash,Transaction.class);
-                if(transaction.getBlockHeight() == null || transaction.getBlockHeight().length == 0){
+                Transaction transaction = getObj("hash", hash, Transaction.class);
+                if (transaction.getBlockHeight() == null || transaction.getBlockHeight().length == 0) {
                     transactions.add(transaction);
                 }
             } catch (Exception e) {
@@ -303,7 +292,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         try {
             byte[] blockHeight = transaction.getBlockHeight();
             Optional<Block> blockOptional = getBlock(new String(blockHeight));
-            if(blockOptional != null && blockOptional.isPresent()){
+            if (blockOptional != null && blockOptional.isPresent()) {
                 addObj(transaction);
                 return true;
             }
@@ -316,9 +305,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public Optional<Transaction> getConfirmTransaction(String txHash) {
         try {
-            Transaction transaction = getObj("hash",txHash,Transaction.class);
-            if(transaction != null){
-                if(transaction.getBlockHeight() != null && transaction.getBlockHeight().length > 0){
+            Transaction transaction = getObj("hash", txHash, Transaction.class);
+            if (transaction != null) {
+                if (transaction.getBlockHeight() != null && transaction.getBlockHeight().length > 0) {
                     return Optional.of(transaction);
                 }
             }
@@ -387,10 +376,10 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public List<Block> blockPagination(int pageCount, int pageNumber) throws Exception {
         List<Block> blocks = new ArrayList<>();
         Optional<Object> curHeightOpt = getLastBlockHeight();
-        if(curHeightOpt.isPresent() && (long)curHeightOpt.get() > 0) {
-            long curHeight = (long)curHeightOpt.get();
-            long end = curHeight-pageCount * (pageNumber - 1);
-            long begin = curHeight-pageCount * pageNumber+1;
+        if (curHeightOpt.isPresent() && (long) curHeightOpt.get() > 0) {
+            long curHeight = (long) curHeightOpt.get();
+            long end = curHeight - pageCount * (pageNumber - 1);
+            long begin = curHeight - pageCount * pageNumber + 1;
             for (long cur = end; cur >= begin; cur++) {
                 blocks.add(getObj("blockHeight", "" + cur, Block.class));
             }
@@ -413,6 +402,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             return getDtoOrderByHandle(pageCount, pageNumber, handleMap.get(IndexColumnNames.TRANSTIMEINDEX.indexName)
                     , screenHanles, screenVals,0, handleMap.get(IndexColumnNames.TRANSTIMEINDEX.overAndNextName),
                     Transaction.class, "hash", orderByType, 150, 0,handleMap.get(getColName("transaction","time")));
+
         } catch (Exception e) {
             return new ArrayList<>();
         }
@@ -421,8 +411,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public List<Transaction> getTransactionByAddress(int pageCount, int pageNumber, int orderByType, String address) {
         List<ColumnFamilyHandle> screenHands = new ArrayList<>();
-        screenHands.add(handleMap.get(getColName("transaction","payAddress")));
-        screenHands.add(handleMap.get(getColName("transaction","receiptAddress")));
+        screenHands.add(handleMap.get(getColName("transaction", "payAddress")));
+        screenHands.add(handleMap.get(getColName("transaction", "receiptAddress")));
         List<byte[][]> vals = new ArrayList<>();
         byte[][] val = new byte[1][];
         val[0] = address.getBytes();
@@ -441,18 +431,18 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public List<Transaction> getNewBlocksTransactions(int pageCount, int pageNumber) {
         List<ColumnFamilyHandle> screenHandles = new ArrayList<>();
-        screenHandles.add(handleMap.get(getColName("transaction","blockHeight")));
+        screenHandles.add(handleMap.get(getColName("transaction", "blockHeight")));
         Optional<Object> lastBlockHeightOpt = getLastBlockHeight();
         List<byte[][]> vals = new ArrayList<>();
         long lastBlockHeight = 0;
-        int size = lastBlockHeight>=0? (int) (lastBlockHeight <= 100 ? lastBlockHeight : 100) :1;
+        int size = lastBlockHeight >= 0 ? (int) (lastBlockHeight <= 100 ? lastBlockHeight : 100) : 1;
         byte[][] val = new byte[size][];
-        if(lastBlockHeightOpt.isPresent()){
+        if (lastBlockHeightOpt.isPresent()) {
             lastBlockHeight = Long.parseLong(lastBlockHeightOpt.get().toString());
         }
-        for(int i = 0;lastBlockHeight >=0 && i < 100;i ++){
-            val[i] = (lastBlockHeight+"").getBytes();
-            lastBlockHeight --;
+        for (int i = 0; lastBlockHeight >= 0 && i < 100; i++) {
+            val[i] = (lastBlockHeight + "").getBytes();
+            lastBlockHeight--;
         }
         vals.add(val);
         try {
@@ -462,11 +452,13 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                     handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.overAndNextName),Transaction.class,
                     "hash",0,300,0,
                     handleMap.get(getColName("transaction","blockHeight")));
+
         } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList<>();
         }
     }
+
     public List<Trustee> trusteePagination(int pageCount, int pageNumber, int orderByType, List<String> screens, List<byte[][]> screenVals) {
         List<ColumnFamilyHandle> screenHanles = new ArrayList<>();
         if (screens != null && screenVals != null) {
@@ -477,12 +469,15 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         if (screenVals == null) {
             screenVals = new ArrayList<>();
         }
-        if(screens == null){
+        if (screens == null) {
             screens = new ArrayList<>();
         }
         try {
-            return getDtoOrderByHandle(pageCount, pageNumber, handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName)
-                    , screenHanles, screenVals,0, handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.overAndNextName), Trustee.class, "votes", orderByType, 100, 0,
+            return getDtoOrderByHandle(pageCount, pageNumber,
+                    handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName)
+                    , screenHanles, screenVals,0,
+                    handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.overAndNextName),
+                    Trustee.class, "votes", orderByType, 100, 0,
                     handleMap.get(getColName("trustee", "votes")));
         } catch (Exception e) {
             e.printStackTrace();
