@@ -92,8 +92,8 @@ public abstract class BaseDBAccess implements DBAccess {
                 descriptorList.add(new ColumnFamilyDescriptor(getColName("blockHeight", "index").getBytes()));
                 descriptorList.add(new ColumnFamilyDescriptor(getColName("transcationTimeIndex", "overAndNext").getBytes()));
                 descriptorList.add(new ColumnFamilyDescriptor(getColName("blockHeightIndex", "overAndNext").getBytes()));
-                descriptorList.add(new ColumnFamilyDescriptor("co".getBytes()));
-                descriptorList.add(new ColumnFamilyDescriptor("co2".getBytes()));
+//                descriptorList.add(new ColumnFamilyDescriptor("co".getBytes()));
+//                descriptorList.add(new ColumnFamilyDescriptor("co2".getBytes()));
                 //打开数据库
                 List<ColumnFamilyHandle> handleList = new ArrayList<>();
                 rocksDB = RocksDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
