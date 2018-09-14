@@ -24,7 +24,11 @@ public class AppTest
 
         Credentials credentials = Credentials.create(keyPair.exportPrivateKey());
         System.out.println(credentials.getAddress());*/
-
-        System.out.println("asd");
+//1536740510951     3600000
+        long valK = 3600500;
+        long gropSize = 3600*1000;
+        valK = valK/gropSize;
+        valK = valK*gropSize;
+        System.out.println(valK);
     }
 }

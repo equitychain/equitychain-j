@@ -80,6 +80,16 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 ColumnFamilyHandle blockHeightNextHand = rocksDB.createColumnFamily(blockHeightIndexDescriptor);
                 handleMap.put(blockNextHeight, blockHeightNextHand);
 
+                String transactionBlockHeight = getColName("transactionBlockHeight","index");
+                String transactionBlockHeightOve = getColName("transactionBlockHeight","overAndNext");
+                ColumnFamilyDescriptor descriptor2 = new ColumnFamilyDescriptor(transactionBlockHeight.getBytes());
+                ColumnFamilyHandle handle1 = rocksDB.createColumnFamily(descriptor2);
+                handleMap.put(transactionBlockHeight,handle1);
+                ColumnFamilyDescriptor descriptor3 = new ColumnFamilyDescriptor(transactionBlockHeightOve.getBytes());
+                ColumnFamilyHandle handle2 = rocksDB.createColumnFamily(descriptor3);
+                handleMap.put(transactionBlockHeightOve,handle2);
+
+
 
             } catch (Exception e) {
                 //列集合
@@ -97,6 +107,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 descriptorList.add(new ColumnFamilyDescriptor(getColName("blockHeight", "index").getBytes()));
                 descriptorList.add(new ColumnFamilyDescriptor(getColName("transcationTimeIndex", "overAndNext").getBytes()));
                 descriptorList.add(new ColumnFamilyDescriptor(getColName("blockHeightIndex", "overAndNext").getBytes()));
+                descriptorList.add(new ColumnFamilyDescriptor(getColName("transactionBlockHeight","index").getBytes()));
+                descriptorList.add(new ColumnFamilyDescriptor(getColName("transactionBlockHeight","overAndNext").getBytes()));
                 //打开数据库
                 List<ColumnFamilyHandle> handleList = new ArrayList<>();
                 rocksDB = RocksDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
@@ -530,7 +542,33 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     public List<Transaction> getNewBlocksTransactions(int pageCount, int pageNumber) {
-        return null;
+        List<ColumnFamilyHandle> screenHandles = new ArrayList<>();
+        screenHandles.add(handleMap.get(getColName("transaction","blockHeight")));
+        Optional<Object> lastBlockHeightOpt = getLastBlockHeight();
+        List<byte[][]> vals = new ArrayList<>();
+        long lastBlockHeight = 0;
+        int size = lastBlockHeight>=0? (int) (lastBlockHeight <= 100 ? lastBlockHeight : 100) :1;
+        byte[][] val = new byte[size][];
+        if(lastBlockHeightOpt.isPresent()){
+            lastBlockHeight = Long.parseLong(lastBlockHeightOpt.get().toString());
+        }
+        for(int i = 0;lastBlockHeight >=0 && i < 100;i ++){
+            val[i] = (lastBlockHeight+"").getBytes();
+            lastBlockHeight --;
+        }
+        vals.add(val);
+        try {
+            return getDtoOrderByHandle(pageCount,pageNumber,
+                    handleMap.get(getColName("transactionBlockHeight","index")),
+                    screenHandles,vals,0,
+                    handleMap.get(getColName(
+                            "transactionBlockHeight","overAndNext")),Transaction.class,
+                    "hash",0,300,0,
+                    handleMap.get(getColName("transaction","blockHeight")));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
 

@@ -55,11 +55,12 @@ public class Transaction {
 
   @FaildClaz(name = "eggUsed",type = byte[].class)
   private byte[] eggUsed;
-
+  @FaildClaz(name = "tradeType",type = byte[].class)
   private byte[] tradeType;//交易类型
+  @FaildClaz(name = "blockHeight",type = byte[].class)
   private byte[] blockHeight;//已确认流水打包到哪个区块
   //流水状态（等待 0， 成功 1， 失败 2）
-  @FaildClaz(name = "status",type = byte[].class)
+  @FaildClaz(name = "status",type = Integer.class)
   private Integer status;
 
   public Integer getNonce() {

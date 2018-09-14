@@ -1,10 +1,9 @@
+
 package com.passport.transactionhandler;
 
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
-import com.passport.core.Account;
-import com.passport.core.Transaction;
-import com.passport.core.Trustee;
+import com.passport.core.*;
 import com.passport.db.dbhelper.DBAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,12 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.List;
+
 
 /**
  * 处理委托人撤消注册
  * @author: xujianfeng
  * @create: 2018-09-10 17:46
  **/
+
 @Component("TRUSTEE_CANNEL")
 public class TrusteeCannelHandler extends TransactionStrategy {
     private static final Logger logger = LoggerFactory.getLogger(TrusteeCannelHandler.class);
@@ -44,8 +46,25 @@ public class TrusteeCannelHandler extends TransactionStrategy {
                 if (flag) {
                     account.setBalance(result);
                     dbAccess.putAccount(account);
+                    //撤销注册为受托人成功后需要返还票数
+                    List<VoteRecord> voteRecords = dbAccess.listVoteRecords(payAddress,"receiptAddress");
+                    if(voteRecords != null){
+                        for(VoteRecord voteRecord : voteRecords){
+                            voteRecord.setStatus(0);
+                            dbAccess.putVoteRecord(voteRecord);
+                            int number = voteRecord.getVoteNum();
+                            String payAddr = voteRecord.getPayAddress();
+                            Optional<Voter> voterOptional = dbAccess.getVoter(payAddr);
+                            if(voterOptional.isPresent()){
+                                Voter voter = voterOptional.get();
+                                voter.setVoteNum(voter.getVoteNum() + number);
+                                dbAccess.putVoter(voter);
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 }
+
