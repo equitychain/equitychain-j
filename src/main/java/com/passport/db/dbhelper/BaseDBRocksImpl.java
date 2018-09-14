@@ -5,6 +5,8 @@ import com.google.common.base.Optional;
 import com.passport.core.*;
 import com.passport.core.Transaction;
 import com.passport.utils.SerializeUtils;
+import com.passport.utils.ThreadUtil;
+import com.passport.webhandler.BlockHandler;
 import org.rocksdb.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -87,6 +89,86 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                     handleMap.put(name, handler);
                 });
             }
+            //测试数据
+//            for(int blocks = 1; blocks <= 100; blocks ++){
+//                final int k = blocks;
+//                Runnable runnable = new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        System.out.println("Thread"+k+"  started");
+//                        for(int tcurB = (k-1)*30000+1; tcurB <= k*30000; tcurB ++) {
+//                            try {
+//                                BlockHeader blockHeader = new BlockHeader();
+//                                Block block = new Block();
+//
+//                                byte[] blockHash = ("blockHash----" + tcurB).getBytes();
+//                                long blockTime = tcurB / 360;
+//                                blockTime = 123434564l + blockTime * 3600 + blockTime % 360;
+//
+//                                blockHeader.setEggMax(tcurB % 100 + 25);
+//                                blockHeader.setHash(blockHash);
+//                                blockHeader.setVersion("1.0.0 test".getBytes());
+//                                blockHeader.setHashPrevBlock(("blockHash----" + (tcurB - 1)).getBytes());
+//                                blockHeader.setTimeStamp(blockTime);
+//
+//                                block.setBlockHeader(blockHeader);
+//                                block.setTransactionCount(800);
+//                                block.setBlockSize(1024 * 3l);
+//                                block.setBlockHeight(Long.parseLong(tcurB + ""));
+//
+//                                List<Transaction> transactions = new ArrayList<>();
+//                                for (int trans = 1; trans <= 800; trans++) {
+//                                    Transaction transaction = new Transaction();
+//                                    transaction.setEggMax(("" + (tcurB % 100 + trans % 50)).getBytes());
+//                                    transaction.setSignature("abcsign".getBytes());
+//                                    transaction.setTime((blockTime + "").getBytes());
+//                                    transaction.setHash(("transHash---" + tcurB + "-" + trans).getBytes());
+//                                    transaction.setEggPrice("100000".getBytes());
+//                                    transaction.setPayAddress(("address" + (tcurB % 1600)).getBytes());
+//                                    transaction.setReceiptAddress(("" + trans).getBytes());
+//                                    transaction.setNonce(1);
+//                                    transaction.setBlockHeight((block.getBlockHeight() + "").getBytes());
+//                                    transactions.add(transaction);
+//                                    addObj(transaction);
+//                                    putSuoyinKey(handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.indexName),
+//                                            transaction.getBlockHeight(), transaction.getHash());
+//                                    putOverAndNext(handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.overAndNextName),
+//                                            transaction.getBlockHeight());
+//                                    putSuoyinKey(handleMap.get(IndexColumnNames.TRANSTIMEINDEX.indexName),
+//                                            transaction.getTime(), transaction.getHash());
+//                                    putOverAndNext(handleMap.get(IndexColumnNames.TRANSTIMEINDEX.overAndNextName),
+//                                            transaction.getTime());
+//                                }
+//                                block.setTransactions(transactions);
+//                                addObj(block);
+//                                System.out.println("block  " + tcurB + "   添加成功");
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                                System.out.println("block  " + tcurB + "   添加异常");
+//                            }
+//                        }
+//                    }
+//                };
+//                ThreadUtil.putTask(runnable);
+//            }
+//            for(int i = 0; i < 1000000; i ++){
+//                Trustee trustee = new Trustee();
+//                trustee.setVotes(i%10000l);
+//                trustee.setStatus(1);
+//                trustee.setAddress("address---"+i);
+//                trustee.setGenerateRate(0.01f*i%98);
+//                trustee.setIncome(new BigDecimal(6666*0.01f*i%98));
+//                addObj(trustee);
+//
+//                synchronized (indexLock) {
+//                    putSuoyinKey(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName),
+//                            (trustee.getVotes() + "").getBytes(), trustee.getAddress().getBytes());
+//                    putOverAndNext(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.overAndNextName),
+//                            (trustee.getVotes() + "").getBytes());
+//                    System.out.println("Trustee  " + i + "   添加成功");
+//                }
+//            }
+//            System.out.println("测试数据添加完成");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -127,8 +209,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         try {
             addObj(block);
             //todo 区块的索引数据添加，要那些字段加索引
-//            putSuoyinKey(handleMap.get(getColName(BLOCK_HEIGHT_COLNAME, SUFFIX_INDEX)), block.getBlockHeight().toString().getBytes(), block.getBlockHeight().toString().getBytes());
-//            putOverAndNext(handleMap.get(getColName(BLOCK_HEIGHT_RELA_COLNAME, SUFFIX_RELA)), block.getBlockHeight().toString().getBytes());
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -263,10 +343,14 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     public void deleteUnconfirmTransaction(String txHash) {
-//        Optional<Transaction> optionalTran = getUnconfirmTransaction(txHash);
-//        if(optionalTran.isPresent()){
-//
-//        }
+        Optional<Transaction> transaction = getUnconfirmTransaction(txHash);
+        if(transaction.isPresent()){
+            try {
+                delObj("hash",txHash,Transaction.class,true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -317,59 +401,160 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         return Optional.absent();
     }
 
-    @Override
-    public Optional<Account> getMinerAccount() {
-        return null;
+    public Optional<Account> getMinerAccount(){
+        Optional<Object> getMinerAccount = (Optional<Object>) SerializeUtils.unSerialize(get(MINERACCOUNT.getBytes()));
+        if(getMinerAccount != null && getMinerAccount.isPresent()){
+            return Optional.of((Account) getMinerAccount.get());
+        }
+        return Optional.absent();
     }
 
     @Override
     public boolean putMinerAccount(Account account) {
-        return false;
+        return put(MINERACCOUNT.getBytes(),SerializeUtils.serialize(Optional.of(account)));
     }
 
     @Override
     public boolean putTrustee(Trustee trustee) {
+        try {
+            addObj(trustee);
+            //添加索引
+            putSuoyinKey(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName),
+                    (trustee.getVotes()+"").getBytes(),trustee.getAddress().getBytes());
+            putOverAndNext(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.overAndNextName),
+                    (trustee.getVotes()+"").getBytes());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     @Override
     public Optional<Trustee> getTrustee(String address) {
-        return null;
+        try {
+            Trustee trustee = getObj("address",address,Trustee.class);
+            return Optional.of(trustee);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Optional.absent();
     }
 
     @Override
     public List<Trustee> listTrustees() {
-        return null;
+        return trusteePagination(101,1,0,null,null);
     }
 
     @Override
     public boolean putVoter(Voter voter) {
+        try {
+            addObj(voter);
+            putSuoyinKey(handleMap.get(IndexColumnNames.VOTERNUMBEROFVOTE.indexName),
+                    voter.getVoteNum().toString().getBytes(),voter.getAddress().getBytes());
+            putOverAndNext(handleMap.get(IndexColumnNames.VOTERNUMBEROFVOTE.overAndNextName),
+                    voter.getVoteNum().toString().getBytes());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     @Override
     public Optional<Voter> getVoter(String address) {
-        return null;
+        try {
+            Voter voter = getObj("address",address,Voter.class);
+            return Optional.of(voter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Optional.absent();
     }
 
     @Override
     public List<Voter> listVoters() {
-        return null;
+
+        try {
+            return getDtoListByField("voter","address",
+                    null,null,null,Voter.class,
+                    handleMap.get(IndexColumnNames.VOTERNUMBEROFVOTE.overAndNextName),
+                    handleMap.get(IndexColumnNames.VOTERNUMBEROFVOTE.indexName),
+                    handleMap.get(getColName("voter","voteNum")),0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     @Override
     public boolean putVoteRecord(VoteRecord voteRecord) {
+        try {
+            addObj(voteRecord);
+            putSuoyinKey(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName),
+                    voteRecord.getVoteNum().toString().getBytes(),voteRecord.getPayAddress().getBytes());
+            putOverAndNext(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.overAndNextName),
+                    voteRecord.getVoteNum().toString().getBytes());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
+    /**
+     *
+     * @param time
+     * @param type      0 =     1 >=     2 <=
+     * @return
+     */
     @Override
-    public List<VoteRecord> listVoteRecords() {
-        return null;
+    public List<VoteRecord> listVoteRecords(long time,int type) {
+        try {
+            List<String> fields = new ArrayList<>();
+            fields.add("time");
+            List<byte[]> value = new ArrayList<>();
+            value.add((""+time).getBytes());
+            List<Integer> types = new ArrayList<>();
+            types.add(type);
+            return getDtoListByField("voteRecord","payAddress",fields,value,types,VoteRecord.class
+            ,handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.overAndNextName)
+            ,handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName)
+            ,handleMap.get(getColName("voteRecord","voteNum")),0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
+    /**
+     *
+     * @param   address   投票人/受托人的地址
+     * @param   type      投票人/受托人的字段名
+     * @param time
+     * @param scrType 0 =     1 >=     2 <=
+     * @return
+     */
     @Override
-    public List<VoteRecord> listVoteRecords(String address, String type) {
-        return null;
+    public List<VoteRecord> listVoteRecords(String address, String type,long time,int scrType) {
+        try {
+            List<String> fields = new ArrayList<>();
+            fields.add(type);
+            fields.add("time");
+            List<byte[]> values = new ArrayList<>();
+            values.add(address.getBytes());
+            values.add((""+time).getBytes());
+            List<Integer> screenType = new ArrayList<>();
+            screenType.add(0);
+            screenType.add(scrType);
+            return getDtoListByField("voteRecord","payAddress",fields,values,screenType,VoteRecord.class
+                    ,handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.overAndNextName)
+                    ,handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName)
+                    ,handleMap.get(getColName("voteRecord","voteNum")),0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     @Override
@@ -427,7 +612,14 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             return new ArrayList<>();
         }
     }
-
+    public List<Transaction> getTransactionsByBlockHeight(long blockHeight){
+        Optional<Block> blockOpt = getBlock(blockHeight);
+        if(blockOpt.isPresent()){
+            return blockOpt.get().getTransactions();
+        }else{
+            return new ArrayList<>();
+        }
+    }
     @Override
     public List<Transaction> getNewBlocksTransactions(int pageCount, int pageNumber) {
         List<ColumnFamilyHandle> screenHandles = new ArrayList<>();
