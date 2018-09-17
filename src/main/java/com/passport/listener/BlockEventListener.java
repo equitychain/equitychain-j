@@ -2,18 +2,20 @@ package com.passport.listener;
 
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
-import com.passport.core.Account;
-import com.passport.core.Block;
-import com.passport.core.BlockHeader;
-import com.passport.core.GenesisBlockInfo;
+import com.passport.core.*;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.event.GenerateBlockEvent;
 import com.passport.event.SyncBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.peer.ChannelsManager;
 import com.passport.proto.*;
+import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
 import com.passport.webhandler.BlockHandler;
+import com.passport.webhandler.MinerHandler;
+import com.passport.webhandler.TrusteeHandler;
+import io.netty.channel.group.ChannelGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,11 +46,18 @@ public class BlockEventListener {
 	private ChannelsManager channelsManager;
 	@Autowired
 	private BlockHandler blockHandler;
+	@Autowired
+	private BlockUtils blockUtils;
+	@Autowired
+	private MinerHandler minerHandler;
+	@Autowired
+	private TrusteeHandler trusteeHandler;
 
-	/**
-	 * 同步下一个区块（被动获取）
-	 * @param event
-	 */
+
+			/**
+             * 同步下一个区块（被动获取）
+             * @param event
+             */
 	@EventListener(SyncNextBlockEvent.class)
 	public void syncNextBlock(SyncNextBlockEvent event) throws ParseException {
 		Long blockHeight = CastUtils.castLong(event.getSource());
@@ -155,5 +165,52 @@ public class BlockEventListener {
 		builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
 		builder.setData(dataBuilder.build());
 		channelsManager.getChannels().writeAndFlush(builder.build());
+	}
+
+	/**
+	 * 由第一个节点发起出块
+	 * @param event
+	 */
+	@EventListener(GenerateBlockEvent.class)
+	public void generateBlock(GenerateBlockEvent event) {
+		ChannelGroup channels = channelsManager.getChannels();
+		//第一个启动的节点，负责生成区块
+		if(channels.size() == 0){
+			//当前区块周期
+			Optional<Object> lastBlockHeightOptional = dbAccess.getLastBlockHeight();
+			if(!lastBlockHeightOptional.isPresent()){
+				return;
+			}
+
+			long blockHeight = CastUtils.castLong(lastBlockHeightOptional.get());
+			if(blockHeight > 1){
+				return;
+			}
+
+			Long timestamp = blockUtils.getTimestamp4BlockCycle(blockHeight + 1);
+			//查询投票记录（status==1）,时间小于等于timestamp，按投票票数从高到低排列的101个受托人，放到101个受托人列表中
+			List<Trustee> list = new ArrayList<>();//TODO
+
+			//101个受托人放到本地存放，key为出块周期，下一个出块周期到来时，需要删除上一个出块周期的数据
+			int blockCycle = blockUtils.getBlockCycle(blockHeight + 1);
+			dbAccess.put(String.valueOf(blockCycle), list);//TODO
+
+			Trustee trustee = blockUtils.randomPickBlockPruducer(list, blockHeight + 1);
+			String address = trustee.getAddress();
+			Optional<Account> accountOptional = dbAccess.getAccount(address);
+			if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null){//出块人属于本节点
+				Account account = accountOptional.get();
+				if(account.getPrivateKey() != null){
+					//打包区块
+					minerHandler.packagingBlock(account);
+
+					//更新101个受托人，已经出块人的状态
+					trusteeHandler.changeStatus(trustee, blockCycle);
+
+					//出块完成后，计算出下一个出块人是不是自己，如果是则发布出块事件
+
+				}
+			}
+		}
 	}
 }
