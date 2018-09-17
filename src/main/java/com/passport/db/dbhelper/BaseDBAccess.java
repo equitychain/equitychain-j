@@ -1,13 +1,22 @@
 package com.passport.db.dbhelper;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.*;
+import com.google.common.base.Optional;
 import com.passport.annotations.EntityClaz;
 import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
+import com.passport.annotations.RocksTransaction;
+import com.passport.core.Block;
+import com.passport.core.Transaction;
+import com.passport.core.Trustee;
+import com.passport.db.transaction.RocksdbTransaction;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -16,11 +25,154 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public abstract class BaseDBAccess implements DBAccess {
+    @Autowired
+    public RocksdbTransaction transaction;
     protected RocksDB rocksDB;
+    @Value("${db.dataDir}")
+    private String dataDir;
     //列的handler
     protected final Map<String, ColumnFamilyHandle> handleMap = new HashMap<>();
     protected final Set<Class> dtoClasses = new HashSet<>();
-    protected abstract void initDB();
+
+    protected void initDB() {
+        try {
+            //数据库目录不存在就创建
+            File directory = new File(System.getProperty("user.dir") + "/" + dataDir);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            List<String> fields = new ArrayList<>();
+            IndexColumnNames[] indexColumnNames = IndexColumnNames.values();
+            //TODO 添加dto的字节码
+            fields.addAll(getClassCols(new com.passport.core.Transaction().getClass()));
+            fields.addAll(getClassCols(new Block().getClass()));
+            fields.addAll(getClassCols(new Trustee().getClass()));
+            dtoClasses.add(new Transaction().getClass());
+            dtoClasses.add(new Block().getClass());
+            dtoClasses.add(new Trustee().getClass());
+            try {
+                rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), dataDir);
+                System.out.println("========create fields=========");
+                //添加默认的列族
+                handleMap.put("default", rocksDB.getDefaultColumnFamily());
+                for (String field : fields) {
+                    ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(field.getBytes());
+                    ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
+                    handleMap.put(field, handle);
+                    System.out.println("====field:" + field);
+                }
+                for(IndexColumnNames columnNames : indexColumnNames){
+                    ColumnFamilyHandle indexNameHandle = rocksDB.createColumnFamily(columnNames.getIndexName());
+                    ColumnFamilyHandle indexOverHandle = rocksDB.createColumnFamily(columnNames.getOverAndNextName());
+                    handleMap.put(columnNames.indexName, indexNameHandle);
+                    handleMap.put(columnNames.overAndNextName,indexOverHandle);
+                }
+            } catch (Exception e) {
+                //列集合
+                List<ColumnFamilyDescriptor> descriptorList = new ArrayList<>();
+                ColumnFamilyDescriptor defaultDescriptor = new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY);
+                descriptorList.add(defaultDescriptor);
+                System.out.println("========load fields=========");
+                for (String s : fields) {
+                    ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(s.getBytes());
+                    descriptorList.add(descriptor);
+                    System.out.println("====field:" + s);
+                }
+                for(IndexColumnNames names : indexColumnNames){
+                    descriptorList.add(names.getIndexName());
+                    descriptorList.add(names.getOverAndNextName());
+                }
+                //打开数据库
+                List<ColumnFamilyHandle> handleList = new ArrayList<>();
+                rocksDB = RocksDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
+                handleList.forEach((handler) -> {
+                    String name = new String(handler.getName());
+                    handleMap.put(name, handler);
+                });
+            }
+            //测试数据
+            /*for(int blocks = 1; blocks <= 100; blocks ++){
+                final int k = blocks;
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("Thread"+k+"  started");
+                        for(int tcurB = (k-1)*30000+1; tcurB <= k*30000; tcurB ++) {
+                            try {
+                                BlockHeader blockHeader = new BlockHeader();
+                                Block block = new Block();
+
+                                byte[] blockHash = ("blockHash----" + tcurB).getBytes();
+                                long blockTime = tcurB / 360;
+                                blockTime = 123434564l + blockTime * 3600 + blockTime % 360;
+
+                                blockHeader.setEggMax(tcurB % 100 + 25);
+                                blockHeader.setHash(blockHash);
+                                blockHeader.setVersion("1.0.0 test".getBytes());
+                                blockHeader.setHashPrevBlock(("blockHash----" + (tcurB - 1)).getBytes());
+                                blockHeader.setTimeStamp(blockTime);
+
+                                block.setBlockHeader(blockHeader);
+                                block.setTransactionCount(800);
+                                block.setBlockSize(1024 * 3l);
+                                block.setBlockHeight(Long.parseLong(tcurB + ""));
+
+                                List<Transaction> transactions = new ArrayList<>();
+                                for (int trans = 1; trans <= 800; trans++) {
+                                    Transaction transaction = new Transaction();
+                                    transaction.setEggMax(("" + (tcurB % 100 + trans % 50)).getBytes());
+                                    transaction.setSignature("abcsign".getBytes());
+                                    transaction.setTime((blockTime + "").getBytes());
+                                    transaction.setHash(("transHash---" + tcurB + "-" + trans).getBytes());
+                                    transaction.setEggPrice("100000".getBytes());
+                                    transaction.setPayAddress(("address" + (tcurB % 1600)).getBytes());
+                                    transaction.setReceiptAddress(("" + trans).getBytes());
+                                    transaction.setNonce(1);
+                                    transaction.setBlockHeight((block.getBlockHeight() + "").getBytes());
+                                    transactions.add(transaction);
+                                    addObj(transaction);
+                                    putSuoyinKey(handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.indexName),
+                                            transaction.getBlockHeight(), transaction.getHash());
+                                    putOverAndNext(handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.overAndNextName),
+                                            transaction.getBlockHeight());
+                                    putSuoyinKey(handleMap.get(IndexColumnNames.TRANSTIMEINDEX.indexName),
+                                            transaction.getTime(), transaction.getHash());
+                                    putOverAndNext(handleMap.get(IndexColumnNames.TRANSTIMEINDEX.overAndNextName),
+                                            transaction.getTime());
+                                }
+                                block.setTransactions(transactions);
+                                addObj(block);
+                                System.out.println("block  " + tcurB + "   添加成功");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                System.out.println("block  " + tcurB + "   添加异常");
+                            }
+                        }
+                    }
+                };
+                ThreadUtil.putTask(runnable);
+            }
+            for(int i = 0; i < 10000; i ++){
+                Trustee trustee = new Trustee();
+                trustee.setVotes(i%10000l);
+                trustee.setStatus(1);
+                trustee.setAddress("address---"+i);
+                trustee.setGenerateRate(0.01f*i%98);
+                trustee.setIncome(new BigDecimal(6666*0.01f*i%98));
+                addObj(trustee);
+
+                putSuoyinKey(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName),
+                        (trustee.getVotes() + "").getBytes(), trustee.getAddress().getBytes());
+                putOverAndNext(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.overAndNextName),
+                        (trustee.getVotes() + "").getBytes());
+                System.out.println("Trustee  " + i + "   添加成功");
+            }
+            System.out.println("测试数据添加完成");*/
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * 解析获取类里的所有有注解的field名和类名的拼接
@@ -54,9 +206,71 @@ public abstract class BaseDBAccess implements DBAccess {
     protected final String[] getClassNameAndFieldName(String colName) {
         return colName.split("-");
     }
-
+    public final <T> void delObj(String keyField,String fieldVale,Class<T> dtoClazz,boolean deleteCase)throws Exception{
+        if(dtoClazz.isAnnotationPresent(EntityClaz.class)){
+            //获取到EntityClaz注解
+            EntityClaz entityClaz = (EntityClaz) dtoClazz.getAnnotation(EntityClaz.class);
+            //获取到类名
+            String className = entityClaz.name();
+            //所有的字段
+            Field[] fields = dtoClazz.getDeclaredFields();
+            for(Field f : fields){
+                if(f.isAnnotationPresent(FaildClaz.class)){
+                    FaildClaz faildClaz = f.getAnnotation(FaildClaz.class);
+                    String fieldName = faildClaz.name();
+                    ColumnFamilyHandle colHandle = handleMap.get(getColName(className,fieldName));
+                    if(deleteCase && (faildClaz.type() == List.class || dtoClasses.contains(faildClaz))){
+                        //删除级联
+                        byte[] fieldVal = getByColumnFamilyHandle(colHandle,fieldVale.getBytes());
+                        if(faildClaz.type() == List.class){
+                            List list = (List) SerializeUtils.unSerialize(fieldVal);
+                            if(list != null && list.size() > 0){
+                                Class listType = faildClaz.genericParadigm();
+                                String conKeyF = getKeyFieldByClass(listType);
+                                for(Object o : list){
+                                    String conKeyV = o.toString();
+                                    delObj(conKeyF,conKeyV,listType,true);
+                                }
+                            }
+                        }else{
+                            String conKeyF = getKeyFieldByClass(faildClaz.type());
+                            if(conKeyF != null) {
+                                delObj(conKeyF,new String(fieldVal),faildClaz.type(),true);
+                            }
+                        }
+                    }
+                    //删除列的值
+                    deleteByColumnFamilyHandle(colHandle,fieldVale.getBytes());
+                }
+            }
+        }
+    }
+    protected String getClassNameByClass(Class claz){
+        if(claz.isAnnotationPresent(EntityClaz.class)){
+            EntityClaz entityClaz = (EntityClaz) claz.getAnnotation(EntityClaz.class);
+            return entityClaz.name();
+        }
+        return null;
+    }
+    protected String getKeyFieldByClass(Class claz){
+        if(claz.isAnnotationPresent(EntityClaz.class)){
+            Field[] fields = claz.getDeclaredFields();
+            Field keyField = null;
+            for(Field f : fields){
+                f.setAccessible(true);
+                if(f.isAnnotationPresent(KeyField.class)){
+                    keyField = f;
+                    break;
+                }
+            }
+            if(keyField != null) {
+                return keyField.getAnnotation(FaildClaz.class).name();
+            }
+        }
+        return null;
+    }
     // 添加有注解的对象
-    protected final void addObj(Object obj) throws Exception {
+    public final void addObj(Object obj) throws Exception {
         Class c = obj.getClass();
         //判断是否是dto
         if (c.isAnnotationPresent(EntityClaz.class)) {
@@ -95,7 +309,7 @@ public abstract class BaseDBAccess implements DBAccess {
                         byte[] value = (byte[]) f.get(obj);
                         String fieldName = faildClaz.name();
                         ColumnFamilyHandle handle = handleMap.get(getColName(className, fieldName));
-                        rocksDB.put(handle, key, value);
+                        putByColumnFamilyHandle(handle,key, value);
                     } else if (faildClaz.type() == long.class || faildClaz.type() == Long.class
                             || faildClaz.type() == int.class || faildClaz.type() == Integer.class
                             || faildClaz.type() == String.class || faildClaz.type() == BigDecimal.class || faildClaz.type() == float.class || faildClaz.type() == Float.class) {
@@ -103,7 +317,7 @@ public abstract class BaseDBAccess implements DBAccess {
                         String fieldName = faildClaz.name();
                         ColumnFamilyHandle handle = handleMap.get(getColName(className, fieldName));
                         byte[] val = fieldValue.getBytes();
-                        rocksDB.put(handle, key, val);
+                        putByColumnFamilyHandle(handle, key, val);
                     } else if (faildClaz.type() == List.class) {
                         List arr = (List) f.get(obj);
                         if (arr == null) continue;
@@ -128,7 +342,7 @@ public abstract class BaseDBAccess implements DBAccess {
                                 if (!hasKey) break;
                             }
                         }
-                        rocksDB.put(handleMap.get(getColName(className, fieldName)), key, SerializeUtils.serialize(value));
+                        putByColumnFamilyHandle(handleMap.get(getColName(className, fieldName)), key, SerializeUtils.serialize(value));
                     } else if (dtoClasses.contains(faildClaz.type())) {
                         //一对一的数据  比如block中有blockHead
                         Class contancClass = faildClaz.type();
@@ -156,7 +370,7 @@ public abstract class BaseDBAccess implements DBAccess {
                                 addObj(contanc);
                                 //然后获取这个对象的主键，把他的主键保存在对应的key中
                                 contancKeyF.setAccessible(true);
-                                rocksDB.put(handleMap.get(getColName(className, fieldName)), key, keyValue.getBytes());
+                                putByColumnFamilyHandle(handleMap.get(getColName(className, fieldName)), key, keyValue.getBytes());
                             }
                         }
                     }
@@ -168,7 +382,7 @@ public abstract class BaseDBAccess implements DBAccess {
     }
 
     //获取有注解的对象
-    protected final <T> T getObj(String keyField, String fieldValue, Class<T> dtoClazz) throws Exception {
+    public <T> T getObj(String keyField, String fieldValue, Class<T> dtoClazz) throws Exception {
         //获取字段对应的列名集合
         List<String> colNames = getClassCols(dtoClazz);
         //需要返回的对象
@@ -185,7 +399,7 @@ public abstract class BaseDBAccess implements DBAccess {
                     return;
                 }
                 //获取到了该列的值
-                byte[] value = rocksDB.get(handle, fieldValue.getBytes());
+                byte[] value = getByColumnFamilyHandle(handle, fieldValue.getBytes());
                 if (value == null) {
                     if (colName.contains("-" + keyField)) {
                         Field field = dtoClazz.getDeclaredField(keyField);
@@ -275,27 +489,31 @@ public abstract class BaseDBAccess implements DBAccess {
         });
         return t;
     }
-    long gropSize = 3600*1000;
+
+    long gropSize = 3600 * 1000;
+
     //索引数据的添加
     protected final void putSuoyinKey(ColumnFamilyHandle handle, byte[] key, byte[] valueItem) throws RocksDBException {
-        long valK = Long.parseLong(new String(key));
-        valK = valK/gropSize;
-        valK = valK*gropSize;
-        byte[] listByte = rocksDB.get(handle, (""+valK).getBytes());
-        Set<byte[]> valueList = new HashSet<>();
-        if (listByte != null && listByte.length != 0) {
-            valueList = (Set<byte[]>) SerializeUtils.unSerialize(listByte);
+        synchronized (handle) {
+            long valK = Long.parseLong(new String(key));
+            valK = valK / gropSize;
+            valK = valK * gropSize;
+            byte[] listByte = getByColumnFamilyHandle(handle, ("" + valK).getBytes());
+            Set<byte[]> valueList = new HashSet<>();
+            if (listByte != null && listByte.length != 0) {
+                valueList = (Set<byte[]>) SerializeUtils.unSerialize(listByte);
+            }
+            valueList.add(valueItem);
+            putByColumnFamilyHandle(handle, ("" + valK).getBytes(), SerializeUtils.serialize(valueList));
         }
-        valueList.add(valueItem);
-        rocksDB.put(handle, (""+valK).getBytes(), SerializeUtils.serialize(valueList));
     }
 
     //索引数据的获取
     protected final Set<byte[]> getSuoyinValue(ColumnFamilyHandle handle, byte[] key) throws RocksDBException {
         long valK = Long.parseLong(new String(key));
-        valK = valK/gropSize;
-        valK = valK*gropSize;
-        byte[] listByte = rocksDB.get(handle, (""+valK).getBytes());
+        valK = valK / gropSize;
+        valK = valK * gropSize;
+        byte[] listByte = getByColumnFamilyHandle(handle, ("" + valK).getBytes());
         Set<byte[]> valueList = null;
         if (listByte != null && listByte.length != 0) {
             valueList = (Set<byte[]>) SerializeUtils.unSerialize(listByte);
@@ -305,104 +523,237 @@ public abstract class BaseDBAccess implements DBAccess {
 
     //索引数据关系的添加
     protected final void putOverAndNext(ColumnFamilyHandle overAndNextHandle, byte[] time) throws RocksDBException, ParseException {
-        long valK = Long.parseLong(new String(time));
-        valK = valK/gropSize;
-        valK = valK*gropSize;
-        time = (valK+"").getBytes();
-        byte[] value = rocksDB.get(overAndNextHandle, time);
-        if (value == null || value.length == 0) {
-            //只有值不存在才会存，存在的话不需要存
-            long curTime = Long.parseLong(new String(time));
-            //先遍历出最大的
-            RocksIterator iterator = rocksDB.newIterator(overAndNextHandle);
-            byte[] maxTime = null;
-            byte[] maxTimeValue = null;
-            for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-                byte[] overAndNextValue = iterator.value();
-                if (overAndNextValue != null && overAndNextValue.length != 0) {
-                    String overAndNextStr = new String(overAndNextValue);
-                    JSONObject object = JSONObject.parseObject(overAndNextStr);
-                    String over = object.getString("over");
-                    if (over == null || "".equals(over)) {
-                        maxTime = iterator.key();
-                        maxTimeValue = iterator.value();
-                    }
-                }
-            }
-            if (maxTime == null) {
-                //还没有数据,添加第一个
-                JSONObject oneTime = new JSONObject();
-                oneTime.put("over", "");
-                oneTime.put("next", "");
-                rocksDB.put(overAndNextHandle, time, oneTime.toJSONString().getBytes());
-            }
-            if (maxTime != null) {
-                //有数据
-                if (curTime < Long.parseLong(new String(maxTime))) {
-                    //插入到中间某个值
-                    byte[] tempKey = maxTime;
-                    byte[] tempValue = maxTimeValue;
-                    while (true) {
-                        //循环遍历，定位我这个时间要插入到那条记录
-                        JSONObject tempOverAndNext = JSONObject.parseObject(new String(tempValue));
-                        String tempNext = tempOverAndNext.getString("next");
-                        if (tempNext == null || "".equals(tempNext) || curTime > Long.parseLong(tempNext)) {
-                            //这个tempKey是新值的over
-                            if (tempNext == null || "".equals(tempNext)) {
-                                //新值是最小值
-                                JSONObject minTime = new JSONObject();
-                                minTime.put("over", new String(tempKey));
-                                minTime.put("next", "");
-                                rocksDB.put(overAndNextHandle, time, minTime.toJSONString().getBytes());
-                                //更改最小值
-                                tempOverAndNext.put("next", curTime + "");
-                                rocksDB.put(overAndNextHandle, tempKey, tempOverAndNext.toJSONString().getBytes());
-                            } else {
-                                //中间的值
-                                //查出下一个值需要更新用
-                                byte[] nextTempKey = tempNext.getBytes();
-                                byte[] nextTempValue = rocksDB.get(overAndNextHandle, tempNext.getBytes());
-                                //先插入新值
-                                JSONObject newTime = new JSONObject();
-                                newTime.put("over", new String(tempKey));
-                                newTime.put("next", tempNext);
-                                rocksDB.put(overAndNextHandle, time, newTime.toJSONString().getBytes());
-                                //旧值的更新，更新两个
-                                tempOverAndNext.put("next", curTime + "");
-                                rocksDB.put(overAndNextHandle, tempKey, tempOverAndNext.toJSONString().getBytes());
-                                JSONObject nextObj = JSONObject.parseObject(new String(nextTempValue));
-                                nextObj.put("over", curTime + "");
-                                rocksDB.put(overAndNextHandle, nextTempKey, nextObj.toJSONString().getBytes());
-                            }
-                            break;
-                        } else {
-                            //这个tempKey不是新值的over,继续往下移动
-                            tempKey = tempNext.getBytes();
-                            tempValue = rocksDB.get(overAndNextHandle, tempNext.getBytes());
+        synchronized (overAndNextHandle) {
+            long valK = Long.parseLong(new String(time));
+            valK = valK / gropSize;
+            valK = valK * gropSize;
+            time = (valK + "").getBytes();
+            byte[] value = getByColumnFamilyHandle(overAndNextHandle, time);
+            if (value == null || value.length == 0) {
+                //只有值不存在才会存，存在的话不需要存
+                long curTime = Long.parseLong(new String(time));
+                //先遍历出最大的
+                RocksIterator iterator = rocksDB.newIterator(overAndNextHandle);
+                byte[] maxTime = null;
+                byte[] maxTimeValue = null;
+                for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+                    byte[] overAndNextValue = iterator.value();
+                    if (overAndNextValue != null && overAndNextValue.length != 0) {
+                        String overAndNextStr = new String(overAndNextValue);
+                        JSONObject object = JSONObject.parseObject(overAndNextStr);
+                        String over = object.getString("over");
+                        if (over == null || "".equals(over)) {
+                            maxTime = iterator.key();
+                            maxTimeValue = iterator.value();
                         }
                     }
-                } else {
-                    //这个新值就是最大值
+                }
+                if (maxTime == null) {
+                    //还没有数据,添加第一个
                     JSONObject oneTime = new JSONObject();
                     oneTime.put("over", "");
-                    oneTime.put("next", new String(maxTime));
-                    rocksDB.put(overAndNextHandle, time, oneTime.toJSONString().getBytes());
-                    //更新之前旧值的over
-                    JSONObject oldValue = JSONObject.parseObject(new String(maxTimeValue));
-                    oldValue.put("over", curTime + "");
-                    rocksDB.put(overAndNextHandle, maxTime, oldValue.toJSONString().getBytes());
+                    oneTime.put("next", "");
+                    putByColumnFamilyHandle(overAndNextHandle, time, oneTime.toJSONString().getBytes());
+                }
+                if (maxTime != null) {
+                    //有数据
+                    if (curTime < Long.parseLong(new String(maxTime))) {
+                        //插入到中间某个值
+                        byte[] tempKey = maxTime;
+                        byte[] tempValue = maxTimeValue;
+                        while (true) {
+                            //循环遍历，定位我这个时间要插入到那条记录
+                            JSONObject tempOverAndNext = JSONObject.parseObject(new String(tempValue));
+                            String tempNext = tempOverAndNext.getString("next");
+                            if (tempNext == null || "".equals(tempNext) || curTime > Long.parseLong(tempNext)) {
+                                //这个tempKey是新值的over
+                                if (tempNext == null || "".equals(tempNext)) {
+                                    //新值是最小值
+                                    JSONObject minTime = new JSONObject();
+                                    minTime.put("over", new String(tempKey));
+                                    minTime.put("next", "");
+                                    putByColumnFamilyHandle(overAndNextHandle, time, minTime.toJSONString().getBytes());
+                                    //更改最小值
+                                    tempOverAndNext.put("next", curTime + "");
+                                    putByColumnFamilyHandle(overAndNextHandle, tempKey, tempOverAndNext.toJSONString().getBytes());
+                                } else {
+                                    //中间的值
+                                    //查出下一个值需要更新用
+                                    byte[] nextTempKey = tempNext.getBytes();
+                                    byte[] nextTempValue = getByColumnFamilyHandle(overAndNextHandle, tempNext.getBytes());
+                                    //先插入新值
+                                    JSONObject newTime = new JSONObject();
+                                    newTime.put("over", new String(tempKey));
+                                    newTime.put("next", tempNext);
+                                    putByColumnFamilyHandle(overAndNextHandle, time, newTime.toJSONString().getBytes());
+                                    //旧值的更新，更新两个
+                                    tempOverAndNext.put("next", curTime + "");
+                                    putByColumnFamilyHandle(overAndNextHandle, tempKey, tempOverAndNext.toJSONString().getBytes());
+                                    JSONObject nextObj = JSONObject.parseObject(new String(nextTempValue));
+                                    nextObj.put("over", curTime + "");
+                                    putByColumnFamilyHandle(overAndNextHandle, nextTempKey, nextObj.toJSONString().getBytes());
+                                }
+                                break;
+                            } else {
+                                //这个tempKey不是新值的over,继续往下移动
+                                tempKey = tempNext.getBytes();
+                                tempValue = getByColumnFamilyHandle(overAndNextHandle, tempNext.getBytes());
+                            }
+                        }
+                    } else {
+                        //这个新值就是最大值
+                        JSONObject oneTime = new JSONObject();
+                        oneTime.put("over", "");
+                        oneTime.put("next", new String(maxTime));
+                        putByColumnFamilyHandle(overAndNextHandle, time, oneTime.toJSONString().getBytes());
+                        //更新之前旧值的over
+                        JSONObject oldValue = JSONObject.parseObject(new String(maxTimeValue));
+                        oldValue.put("over", curTime + "");
+                        putByColumnFamilyHandle(overAndNextHandle, maxTime, oldValue.toJSONString().getBytes());
+                    }
                 }
             }
         }
     }
 
     /**
+     *
+     * @param fields
+     * @param values
+     * @param screenTypes           0 =     1 >=     2 <=
+     * @param tClass
+     * @param overAndNextHandle
+     * @param indexHandle
+     * @param orderByFieldHandle
+     * @param orderByType
+     * @param <T>
+     * @return
+     * @throws Exception
+     */
+    public <T> List<T> getDtoListByField(List<String> fields, List<byte[]> values,List<Integer> screenTypes, Class<T> tClass,ColumnFamilyHandle overAndNextHandle, ColumnFamilyHandle indexHandle,ColumnFamilyHandle orderByFieldHandle,int orderByType) throws Exception{
+        String className = getClassNameByClass(tClass);
+        int flushSize = 300;
+        //段判断筛选的字和字段对应的值是否匹配
+        if (fields != null && values != null && screenTypes != null) {
+            if (fields.size() != values.size()) {
+                throw new Exception("Filter fields and values do not match.");
+            }
+            if(fields.size() != screenTypes.size()){
+                throw new Exception("Filter fields and values do not match.");
+            }
+        } else if (fields == null && values == null && screenTypes == null) {
+            fields = new ArrayList<>();
+            values = new ArrayList<>();
+            screenTypes = new ArrayList<>();
+        } else {
+            throw new Exception("Filter fields and values do not match.");
+        }
+        //排序字段索引区间的索引
+        int keysIndex = 1;
+        //当页需要返回的数据
+        ArrayList<T> tList = new ArrayList<>();
+        //循环遍历排序字段索引的各个区间
+        while (true) {
+            //根据排序字段的索引区间缓存大小和区间的索引位置获取当前位置的区间    排序
+            byte[][] keys = handleOrder(flushSize, keysIndex, overAndNextHandle, orderByType);
+            //如果排序字段索引区间都遍历完了就退出返回
+            if (keys == null || keys.length == 0 || Arrays.equals(keys, new byte[flushSize][])) {
+                break;
+            }
+            //索引区间位置的移动
+            keysIndex++;
+            //遍历各个排序字段的类型的主键集合
+            for (int i = 0; i < keys.length; i++) {
+                byte[] suoyinKey = keys[i];
+                if (suoyinKey == null) {
+                    continue;
+                }
+                //这是改排序字段类型的主键集合
+                Set<byte[]> shaixuanSet = getSuoyinValue(indexHandle, suoyinKey);
+                if (shaixuanSet == null || shaixuanSet.size() == 0) {
+                    continue;
+                }
+                //筛选主键集合，根据需要的筛选字段进行筛选，重新装入到集合
+                Set<byte[]> heightList = new HashSet<>();
+                for (byte[] bytes : shaixuanSet) {
+                    boolean add = true;
+                    for (int k = 0; k < fields.size(); k++) {
+                        ColumnFamilyHandle handle = handleMap.get(getColName(className,fields.get(k)));
+                        byte[] val = getByColumnFamilyHandle(handle, bytes);
+                        byte[] value = values.get(k);
+
+                        long val1 = 0;
+                        long val2 = 0;
+                        int screenType = screenTypes.get(k);
+                        if(val == null || val.length == 0){
+                            if(screenType != 0){
+                                add = false;
+                                break;
+                            }
+                            if(value != null && value.length != 0){
+                                add = false;
+                                break;
+                            }
+                        }else {
+                            switch (screenType) {
+                                case 0:
+                                if (!Arrays.equals(val, value)) {
+                                    add = false;
+                                }
+                                break;
+                                case 1:
+                                    //>=
+                                    val1 = Long.parseLong(new String(val));
+                                    val2 = Long.parseLong(new String(value));
+                                    if(!(val1 >= val2)){
+                                        add = false;
+                                    }
+                                    break;
+                                case 2:
+                                    //<=
+                                    val1 = Long.parseLong(new String(val));
+                                    val2 = Long.parseLong(new String(value));
+                                    if(!(val1 <= val2)){
+                                        add = false;
+                                    }
+                                    break;
+                                 default:
+                                     if (!Arrays.equals(val, value)) {
+                                         add = false;
+                                     }
+                                     break;
+                            }
+                            if(add == false){
+                                break;
+                            }
+                        }
+                    }
+                    if (add) {
+                        heightList.add(bytes);
+                    }
+                }
+                //释放内存，这时我们只需要筛选后的集合，大的集合可以释放
+                shaixuanSet = null;
+                if (heightList == null || heightList.size() == 0) {
+                    continue;
+                }
+                byte[][] paixuHeight = longOrder(heightList, orderByFieldHandle);
+                String keyFiledName = getKeyFieldByClass(tClass);
+                for(byte[] heightByt : paixuHeight){
+                    T tObj = getObj(keyFiledName, new String(heightByt), tClass);
+                    tList.add(tObj);
+                }
+            }
+        }
+        return tList;
+    }
+    /**
      * 根据多字段筛选排序分页
      *
      * @param pageCount         分页的每页条数
      * @param pageNumber        分页的当前页数
      * @param indexHandle       排序字段的索引Handle
-     * @param screenHands     筛选字段的Handle集合
+     * @param screenHands       筛选字段的Handle集合
      * @param vals              筛选字段的值集合   可以有多个值
      * @param screenType        筛选类型   0 and   1 or  （注意，要么全是and，要么全是or）
      * @param overAndNextHandle 索引字段的排序关系handle
@@ -412,17 +763,17 @@ public abstract class BaseDBAccess implements DBAccess {
      * @param flushSize         排序字段区间的缓存
      * @param dtoType           对象主键的类型  根据这个类型匹配不同的排序方法
      * @param <T>               对象
-     * @return                  该页的数据
+     * @return 该页的数据
      * @throws Exception
      */
-    protected final <T> ArrayList<T> getDtoOrderByHandle(int pageCount, int pageNumber,
+    public final <T> ArrayList<T> getDtoOrderByHandle(int pageCount, int pageNumber,
                                                          ColumnFamilyHandle indexHandle, List<ColumnFamilyHandle> screenHands,
-                                                         List<byte[][]> vals,int screenType,
+                                                         List<byte[][]> vals, int screenType,
                                                          ColumnFamilyHandle overAndNextHandle, Class<T> tClass, String keyFiledName,
-                                                         int orderByType, int flushSize, int dtoType,ColumnFamilyHandle orderByFieldHandle) throws Exception {
+                                                         int orderByType, int flushSize, int dtoType, ColumnFamilyHandle orderByFieldHandle) throws Exception {
         //段判断筛选的字和字段对应的值是否匹配
         if (screenHands != null && vals != null) {
-            if(screenHands.size() != vals.size()) {
+            if (screenHands.size() != vals.size()) {
                 throw new Exception("Filter fields and values do not match.");
             }
         } else if (vals == null && screenHands == null) {
@@ -473,21 +824,21 @@ public abstract class BaseDBAccess implements DBAccess {
                 Set<byte[]> heightList = new HashSet<>();
                 for (byte[] bytes : shaixuanSet) {
                     boolean add = true;
-                    switch (screenType){
+                    switch (screenType) {
                         case 0:
                             add = true;
                             //and
                             for (int k = 0; k < screenHands.size(); k++) {
                                 ColumnFamilyHandle handle = screenHands.get(k);
-                                byte[] val = rocksDB.get(handle, bytes);
+                                byte[] val = getByColumnFamilyHandle(handle, bytes);
                                 boolean valInVals = false;
-                                for(byte[] inByte : vals.get(k)){
-                                    if(val == null || val.length == 0){
-                                        if(inByte == null || inByte.length == 0){
+                                for (byte[] inByte : vals.get(k)) {
+                                    if (val == null || val.length == 0) {
+                                        if (inByte == null || inByte.length == 0) {
                                             valInVals = true;
                                             break;
                                         }
-                                    }else {
+                                    } else {
                                         if (Arrays.equals(val, inByte)) {
                                             valInVals = true;
                                             break;
@@ -502,19 +853,19 @@ public abstract class BaseDBAccess implements DBAccess {
                             break;
                         case 1:
                             //or
-                            if(screenHands != null && screenHands.size() > 0) {
+                            if (screenHands != null && screenHands.size() > 0) {
                                 add = false;
-                                for (int k = 0; k < screenHands.size(); k++){
+                                for (int k = 0; k < screenHands.size(); k++) {
                                     ColumnFamilyHandle handle = screenHands.get(k);
-                                    byte[] val = rocksDB.get(handle, bytes);
+                                    byte[] val = getByColumnFamilyHandle(handle, bytes);
                                     boolean valInVals = false;
-                                    for(byte[] inByte : vals.get(k)){
-                                        if(val == null || val.length == 0) {
-                                            if(inByte == null || inByte.length == 0){
+                                    for (byte[] inByte : vals.get(k)) {
+                                        if (val == null || val.length == 0) {
+                                            if (inByte == null || inByte.length == 0) {
                                                 valInVals = true;
                                                 break;
                                             }
-                                        }else{
+                                        } else {
                                             if (Arrays.equals(val, inByte)) {
                                                 valInVals = true;
                                                 break;
@@ -582,7 +933,7 @@ public abstract class BaseDBAccess implements DBAccess {
                     //todo 排序方式是以long类型排序
                     byte[][] paixuHeight = null;
                     if (dtoType == 0) {
-                        paixuHeight = longOrder(heightList,orderByFieldHandle);
+                        paixuHeight = longOrder(heightList, orderByFieldHandle);
 
                     } else {
                         //todo 这里是不同排序方式
@@ -614,7 +965,7 @@ public abstract class BaseDBAccess implements DBAccess {
      *
      * @param flushSize         缓存大小
      * @param fushIndex         缓存位置
-     * @param overAndNextHandle 关系的handle   handleMap.get(getColName("blockHeightIndex","overAndNext"))
+     * @param overAndNextHandle 关系的handle
      * @param orderType         排序类型       1升序,0降序
      * @return
      * @throws RocksDBException
@@ -678,7 +1029,7 @@ public abstract class BaseDBAccess implements DBAccess {
             }
             //元素的下移
             tempTime = next.getBytes();
-            tempTimeValue = rocksDB.get(overAndNextHandle, tempTime);
+            tempTimeValue = getByColumnFamilyHandle(overAndNextHandle, tempTime);
             curIndex++;
         }
         return result;
@@ -690,26 +1041,127 @@ public abstract class BaseDBAccess implements DBAccess {
      * @param longBytes 需要排序的byte[]
      * @return
      */
-    public byte[][] longOrder(Set<byte[]> longBytes,ColumnFamilyHandle orderbyHandle) throws RocksDBException {
+    public byte[][] longOrder(Set<byte[]> longBytes, ColumnFamilyHandle orderbyHandle) throws RocksDBException {
         byte[][] result = new byte[longBytes.size()][];
         result = longBytes.toArray(result);
         //冒泡排序
         for (int i = 0; i < result.length; i++) {
             byte[] cur = result[i];
-            long curVal = Long.parseLong(new String(rocksDB.get(orderbyHandle,cur)));
+            long curVal = Long.parseLong(new String(getByColumnFamilyHandle(orderbyHandle, cur)));
             for (int j = i + 1; j < result.length; j++) {
                 byte[] place = result[j];
-                long placeHeight = Long.parseLong(new String(rocksDB.get(orderbyHandle,place)));
+                long placeHeight = Long.parseLong(new String(getByColumnFamilyHandle(orderbyHandle, place)));
                 if (placeHeight > curVal) {
                     byte[] temp = result[i];
                     result[i] = result[j];
                     result[j] = temp;
                     cur = result[i];
-                    curVal =  Long.parseLong(new String(rocksDB.get(orderbyHandle,cur)));
+                    curVal = Long.parseLong(new String(getByColumnFamilyHandle(orderbyHandle, cur)));
                 }
             }
         }
         return result;
     }
 
+    @Override
+    public boolean put(byte[] key, byte[] value) {
+        boolean res = false;
+        try {
+            rocksDB.put(key, value);
+            res = true;
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    @Override
+    public boolean putByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle, byte[] key, byte[] value) {
+        boolean res = false;
+        try {
+            rocksDB.put(columnFamilyHandle, key, value);
+            res = true;
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    @Override
+    public byte[] get(byte[] key) {
+        byte[] res = null;
+        try {
+            res = rocksDB.get(key);
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    @Override
+    public byte[] getByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+        byte[] res = null;
+        try {
+            res = rocksDB.get(columnFamilyHandle, key);
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    @Override
+    public boolean delete(byte[] key) {
+        boolean res = false;
+        try {
+            rocksDB.delete(key);
+            res = true;
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    @Override
+    public boolean deleteByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+        boolean res = false;
+        try {
+            rocksDB.delete(columnFamilyHandle, key);
+            res = true;
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    // transaction start
+    protected Snapshot snapshot;
+
+    protected Set<String> KeysSet = new HashSet<>();
+
+    public void setSnapshot(Snapshot snapshot) {
+        this.snapshot = snapshot;
+    }
+
+    public Set<String> getKeysSet() {
+        return KeysSet;
+    }
+
+    public void setKeysSet(Set<String> keysSet) {
+        KeysSet = keysSet;
+    }
+
+    public Snapshot getCurrentSnapshot() {
+        return rocksDB.getSnapshot();
+    }
+
+    public void close() {
+        //在一个事务的最后调用该方法,由切面决定调用时间(当事务注解的方法完成的时候执行)
+        //关闭DB对象实例,情况Keyset,快照
+        //todo 接下来还要加入清空实例化对象文件, 记录keySet对象的实例化对象文件之后如果事务正确执行完毕, 则清除该文件,如果执行过程中出现 问题,则在启动的时候逐一回复, 逐一回复的会后应从linkedList最后开始一次恢复
+        rocksDB.close();
+        setKeysSet(new HashSet());
+        setSnapshot(null);
+
+    }
+    // transaction end
 }

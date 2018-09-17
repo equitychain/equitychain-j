@@ -1,3 +1,5 @@
+
+/*
 package com.passport.db.dbhelper;
 
 import com.google.common.base.Optional;
@@ -15,9 +17,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+*/
 /**
  *
- */
+ *//*
+
 //@Component
 
 public class RocksDBAccess implements DBAccess {
@@ -52,9 +56,11 @@ public class RocksDBAccess implements DBAccess {
 	public RocksDBAccess() {
 	}
 
+*/
 /**
 	 * 初始化RocksDB
-	 */
+	 *//*
+
 
 //	@PostConstruct
 	public void initRocksDB() {
@@ -347,3 +353,4 @@ public class RocksDBAccess implements DBAccess {
 	}
 }
 
+*/
