@@ -10,6 +10,7 @@ public class VoteRecord {
     private String receiptAddress;//受托人钱包地址
     private Integer voteNum;//投票数,默认一次只可投一票
     private Integer status;//0撤消1正常
+    private Long timestamp;//投票时间
     public VoteRecord(){
 
     }
