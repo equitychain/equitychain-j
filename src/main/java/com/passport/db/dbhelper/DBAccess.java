@@ -103,6 +103,37 @@ public interface DBAccess {
 	 */
 	boolean putNodeList(List<String> nodes);
 
+
+	/**
+	 * 往数据库添加|更新一条数据
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	boolean put(String key, Object value);
+
+	/**
+	 * 获取某一条指定的数据
+	 * @param key
+	 * @return
+	 */
+	Optional<Object> get(String key);
+
+    /**
+     * 获取某一条指定的数据(通过列族)
+     * @param columFamily
+     * @param key
+     * @return
+     */
+    Optional<Object> get(String columFamily ,String key);
+
+	/**
+	 * 删除一条数据
+	 * @param key
+	 * @return
+	 */
+	boolean delete(String key);
+
 	/**
 	 * 根据前缀搜索
 	 * @param keyPrefix
@@ -291,8 +322,6 @@ public interface DBAccess {
 
     /**
      * 筛选排序查询    不分页
-     * @param className               类的注解name
-     * @param keyFieldName            主键的字段名字
      * @param fields                   筛选的字段
      * @param values                   筛选字段所对应的值
      * @param tClass                   查询dto的class字节码

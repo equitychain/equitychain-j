@@ -2,12 +2,13 @@ package com.passport.db.dbhelper;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Optional;
+import com.passport.annotations.RocksTransaction;
 import com.passport.core.*;
 import com.passport.core.Transaction;
 import com.passport.utils.SerializeUtils;
-import com.passport.utils.ThreadUtil;
 import com.passport.webhandler.BlockHandler;
 import org.rocksdb.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,9 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class BaseDBRocksImpl extends BaseDBAccess {
@@ -33,143 +36,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     @PostConstruct
-    protected void initDB() {
-        try {
-            //数据库目录不存在就创建
-            File directory = new File(System.getProperty("user.dir") + "/" + dataDir);
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
-            List<String> fields = new ArrayList<>();
-            IndexColumnNames[] indexColumnNames = IndexColumnNames.values();
-            //TODO 添加dto的字节码
-            fields.addAll(getClassCols(new Transaction().getClass()));
-            fields.addAll(getClassCols(new Block().getClass()));
-            fields.addAll(getClassCols(new Trustee().getClass()));
-            dtoClasses.add(new Transaction().getClass());
-            dtoClasses.add(new Block().getClass());
-            dtoClasses.add(new Trustee().getClass());
-            try {
-                rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), dataDir);
-                System.out.println("========create fields=========");
-                //添加默认的列族
-                handleMap.put("default", rocksDB.getDefaultColumnFamily());
-                for (String field : fields) {
-                    ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(field.getBytes());
-                    ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
-                    handleMap.put(field, handle);
-                    System.out.println("====field:" + field);
-                }
-                for(IndexColumnNames columnNames : indexColumnNames){
-                    ColumnFamilyHandle indexNameHandle = rocksDB.createColumnFamily(columnNames.getIndexName());
-                    ColumnFamilyHandle indexOverHandle = rocksDB.createColumnFamily(columnNames.getOverAndNextName());
-                    handleMap.put(columnNames.indexName, indexNameHandle);
-                    handleMap.put(columnNames.overAndNextName,indexOverHandle);
-                }
-            } catch (Exception e) {
-                //列集合
-                List<ColumnFamilyDescriptor> descriptorList = new ArrayList<>();
-                ColumnFamilyDescriptor defaultDescriptor = new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY);
-                descriptorList.add(defaultDescriptor);
-                System.out.println("========load fields=========");
-                for (String s : fields) {
-                    ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(s.getBytes());
-                    descriptorList.add(descriptor);
-                    System.out.println("====field:" + s);
-                }
-                for(IndexColumnNames names : indexColumnNames){
-                    descriptorList.add(names.getIndexName());
-                    descriptorList.add(names.getOverAndNextName());
-                }
-                //打开数据库
-                List<ColumnFamilyHandle> handleList = new ArrayList<>();
-                rocksDB = RocksDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
-                handleList.forEach((handler) -> {
-                    String name = new String(handler.getName());
-                    handleMap.put(name, handler);
-                });
-            }
-            //测试数据
-            /*for(int blocks = 1; blocks <= 100; blocks ++){
-                final int k = blocks;
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        System.out.println("Thread"+k+"  started");
-                        for(int tcurB = (k-1)*30000+1; tcurB <= k*30000; tcurB ++) {
-                            try {
-                                BlockHeader blockHeader = new BlockHeader();
-                                Block block = new Block();
-
-                                byte[] blockHash = ("blockHash----" + tcurB).getBytes();
-                                long blockTime = tcurB / 360;
-                                blockTime = 123434564l + blockTime * 3600 + blockTime % 360;
-
-                                blockHeader.setEggMax(tcurB % 100 + 25);
-                                blockHeader.setHash(blockHash);
-                                blockHeader.setVersion("1.0.0 test".getBytes());
-                                blockHeader.setHashPrevBlock(("blockHash----" + (tcurB - 1)).getBytes());
-                                blockHeader.setTimeStamp(blockTime);
-
-                                block.setBlockHeader(blockHeader);
-                                block.setTransactionCount(800);
-                                block.setBlockSize(1024 * 3l);
-                                block.setBlockHeight(Long.parseLong(tcurB + ""));
-
-                                List<Transaction> transactions = new ArrayList<>();
-                                for (int trans = 1; trans <= 800; trans++) {
-                                    Transaction transaction = new Transaction();
-                                    transaction.setEggMax(("" + (tcurB % 100 + trans % 50)).getBytes());
-                                    transaction.setSignature("abcsign".getBytes());
-                                    transaction.setTime((blockTime + "").getBytes());
-                                    transaction.setHash(("transHash---" + tcurB + "-" + trans).getBytes());
-                                    transaction.setEggPrice("100000".getBytes());
-                                    transaction.setPayAddress(("address" + (tcurB % 1600)).getBytes());
-                                    transaction.setReceiptAddress(("" + trans).getBytes());
-                                    transaction.setNonce(1);
-                                    transaction.setBlockHeight((block.getBlockHeight() + "").getBytes());
-                                    transactions.add(transaction);
-                                    addObj(transaction);
-                                    putSuoyinKey(handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.indexName),
-                                            transaction.getBlockHeight(), transaction.getHash());
-                                    putOverAndNext(handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.overAndNextName),
-                                            transaction.getBlockHeight());
-                                    putSuoyinKey(handleMap.get(IndexColumnNames.TRANSTIMEINDEX.indexName),
-                                            transaction.getTime(), transaction.getHash());
-                                    putOverAndNext(handleMap.get(IndexColumnNames.TRANSTIMEINDEX.overAndNextName),
-                                            transaction.getTime());
-                                }
-                                block.setTransactions(transactions);
-                                addObj(block);
-                                System.out.println("block  " + tcurB + "   添加成功");
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                System.out.println("block  " + tcurB + "   添加异常");
-                            }
-                        }
-                    }
-                };
-                ThreadUtil.putTask(runnable);
-            }
-            for(int i = 0; i < 10000; i ++){
-                Trustee trustee = new Trustee();
-                trustee.setVotes(i%10000l);
-                trustee.setStatus(1);
-                trustee.setAddress("address---"+i);
-                trustee.setGenerateRate(0.01f*i%98);
-                trustee.setIncome(new BigDecimal(6666*0.01f*i%98));
-                addObj(trustee);
-
-                putSuoyinKey(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName),
-                        (trustee.getVotes() + "").getBytes(), trustee.getAddress().getBytes());
-                putOverAndNext(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.overAndNextName),
-                        (trustee.getVotes() + "").getBytes());
-                System.out.println("Trustee  " + i + "   添加成功");
-            }
-            System.out.println("测试数据添加完成");*/
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected void initDB(){
+        super.initDB();
     }
 
     /**
@@ -180,7 +48,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
      * @return
      */
     @Override
-    @Deprecated
     public boolean putLastBlockHeight(Object lastBlock) {
         return true;
     }
@@ -251,12 +118,69 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     public boolean putNodeList(List<String> nodes) {
-        return put(CLIENT_NODES_LIST_KEY.getBytes(), SerializeUtils.serialize(nodes));
+        try {
+
+            rocksDB.put(CLIENT_NODES_LIST_KEY.getBytes(), SerializeUtils.serialize(nodes));
+            return true;
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
+    @Override
+    public boolean put(String key, Object value) {
+        try {
+            KeysSet.add(key);//存储key到文件
+            rocksDB.put(key.getBytes(), SerializeUtils.serialize(value));
+            return true;
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     @Override
-    @Deprecated
+    public Optional<Object> get(String key) {
+        try {
+            byte[] objByt = rocksDB.get(key.getBytes());
+            if (objByt != null) {
+                Optional.of(SerializeUtils.unSerialize(objByt));
+            }
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+        }
+        return Optional.absent();
+    }
+
+    @Override
+    public Optional<Object> get(String columnFamily,String key) {
+        byte[] objByt = new byte[100];
+        try {
+            objByt = rocksDB.get(super.handleMap.get(columnFamily),key.getBytes());
+//            if (objByt != null) {
+//                Optional.of(SerializeUtils.unSerialize(objByt));
+
+        } catch (RocksDBException e) {
+//            e.printStackTrace();
+        }
+//        return Optional.absent();
+        System.out.println(new String(objByt)+"-----------!");
+        return null;
+    }
+
+    @Override
+    public boolean delete(String key) {
+        try {
+            rocksDB.delete(key.getBytes());
+            return true;
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
     public <T> List<T> seekByKey(String keyPrefix) {
         ArrayList<T> ts = new ArrayList<>();
         ReadOptions options = new ReadOptions();

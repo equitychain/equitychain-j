@@ -1,15 +1,22 @@
 package com.passport.db.dbhelper;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.*;
 import com.google.common.base.Optional;
 import com.passport.annotations.EntityClaz;
 import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
+import com.passport.annotations.RocksTransaction;
+import com.passport.core.Block;
+import com.passport.core.Transaction;
+import com.passport.core.Trustee;
+import com.passport.db.transaction.RocksdbTransaction;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -18,12 +25,153 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public abstract class BaseDBAccess implements DBAccess {
+    @Autowired
+    public RocksdbTransaction transaction;
     protected RocksDB rocksDB;
+    @Value("${db.dataDir}")
+    private String dataDir;
     //列的handler
     protected final Map<String, ColumnFamilyHandle> handleMap = new HashMap<>();
     protected final Set<Class> dtoClasses = new HashSet<>();
 
-    protected abstract void initDB();
+    protected void initDB() {
+        try {
+            //数据库目录不存在就创建
+            File directory = new File(System.getProperty("user.dir") + "/" + dataDir);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            List<String> fields = new ArrayList<>();
+            IndexColumnNames[] indexColumnNames = IndexColumnNames.values();
+            //TODO 添加dto的字节码
+            fields.addAll(getClassCols(new com.passport.core.Transaction().getClass()));
+            fields.addAll(getClassCols(new Block().getClass()));
+            fields.addAll(getClassCols(new Trustee().getClass()));
+            dtoClasses.add(new Transaction().getClass());
+            dtoClasses.add(new Block().getClass());
+            dtoClasses.add(new Trustee().getClass());
+            try {
+                rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), dataDir);
+                System.out.println("========create fields=========");
+                //添加默认的列族
+                handleMap.put("default", rocksDB.getDefaultColumnFamily());
+                for (String field : fields) {
+                    ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(field.getBytes());
+                    ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
+                    handleMap.put(field, handle);
+                    System.out.println("====field:" + field);
+                }
+                for(IndexColumnNames columnNames : indexColumnNames){
+                    ColumnFamilyHandle indexNameHandle = rocksDB.createColumnFamily(columnNames.getIndexName());
+                    ColumnFamilyHandle indexOverHandle = rocksDB.createColumnFamily(columnNames.getOverAndNextName());
+                    handleMap.put(columnNames.indexName, indexNameHandle);
+                    handleMap.put(columnNames.overAndNextName,indexOverHandle);
+                }
+            } catch (Exception e) {
+                //列集合
+                List<ColumnFamilyDescriptor> descriptorList = new ArrayList<>();
+                ColumnFamilyDescriptor defaultDescriptor = new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY);
+                descriptorList.add(defaultDescriptor);
+                System.out.println("========load fields=========");
+                for (String s : fields) {
+                    ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(s.getBytes());
+                    descriptorList.add(descriptor);
+                    System.out.println("====field:" + s);
+                }
+                for(IndexColumnNames names : indexColumnNames){
+                    descriptorList.add(names.getIndexName());
+                    descriptorList.add(names.getOverAndNextName());
+                }
+                //打开数据库
+                List<ColumnFamilyHandle> handleList = new ArrayList<>();
+                rocksDB = RocksDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
+                handleList.forEach((handler) -> {
+                    String name = new String(handler.getName());
+                    handleMap.put(name, handler);
+                });
+            }
+            //测试数据
+            /*for(int blocks = 1; blocks <= 100; blocks ++){
+                final int k = blocks;
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("Thread"+k+"  started");
+                        for(int tcurB = (k-1)*30000+1; tcurB <= k*30000; tcurB ++) {
+                            try {
+                                BlockHeader blockHeader = new BlockHeader();
+                                Block block = new Block();
+
+                                byte[] blockHash = ("blockHash----" + tcurB).getBytes();
+                                long blockTime = tcurB / 360;
+                                blockTime = 123434564l + blockTime * 3600 + blockTime % 360;
+
+                                blockHeader.setEggMax(tcurB % 100 + 25);
+                                blockHeader.setHash(blockHash);
+                                blockHeader.setVersion("1.0.0 test".getBytes());
+                                blockHeader.setHashPrevBlock(("blockHash----" + (tcurB - 1)).getBytes());
+                                blockHeader.setTimeStamp(blockTime);
+
+                                block.setBlockHeader(blockHeader);
+                                block.setTransactionCount(800);
+                                block.setBlockSize(1024 * 3l);
+                                block.setBlockHeight(Long.parseLong(tcurB + ""));
+
+                                List<Transaction> transactions = new ArrayList<>();
+                                for (int trans = 1; trans <= 800; trans++) {
+                                    Transaction transaction = new Transaction();
+                                    transaction.setEggMax(("" + (tcurB % 100 + trans % 50)).getBytes());
+                                    transaction.setSignature("abcsign".getBytes());
+                                    transaction.setTime((blockTime + "").getBytes());
+                                    transaction.setHash(("transHash---" + tcurB + "-" + trans).getBytes());
+                                    transaction.setEggPrice("100000".getBytes());
+                                    transaction.setPayAddress(("address" + (tcurB % 1600)).getBytes());
+                                    transaction.setReceiptAddress(("" + trans).getBytes());
+                                    transaction.setNonce(1);
+                                    transaction.setBlockHeight((block.getBlockHeight() + "").getBytes());
+                                    transactions.add(transaction);
+                                    addObj(transaction);
+                                    putSuoyinKey(handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.indexName),
+                                            transaction.getBlockHeight(), transaction.getHash());
+                                    putOverAndNext(handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.overAndNextName),
+                                            transaction.getBlockHeight());
+                                    putSuoyinKey(handleMap.get(IndexColumnNames.TRANSTIMEINDEX.indexName),
+                                            transaction.getTime(), transaction.getHash());
+                                    putOverAndNext(handleMap.get(IndexColumnNames.TRANSTIMEINDEX.overAndNextName),
+                                            transaction.getTime());
+                                }
+                                block.setTransactions(transactions);
+                                addObj(block);
+                                System.out.println("block  " + tcurB + "   添加成功");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                System.out.println("block  " + tcurB + "   添加异常");
+                            }
+                        }
+                    }
+                };
+                ThreadUtil.putTask(runnable);
+            }
+            for(int i = 0; i < 10000; i ++){
+                Trustee trustee = new Trustee();
+                trustee.setVotes(i%10000l);
+                trustee.setStatus(1);
+                trustee.setAddress("address---"+i);
+                trustee.setGenerateRate(0.01f*i%98);
+                trustee.setIncome(new BigDecimal(6666*0.01f*i%98));
+                addObj(trustee);
+
+                putSuoyinKey(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName),
+                        (trustee.getVotes() + "").getBytes(), trustee.getAddress().getBytes());
+                putOverAndNext(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.overAndNextName),
+                        (trustee.getVotes() + "").getBytes());
+                System.out.println("Trustee  " + i + "   添加成功");
+            }
+            System.out.println("测试数据添加完成");*/
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
     /**
@@ -984,4 +1132,36 @@ public abstract class BaseDBAccess implements DBAccess {
         }
         return res;
     }
+
+    // transaction start
+    protected Snapshot snapshot;
+
+    protected Set<String> KeysSet = new HashSet<>();
+
+    public void setSnapshot(Snapshot snapshot) {
+        this.snapshot = snapshot;
+    }
+
+    public Set<String> getKeysSet() {
+        return KeysSet;
+    }
+
+    public void setKeysSet(Set<String> keysSet) {
+        KeysSet = keysSet;
+    }
+
+    public Snapshot getCurrentSnapshot() {
+        return rocksDB.getSnapshot();
+    }
+
+    public void close() {
+        //在一个事务的最后调用该方法,由切面决定调用时间(当事务注解的方法完成的时候执行)
+        //关闭DB对象实例,情况Keyset,快照
+        //todo 接下来还要加入清空实例化对象文件, 记录keySet对象的实例化对象文件之后如果事务正确执行完毕, 则清除该文件,如果执行过程中出现 问题,则在启动的时候逐一回复, 逐一回复的会后应从linkedList最后开始一次恢复
+        rocksDB.close();
+        setKeysSet(new HashSet());
+        setSnapshot(null);
+
+    }
+    // transaction end
 }
