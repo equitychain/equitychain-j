@@ -90,13 +90,13 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 });
             }
             //测试数据
-            for(int blocks = 1; blocks <= 10; blocks ++){
+            /*for(int blocks = 1; blocks <= 100; blocks ++){
                 final int k = blocks;
                 Runnable runnable = new Runnable() {
                     @Override
                     public void run() {
                         System.out.println("Thread"+k+"  started");
-                        for(int tcurB = (k-1)*30+1; tcurB <= k*30; tcurB ++) {
+                        for(int tcurB = (k-1)*30000+1; tcurB <= k*30000; tcurB ++) {
                             try {
                                 BlockHeader blockHeader = new BlockHeader();
                                 Block block = new Block();
@@ -166,7 +166,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                         (trustee.getVotes() + "").getBytes());
                 System.out.println("Trustee  " + i + "   添加成功");
             }
-            System.out.println("测试数据添加完成");
+            System.out.println("测试数据添加完成");*/
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -644,11 +644,11 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         Optional<Object> lastBlockHeightOpt = getLastBlockHeight();
         List<byte[][]> vals = new ArrayList<>();
         long lastBlockHeight = 0;
-        int size = lastBlockHeight >= 0 ? (int) (lastBlockHeight <= 100 ? lastBlockHeight : 100) : 1;
-        byte[][] val = new byte[size][];
         if (lastBlockHeightOpt.isPresent()) {
             lastBlockHeight = Long.parseLong(lastBlockHeightOpt.get().toString());
         }
+        int size = lastBlockHeight >= 0 ? (int) (lastBlockHeight <= 100 ? lastBlockHeight : 100) : 1;
+        byte[][] val = new byte[size][];
         for (int i = 0; lastBlockHeight >= 0 && i < 100; i++) {
             val[i] = (lastBlockHeight + "").getBytes();
             lastBlockHeight--;
