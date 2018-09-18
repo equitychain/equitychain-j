@@ -244,7 +244,7 @@ public interface DBAccess {
 	 * 获取投票人列表
 	 * @return
 	 */
-	List<Voter> listVoters();
+	List<Voter> listVoters(long time);
 
 	/**
 	 * 添加一条投票记录

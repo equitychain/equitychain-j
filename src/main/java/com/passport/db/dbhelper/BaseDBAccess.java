@@ -54,9 +54,11 @@ public abstract class BaseDBAccess implements DBAccess {
             fields.addAll(getClassCols(new Block().getClass()));
             fields.addAll(getClassCols(new Trustee().getClass()));
             fields.addAll(getClassCols(new VoteRecord().getClass()));
+            fields.addAll(getClassCols(new Voter().getClass()));
             dtoClasses.add(new Transaction().getClass());
             dtoClasses.add(new Block().getClass());
-            dtoClasses.add(new Trustee().getClass());
+            dtoClasses.add(new VoteRecord().getClass());
+            dtoClasses.add(new Voter().getClass());
             try {
                 rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), dataDir);
                 System.out.println("========create fields=========");
@@ -75,7 +77,6 @@ public abstract class BaseDBAccess implements DBAccess {
                     handleMap.put(columnNames.overAndNextName,indexOverHandle);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
                 //列集合
                 List<ColumnFamilyDescriptor> descriptorList = new ArrayList<>();
                 ColumnFamilyDescriptor defaultDescriptor = new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY);
@@ -199,20 +200,20 @@ public abstract class BaseDBAccess implements DBAccess {
             System.out.println("blocks:"+i);
             System.out.println("trans:"+k);*/
             List<VoteRecord> voteRecords = new ArrayList<>();
-            for (int i = 0; i < 1000;i ++){
+            for (int i = 0; i < 200000;i ++){
                 VoteRecord voteRecord = new VoteRecord();
                 voteRecord.setTime(10l*i);
                 voteRecord.setStatus(i%2);
-                voteRecord.setPayAddress("address"+(1000-i)%100);
-                voteRecord.setReceiptAddress(("address"+i%100));
+                voteRecord.setPayAddress("address-pay"+i);
+                voteRecord.setReceiptAddress(("address-rec"+i));
+                voteRecord.setId(voteRecord.getPayAddress()+"-"+voteRecord.getReceiptAddress());
                 voteRecord.setVoteNum(i);
                 voteRecords.add(voteRecord);
-
-                putSuoyinKey(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName),voteRecord.getVoteNum().toString().getBytes(),voteRecord.getPayAddress().getBytes());
+                putSuoyinKey(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName),voteRecord.getVoteNum().toString().getBytes(),voteRecord.getId().getBytes());
                 putOverAndNext(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.overAndNextName),voteRecord.getVoteNum().toString().getBytes());
             }
             addObjs(voteRecords);
-            List<String> fields1 = new ArrayList<>();
+            /*List<String> fields1 = new ArrayList<>();
             List<byte[]> vals = new ArrayList<>();
             List<Integer> screenType = new ArrayList<>();
             fields1.add("receiptAddress");
@@ -227,7 +228,26 @@ public abstract class BaseDBAccess implements DBAccess {
             List<VoteRecord> voteRecords1 = getDtoListByField(fields1,vals,screenType,VoteRecord.class,handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.overAndNextName),handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName),handleMap.get(getColName("voteRecord","voteNum")),0);
             for (VoteRecord v : voteRecords1){
                 System.out.println(GsonUtils.toJson(v));
+            }*/
+            RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("voteRecord","id")));
+            int k = 0;
+            for(iterator.seekToFirst();iterator.isValid();iterator.next()){
+                k++;
             }
+            long begin = System.currentTimeMillis();
+            List<Voter> voters = listVoters(10000l);
+            for(Voter v : voters){
+                System.out.println(GsonUtils.toJson(v));
+            }
+            long end = System.currentTimeMillis();
+            System.out.println("耗时:"+(end-begin)+"  总数:"+k);
+//            long begin = System.currentTimeMillis();
+//            List<Block> blocks = blockPagination(100,10);
+//            long end = System.currentTimeMillis();
+//            System.out.println("耗时:"+(end-begin));
+//            for(Block b : blocks){
+//                System.out.println(GsonUtils.toJson(b));
+//            }
 
         } catch (Exception e) {
             e.printStackTrace();

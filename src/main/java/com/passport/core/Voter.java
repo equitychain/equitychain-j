@@ -50,4 +50,22 @@ public class Voter {
     public void setStatus(Integer status) {
         this.status = status;
     }
+
+    @Override
+    public int hashCode() {
+        return status;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Voter){
+            Voter v = (Voter) obj;
+            if(address == null || "".equals(address)){
+                return (v.address == null || "".equals(v.address));
+            }else{
+                return address.equals(v.address);
+            }
+        }
+        return false;
+    }
 }

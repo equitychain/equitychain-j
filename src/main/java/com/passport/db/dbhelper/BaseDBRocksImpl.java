@@ -395,18 +395,40 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    public List<Voter> listVoters() {
-
-        try {
-            return getDtoListByField(
-                    null,null,null,Voter.class,
-                    handleMap.get(IndexColumnNames.VOTERNUMBEROFVOTE.overAndNextName),
-                    handleMap.get(IndexColumnNames.VOTERNUMBEROFVOTE.indexName),
-                    handleMap.get(getColName("voter","voteNum")),0);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
+    public List<Voter> listVoters(long time) {
+        List<Voter> voters = new ArrayList<>();
+        List<Voter> allVoters = new ArrayList<>();
+        //筛选/分组/求和
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("voteRecord","id")));
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            byte[] timeByte = getByColumnFamilyHandle(handleMap.get(getColName("voteRecord","time")),iterator.key());
+            //time的筛选
+            if(Long.parseLong(new String(timeByte)) <= time){
+                Voter voter = new Voter();
+                voter.setVoteNum(0);
+                voter.setStatus(1);
+                voter.setAddress(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord","receiptAddress")),iterator.key())));
+                int index = -1;
+                //address的分组
+                index = allVoters.indexOf(voter);
+                if(index != -1) {
+                    voter = allVoters.remove(index);
+                }
+                //求和
+                voter.setVoteNum(voter.getVoteNum()+Integer.parseInt(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord","voteNum")),iterator.key()))));
+                allVoters.add(voter);
+            }
         }
+        //排序
+        allVoters.sort(new Comparator<Voter>() {
+            @Override
+            public int compare(Voter o1, Voter o2) {
+                return o1.getVoteNum().intValue()>o2.getVoteNum().intValue()?-1:(o1.getVoteNum().intValue()==o2.getVoteNum().intValue()?0:1);
+            }
+        });
+        //获取前101个
+        voters.addAll(allVoters.size()>=101?allVoters.subList(0,100):allVoters);
+        return voters;
     }
 
     @Override
