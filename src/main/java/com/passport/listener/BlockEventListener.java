@@ -208,7 +208,13 @@ public class BlockEventListener {
 					trusteeHandler.changeStatus(trustee, blockCycle);
 
 					//出块完成后，计算出下一个出块人是不是自己，如果是则发布出块事件
-
+					//查询出块周期内剩余出块者
+					List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
+					Trustee tee = blockUtils.randomPickBlockPruducer(trustees, blockHeight + 2);
+					Optional<Account> accOptional = dbAccess.getAccount(tee.getAddress());
+					if(accOptional.isPresent() && accOptional.get().getPrivateKey() != null) {//出块人属于本节点
+						//出块逻辑
+					}
 				}
 			}
 		}

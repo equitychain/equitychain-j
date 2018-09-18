@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -34,5 +35,24 @@ public class TrusteeHandler {
             }
             dbAccess.put(String.valueOf(blockCycle), list);
         }
+    }
+
+    /**
+     * 找出还未出块的受托人
+     * @param blockCycle
+     * @return
+     */
+    public List<Trustee> findValidTrustees(int blockCycle) {
+        List<Trustee> trustees = new ArrayList<>();
+        Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
+        if(objectOptional.isPresent()){
+            List<Trustee> list = (List<Trustee>)objectOptional.get();
+            for(Trustee tee : list){
+                if(tee.getStatus() == 1){
+                    trustees.add(tee);
+                }
+            }
+        }
+        return trustees;
     }
 }

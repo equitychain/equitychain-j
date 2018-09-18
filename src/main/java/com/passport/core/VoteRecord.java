@@ -1,5 +1,9 @@
 package com.passport.core;
 
+import com.passport.annotations.EntityClaz;
+import com.passport.annotations.FaildClaz;
+import com.passport.annotations.KeyField;
+
 /**
  * 投票记录
  * @author: xujianfeng

@@ -1,12 +1,9 @@
 package com.passport.db.dbhelper;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.base.*;
-import com.google.common.base.Optional;
 import com.passport.annotations.EntityClaz;
 import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
-import com.passport.annotations.RocksTransaction;
 import com.passport.core.Block;
 import com.passport.core.Transaction;
 import com.passport.core.Trustee;
@@ -21,7 +18,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public abstract class BaseDBAccess implements DBAccess {
