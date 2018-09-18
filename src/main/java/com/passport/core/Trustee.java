@@ -76,4 +76,22 @@ public class Trustee {
     public void setStatus(Integer status) {
         this.status = status;
     }
+
+    @Override
+    public int hashCode() {
+        return status;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Trustee){
+            Trustee t = (Trustee) obj;
+            if(address == null || "".equals(address)){
+                return t.address==null||"".equals(t.address);
+            }else{
+                return address.equals(t.address);
+            }
+        }
+        return false;
+    }
 }
