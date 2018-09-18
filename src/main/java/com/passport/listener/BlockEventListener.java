@@ -5,6 +5,7 @@ import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.GenerateBlockEvent;
+import com.passport.event.GenerateNextBlockEvent;
 import com.passport.event.SyncBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.peer.ChannelsManager;
@@ -52,6 +53,8 @@ public class BlockEventListener {
 	private MinerHandler minerHandler;
 	@Autowired
 	private TrusteeHandler trusteeHandler;
+	@Autowired
+	private ApplicationContextProvider provider;
 
 
 			/**
@@ -171,6 +174,30 @@ public class BlockEventListener {
 	 * 由第一个节点发起出块
 	 * @param event
 	 */
+	@EventListener(GenerateNextBlockEvent.class)
+	public void generateNextBlock(GenerateNextBlockEvent event) {
+		//当前区块周期
+		Optional<Object> lastBlockHeightOptional = dbAccess.getLastBlockHeight();
+		if(!lastBlockHeightOptional.isPresent()){
+			return;
+		}
+		long blockHeight = CastUtils.castLong(lastBlockHeightOptional.get());
+		long newBlockHeight = blockHeight + 1;
+		int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
+
+		//出块完成后，计算出的下一个出块人如果是自己则继续发布出块事件
+		List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
+		if(trustees.size() == 0){
+			//出完了则进行下一个周期出块
+		}else{
+			produceBlock(newBlockHeight, trustees, blockCycle);
+		}
+	}
+
+	/**
+	 * 由第一个节点发起出块
+	 * @param event
+	 */
 	@EventListener(GenerateBlockEvent.class)
 	public void generateBlock(GenerateBlockEvent event) {
 		ChannelGroup channels = channelsManager.getChannels();
@@ -181,41 +208,48 @@ public class BlockEventListener {
 			if(!lastBlockHeightOptional.isPresent()){
 				return;
 			}
-
+			//出块后重新启动不再由初始节点主导出块
 			long blockHeight = CastUtils.castLong(lastBlockHeightOptional.get());
 			if(blockHeight > 1){
 				return;
 			}
+			long newBlockHeight = blockHeight + 1;
 
-			Long timestamp = blockUtils.getTimestamp4BlockCycle(blockHeight + 1);
+			Long timestamp = blockUtils.getTimestamp4BlockCycle(newBlockHeight);
 			//查询投票记录（status==1）,时间小于等于timestamp，按投票票数从高到低排列的101个受托人，放到101个受托人列表中
-			List<Trustee> list = new ArrayList<>();//TODO
+			List<Trustee> trustees = new ArrayList<>();//TODO
 
 			//101个受托人放到本地存放，key为出块周期，下一个出块周期到来时，需要删除上一个出块周期的数据
-			int blockCycle = blockUtils.getBlockCycle(blockHeight + 1);
-			dbAccess.put(String.valueOf(blockCycle), list);//TODO
+			int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
+			boolean flag = dbAccess.put(String.valueOf(blockCycle), trustees);//TODO
+			if(!flag){
+				return;
+			}
 
-			Trustee trustee = blockUtils.randomPickBlockPruducer(list, blockHeight + 1);
-			String address = trustee.getAddress();
-			Optional<Account> accountOptional = dbAccess.getAccount(address);
-			if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null){//出块人属于本节点
-				Account account = accountOptional.get();
-				if(account.getPrivateKey() != null){
-					//打包区块
-					minerHandler.packagingBlock(account);
+			//选择出块人
+			produceBlock(newBlockHeight, trustees, blockCycle);
+		}
+	}
 
-					//更新101个受托人，已经出块人的状态
-					trusteeHandler.changeStatus(trustee, blockCycle);
+	/**
+	 * 打包区块、寻找下一个出块人是否在本节点
+	 * @param newBlockHeight 准备出块高度
+	 * @param list
+	 * @param blockCycle
+	 */
+	private void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) {
+		Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
+		Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
+		if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null){//出块人属于本节点
+			Account account = accountOptional.get();
+			if(account.getPrivateKey() != null){
+				//打包区块
+				minerHandler.packagingBlock(account);
 
-					//出块完成后，计算出下一个出块人是不是自己，如果是则发布出块事件
-					//查询出块周期内剩余出块者
-					List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
-					Trustee tee = blockUtils.randomPickBlockPruducer(trustees, blockHeight + 2);
-					Optional<Account> accOptional = dbAccess.getAccount(tee.getAddress());
-					if(accOptional.isPresent() && accOptional.get().getPrivateKey() != null) {//出块人属于本节点
-						//出块逻辑
-					}
-				}
+				//更新101个受托人，已经出块人的状态
+				trusteeHandler.changeStatus(trustee, blockCycle);
+
+				provider.publishEvent(new GenerateNextBlockEvent(0L));
 			}
 		}
 	}
