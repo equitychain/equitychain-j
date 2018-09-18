@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Comparator;
 
 public abstract class BaseDBAccess implements DBAccess {
     @Autowired
@@ -61,11 +62,11 @@ public abstract class BaseDBAccess implements DBAccess {
                     handleMap.put(field, handle);
                     System.out.println("====field:" + field);
                 }
-                for(IndexColumnNames columnNames : indexColumnNames){
+                for (IndexColumnNames columnNames : indexColumnNames) {
                     ColumnFamilyHandle indexNameHandle = rocksDB.createColumnFamily(columnNames.getIndexName());
                     ColumnFamilyHandle indexOverHandle = rocksDB.createColumnFamily(columnNames.getOverAndNextName());
                     handleMap.put(columnNames.indexName, indexNameHandle);
-                    handleMap.put(columnNames.overAndNextName,indexOverHandle);
+                    handleMap.put(columnNames.overAndNextName, indexOverHandle);
                 }
             } catch (Exception e) {
                 //列集合
@@ -78,7 +79,7 @@ public abstract class BaseDBAccess implements DBAccess {
                     descriptorList.add(descriptor);
                     System.out.println("====field:" + s);
                 }
-                for(IndexColumnNames names : indexColumnNames){
+                for (IndexColumnNames names : indexColumnNames) {
                     descriptorList.add(names.getIndexName());
                     descriptorList.add(names.getOverAndNextName());
                 }
@@ -152,7 +153,8 @@ public abstract class BaseDBAccess implements DBAccess {
                 };
                 ThreadUtil.putTask(runnable);
             }
-            for(int i = 0; i < 10000; i ++){
+            */
+/*            for(int i = 0; i < 10000; i ++){
                 Trustee trustee = new Trustee();
                 trustee.setVotes(i%10000l);
                 trustee.setStatus(1);
@@ -206,69 +208,73 @@ public abstract class BaseDBAccess implements DBAccess {
     protected final String[] getClassNameAndFieldName(String colName) {
         return colName.split("-");
     }
-    public final <T> void delObj(String keyField,String fieldVale,Class<T> dtoClazz,boolean deleteCase)throws Exception{
-        if(dtoClazz.isAnnotationPresent(EntityClaz.class)){
+
+    public final <T> void delObj(String keyField, String fieldVale, Class<T> dtoClazz, boolean deleteCase) throws Exception {
+        if (dtoClazz.isAnnotationPresent(EntityClaz.class)) {
             //获取到EntityClaz注解
             EntityClaz entityClaz = (EntityClaz) dtoClazz.getAnnotation(EntityClaz.class);
             //获取到类名
             String className = entityClaz.name();
             //所有的字段
             Field[] fields = dtoClazz.getDeclaredFields();
-            for(Field f : fields){
-                if(f.isAnnotationPresent(FaildClaz.class)){
+            for (Field f : fields) {
+                if (f.isAnnotationPresent(FaildClaz.class)) {
                     FaildClaz faildClaz = f.getAnnotation(FaildClaz.class);
                     String fieldName = faildClaz.name();
-                    ColumnFamilyHandle colHandle = handleMap.get(getColName(className,fieldName));
-                    if(deleteCase && (faildClaz.type() == List.class || dtoClasses.contains(faildClaz))){
+                    ColumnFamilyHandle colHandle = handleMap.get(getColName(className, fieldName));
+                    if (deleteCase && (faildClaz.type() == List.class || dtoClasses.contains(faildClaz))) {
                         //删除级联
-                        byte[] fieldVal = getByColumnFamilyHandle(colHandle,fieldVale.getBytes());
-                        if(faildClaz.type() == List.class){
+                        byte[] fieldVal = getByColumnFamilyHandle(colHandle, fieldVale.getBytes());
+                        if (faildClaz.type() == List.class) {
                             List list = (List) SerializeUtils.unSerialize(fieldVal);
-                            if(list != null && list.size() > 0){
+                            if (list != null && list.size() > 0) {
                                 Class listType = faildClaz.genericParadigm();
                                 String conKeyF = getKeyFieldByClass(listType);
-                                for(Object o : list){
+                                for (Object o : list) {
                                     String conKeyV = o.toString();
-                                    delObj(conKeyF,conKeyV,listType,true);
+                                    delObj(conKeyF, conKeyV, listType, true);
                                 }
                             }
-                        }else{
+                        } else {
                             String conKeyF = getKeyFieldByClass(faildClaz.type());
-                            if(conKeyF != null) {
-                                delObj(conKeyF,new String(fieldVal),faildClaz.type(),true);
+                            if (conKeyF != null) {
+                                delObj(conKeyF, new String(fieldVal), faildClaz.type(), true);
                             }
                         }
                     }
                     //删除列的值
-                    deleteByColumnFamilyHandle(colHandle,fieldVale.getBytes());
+                    deleteByColumnFamilyHandle(colHandle, fieldVale.getBytes());
                 }
             }
         }
     }
-    protected String getClassNameByClass(Class claz){
-        if(claz.isAnnotationPresent(EntityClaz.class)){
+
+    protected String getClassNameByClass(Class claz) {
+        if (claz.isAnnotationPresent(EntityClaz.class)) {
             EntityClaz entityClaz = (EntityClaz) claz.getAnnotation(EntityClaz.class);
             return entityClaz.name();
         }
         return null;
     }
-    protected String getKeyFieldByClass(Class claz){
-        if(claz.isAnnotationPresent(EntityClaz.class)){
+
+    protected String getKeyFieldByClass(Class claz) {
+        if (claz.isAnnotationPresent(EntityClaz.class)) {
             Field[] fields = claz.getDeclaredFields();
             Field keyField = null;
-            for(Field f : fields){
+            for (Field f : fields) {
                 f.setAccessible(true);
-                if(f.isAnnotationPresent(KeyField.class)){
+                if (f.isAnnotationPresent(KeyField.class)) {
                     keyField = f;
                     break;
                 }
             }
-            if(keyField != null) {
+            if (keyField != null) {
                 return keyField.getAnnotation(FaildClaz.class).name();
             }
         }
         return null;
     }
+
     // 添加有注解的对象
     public final void addObj(Object obj) throws Exception {
         Class c = obj.getClass();
@@ -309,7 +315,7 @@ public abstract class BaseDBAccess implements DBAccess {
                         byte[] value = (byte[]) f.get(obj);
                         String fieldName = faildClaz.name();
                         ColumnFamilyHandle handle = handleMap.get(getColName(className, fieldName));
-                        putByColumnFamilyHandle(handle,key, value);
+                        putByColumnFamilyHandle(handle, key, value);
                     } else if (faildClaz.type() == long.class || faildClaz.type() == Long.class
                             || faildClaz.type() == int.class || faildClaz.type() == Integer.class
                             || faildClaz.type() == String.class || faildClaz.type() == BigDecimal.class || faildClaz.type() == float.class || faildClaz.type() == Float.class) {
@@ -617,10 +623,9 @@ public abstract class BaseDBAccess implements DBAccess {
     }
 
     /**
-     *
      * @param fields
      * @param values
-     * @param screenTypes           0 =     1 >=     2 <=
+     * @param screenTypes        0 =     1 >=     2 <=
      * @param tClass
      * @param overAndNextHandle
      * @param indexHandle
@@ -630,7 +635,7 @@ public abstract class BaseDBAccess implements DBAccess {
      * @return
      * @throws Exception
      */
-    public <T> List<T> getDtoListByField(List<String> fields, List<byte[]> values,List<Integer> screenTypes, Class<T> tClass,ColumnFamilyHandle overAndNextHandle, ColumnFamilyHandle indexHandle,ColumnFamilyHandle orderByFieldHandle,int orderByType) throws Exception{
+    public <T> List<T> getDtoListByField(List<String> fields, List<byte[]> values, List<Integer> screenTypes, Class<T> tClass, ColumnFamilyHandle overAndNextHandle, ColumnFamilyHandle indexHandle, ColumnFamilyHandle orderByFieldHandle, int orderByType) throws Exception {
         String className = getClassNameByClass(tClass);
         int flushSize = 300;
         //段判断筛选的字和字段对应的值是否匹配
@@ -638,7 +643,7 @@ public abstract class BaseDBAccess implements DBAccess {
             if (fields.size() != values.size()) {
                 throw new Exception("Filter fields and values do not match.");
             }
-            if(fields.size() != screenTypes.size()){
+            if (fields.size() != screenTypes.size()) {
                 throw new Exception("Filter fields and values do not match.");
             }
         } else if (fields == null && values == null && screenTypes == null) {
@@ -678,34 +683,34 @@ public abstract class BaseDBAccess implements DBAccess {
                 for (byte[] bytes : shaixuanSet) {
                     boolean add = true;
                     for (int k = 0; k < fields.size(); k++) {
-                        ColumnFamilyHandle handle = handleMap.get(getColName(className,fields.get(k)));
+                        ColumnFamilyHandle handle = handleMap.get(getColName(className, fields.get(k)));
                         byte[] val = getByColumnFamilyHandle(handle, bytes);
                         byte[] value = values.get(k);
 
                         long val1 = 0;
                         long val2 = 0;
                         int screenType = screenTypes.get(k);
-                        if(val == null || val.length == 0){
-                            if(screenType != 0){
+                        if (val == null || val.length == 0) {
+                            if (screenType != 0) {
                                 add = false;
                                 break;
                             }
-                            if(value != null && value.length != 0){
+                            if (value != null && value.length != 0) {
                                 add = false;
                                 break;
                             }
-                        }else {
+                        } else {
                             switch (screenType) {
                                 case 0:
-                                if (!Arrays.equals(val, value)) {
-                                    add = false;
-                                }
-                                break;
+                                    if (!Arrays.equals(val, value)) {
+                                        add = false;
+                                    }
+                                    break;
                                 case 1:
                                     //>=
                                     val1 = Long.parseLong(new String(val));
                                     val2 = Long.parseLong(new String(value));
-                                    if(!(val1 >= val2)){
+                                    if (!(val1 >= val2)) {
                                         add = false;
                                     }
                                     break;
@@ -713,17 +718,17 @@ public abstract class BaseDBAccess implements DBAccess {
                                     //<=
                                     val1 = Long.parseLong(new String(val));
                                     val2 = Long.parseLong(new String(value));
-                                    if(!(val1 <= val2)){
+                                    if (!(val1 <= val2)) {
                                         add = false;
                                     }
                                     break;
-                                 default:
-                                     if (!Arrays.equals(val, value)) {
-                                         add = false;
-                                     }
-                                     break;
+                                default:
+                                    if (!Arrays.equals(val, value)) {
+                                        add = false;
+                                    }
+                                    break;
                             }
-                            if(add == false){
+                            if (add == false) {
                                 break;
                             }
                         }
@@ -739,7 +744,7 @@ public abstract class BaseDBAccess implements DBAccess {
                 }
                 byte[][] paixuHeight = longOrder(heightList, orderByFieldHandle);
                 String keyFiledName = getKeyFieldByClass(tClass);
-                for(byte[] heightByt : paixuHeight){
+                for (byte[] heightByt : paixuHeight) {
                     T tObj = getObj(keyFiledName, new String(heightByt), tClass);
                     tList.add(tObj);
                 }
@@ -747,6 +752,7 @@ public abstract class BaseDBAccess implements DBAccess {
         }
         return tList;
     }
+
     /**
      * 根据多字段筛选排序分页
      *
@@ -767,10 +773,10 @@ public abstract class BaseDBAccess implements DBAccess {
      * @throws Exception
      */
     public final <T> ArrayList<T> getDtoOrderByHandle(int pageCount, int pageNumber,
-                                                         ColumnFamilyHandle indexHandle, List<ColumnFamilyHandle> screenHands,
-                                                         List<byte[][]> vals, int screenType,
-                                                         ColumnFamilyHandle overAndNextHandle, Class<T> tClass, String keyFiledName,
-                                                         int orderByType, int flushSize, int dtoType, ColumnFamilyHandle orderByFieldHandle) throws Exception {
+                                                      ColumnFamilyHandle indexHandle, List<ColumnFamilyHandle> screenHands,
+                                                      List<byte[][]> vals, int screenType,
+                                                      ColumnFamilyHandle overAndNextHandle, Class<T> tClass, String keyFiledName,
+                                                      int orderByType, int flushSize, int dtoType, ColumnFamilyHandle orderByFieldHandle) throws Exception {
         //段判断筛选的字和字段对应的值是否匹配
         if (screenHands != null && vals != null) {
             if (screenHands.size() != vals.size()) {
@@ -1061,6 +1067,22 @@ public abstract class BaseDBAccess implements DBAccess {
             }
         }
         return result;
+    }
+
+    public byte[][] longOrderByListSort(Set<byte[]> longBytes, ColumnFamilyHandle orderbyHandle) throws RocksDBException {
+        byte[][] result = new byte[longBytes.size()][];
+        List<byte[]> tempList = new ArrayList(longBytes);
+        tempList.sort(new Comparator() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                byte[] ob1 = (byte[]) o1;
+                byte[] ob2 = (byte[]) o2;
+                long height1 = Long.parseLong(new String(getByColumnFamilyHandle(orderbyHandle, ob1)));
+                long height2 = Long.parseLong(new String(getByColumnFamilyHandle(orderbyHandle, ob2)));
+                return height1 > height2 ? 1 : 0;
+            }
+        });
+        return tempList.toArray(result);
     }
 
     @Override
