@@ -1,26 +1,19 @@
 package com.passport.db.dbhelper;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.base.Optional;
-import com.passport.annotations.RocksTransaction;
 import com.passport.core.*;
-import com.passport.core.Transaction;
 import com.passport.utils.SerializeUtils;
-import com.passport.webhandler.BlockHandler;
-import org.rocksdb.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.rocksdb.ColumnFamilyHandle;
+import org.rocksdb.ReadOptions;
+import org.rocksdb.RocksDBException;
+import org.rocksdb.RocksIterator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
-import java.math.BigDecimal;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class BaseDBRocksImpl extends BaseDBAccess {
@@ -395,35 +388,35 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    public List<Voter> listVoters(long time) {
-        List<Voter> voters = new ArrayList<>();
-        List<Voter> allVoters = new ArrayList<>();
+    public List<Trustee> listVoters(long time) {
+        List<Trustee> voters = new ArrayList<>();
+        List<Trustee> allVoters = new ArrayList<>();
         //筛选/分组/求和
         RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("voteRecord","id")));
         for (iterator.seekToFirst();iterator.isValid();iterator.next()){
             byte[] timeByte = getByColumnFamilyHandle(handleMap.get(getColName("voteRecord","time")),iterator.key());
             //time的筛选
             if(Long.parseLong(new String(timeByte)) <= time){
-                Voter voter = new Voter();
-                voter.setVoteNum(0);
-                voter.setStatus(1);
-                voter.setAddress(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord","receiptAddress")),iterator.key())));
+                Trustee trustee = new Trustee();
+                trustee.setVotes(0l);
+                trustee.setStatus(1);
+                trustee.setAddress(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord","receiptAddress")),iterator.key())));
                 int index = -1;
                 //address的分组
-                index = allVoters.indexOf(voter);
+                index = allVoters.indexOf(trustee);
                 if(index != -1) {
-                    voter = allVoters.remove(index);
+                    trustee = allVoters.remove(index);
                 }
                 //求和
-                voter.setVoteNum(voter.getVoteNum()+Integer.parseInt(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord","voteNum")),iterator.key()))));
-                allVoters.add(voter);
+                trustee.setVotes(trustee.getVotes()+Integer.parseInt(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord","voteNum")),iterator.key()))));
+                allVoters.add(trustee);
             }
         }
         //排序
-        allVoters.sort(new Comparator<Voter>() {
+        allVoters.sort(new Comparator<Trustee>() {
             @Override
-            public int compare(Voter o1, Voter o2) {
-                return o1.getVoteNum().intValue()>o2.getVoteNum().intValue()?-1:(o1.getVoteNum().intValue()==o2.getVoteNum().intValue()?0:1);
+            public int compare(Trustee o1, Trustee o2) {
+                return o1.getVotes().longValue()>o2.getVotes().longValue()?-1:(o1.getVotes().longValue()==o2.getVotes().longValue()?0:1);
             }
         });
         //获取前101个
