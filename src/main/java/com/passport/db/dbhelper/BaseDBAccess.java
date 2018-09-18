@@ -7,10 +7,11 @@ import com.passport.annotations.EntityClaz;
 import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
 import com.passport.annotations.RocksTransaction;
-import com.passport.core.Block;
+import com.passport.constant.Constant;
+import com.passport.core.*;
 import com.passport.core.Transaction;
-import com.passport.core.Trustee;
 import com.passport.db.transaction.RocksdbTransaction;
+import com.passport.utils.GsonUtils;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,16 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public abstract class BaseDBAccess implements DBAccess {
+    ThreadPoolExecutor executor = new ThreadPoolExecutor(100,100,1,TimeUnit.SECONDS,new LinkedBlockingQueue<>(1000));
     @Autowired
     public RocksdbTransaction transaction;
     protected RocksDB rocksDB;
@@ -47,6 +53,7 @@ public abstract class BaseDBAccess implements DBAccess {
             fields.addAll(getClassCols(new com.passport.core.Transaction().getClass()));
             fields.addAll(getClassCols(new Block().getClass()));
             fields.addAll(getClassCols(new Trustee().getClass()));
+            fields.addAll(getClassCols(new VoteRecord().getClass()));
             dtoClasses.add(new Transaction().getClass());
             dtoClasses.add(new Block().getClass());
             dtoClasses.add(new Trustee().getClass());
@@ -68,6 +75,7 @@ public abstract class BaseDBAccess implements DBAccess {
                     handleMap.put(columnNames.overAndNextName,indexOverHandle);
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 //列集合
                 List<ColumnFamilyDescriptor> descriptorList = new ArrayList<>();
                 ColumnFamilyDescriptor defaultDescriptor = new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY);
@@ -91,83 +99,136 @@ public abstract class BaseDBAccess implements DBAccess {
                 });
             }
             //测试数据
-            /*for(int blocks = 1; blocks <= 100; blocks ++){
-                final int k = blocks;
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        System.out.println("Thread"+k+"  started");
-                        for(int tcurB = (k-1)*30000+1; tcurB <= k*30000; tcurB ++) {
-                            try {
-                                BlockHeader blockHeader = new BlockHeader();
-                                Block block = new Block();
+//            for(int blocks = 1; blocks <= 10; blocks ++){
+//                final int k = blocks;
+//                Runnable runnable = new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        System.out.println("Thread"+k+"  started");
+//                        for(int tcurB = (k-1)*10+1; tcurB <= k*10; tcurB ++) {
+//                            try {
+//                                BlockHeader blockHeader = new BlockHeader();
+//                                Block block = new Block();
+//
+//                                byte[] blockHash = ("blockHash----" + tcurB).getBytes();
+//                                long blockTime = tcurB / 360;
+//                                blockTime = 123434564l + blockTime * 3600 + blockTime % 360;
+//
+//                                blockHeader.setEggMax(tcurB % 100 + 25);
+//                                blockHeader.setHash(blockHash);
+//                                blockHeader.setVersion("1.0.0 test".getBytes());
+//                                blockHeader.setHashPrevBlock(("blockHash----" + (tcurB - 1)).getBytes());
+//                                blockHeader.setTimeStamp(blockTime);
+//
+//                                block.setBlockHeader(blockHeader);
+//                                block.setTransactionCount(800);
+//                                block.setBlockSize(1024 * 3l);
+//                                block.setBlockHeight(Long.parseLong(tcurB + ""));
+//
+//                                List<Transaction> transactions = new ArrayList<>();
+//                                long suoyinTime = 0;
+//                                for (int trans = 1; trans <= 300; trans++) {
+//                                    Transaction transaction = new Transaction();
+//                                    transaction.setEggMax(("" + (tcurB % 100 + trans % 50)).getBytes());
+//                                    transaction.setSignature("abcsign".getBytes());
+//                                    transaction.setTime((blockTime + "").getBytes());
+//                                    transaction.setHash(("transHash---" + tcurB + "-" + trans).getBytes());
+//                                    transaction.setEggPrice("100000".getBytes());
+//                                    transaction.setPayAddress(("address" + (tcurB % 1600)).getBytes());
+//                                    transaction.setReceiptAddress(("" + trans).getBytes());
+//                                    transaction.setNonce(1);
+//                                    transaction.setBlockHeight((block.getBlockHeight() + "").getBytes());
+//                                    transactions.add(transaction);
+////                                    addObj(transaction);
+//                                    long begin = System.currentTimeMillis();
+//                                    putSuoyinKey(handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.indexName),
+//                                            transaction.getBlockHeight(), transaction.getHash());
+//                                    putOverAndNext(handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.overAndNextName),
+//                                            transaction.getBlockHeight());
+//                                    putSuoyinKey(handleMap.get(IndexColumnNames.TRANSTIMEINDEX.indexName),
+//                                            transaction.getTime(), transaction.getHash());
+//                                    putOverAndNext(handleMap.get(IndexColumnNames.TRANSTIMEINDEX.overAndNextName),
+//                                            transaction.getTime());
+//                                    long end = System.currentTimeMillis();
+//                                    suoyinTime = suoyinTime+end-begin;
+//                                }
+//                                addObjs(transactions);
+//                                block.setTransactions(transactions);
+//                                List<Block> blocksl = new ArrayList<>();
+//                                blocksl.add(block);
+//                                addObjs(blocksl);
+//                                System.out.println("block  " + tcurB + "   添加成功   suoyintime:"+suoyinTime);
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                                System.out.println("block  " + tcurB + "   添加异常");
+//                            }
+//                        }
+//                    }
+//                };
+//                executor.execute(runnable);
+//            }
+//            for(int i = 0; i < 10000; i ++){
+//                Trustee trustee = new Trustee();
+//                trustee.setVotes(i%10000l);
+//                trustee.setStatus(1);
+//                trustee.setAddress("address---"+i);
+//                trustee.setGenerateRate(0.01f*i%98);
+//                trustee.setIncome(new BigDecimal(6666*0.01f*i%98));
+//                addObj(trustee);
+//
+//                putSuoyinKey(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName),
+//                        (trustee.getVotes() + "").getBytes(), trustee.getAddress().getBytes());
+//                putOverAndNext(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.overAndNextName),
+//                        (trustee.getVotes() + "").getBytes());
+//                System.out.println("Trustee  " + i + "   添加成功");
+//            }
+//            System.out.println("测试数据添加完成");
 
-                                byte[] blockHash = ("blockHash----" + tcurB).getBytes();
-                                long blockTime = tcurB / 360;
-                                blockTime = 123434564l + blockTime * 3600 + blockTime % 360;
-
-                                blockHeader.setEggMax(tcurB % 100 + 25);
-                                blockHeader.setHash(blockHash);
-                                blockHeader.setVersion("1.0.0 test".getBytes());
-                                blockHeader.setHashPrevBlock(("blockHash----" + (tcurB - 1)).getBytes());
-                                blockHeader.setTimeStamp(blockTime);
-
-                                block.setBlockHeader(blockHeader);
-                                block.setTransactionCount(800);
-                                block.setBlockSize(1024 * 3l);
-                                block.setBlockHeight(Long.parseLong(tcurB + ""));
-
-                                List<Transaction> transactions = new ArrayList<>();
-                                for (int trans = 1; trans <= 800; trans++) {
-                                    Transaction transaction = new Transaction();
-                                    transaction.setEggMax(("" + (tcurB % 100 + trans % 50)).getBytes());
-                                    transaction.setSignature("abcsign".getBytes());
-                                    transaction.setTime((blockTime + "").getBytes());
-                                    transaction.setHash(("transHash---" + tcurB + "-" + trans).getBytes());
-                                    transaction.setEggPrice("100000".getBytes());
-                                    transaction.setPayAddress(("address" + (tcurB % 1600)).getBytes());
-                                    transaction.setReceiptAddress(("" + trans).getBytes());
-                                    transaction.setNonce(1);
-                                    transaction.setBlockHeight((block.getBlockHeight() + "").getBytes());
-                                    transactions.add(transaction);
-                                    addObj(transaction);
-                                    putSuoyinKey(handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.indexName),
-                                            transaction.getBlockHeight(), transaction.getHash());
-                                    putOverAndNext(handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.overAndNextName),
-                                            transaction.getBlockHeight());
-                                    putSuoyinKey(handleMap.get(IndexColumnNames.TRANSTIMEINDEX.indexName),
-                                            transaction.getTime(), transaction.getHash());
-                                    putOverAndNext(handleMap.get(IndexColumnNames.TRANSTIMEINDEX.overAndNextName),
-                                            transaction.getTime());
-                                }
-                                block.setTransactions(transactions);
-                                addObj(block);
-                                System.out.println("block  " + tcurB + "   添加成功");
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                System.out.println("block  " + tcurB + "   添加异常");
-                            }
-                        }
-                    }
-                };
-                ThreadUtil.putTask(runnable);
+            /*RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("block","blockHeight")));
+            int i = 0;
+            for(iterator.seekToFirst();iterator.isValid();iterator.next()){
+                String height = new String(iterator.key());
+                i ++;
             }
-            for(int i = 0; i < 10000; i ++){
-                Trustee trustee = new Trustee();
-                trustee.setVotes(i%10000l);
-                trustee.setStatus(1);
-                trustee.setAddress("address---"+i);
-                trustee.setGenerateRate(0.01f*i%98);
-                trustee.setIncome(new BigDecimal(6666*0.01f*i%98));
-                addObj(trustee);
-
-                putSuoyinKey(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName),
-                        (trustee.getVotes() + "").getBytes(), trustee.getAddress().getBytes());
-                putOverAndNext(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.overAndNextName),
-                        (trustee.getVotes() + "").getBytes());
-                System.out.println("Trustee  " + i + "   添加成功");
+            RocksIterator tran = rocksDB.newIterator(handleMap.get(getColName("transaction","hash")));
+            int k = 0;
+            for(tran.seekToFirst();tran.isValid();tran.next()){
+                String hash = new String(tran.key());
+                k ++;
             }
-            System.out.println("测试数据添加完成");*/
+            System.out.println("blocks:"+i);
+            System.out.println("trans:"+k);*/
+            List<VoteRecord> voteRecords = new ArrayList<>();
+            for (int i = 0; i < 1000;i ++){
+                VoteRecord voteRecord = new VoteRecord();
+                voteRecord.setTime(10l*i);
+                voteRecord.setStatus(i%2);
+                voteRecord.setPayAddress("address"+(1000-i)%100);
+                voteRecord.setReceiptAddress(("address"+i%100));
+                voteRecord.setVoteNum(i);
+                voteRecords.add(voteRecord);
+
+                putSuoyinKey(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName),voteRecord.getVoteNum().toString().getBytes(),voteRecord.getPayAddress().getBytes());
+                putOverAndNext(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.overAndNextName),voteRecord.getVoteNum().toString().getBytes());
+            }
+            addObjs(voteRecords);
+            List<String> fields1 = new ArrayList<>();
+            List<byte[]> vals = new ArrayList<>();
+            List<Integer> screenType = new ArrayList<>();
+            fields1.add("receiptAddress");
+            vals.add("address10".getBytes());
+            screenType.add(0);
+            fields1.add("status");
+            vals.add("0".getBytes());
+            screenType.add(0);
+            fields1.add("time");
+            vals.add("9200".getBytes());
+            screenType.add(2);
+            List<VoteRecord> voteRecords1 = getDtoListByField(fields1,vals,screenType,VoteRecord.class,handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.overAndNextName),handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName),handleMap.get(getColName("voteRecord","voteNum")),0);
+            for (VoteRecord v : voteRecords1){
+                System.out.println(GsonUtils.toJson(v));
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -269,8 +330,19 @@ public abstract class BaseDBAccess implements DBAccess {
         }
         return null;
     }
-    // 添加有注解的对象
-    public final void addObj(Object obj) throws Exception {
+    public final void addObjs(List objs)throws Exception{
+        WriteBatch batch = new WriteBatch();
+        int count = 0;
+        for (Object o : objs){
+            count += addObj(o,batch);
+            if(count >= 1000){
+                rocksDB.write(new WriteOptions(),batch);
+                batch = new WriteBatch();
+            }
+        }
+        rocksDB.write(new WriteOptions(),batch);
+    }
+    public final void addObj(Object obj)throws Exception{
         Class c = obj.getClass();
         //判断是否是dto
         if (c.isAnnotationPresent(EntityClaz.class)) {
@@ -310,6 +382,8 @@ public abstract class BaseDBAccess implements DBAccess {
                         String fieldName = faildClaz.name();
                         ColumnFamilyHandle handle = handleMap.get(getColName(className, fieldName));
                         putByColumnFamilyHandle(handle,key, value);
+//                        writeBatch.put(handle,key,value);
+//                        bachCount++;
                     } else if (faildClaz.type() == long.class || faildClaz.type() == Long.class
                             || faildClaz.type() == int.class || faildClaz.type() == Integer.class
                             || faildClaz.type() == String.class || faildClaz.type() == BigDecimal.class || faildClaz.type() == float.class || faildClaz.type() == Float.class) {
@@ -343,6 +417,8 @@ public abstract class BaseDBAccess implements DBAccess {
                             }
                         }
                         putByColumnFamilyHandle(handleMap.get(getColName(className, fieldName)), key, SerializeUtils.serialize(value));
+//                        writeBatch.put(handleMap.get(getColName(className, fieldName)), key, SerializeUtils.serialize(value));
+//                        bachCount ++;
                     } else if (dtoClasses.contains(faildClaz.type())) {
                         //一对一的数据  比如block中有blockHead
                         Class contancClass = faildClaz.type();
@@ -371,6 +447,8 @@ public abstract class BaseDBAccess implements DBAccess {
                                 //然后获取这个对象的主键，把他的主键保存在对应的key中
                                 contancKeyF.setAccessible(true);
                                 putByColumnFamilyHandle(handleMap.get(getColName(className, fieldName)), key, keyValue.getBytes());
+//                                writeBatch.put(handleMap.get(getColName(className, fieldName)), key, keyValue.getBytes());
+//                                bachCount++;
                             }
                         }
                     }
@@ -379,6 +457,127 @@ public abstract class BaseDBAccess implements DBAccess {
         } else {
             throw new Exception("is not a Entity");
         }
+    }
+    // 添加有注解的对象
+    protected final int addObj(Object obj,WriteBatch writeBatch) throws Exception {
+        int bachCount = 0;
+        Class c = obj.getClass();
+        //判断是否是dto
+        if (c.isAnnotationPresent(EntityClaz.class)) {
+            //获取到EntityClaz注解
+            EntityClaz entityClaz = (EntityClaz) c.getAnnotation(EntityClaz.class);
+            //获取到类名
+            String className = entityClaz.name();
+            //所有的字段
+            Field[] fields = c.getDeclaredFields();
+            //筛选出主键key，只能有一个
+            Field keyField = null;
+            for (Field f : fields) {
+                if (f.isAnnotationPresent(KeyField.class)) {
+                    keyField = f;
+                    break;
+                }
+            }
+            //没有主键key
+            if (keyField == null) {
+                throw new Exception("no key field");
+            }
+            //设置可以强制解析
+            keyField.setAccessible(true);
+            for (Field f : fields) {
+                f.setAccessible(true);
+                byte[] key = keyField.get(obj).toString().getBytes();
+                if (keyField.getType() == byte[].class) {
+                    key = (byte[]) keyField.get(obj);
+                }
+                //判断字段是否有字段注解，只解析有字段注解
+                if (f.isAnnotationPresent(FaildClaz.class)) {
+                    FaildClaz faildClaz = f.getAnnotation(FaildClaz.class);
+                    f.setAccessible(true);
+                    if (f.get(obj) == null) continue;
+                    if (faildClaz.type() == byte[].class) {
+                        byte[] value = (byte[]) f.get(obj);
+                        String fieldName = faildClaz.name();
+                        ColumnFamilyHandle handle = handleMap.get(getColName(className, fieldName));
+//                        putByColumnFamilyHandle(handle,key, value);
+                        writeBatch.put(handle,key,value);
+                        bachCount++;
+                    } else if (faildClaz.type() == long.class || faildClaz.type() == Long.class
+                            || faildClaz.type() == int.class || faildClaz.type() == Integer.class
+                            || faildClaz.type() == String.class || faildClaz.type() == BigDecimal.class || faildClaz.type() == float.class || faildClaz.type() == Float.class) {
+                        String fieldValue = f.get(obj).toString();
+                        String fieldName = faildClaz.name();
+                        ColumnFamilyHandle handle = handleMap.get(getColName(className, fieldName));
+                        byte[] val = fieldValue.getBytes();
+//                        putByColumnFamilyHandle(handle, key, val);
+                        writeBatch.put(handle,key,val);
+                        bachCount++;
+                    } else if (faildClaz.type() == List.class) {
+                        List arr = (List) f.get(obj);
+                        if (arr == null) continue;
+                        //主键集合
+                        List value = new ArrayList();
+                        String fieldName = faildClaz.name();
+                        for (Object o : arr) {
+                            Class itemClazz = o.getClass();
+                            //外键解析只解析有注解的
+                            if (itemClazz.isAnnotationPresent(EntityClaz.class)) {
+                                Field[] itemFields = itemClazz.getDeclaredFields();
+                                boolean hasKey = false;
+                                for (Field field : itemFields) {
+                                    if (field.isAnnotationPresent(KeyField.class)) {
+                                        field.setAccessible(true);
+                                        hasKey = true;
+                                        Object item = field.get(o);
+                                        //只保存对应的主键
+                                        value.add(item);
+                                    }
+                                }
+                                if (!hasKey) break;
+                            }
+                        }
+//                        putByColumnFamilyHandle(handleMap.get(getColName(className, fieldName)), key, SerializeUtils.serialize(value));
+                        writeBatch.put(handleMap.get(getColName(className, fieldName)), key, SerializeUtils.serialize(value));
+                        bachCount ++;
+                    } else if (dtoClasses.contains(faildClaz.type())) {
+                        //一对一的数据  比如block中有blockHead
+                        Class contancClass = faildClaz.type();
+                        if (contancClass.isAnnotationPresent(EntityClaz.class)) {
+                            String fieldName = faildClaz.name();
+                            //拿到对象
+                            Object contanc = f.get(obj);
+                            if (contanc == null) {
+                                continue;
+                            }
+                            //判断对象是否合法   是否有主键、添加这个对象是否成功
+                            Field[] contancFields = contancClass.getDeclaredFields();
+                            Field contancKeyF = null;
+                            for (Field contancF : contancFields) {
+                                if (contancF.isAnnotationPresent(KeyField.class)) {
+                                    contancKeyF = contancF;
+                                    break;
+                                }
+                            }
+                            if (contancKeyF != null) {
+                                String keyValue = contancKeyF.get(contanc).toString();
+                                if (keyValue == null) {
+                                    continue;
+                                }
+                                bachCount = bachCount+addObj(contanc,writeBatch);
+                                //然后获取这个对象的主键，把他的主键保存在对应的key中
+                                contancKeyF.setAccessible(true);
+//                                putByColumnFamilyHandle(handleMap.get(getColName(className, fieldName)), key, keyValue.getBytes());
+                                writeBatch.put(handleMap.get(getColName(className, fieldName)), key, keyValue.getBytes());
+                                bachCount++;
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            throw new Exception("is not a Entity");
+        }
+        return bachCount;
     }
 
     //获取有注解的对象
@@ -489,15 +688,12 @@ public abstract class BaseDBAccess implements DBAccess {
         });
         return t;
     }
-
-    long gropSize = 3600 * 1000;
-
     //索引数据的添加
     protected final void putSuoyinKey(ColumnFamilyHandle handle, byte[] key, byte[] valueItem) throws RocksDBException {
         synchronized (handle) {
             long valK = Long.parseLong(new String(key));
-            valK = valK / gropSize;
-            valK = valK * gropSize;
+            valK = valK / Constant.INDEX_GROUPSIZE;
+            valK = valK * Constant.INDEX_GROUPSIZE;
             byte[] listByte = getByColumnFamilyHandle(handle, ("" + valK).getBytes());
             Set<byte[]> valueList = new HashSet<>();
             if (listByte != null && listByte.length != 0) {
@@ -511,8 +707,8 @@ public abstract class BaseDBAccess implements DBAccess {
     //索引数据的获取
     protected final Set<byte[]> getSuoyinValue(ColumnFamilyHandle handle, byte[] key) throws RocksDBException {
         long valK = Long.parseLong(new String(key));
-        valK = valK / gropSize;
-        valK = valK * gropSize;
+        valK = valK / Constant.INDEX_GROUPSIZE;
+        valK = valK * Constant.INDEX_GROUPSIZE;
         byte[] listByte = getByColumnFamilyHandle(handle, ("" + valK).getBytes());
         Set<byte[]> valueList = null;
         if (listByte != null && listByte.length != 0) {
@@ -525,8 +721,8 @@ public abstract class BaseDBAccess implements DBAccess {
     protected final void putOverAndNext(ColumnFamilyHandle overAndNextHandle, byte[] time) throws RocksDBException, ParseException {
         synchronized (overAndNextHandle) {
             long valK = Long.parseLong(new String(time));
-            valK = valK / gropSize;
-            valK = valK * gropSize;
+            valK = valK / Constant.INDEX_GROUPSIZE;
+            valK = valK * Constant.INDEX_GROUPSIZE;
             time = (valK + "").getBytes();
             byte[] value = getByColumnFamilyHandle(overAndNextHandle, time);
             if (value == null || value.length == 0) {
