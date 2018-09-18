@@ -14,7 +14,6 @@ import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
 import com.passport.webhandler.BlockHandler;
-import com.passport.webhandler.MinerHandler;
 import com.passport.webhandler.TrusteeHandler;
 import io.netty.channel.group.ChannelGroup;
 import org.slf4j.Logger;
@@ -27,7 +26,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,17 +48,13 @@ public class BlockEventListener {
 	@Autowired
 	private BlockUtils blockUtils;
 	@Autowired
-	private MinerHandler minerHandler;
-	@Autowired
 	private TrusteeHandler trusteeHandler;
-	@Autowired
-	private ApplicationContextProvider provider;
 
 
-			/**
-             * 同步下一个区块（被动获取）
-             * @param event
-             */
+	/**
+	 * 同步下一个区块（被动获取）
+	 * @param event
+	 */
 	@EventListener(SyncNextBlockEvent.class)
 	public void syncNextBlock(SyncNextBlockEvent event) throws ParseException {
 		Long blockHeight = CastUtils.castLong(event.getSource());
@@ -176,22 +170,7 @@ public class BlockEventListener {
 	 */
 	@EventListener(GenerateNextBlockEvent.class)
 	public void generateNextBlock(GenerateNextBlockEvent event) {
-		//当前区块周期
-		Optional<Object> lastBlockHeightOptional = dbAccess.getLastBlockHeight();
-		if(!lastBlockHeightOptional.isPresent()){
-			return;
-		}
-		long blockHeight = CastUtils.castLong(lastBlockHeightOptional.get());
-		long newBlockHeight = blockHeight + 1;
-		int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
-
-		//出块完成后，计算出的下一个出块人如果是自己则继续发布出块事件
-		List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
-		if(trustees.size() == 0){
-			//出完了则进行下一个周期出块
-		}else{
-			produceBlock(newBlockHeight, trustees, blockCycle);
-		}
+		blockHandler.produceNextBlock();
 	}
 
 	/**
@@ -214,43 +193,14 @@ public class BlockEventListener {
 				return;
 			}
 			long newBlockHeight = blockHeight + 1;
-
-			Long timestamp = blockUtils.getTimestamp4BlockCycle(newBlockHeight);
-			//查询投票记录（status==1）,时间小于等于timestamp，按投票票数从高到低排列的101个受托人，放到101个受托人列表中
-			List<Trustee> trustees = new ArrayList<>();//TODO
-
-			//101个受托人放到本地存放，key为出块周期，下一个出块周期到来时，需要删除上一个出块周期的数据
 			int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
-			boolean flag = dbAccess.put(String.valueOf(blockCycle), trustees);//TODO
-			if(!flag){
-				return;
-			}
+
+			//取得票前101个委托人
+			List<Trustee> trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
 
 			//选择出块人
-			produceBlock(newBlockHeight, trustees, blockCycle);
+			blockHandler.produceBlock(newBlockHeight, trustees, blockCycle);
 		}
 	}
 
-	/**
-	 * 打包区块、寻找下一个出块人是否在本节点
-	 * @param newBlockHeight 准备出块高度
-	 * @param list
-	 * @param blockCycle
-	 */
-	private void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) {
-		Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
-		Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
-		if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null){//出块人属于本节点
-			Account account = accountOptional.get();
-			if(account.getPrivateKey() != null){
-				//打包区块
-				minerHandler.packagingBlock(account);
-
-				//更新101个受托人，已经出块人的状态
-				trusteeHandler.changeStatus(trustee, blockCycle);
-
-				provider.publishEvent(new GenerateNextBlockEvent(0L));
-			}
-		}
-	}
 }

@@ -1,17 +1,13 @@
 package com.passport.db.dbhelper;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.base.*;
-import com.google.common.base.Optional;
 import com.passport.annotations.EntityClaz;
 import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
-import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.core.Transaction;
 import com.passport.db.transaction.RocksdbTransaction;
-import com.passport.utils.GsonUtils;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +17,7 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.sql.Time;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -99,156 +93,6 @@ public abstract class BaseDBAccess implements DBAccess {
                     handleMap.put(name, handler);
                 });
             }
-            //测试数据
-//            for(int blocks = 1; blocks <= 10; blocks ++){
-//                final int k = blocks;
-//                Runnable runnable = new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        System.out.println("Thread"+k+"  started");
-//                        for(int tcurB = (k-1)*10+1; tcurB <= k*10; tcurB ++) {
-//                            try {
-//                                BlockHeader blockHeader = new BlockHeader();
-//                                Block block = new Block();
-//
-//                                byte[] blockHash = ("blockHash----" + tcurB).getBytes();
-//                                long blockTime = tcurB / 360;
-//                                blockTime = 123434564l + blockTime * 3600 + blockTime % 360;
-//
-//                                blockHeader.setEggMax(tcurB % 100 + 25);
-//                                blockHeader.setHash(blockHash);
-//                                blockHeader.setVersion("1.0.0 test".getBytes());
-//                                blockHeader.setHashPrevBlock(("blockHash----" + (tcurB - 1)).getBytes());
-//                                blockHeader.setTimeStamp(blockTime);
-//
-//                                block.setBlockHeader(blockHeader);
-//                                block.setTransactionCount(800);
-//                                block.setBlockSize(1024 * 3l);
-//                                block.setBlockHeight(Long.parseLong(tcurB + ""));
-//
-//                                List<Transaction> transactions = new ArrayList<>();
-//                                long suoyinTime = 0;
-//                                for (int trans = 1; trans <= 300; trans++) {
-//                                    Transaction transaction = new Transaction();
-//                                    transaction.setEggMax(("" + (tcurB % 100 + trans % 50)).getBytes());
-//                                    transaction.setSignature("abcsign".getBytes());
-//                                    transaction.setTime((blockTime + "").getBytes());
-//                                    transaction.setHash(("transHash---" + tcurB + "-" + trans).getBytes());
-//                                    transaction.setEggPrice("100000".getBytes());
-//                                    transaction.setPayAddress(("address" + (tcurB % 1600)).getBytes());
-//                                    transaction.setReceiptAddress(("" + trans).getBytes());
-//                                    transaction.setNonce(1);
-//                                    transaction.setBlockHeight((block.getBlockHeight() + "").getBytes());
-//                                    transactions.add(transaction);
-////                                    addObj(transaction);
-//                                    long begin = System.currentTimeMillis();
-//                                    putSuoyinKey(handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.indexName),
-//                                            transaction.getBlockHeight(), transaction.getHash());
-//                                    putOverAndNext(handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.overAndNextName),
-//                                            transaction.getBlockHeight());
-//                                    putSuoyinKey(handleMap.get(IndexColumnNames.TRANSTIMEINDEX.indexName),
-//                                            transaction.getTime(), transaction.getHash());
-//                                    putOverAndNext(handleMap.get(IndexColumnNames.TRANSTIMEINDEX.overAndNextName),
-//                                            transaction.getTime());
-//                                    long end = System.currentTimeMillis();
-//                                    suoyinTime = suoyinTime+end-begin;
-//                                }
-//                                addObjs(transactions);
-//                                block.setTransactions(transactions);
-//                                List<Block> blocksl = new ArrayList<>();
-//                                blocksl.add(block);
-//                                addObjs(blocksl);
-//                                System.out.println("block  " + tcurB + "   添加成功   suoyintime:"+suoyinTime);
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                                System.out.println("block  " + tcurB + "   添加异常");
-//                            }
-//                        }
-//                    }
-//                };
-//                executor.execute(runnable);
-//            }
-//            for(int i = 0; i < 10000; i ++){
-//                Trustee trustee = new Trustee();
-//                trustee.setVotes(i%10000l);
-//                trustee.setStatus(1);
-//                trustee.setAddress("address---"+i);
-//                trustee.setGenerateRate(0.01f*i%98);
-//                trustee.setIncome(new BigDecimal(6666*0.01f*i%98));
-//                addObj(trustee);
-//
-//                putSuoyinKey(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName),
-//                        (trustee.getVotes() + "").getBytes(), trustee.getAddress().getBytes());
-//                putOverAndNext(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.overAndNextName),
-//                        (trustee.getVotes() + "").getBytes());
-//                System.out.println("Trustee  " + i + "   添加成功");
-//            }
-//            System.out.println("测试数据添加完成");
-
-            /*RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("block","blockHeight")));
-            int i = 0;
-            for(iterator.seekToFirst();iterator.isValid();iterator.next()){
-                String height = new String(iterator.key());
-                i ++;
-            }
-            RocksIterator tran = rocksDB.newIterator(handleMap.get(getColName("transaction","hash")));
-            int k = 0;
-            for(tran.seekToFirst();tran.isValid();tran.next()){
-                String hash = new String(tran.key());
-                k ++;
-            }
-            System.out.println("blocks:"+i);
-            System.out.println("trans:"+k);*/
-            List<VoteRecord> voteRecords = new ArrayList<>();
-            for (int i = 0; i < 200000;i ++){
-                VoteRecord voteRecord = new VoteRecord();
-                voteRecord.setTime(10l*i);
-                voteRecord.setStatus(i%2);
-                voteRecord.setPayAddress("address-pay"+i);
-                voteRecord.setReceiptAddress(("address-rec"+i));
-                voteRecord.setId(voteRecord.getPayAddress()+"-"+voteRecord.getReceiptAddress());
-                voteRecord.setVoteNum(i);
-                voteRecords.add(voteRecord);
-                putSuoyinKey(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName),voteRecord.getVoteNum().toString().getBytes(),voteRecord.getId().getBytes());
-                putOverAndNext(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.overAndNextName),voteRecord.getVoteNum().toString().getBytes());
-            }
-            addObjs(voteRecords);
-            /*List<String> fields1 = new ArrayList<>();
-            List<byte[]> vals = new ArrayList<>();
-            List<Integer> screenType = new ArrayList<>();
-            fields1.add("receiptAddress");
-            vals.add("address10".getBytes());
-            screenType.add(0);
-            fields1.add("status");
-            vals.add("0".getBytes());
-            screenType.add(0);
-            fields1.add("time");
-            vals.add("9200".getBytes());
-            screenType.add(2);
-            List<VoteRecord> voteRecords1 = getDtoListByField(fields1,vals,screenType,VoteRecord.class,handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.overAndNextName),handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName),handleMap.get(getColName("voteRecord","voteNum")),0);
-            for (VoteRecord v : voteRecords1){
-                System.out.println(GsonUtils.toJson(v));
-            }*/
-            RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("voteRecord","id")));
-            int k = 0;
-            for(iterator.seekToFirst();iterator.isValid();iterator.next()){
-                k++;
-            }
-            long begin = System.currentTimeMillis();
-            List<Voter> voters = listVoters(10000l);
-            for(Voter v : voters){
-                System.out.println(GsonUtils.toJson(v));
-            }
-            long end = System.currentTimeMillis();
-            System.out.println("耗时:"+(end-begin)+"  总数:"+k);
-//            long begin = System.currentTimeMillis();
-//            List<Block> blocks = blockPagination(100,10);
-//            long end = System.currentTimeMillis();
-//            System.out.println("耗时:"+(end-begin));
-//            for(Block b : blocks){
-//                System.out.println(GsonUtils.toJson(b));
-//            }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

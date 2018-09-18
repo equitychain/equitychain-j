@@ -388,7 +388,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    public List<Trustee> listVoters(long time) {
+    public List<Trustee> getTrusteeOfRangeBeforeTime(long time) {
         List<Trustee> voters = new ArrayList<>();
         List<Trustee> allVoters = new ArrayList<>();
         //筛选/分组/求和

@@ -4,15 +4,16 @@ import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.protobuf.ByteString;
 import com.passport.constant.Constant;
-import com.passport.core.Block;
-import com.passport.core.BlockHeader;
-import com.passport.core.Transaction;
+import com.passport.core.*;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.event.GenerateNextBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.proto.BlockHeaderMessage;
 import com.passport.proto.BlockMessage;
 import com.passport.proto.TransactionMessage;
+import com.passport.utils.BlockUtils;
+import com.passport.utils.CastUtils;
 import com.passport.utils.RawardUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class BlockHandler {
@@ -31,7 +36,12 @@ public class BlockHandler {
     @Autowired
     private ApplicationContextProvider provider;
     @Autowired
-    private TransactionHandler transactionHandler;
+    private MinerHandler minerHandler;
+    @Autowired
+    private TrusteeHandler trusteeHandler;
+    @Autowired
+    private BlockUtils blockUtils;
+
     public volatile boolean padding = false;
 
     /**
@@ -286,4 +296,68 @@ public class BlockHandler {
 
         return blockBuilder;
     }
+
+    public void produceNextBlock() {
+        //当前区块周期
+        Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
+        if(lastBlockOptional.isPresent()){
+            return;
+        }
+        Block block = lastBlockOptional.get();
+
+        long blockHeight = CastUtils.castLong(block.getBlockHeight());
+        long newBlockHeight = blockHeight + 1;
+        int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
+
+        //出块完成后，计算出的下一个出块人如果是自己则继续发布出块事件
+        List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
+        if(trustees.size() == 0){
+            trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
+        }
+
+        waitIfNotArrived(block);
+
+        produceBlock(newBlockHeight, trustees, blockCycle);
+    }
+
+    /**
+     * 未到出块时间则睡眠等待
+     * @param block
+     */
+    private void waitIfNotArrived(Block block) {
+        long lastTimestamp = block.getBlockHeader().getTimeStamp();
+        long currentTimestamp = System.currentTimeMillis();
+        long timeGap = currentTimestamp - lastTimestamp;
+        if(timeGap < Constant.BLOCK_GENERATE_TIMEGAP*1000){//间隔小于10秒，则睡眠等待
+            try {
+                TimeUnit.MILLISECONDS.sleep(timeGap);
+            } catch (InterruptedException e) {
+                logger.error("生产区块睡眠等待异常", e);
+            }
+        }
+    }
+
+    /**
+     * 打包区块、寻找下一个出块人是否在本节点
+     * @param newBlockHeight 准备出块高度
+     * @param list
+     * @param blockCycle
+     */
+    public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) {
+        Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
+        Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
+        if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null){//出块人属于本节点
+            Account account = accountOptional.get();
+            if(account.getPrivateKey() != null){
+                //打包区块
+                minerHandler.packagingBlock(account);
+
+                //更新101个受托人，已经出块人的状态
+                trusteeHandler.changeStatus(trustee, blockCycle);
+
+                provider.publishEvent(new GenerateNextBlockEvent(0L));
+            }
+        }
+    }
+
 }
