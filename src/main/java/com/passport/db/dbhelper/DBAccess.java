@@ -2,13 +2,60 @@ package com.passport.db.dbhelper;
 
 import com.google.common.base.Optional;
 import com.passport.core.*;
+import org.rocksdb.ColumnFamilyHandle;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
  */
 public interface DBAccess {
+
+	/**
+	 * 往数据库添加|更新一条数据
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	boolean put(byte[] key, byte[] value);
+
+	/**
+	 * 往数据库添加|更新一条数据,指定列族
+	 * @param columnFamilyHandle
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	boolean putByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle, byte[] key, byte[] value);
+
+	/**
+	 * 获取某一条指定的数据
+	 * @param key
+	 * @return
+	 */
+	byte[] get(byte[] key);
+
+	/**
+	 * 获取指定列族的value
+	 * @param columnFamilyHandle
+	 * @param key
+	 * @return
+	 */
+	byte[] getByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle,byte[] key);
+
+	/**
+	 * 删除一条数据
+	 * @param key
+	 * @return
+	 */
+	boolean delete(byte[] key);
+	/**
+	 * 删除一条数据
+	 * @param key
+	 * @return
+	 */
+	boolean deleteByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle,byte[] key);
 
 	/**
 	 * 更新最新一个区块的Hash值
@@ -55,6 +102,7 @@ public interface DBAccess {
 	 * @return
 	 */
 	boolean putNodeList(List<String> nodes);
+
 
 	/**
 	 * 往数据库添加|更新一条数据
@@ -153,6 +201,8 @@ public interface DBAccess {
 	 */
 	Optional<Transaction> getConfirmTransaction(String txHash);
 
+	List<Transaction> getAllTrans();
+
 	Optional<Account> getMinerAccount();
 
 	boolean putMinerAccount(Account account);
@@ -192,10 +242,10 @@ public interface DBAccess {
 	Optional<Voter> getVoter(String address);
 
 	/**
-	 * 获取投票人列表
+	 * 统计指定时间节点前的投票记录，取得票前101名委托人
 	 * @return
 	 */
-	List<Voter> listVoters();
+	List<Trustee> getTrusteeOfRangeBeforeTime(long time);
 
 	/**
 	 * 添加一条投票记录
@@ -204,26 +254,36 @@ public interface DBAccess {
 	 */
 	boolean putVoteRecord(VoteRecord voteRecord);
 
+    void addObjs(List objs) throws Exception;
+
+    void addObj(Object obj) throws Exception;
+
+    <T> void delObj(String keyField,String fieldVale,Class<T> dtoClazz,boolean deleteCase)throws Exception;
+
+    <T> T getObj(String keyField, Object fieldValue, Class<T> dtoClazz) throws Exception;
 	/**
 	 * 获取投票记录列表
+     * type      0 =     1 >=     2 <=
 	 * @return
 	 */
-	List<VoteRecord> listVoteRecords();
+	List<VoteRecord> listVoteRecords(long time,int type);
 	/**
 	 * 根据 投票人/受托人 获取投票记录列表
 	 * @param   address   投票人/受托人的地址
-	 * @param   type      投票人/受托人的类型，是根据那个
+	 * @param   type      投票人/受托人的字段名
+     *                    screenType      0 =     1 >=     2 <=
 	 * @return  返回需要的投票集合
 	 */
-	List<VoteRecord> listVoteRecords(String address, String type);
+    List<VoteRecord> listVoteRecords(String address, String type,long time, int screenType);
+
+    List<VoteRecord> listVoteRecords(String address, String typee);
 	/**
 	 * 区块分页查询
 	 * @param pageCount：每页记录数
 	 * @param pageNumber：页码
-	 * @param orderByType：排序类型
 	 * @return
 	 */
-	List<Block> blockPagination(int pageCount, int pageNumber, int orderByType) throws Exception;
+	List<Block> blockPagination(int pageCount, int pageNumber) throws Exception;
 	/**
 	 * 交易流水分页查询
 	 * @param pageCount：每页记录数
@@ -235,7 +295,71 @@ public interface DBAccess {
 	 */
 	List<Transaction> transactionPagination(int pageCount, int pageNumber, int orderByType,List<String> screens,List<byte[][]> screenVals);
 
+    /**
+     * 根据地址查询流水
+     * @param pageCount
+     * @param pageNumber
+     * @param orderByType
+     * @param address
+     * @return
+     */
 	List<Transaction> getTransactionByAddress(int pageCount, int pageNumber, int orderByType,String address);
 
+	List<Transaction> getTransactionsByBlockHeight(long blockHeight);
+    /**
+     * 查询前100个区块的流水
+     * @param pageCount
+     * @param pageNumber
+     * @return
+     */
 	List<Transaction> getNewBlocksTransactions(int pageCount, int pageNumber);
+	/**
+	 * 委托人分页查询
+	 * @param pageCount：每页记录数
+	 * @param pageNumber：页码
+	 * @param orderByType：排序类型
+	 * @param screens      筛选字段
+	 * @param  screenVals  筛选字段对应的值
+	 * @return
+	 */
+	List<Trustee> trusteePagination(int pageCount, int pageNumber, int orderByType,List<String> screens,List<byte[][]> screenVals);
+
+    /**
+     * 筛选排序查询    不分页
+     * @param fields                   筛选的字段
+     * @param values                   筛选字段所对应的值
+     * @param tClass                   查询dto的class字节码
+     * @param overAndNextHandle       排序索引的关系handle
+     * @param indexHandle              排序索引的indexhandle
+     * @param orderByFieldHandle       排序字段的handle
+     * @param orderType                 排序类型  1升序,0降序
+     * @param screenType                0 =     1 >=     2 <=
+     * @param <T>                       dto
+     * @return                             list
+     * @throws Exception
+     */
+	<T> List<T> getDtoListByField(List<String> fields, List<byte[]> values,List<Integer> screenType, Class<T> tClass,ColumnFamilyHandle overAndNextHandle,ColumnFamilyHandle indexHandle,ColumnFamilyHandle orderByFieldHandle, int orderType)throws Exception;
+
+    /**
+     * @param pageCount         分页的每页条数
+     * @param pageNumber        分页的当前页数
+     * @param indexHandle       排序字段的索引Handle
+     * @param screenHands       筛选字段的Handle集合
+     * @param vals              筛选字段的值集合   可以有多个值
+     *@param screenType        筛选类型   0 and   1 or  （注意，要么全是and，要么全是or）
+     * @param overAndNextHandle 索引字段的排序关系handle
+     * @param tClass            对象的字节码
+     * @param keyFiledName      主键字段的名
+     * @param orderByType       排序类型 1升序,0降序
+     * @param flushSize         排序字段区间的缓存
+     * @param dtoType           对象主键的类型  根据这个类型匹配不同的排序方法
+     * @param <T>               对象
+     * @return 该页的数据
+     * @throws Exception
+     */
+    <T> ArrayList<T> getDtoOrderByHandle(int pageCount, int pageNumber,
+                                         ColumnFamilyHandle indexHandle, List<ColumnFamilyHandle> screenHands,
+                                         List<byte[][]> vals, int screenType,
+                                         ColumnFamilyHandle overAndNextHandle, Class<T> tClass, String keyFiledName,
+                                         int orderByType, int flushSize, int dtoType, ColumnFamilyHandle orderByFieldHandle) throws Exception;
 }

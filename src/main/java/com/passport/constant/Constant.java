@@ -36,7 +36,9 @@ public interface Constant {
 
   Integer BLOCK_SYNC_PERTIME = 50;//一次主动同步的区块数
 
-  Integer TRUSTEES_INIT_NUM = 11;//受托人初始化的人数
+  Integer TRUSTEES_INIT_NUM = 101;//受托人初始化的人数
+
+  Integer BLOCK_GENERATE_TIMEGAP = 10;//每个区块生成时间间隔
 
   Long GENESIS_BLOCK_TIMESTAMP = DateUtils.formatStringDate("2018-09-01 00:00:00").getTime();//创世区块时间
 
@@ -51,4 +53,6 @@ public interface Constant {
   Integer BLOCK_DISTANCE = 3000000;//按10秒出一个区块，一个出块量360*24*365，一年约产生3000000个区块
   //每年出块奖励递减
   BigDecimal[] REWARD_ARRAY = {new BigDecimal(10), new BigDecimal(8), new BigDecimal(6), new BigDecimal(4), new BigDecimal(2), new BigDecimal(1)};
+  //索引set集合分割大小
+  int INDEX_GROUPSIZE = 1000;
 }

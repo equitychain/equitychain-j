@@ -1,15 +1,29 @@
 package com.passport.core;
 
+import com.passport.annotations.EntityClaz;
+import com.passport.annotations.FaildClaz;
+import com.passport.annotations.KeyField;
+
 /**
  * 投票记录
  * @author: xujianfeng
  * @create: 2018-09-06 11:45
  **/
+@EntityClaz(name = "voteRecord")
 public class VoteRecord {
+    @KeyField
+    @FaildClaz(name = "id",type = String.class)
+    private String id;
+    @FaildClaz(name = "payAddress",type = String.class)
     private String payAddress;//投票人钱包地址
+    @FaildClaz(name = "receiptAddress",type = String.class)
     private String receiptAddress;//受托人钱包地址
+    @FaildClaz(name = "voteNum",type = Integer.class)
     private Integer voteNum;//投票数,默认一次只可投一票
+    @FaildClaz(name = "status",type = Integer.class)
     private Integer status;//0撤消1正常
+    @FaildClaz(name = "time",type = Long.class)
+    private Long time;//时间戳
     public VoteRecord(){
 
     }
@@ -50,5 +64,21 @@ public class VoteRecord {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Long getTime() {
+        return time;
+    }
+
+    public void setTime(Long time) {
+        this.time = time;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId() {
+        this.id = payAddress+"_"+receiptAddress;
     }
 }

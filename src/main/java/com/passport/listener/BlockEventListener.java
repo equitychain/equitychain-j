@@ -2,18 +2,20 @@ package com.passport.listener;
 
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
-import com.passport.core.Account;
-import com.passport.core.Block;
-import com.passport.core.BlockHeader;
-import com.passport.core.GenesisBlockInfo;
+import com.passport.core.*;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.event.GenerateBlockEvent;
+import com.passport.event.GenerateNextBlockEvent;
 import com.passport.event.SyncBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.peer.ChannelsManager;
 import com.passport.proto.*;
+import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
 import com.passport.webhandler.BlockHandler;
+import com.passport.webhandler.TrusteeHandler;
+import io.netty.channel.group.ChannelGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,11 @@ public class BlockEventListener {
 	private ChannelsManager channelsManager;
 	@Autowired
 	private BlockHandler blockHandler;
+	@Autowired
+	private BlockUtils blockUtils;
+	@Autowired
+	private TrusteeHandler trusteeHandler;
+
 
 	/**
 	 * 同步下一个区块（被动获取）
@@ -56,7 +63,8 @@ public class BlockEventListener {
 			Optional<Object> lastBlockHeight = dbAccess.getLastBlockHeight();
 			if (lastBlockHeight.isPresent()) {
 				blockHeight = CastUtils.castLong(lastBlockHeight.get());
-			}else{
+			}
+			if(blockHeight == 0){
 				//创建创世块
 				Block block = createGenesisBlock();
 				blockHeight = block.getBlockHeight();
@@ -132,6 +140,10 @@ public class BlockEventListener {
 			dbAccess.putTrustee(trustee);
 		});
 
+		genesisBlockInfo.getVoteRecords().forEach(voteRecord -> {
+			dbAccess.putVoteRecord(voteRecord);
+		});
+
 		return genesisBlockInfo;
 	}
 
@@ -156,4 +168,44 @@ public class BlockEventListener {
 		builder.setData(dataBuilder.build());
 		channelsManager.getChannels().writeAndFlush(builder.build());
 	}
+
+	/**
+	 * 由第一个节点发起出块
+	 * @param event
+	 */
+	@EventListener(GenerateNextBlockEvent.class)
+	public void generateNextBlock(GenerateNextBlockEvent event) {
+		blockHandler.produceNextBlock();
+	}
+
+	/**
+	 * 由第一个节点发起出块
+	 * @param event
+	 */
+	@EventListener(GenerateBlockEvent.class)
+	public void generateBlock(GenerateBlockEvent event) {
+		ChannelGroup channels = channelsManager.getChannels();
+		//第一个启动的节点，负责生成区块
+		if(channels.size() == 0){
+			//当前区块周期
+			Optional<Object> lastBlockHeightOptional = dbAccess.getLastBlockHeight();
+			if(!lastBlockHeightOptional.isPresent()){
+				return;
+			}
+			//出块后重新启动不再由初始节点主导出块
+			long blockHeight = CastUtils.castLong(lastBlockHeightOptional.get());
+			if(blockHeight > 1){
+				return;
+			}
+			long newBlockHeight = blockHeight + 1;
+			int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
+
+			//取得票前101个委托人
+			List<Trustee> trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
+
+			//选择出块人
+			blockHandler.produceBlock(newBlockHeight, trustees, blockCycle);
+		}
+	}
+
 }

@@ -3,11 +3,8 @@ package com.passport.web;
 import com.passport.core.Account;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
-import com.passport.transactionhandler.TransactionStrategy;
 import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.CheckUtils;
-import com.passport.utils.LockUtil;
-import com.passport.utils.StoryFileUtil;
 import com.passport.webhandler.AccountHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,8 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 public class AccountController {
     @Autowired
     AccountHandler accountHandler;
-    @Autowired
-    StoryFileUtil fileUtil;
 //    @Autowired
 //    DBAccess dbAccess;
 //    @Value("${wallet.keystoreDir}")
@@ -88,7 +83,7 @@ public class AccountController {
     }
 
     //解锁账号
-    @GetMapping("/unlock")
+    /*@GetMapping("/unlock")
     public ResultDto unlock(HttpServletRequest request) throws Exception {
         String address = request.getParameter("address");
         String time = request.getParameter("time");
@@ -104,5 +99,5 @@ public class AccountController {
             lock = LockUtil.unLockAddr(address,password,fileUtil,Long.parseLong(time));
         }
         return new ResultDto(ResultEnum.SUCCESS.getCode(), lock);
-    }
+    }*/
 }

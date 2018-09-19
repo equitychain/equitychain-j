@@ -3,10 +3,7 @@ package com.passport.webhandler;
 import com.google.common.base.Optional;
 import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
-import com.passport.core.Account;
-import com.passport.core.GenesisBlockInfo;
-import com.passport.core.Transaction;
-import com.passport.core.Trustee;
+import com.passport.core.*;
 import com.passport.crypto.eth.ECKeyPair;
 import com.passport.crypto.eth.WalletUtils;
 import com.passport.db.dbhelper.BaseDBAccess;
@@ -134,6 +131,7 @@ public class AccountHandler {
         List<Account> accounts = new ArrayList<>();
         List<Transaction> transactions = new ArrayList<>();
         List<Trustee> trustees = new ArrayList<>();
+        List<VoteRecord> voteRecords = new ArrayList<>();
         for (int i = 0; i < Constant.TRUSTEES_INIT_NUM; i++) {
             try {
                 //创建账户
@@ -147,6 +145,16 @@ public class AccountHandler {
                 transaction.setBlockHeight("1".getBytes());
                 transactions.add(transaction);
 
+                //增加投票记录
+                VoteRecord voteRecord = new VoteRecord();
+                voteRecord.setPayAddress("");
+                voteRecord.setReceiptAddress(account.getAddress());
+                voteRecord.setTime(Constant.GENESIS_BLOCK_TIMESTAMP);
+                voteRecord.setStatus(1);
+                voteRecord.setVoteNum(1);
+                voteRecord.setId();
+                voteRecords.add(voteRecord);
+
                 //把新增的受托人放到受托人列表
                 Trustee trustee = new Trustee(account.getAddress(), 0L, 0f, new BigDecimal(0), 1);
                 trustees.add(trustee);
@@ -157,6 +165,7 @@ public class AccountHandler {
         genesisBlockInfo.setAccounts(accounts);
         genesisBlockInfo.setTransactions(transactions);
         genesisBlockInfo.setTrustees(trustees);
+        genesisBlockInfo.setVoteRecords(voteRecords);
         //在项目下生成json文件
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(Constant.GENESIS_PATH))) {
             writer.write(GsonUtils.toJson(genesisBlockInfo));

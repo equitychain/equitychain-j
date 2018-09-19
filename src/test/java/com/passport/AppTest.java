@@ -19,14 +19,24 @@ public class AppTest
      * Rigorous Test :-)
      */
     @Test
-    public void shouldAnswerWithTrue(){
-//        try {
-//            for(int i = 0;i<1000;i++){
-//                baseDBAccess.put(i+"",i);
-//            }
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
-        System.out.println("asd");
+    public void shouldAnswerWithTrue() throws Exception
+    {
+        /*File file = new File("./keystore");
+        if(!file.exists()){
+            file.mkdir();
+        }
+        System.out.println(file.getPath());
+        ECKeyPair keyPair = WalletUtils.generateNewWalletFile("hq123456", file, true);
+        Account account = new Account(keyPair.getAddress(), keyPair.exportPrivateKey(), BigDecimal.ZERO);
+        System.out.println(GsonUtils.toJson(account));
+
+        Credentials credentials = Credentials.create(keyPair.exportPrivateKey());
+        System.out.println(credentials.getAddress());*/
+//1536740510951     3600000
+        long valK = 3600500;
+        long gropSize = 3600*1000;
+        valK = valK/gropSize;
+        valK = valK*gropSize;
+        System.out.println(valK);
     }
 }
