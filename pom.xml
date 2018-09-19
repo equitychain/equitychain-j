@@ -227,12 +227,12 @@
           <version>1.2.47</version>
       </dependency>
 
-    <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>tomcat-embed-websocket</artifactId>
-      <version>8.5.15</version>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.apache.tomcat.embed</groupId>-->
+      <!--<artifactId>tomcat-embed-websocket</artifactId>-->
+      <!--<version>8.5.15</version>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
   </dependencies>
 
   <build>
