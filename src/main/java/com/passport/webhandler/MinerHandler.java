@@ -7,6 +7,7 @@ import com.passport.core.BlockHeader;
 import com.passport.core.Transaction;
 import com.passport.crypto.ECDSAUtil;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.enums.TransactionTypeEnum;
 import com.passport.event.SyncBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.utils.GsonUtils;
@@ -66,6 +67,7 @@ public class MinerHandler {
         String transactionJson = GsonUtils.toJson(transaction);
         //计算交易hash
         transaction.setHash(ECDSAUtil.applySha256(transactionJson).getBytes());
+        transaction.setTradeType(TransactionTypeEnum.BLOCK_REWARD.getDesc().getBytes());
 
         List<Transaction> list = new ArrayList<>();
         list.add(transaction);
