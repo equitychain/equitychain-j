@@ -3,6 +3,7 @@ package com.passport.db.dbhelper;
 import com.google.common.base.Optional;
 import com.passport.core.*;
 import org.rocksdb.ColumnFamilyHandle;
+import org.rocksdb.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -251,6 +252,8 @@ public interface DBAccess {
 	 * @return
 	 */
 	boolean putVoteRecord(VoteRecord voteRecord);
+
+    void addObjs(List objs) throws Exception;
 
     void addObj(Object obj) throws Exception;
 
