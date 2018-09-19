@@ -66,6 +66,11 @@ public class Connector implements InitializingBean {
     //生成下一个区块
     @EventListener(ApplicationReadyEvent.class)
     public void generateNextBlock() {
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         provider.publishEvent(new GenerateBlockEvent(0L));
     }
 

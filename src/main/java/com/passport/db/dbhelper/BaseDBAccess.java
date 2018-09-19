@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -47,12 +48,14 @@ public abstract class BaseDBAccess implements DBAccess {
             //TODO 添加dto的字节码
             fields.addAll(getClassCols(new com.passport.core.Transaction().getClass()));
             fields.addAll(getClassCols(new Block().getClass()));
+            fields.addAll(getClassCols(new BlockHeader().getClass()));
             fields.addAll(getClassCols(new Trustee().getClass()));
             fields.addAll(getClassCols(new Account().getClass()));
             fields.addAll(getClassCols(new VoteRecord().getClass()));
             fields.addAll(getClassCols(new Voter().getClass()));
             dtoClasses.add(new Transaction().getClass());
             dtoClasses.add(new Block().getClass());
+            dtoClasses.add(new BlockHeader().getClass());
             dtoClasses.add(new Account().getClass());
             dtoClasses.add(new Trustee().getClass());
             dtoClasses.add(new VoteRecord().getClass());
@@ -96,6 +99,12 @@ public abstract class BaseDBAccess implements DBAccess {
                     String name = new String(handler.getName());
                     handleMap.put(name, handler);
                 });
+            }
+            String las = getLastBlockHeight().get().toString();
+            System.out.println("last"+las);
+            RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("blockHeader","timeStamp")));
+            for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+                System.out.println("key:"+new String(iterator.key())+"   value:"+new String(iterator.value()));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -307,20 +316,22 @@ public abstract class BaseDBAccess implements DBAccess {
                             Field[] contancFields = contancClass.getDeclaredFields();
                             Field contancKeyF = null;
                             for (Field contancF : contancFields) {
+                                contancF.setAccessible(true);
                                 if (contancF.isAnnotationPresent(KeyField.class)) {
                                     contancKeyF = contancF;
                                     break;
                                 }
                             }
                             if (contancKeyF != null) {
-                                String keyValue = contancKeyF.get(contanc).toString();
-                                if (keyValue == null) {
+                                contancKeyF.setAccessible(true);
+                                Object val = contancKeyF.get(contanc);
+                                if (val == null) {
                                     continue;
                                 }
                                 addObj(contanc);
                                 //然后获取这个对象的主键，把他的主键保存在对应的key中
                                 contancKeyF.setAccessible(true);
-                                putByColumnFamilyHandle(handleMap.get(getColName(className, fieldName)), key, keyValue.getBytes());
+                                putByColumnFamilyHandle(handleMap.get(getColName(className, fieldName)), key, val instanceof byte[]?(byte[])val:val.toString().getBytes());
 //                                writeBatch.put(handleMap.get(getColName(className, fieldName)), key, keyValue.getBytes());
 //                                bachCount++;
                             }
@@ -456,7 +467,8 @@ public abstract class BaseDBAccess implements DBAccess {
     }
 
     //获取有注解的对象
-    public <T> T getObj(String keyField, String fieldValue, Class<T> dtoClazz) throws Exception {
+    public <T> T getObj(String keyField, Object fieldValue, Class<T> dtoClazz) throws Exception {
+        byte[] fieldValByt = fieldValue instanceof byte[]?(byte[])fieldValue:fieldValue.toString().getBytes();
         //获取字段对应的列名集合
         List<String> colNames = getClassCols(dtoClazz);
         //需要返回的对象
@@ -473,7 +485,7 @@ public abstract class BaseDBAccess implements DBAccess {
                     return;
                 }
                 //获取到了该列的值
-                byte[] value = getByColumnFamilyHandle(handle, fieldValue.getBytes());
+                byte[] value = getByColumnFamilyHandle(handle, fieldValByt);
                 if (value == null) {
                     if (colName.contains("-" + keyField)) {
                         Field field = dtoClazz.getDeclaredField(keyField);
@@ -482,7 +494,7 @@ public abstract class BaseDBAccess implements DBAccess {
                         if (typeClass == String.class) {
                             field.set(t, fieldValue);
                         } else if (typeClass == byte[].class) {
-                            field.set(t, fieldValue.getBytes());
+                            field.set(t, fieldValByt);
                         }
                     }
                     return;
@@ -540,6 +552,7 @@ public abstract class BaseDBAccess implements DBAccess {
                         Field contacKeyField = null;
                         //获取主键
                         for (Field fie : contacFileds) {
+                            fie.setAccessible(true);
                             if (fie.isAnnotationPresent(KeyField.class)) {
                                 contacKeyField = fie;
                                 break;
@@ -551,8 +564,10 @@ public abstract class BaseDBAccess implements DBAccess {
                             FaildClaz keyFieClas = contacKeyField.getAnnotation(FaildClaz.class);
                             String keyVal = new String(value);
                             if (keyVal != null && !"".equals(keyVal)) {
-                                Object contancObj = getObj(keyFieClas.name(), keyVal, contancClass);
-                                if (contancObj != null) field.set(t, contancObj);
+                                Object contancObj = getObj(keyFieClas.name(), value, contancClass);
+                                if (contancObj != null){
+                                    field.set(t, contancObj);
+                                }
                             }
                         }
                     }

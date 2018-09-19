@@ -3,8 +3,10 @@ package com.passport.utils;
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.core.Block;
+import com.passport.core.BlockHeader;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.webhandler.BlockHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +43,10 @@ public class BlockUtils {
         long timeGapSecond = (blockCycle - 1) * Constant.TRUSTEES_INIT_NUM * Constant.BLOCK_GENERATE_TIMEGAP * 1000;
         Optional<Block> block = dbAccess.getBlock(1);
         if(block.isPresent()){
-            return block.get().getBlockHeader().getTimeStamp() + timeGapSecond;
+            Block block1 = block.get();
+            BlockHeader handler = block1.getBlockHeader();
+
+            return handler.getTimeStamp() + timeGapSecond;
         }
         return null;
     }
