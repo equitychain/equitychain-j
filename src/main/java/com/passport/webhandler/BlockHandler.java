@@ -300,7 +300,7 @@ public class BlockHandler {
     public void produceNextBlock() {
         //当前区块周期
         Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
-        if(lastBlockOptional.isPresent()){
+        if(!lastBlockOptional.isPresent()){
             return;
         }
         Block block = lastBlockOptional.get();

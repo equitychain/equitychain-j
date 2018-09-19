@@ -1,5 +1,6 @@
 package com.passport.web;
 
+import com.google.common.base.Optional;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
@@ -30,4 +31,21 @@ public class BlockController {
         minerHandler.mining();
         return new ResultDto(ResultEnum.SUCCESS);
     }
+    /**
+     * 获取最新区块高度
+     *
+     * @return
+     */
+    @GetMapping("getBlockHeight")
+    public ResultDto getBlockHeight() {
+        String blockHeight = "0";
+        Optional<Object> blockOptional = dbAccess.getLastBlockHeight();
+        if (blockOptional.isPresent()) {
+            blockHeight = blockOptional.get().toString();
+        }
+        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
+        resultDto.setData(blockHeight);
+        return resultDto;
+    }
+
 }

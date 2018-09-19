@@ -321,9 +321,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("transaction","hash")));
         List<Transaction> result = new ArrayList<>();
         for (iterator.seekToFirst();iterator.isValid();iterator.next()){
-            String hash = new String(iterator.key());
             try {
-                result.add(getObj("hash",hash,Transaction.class));
+                result.add(getObj("hash",iterator.key(),Transaction.class));
             } catch (Exception e) {
                 e.printStackTrace();
             }
