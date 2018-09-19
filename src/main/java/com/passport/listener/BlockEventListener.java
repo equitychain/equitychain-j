@@ -63,7 +63,8 @@ public class BlockEventListener {
 			Optional<Object> lastBlockHeight = dbAccess.getLastBlockHeight();
 			if (lastBlockHeight.isPresent()) {
 				blockHeight = CastUtils.castLong(lastBlockHeight.get());
-			}else{
+			}
+			if(blockHeight == 0){
 				//创建创世块
 				Block block = createGenesisBlock();
 				blockHeight = block.getBlockHeight();

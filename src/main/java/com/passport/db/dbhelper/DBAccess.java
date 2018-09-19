@@ -260,7 +260,7 @@ public interface DBAccess {
 
     <T> void delObj(String keyField,String fieldVale,Class<T> dtoClazz,boolean deleteCase)throws Exception;
 
-    <T> T getObj(String keyField, String fieldValue, Class<T> dtoClazz) throws Exception;
+    <T> T getObj(String keyField, Object fieldValue, Class<T> dtoClazz) throws Exception;
 	/**
 	 * 获取投票记录列表
      * type      0 =     1 >=     2 <=
