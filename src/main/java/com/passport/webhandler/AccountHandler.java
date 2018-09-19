@@ -122,11 +122,12 @@ public class AccountHandler {
 
                 //增加投票记录
                 VoteRecord voteRecord = new VoteRecord();
-                voteRecord.setPayAddress(null);
+                voteRecord.setPayAddress("");
                 voteRecord.setReceiptAddress(account.getAddress());
                 voteRecord.setTime(Constant.GENESIS_BLOCK_TIMESTAMP);
                 voteRecord.setStatus(1);
                 voteRecord.setVoteNum(1);
+                voteRecord.setId();
                 voteRecords.add(voteRecord);
 
                 //把新增的受托人放到受托人列表
