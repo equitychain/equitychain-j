@@ -3,7 +3,6 @@ package com.passport.db.dbhelper;
 import com.google.common.base.Optional;
 import com.passport.core.*;
 import org.rocksdb.ColumnFamilyHandle;
-import org.rocksdb.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -241,10 +240,10 @@ public interface DBAccess {
 	Optional<Voter> getVoter(String address);
 
 	/**
-	 * 获取投票人列表
+	 * 统计指定时间节点前的投票记录，取得票前101名委托人
 	 * @return
 	 */
-	List<Voter> listVoters();
+	List<Trustee> getTrusteeOfRangeBeforeTime(long time);
 
 	/**
 	 * 添加一条投票记录

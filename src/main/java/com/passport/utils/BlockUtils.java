@@ -52,7 +52,7 @@ public class BlockUtils {
      * @param blockHeight
      * @return
      */
-    public Trustee randomPickBlockPruducer(List<Trustee> trustees, long blockHeight){
+    public Trustee randomPickBlockProducer(List<Trustee> trustees, long blockHeight){
         Long index = blockHeight * 100 % trustees.size();
         return trustees.get(index.intValue());
     }

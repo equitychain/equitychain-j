@@ -12,6 +12,8 @@ import com.passport.annotations.KeyField;
 @EntityClaz(name = "voteRecord")
 public class VoteRecord {
     @KeyField
+    @FaildClaz(name = "id",type = String.class)
+    private String id;
     @FaildClaz(name = "payAddress",type = String.class)
     private String payAddress;//投票人钱包地址
     @FaildClaz(name = "receiptAddress",type = String.class)
@@ -70,5 +72,13 @@ public class VoteRecord {
 
     public void setTime(Long time) {
         this.time = time;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

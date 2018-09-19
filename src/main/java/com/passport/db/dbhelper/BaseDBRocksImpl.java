@@ -1,26 +1,19 @@
 package com.passport.db.dbhelper;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.base.Optional;
-import com.passport.annotations.RocksTransaction;
 import com.passport.core.*;
-import com.passport.core.Transaction;
 import com.passport.utils.SerializeUtils;
-import com.passport.webhandler.BlockHandler;
-import org.rocksdb.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.rocksdb.ColumnFamilyHandle;
+import org.rocksdb.ReadOptions;
+import org.rocksdb.RocksDBException;
+import org.rocksdb.RocksIterator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
-import java.math.BigDecimal;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class BaseDBRocksImpl extends BaseDBAccess {
@@ -395,18 +388,40 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    public List<Voter> listVoters() {
-
-        try {
-            return getDtoListByField(
-                    null,null,null,Voter.class,
-                    handleMap.get(IndexColumnNames.VOTERNUMBEROFVOTE.overAndNextName),
-                    handleMap.get(IndexColumnNames.VOTERNUMBEROFVOTE.indexName),
-                    handleMap.get(getColName("voter","voteNum")),0);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
+    public List<Trustee> getTrusteeOfRangeBeforeTime(long time) {
+        List<Trustee> voters = new ArrayList<>();
+        List<Trustee> allVoters = new ArrayList<>();
+        //筛选/分组/求和
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("voteRecord","id")));
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            byte[] timeByte = getByColumnFamilyHandle(handleMap.get(getColName("voteRecord","time")),iterator.key());
+            //time的筛选
+            if(Long.parseLong(new String(timeByte)) <= time){
+                Trustee trustee = new Trustee();
+                trustee.setVotes(0l);
+                trustee.setStatus(1);
+                trustee.setAddress(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord","receiptAddress")),iterator.key())));
+                int index = -1;
+                //address的分组
+                index = allVoters.indexOf(trustee);
+                if(index != -1) {
+                    trustee = allVoters.remove(index);
+                }
+                //求和
+                trustee.setVotes(trustee.getVotes()+Integer.parseInt(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord","voteNum")),iterator.key()))));
+                allVoters.add(trustee);
+            }
         }
+        //排序
+        allVoters.sort(new Comparator<Trustee>() {
+            @Override
+            public int compare(Trustee o1, Trustee o2) {
+                return o1.getVotes().longValue()>o2.getVotes().longValue()?-1:(o1.getVotes().longValue()==o2.getVotes().longValue()?0:1);
+            }
+        });
+        //获取前101个
+        voters.addAll(allVoters.size()>=101?allVoters.subList(0,100):allVoters);
+        return voters;
     }
 
     @Override

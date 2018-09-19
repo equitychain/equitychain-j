@@ -90,6 +90,9 @@ public class BlockSyncREQ extends Strategy {
 
             //流水匹配，和区块中流水一样的未确认流水将放到已确认流水中
             transactionHandler.matchUnConfirmTransactions(blockLocal);
+
+            //打包流水成功后，判断下个出块人是否本节点
+            blockHandler.produceNextBlock();
         } catch (Exception e) {
             logger.error("接收区块广播异常", e);
         } finally {
