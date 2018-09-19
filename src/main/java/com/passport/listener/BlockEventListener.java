@@ -140,6 +140,10 @@ public class BlockEventListener {
 			dbAccess.putTrustee(trustee);
 		});
 
+		genesisBlockInfo.getVoteRecords().forEach(voteRecord -> {
+			dbAccess.putVoteRecord(voteRecord);
+		});
+
 		return genesisBlockInfo;
 	}
 

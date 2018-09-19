@@ -3,6 +3,7 @@ package com.passport.core;
 import java.util.List;
 
 /**
+ * 创世块信息
  * @author: xujianfeng
  * @create: 2018-09-05 13:57
  **/
@@ -10,6 +11,7 @@ public class GenesisBlockInfo {
     private List<Account> accounts;
     private List<Transaction> transactions;
     private List<Trustee> trustees;
+    private List<VoteRecord> voteRecords;
 
     public List<Account> getAccounts() {
         return accounts;
@@ -33,5 +35,13 @@ public class GenesisBlockInfo {
 
     public void setTrustees(List<Trustee> trustees) {
         this.trustees = trustees;
+    }
+
+    public List<VoteRecord> getVoteRecords() {
+        return voteRecords;
+    }
+
+    public void setVoteRecords(List<VoteRecord> voteRecords) {
+        this.voteRecords = voteRecords;
     }
 }
