@@ -55,7 +55,7 @@ public class TransactionController {
      * @param request
      * @return
      */
-    @GetMapping
+    @GetMapping("getTransactionByAddress")
     public ResultDto getTransactionByAddress(HttpServletRequest request) {
         String pageSize = request.getParameter("pageSize");
         String pageNumber = request.getParameter("pageNumber");
@@ -87,7 +87,7 @@ public class TransactionController {
      * @param request
      * @return
      */
-    @GetMapping
+    @GetMapping("getTransactionByNBlock")
     public ResultDto getTransactionByNBlock(HttpServletRequest request) {
         String pageSize = request.getParameter("pageSize");
         String pageNumber = request.getParameter("pageNumber");
@@ -108,7 +108,7 @@ public class TransactionController {
      * @param request
      * @return
      */
-    @GetMapping
+    @GetMapping("getTransactionByBlockHeight")
     public ResultDto getTransactionByBlockHeight(HttpServletRequest request) {
         String blockHeight = request.getParameter("blockHeight");
         //非空检验
