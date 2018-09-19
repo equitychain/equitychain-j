@@ -58,7 +58,7 @@ public class Connector implements InitializingBean {
     }
 
     //启动的时候自动开始区块同步
-//    @EventListener(ApplicationReadyEvent.class)
+    @EventListener(ApplicationReadyEvent.class)
     public void syncNextBlock() {
         provider.publishEvent(new SyncNextBlockEvent(0L));
 
