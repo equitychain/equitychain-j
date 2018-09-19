@@ -48,10 +48,13 @@ public abstract class BaseDBAccess implements DBAccess {
             fields.addAll(getClassCols(new com.passport.core.Transaction().getClass()));
             fields.addAll(getClassCols(new Block().getClass()));
             fields.addAll(getClassCols(new Trustee().getClass()));
+            fields.addAll(getClassCols(new Account().getClass()));
             fields.addAll(getClassCols(new VoteRecord().getClass()));
             fields.addAll(getClassCols(new Voter().getClass()));
             dtoClasses.add(new Transaction().getClass());
             dtoClasses.add(new Block().getClass());
+            dtoClasses.add(new Account().getClass());
+            dtoClasses.add(new Trustee().getClass());
             dtoClasses.add(new VoteRecord().getClass());
             dtoClasses.add(new Voter().getClass());
             try {
