@@ -201,6 +201,8 @@ public interface DBAccess {
 	 */
 	Optional<Transaction> getConfirmTransaction(String txHash);
 
+	List<Transaction> getAllTrans();
+
 	Optional<Account> getMinerAccount();
 
 	boolean putMinerAccount(Account account);

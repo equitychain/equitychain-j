@@ -7,11 +7,13 @@ import com.passport.enums.ResultEnum;
 import com.passport.utils.CheckUtils;
 import com.passport.webhandler.TransactionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 交易
@@ -44,5 +46,10 @@ public class TransactionController {
 
         Transaction transaction = transactionHandler.sendTransaction(payAddress, receiptAddress, value, extarData, password, tradeType);
         return new ResultDto(ResultEnum.SUCCESS.getCode(), transaction);
+    }
+    @GetMapping("/getAllTrans")
+    public ResultDto getAllTrans(HttpServletRequest request) throws Exception {
+        List<Transaction> transactionList = dbAccess.getAllTrans();
+        return new ResultDto(ResultEnum.SUCCESS.getCode(),transactionList);
     }
 }

@@ -316,6 +316,21 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         return Optional.absent();
     }
 
+    @Override
+    public List<Transaction> getAllTrans() {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("transaction","hash")));
+        List<Transaction> result = new ArrayList<>();
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            String hash = new String(iterator.key());
+            try {
+                result.add(getObj("hash",hash,Transaction.class));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
     public Optional<Account> getMinerAccount(){
         Optional<Object> getMinerAccount = (Optional<Object>) SerializeUtils.unSerialize(get(MINERACCOUNT.getBytes()));
         if(getMinerAccount != null && getMinerAccount.isPresent()){
