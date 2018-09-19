@@ -78,6 +78,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public Optional<Block> getBlock(Object blockHeight) {
         try {
             Block block = getObj("blockHeight", blockHeight.toString(), Block.class);
+            if(block.isNullContent()){
+               return Optional.absent();
+            }
             return Optional.of(block);
         } catch (Exception e) {
             e.printStackTrace();
