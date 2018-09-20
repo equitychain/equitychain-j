@@ -84,4 +84,21 @@ public class BlockController {
         resultDto.setData(block);
         return resultDto;
     }
+
+    /**
+     * 获取最新区块高度
+     *
+     * @return
+     */
+    @GetMapping("getBlockHeight")
+    public ResultDto getBlockHeight() {
+        String blockHeight = "0";
+        Optional<Object> blockOptional = dbAccess.getLastBlockHeight();
+        if (blockOptional.isPresent()) {
+            blockHeight = blockOptional.get().toString();
+        }
+        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
+        resultDto.setData(blockHeight);
+        return resultDto;
+    }
 }
