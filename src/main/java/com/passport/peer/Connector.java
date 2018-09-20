@@ -71,10 +71,10 @@ public class Connector implements InitializingBean {
     }
 
     //生成下一个区块
-    /*@EventListener(ApplicationReadyEvent.class)
+    //@EventListener(ApplicationReadyEvent.class)
     public void generateNextBlock() {
         provider.publishEvent(new GenerateBlockEvent(0L));
-    }*/
+    }
 
     @EventListener(ApplicationReadyEvent.class)
     public void syncAccountList() {
