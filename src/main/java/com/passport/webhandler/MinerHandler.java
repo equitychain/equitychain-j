@@ -67,7 +67,7 @@ public class MinerHandler {
         String transactionJson = GsonUtils.toJson(transaction);
         //计算交易hash
         transaction.setHash(ECDSAUtil.applySha256(transactionJson).getBytes());
-        transaction.setTradeType(TransactionTypeEnum.BLOCK_REWARD.getDesc().getBytes());
+        transaction.setTradeType(TransactionTypeEnum.BLOCK_REWARD.toString().getBytes());
 
         List<Transaction> list = new ArrayList<>();
         list.add(transaction);
