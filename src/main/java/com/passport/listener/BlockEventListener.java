@@ -188,7 +188,7 @@ public class BlockEventListener {
 		//第一个启动的节点，负责生成区块
 		if(channels.size() == 0){
 			//当前区块周期
-			Optional<Object> lastBlockHeightOptional = dbAccess.getLastBlockHeight();
+ 			Optional<Object> lastBlockHeightOptional = dbAccess.getLastBlockHeight();
 			if(!lastBlockHeightOptional.isPresent()){
 				return;
 			}
