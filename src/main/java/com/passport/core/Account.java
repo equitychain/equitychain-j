@@ -12,7 +12,7 @@ import java.math.BigDecimal;
  * @create: 2018-07-26 11:20
  **/
 @EntityClaz(name = "account")
-public class Account {
+public class Account{
     @KeyField
     @FaildClaz(name = "address",type = String.class)
     private String address;//地址
@@ -68,5 +68,19 @@ public class Account {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "address='" + address + '\'' +
+                ", privateKey='" + privateKey + '\'' +
+                ", balance=" + balance +
+                ", password='" + password + '\'' +
+                '}';
+    }
+
+    public boolean isNullContent() {
+        return privateKey == null && balance == null && password == null;
     }
 }
