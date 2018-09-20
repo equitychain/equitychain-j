@@ -260,7 +260,7 @@ public class BlockHandler {
             transaction.setEggPrice(trans.getEggPrice().toByteArray());
             transaction.setEggMax(trans.getEggMax().toByteArray());
             transaction.setTime(trans.getTimeStamp().toByteArray());
-
+            transaction.setTradeType(trans.getTradeType().toByteArray());
             block.getTransactions().add(transaction);
         });
 
@@ -299,7 +299,7 @@ public class BlockHandler {
             if(trans.getSignature()!=null)transactionBuilder.setSignature(ByteString.copyFrom(trans.getSignature()));
             if(trans.getEggPrice()!=null)transactionBuilder.setEggPrice(ByteString.copyFrom(trans.getEggPrice()));
             if(trans.getEggMax()!=null)transactionBuilder.setEggMax(ByteString.copyFrom(trans.getEggMax()));
-
+            if(trans.getTradeType()!=null)transactionBuilder.setTradeType(ByteString.copyFrom(trans.getTradeType()));
             blockBuilder.addTransactions(transactionBuilder.build());
         });
 
