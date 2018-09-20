@@ -263,9 +263,9 @@ public class BlockHandler {
             transaction.setTradeType(trans.getTradeType().toByteArray());
             transaction.setBlockHeight(trans.getBlockHeight().toByteArray());
             transaction.setEggUsed(trans.getEggUsed().toByteArray());
-            transaction.setNonce(Integer.parseInt(new String(trans.getNonce().toByteArray())));
+            if(trans.getNonce().toByteArray() != null && trans.getNonce().toByteArray().length != 0 )transaction.setNonce(Integer.parseInt(new String(trans.getNonce().toByteArray())));
             transaction.setPublicKey(trans.getPublicKey().toByteArray());
-            transaction.setStatus(Integer.parseInt(new String(trans.getStatus().toByteArray())));
+            if(trans.getStatus().toByteArray() != null && trans.getStatus().toByteArray().length != 0) transaction.setStatus(Integer.parseInt(new String(trans.getStatus().toByteArray())));
             block.getTransactions().add(transaction);
         });
 
