@@ -261,6 +261,11 @@ public class BlockHandler {
             transaction.setEggMax(trans.getEggMax().toByteArray());
             transaction.setTime(trans.getTimeStamp().toByteArray());
             transaction.setTradeType(trans.getTradeType().toByteArray());
+            transaction.setBlockHeight(trans.getBlockHeight().toByteArray());
+            transaction.setEggUsed(trans.getEggUsed().toByteArray());
+            transaction.setNonce(Integer.parseInt(new String(trans.getNonce().toByteArray())));
+            transaction.setPublicKey(trans.getPublicKey().toByteArray());
+            transaction.setStatus(Integer.parseInt(new String(trans.getStatus().toByteArray())));
             block.getTransactions().add(transaction);
         });
 
@@ -300,6 +305,11 @@ public class BlockHandler {
             if(trans.getEggPrice()!=null)transactionBuilder.setEggPrice(ByteString.copyFrom(trans.getEggPrice()));
             if(trans.getEggMax()!=null)transactionBuilder.setEggMax(ByteString.copyFrom(trans.getEggMax()));
             if(trans.getTradeType()!=null)transactionBuilder.setTradeType(ByteString.copyFrom(trans.getTradeType()));
+            if(trans.getBlockHeight()!=null)transactionBuilder.setBlockHeight(ByteString.copyFrom(trans.getBlockHeight()));
+            if(trans.getEggUsed() != null) transactionBuilder.setEggUsed(ByteString.copyFrom(trans.getEggUsed()));
+            if (trans.getNonce()!=null) transactionBuilder.setNonce(ByteString.copyFrom(trans.getNonce().toString().getBytes()));
+            if(trans.getPublicKey()!=null)transactionBuilder.setPublicKey(ByteString.copyFrom(trans.getPublicKey()));
+            if(trans.getStatus()!=null)transactionBuilder.setStatus(ByteString.copyFrom(trans.getStatus().toString().getBytes()));
             blockBuilder.addTransactions(transactionBuilder.build());
         });
 

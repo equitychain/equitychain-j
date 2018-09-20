@@ -35,8 +35,8 @@ public class AccountListSyncRESP extends Strategy {
             Optional<Account> accountOptional = dbAccess.getAccount(account.getAddress().toString());
             if(!accountOptional.isPresent()){//同步不存在本地数据库的账户
                 Account acc = new Account();
-                acc.setAddress(String.valueOf(account.getAddress()));
-                acc.setPrivateKey(String.valueOf(account.getPrivateKey().toString()));
+                acc.setAddress(new String(account.getAddress().toByteArray()));
+                acc.setPrivateKey(new String(account.getPrivateKey().toByteArray()));
                 byte[] balanceByte = account.getBalance().toByteArray();
                 acc.setBalance((balanceByte==null||balanceByte.length==0)?BigDecimal.ZERO:new BigDecimal(new String(balanceByte)));
                 boolean flag = dbAccess.putAccount(acc);
