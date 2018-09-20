@@ -542,7 +542,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             long curHeight = (long) curHeightOpt.get();
             long end = curHeight - pageCount * (pageNumber - 1);
             long begin = curHeight - pageCount * pageNumber + 1;
-            for (long cur = end; cur >= begin; cur++) {
+            for (long cur = end; cur >= begin; cur --) {
                 blocks.add(getObj("blockHeight", "" + cur, Block.class));
             }
         }
