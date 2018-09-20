@@ -100,6 +100,10 @@ public class Block {
 
     return blockHeader.getHash();
   }
+  public boolean isNullContent(){
+    return blockSize == null && blockHeader == null
+            && transactionCount==null&& transactions==null;
+  }
   //之所以复写hashCode和equals，是因为list的contans方法，blockHandler里面的检查区块用到了
   @Override
   public int hashCode() {
