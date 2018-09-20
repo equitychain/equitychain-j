@@ -12,6 +12,8 @@ import com.passport.listener.ApplicationContextProvider;
 import com.passport.proto.BlockHeaderMessage;
 import com.passport.proto.BlockMessage;
 import com.passport.proto.TransactionMessage;
+import com.passport.transactionhandler.TransactionStrategy;
+import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.RawardUtil;
@@ -41,6 +43,8 @@ public class BlockHandler {
     private TrusteeHandler trusteeHandler;
     @Autowired
     private BlockUtils blockUtils;
+    @Autowired
+    private TransactionStrategyContext transactionStrategyContext;
 
     public volatile boolean padding = false;
 
@@ -147,7 +151,12 @@ public class BlockHandler {
 
                                     //同时保存区块中的流水到已确认流水列表中
                                     blockLocal.getTransactions().forEach(transaction -> {
-                                        dbAccess.putConfirmTransaction(transaction);
+                                        TransactionStrategy transactionStrategy = transactionStrategyContext.getTransactionStrategy(new String(transaction.getTradeType()));
+                                        if(transactionStrategy != null){
+                                            transactionStrategy.handleTransaction(transaction);
+
+                                            dbAccess.putConfirmTransaction(transaction);
+                                        }
                                     });
                                 }
                             }else{
