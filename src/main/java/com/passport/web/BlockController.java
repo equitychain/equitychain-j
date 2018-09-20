@@ -1,16 +1,20 @@
 package com.passport.web;
 
 import com.google.common.base.Optional;
+import com.passport.core.Block;
+import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
 import com.passport.webhandler.MinerHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 区块
@@ -48,4 +52,37 @@ public class BlockController {
         return resultDto;
     }
 
+    /**
+     * 根据区块高度获取区块
+     * @return
+     */
+    @GetMapping("getBlockByHeight/{blockHeight}")
+    public ResultDto<?> getBlockByHeight(@PathVariable(value="blockHeight") long blockHeight) {
+        Optional<Block> block = dbAccess.getBlock(blockHeight);
+        return new ResultDto(ResultEnum.SUCCESS.getCode(), block.get());
+    }
+
+    /**
+     * 根据区块高度获取流水列表
+     * @return
+     */
+    @GetMapping("getTransactionsByBlockHeight/{blockHeight}")
+    public ResultDto<?> getTransactionsByBlockHeight(@PathVariable(value="blockHeight") long blockHeight) {
+        List<Transaction> transactions = dbAccess.getTransactionsByBlockHeight(blockHeight);
+        return new ResultDto(ResultEnum.SUCCESS.getCode(), transactions);
+    }
+
+    /**
+     * 分页查询区块
+     * @return
+     */
+    @GetMapping("getBlockByPage/{pageNum}")
+    public ResultDto<?> getBlockByPage(@PathVariable(value="pageNum") int pageNum) {
+        try {
+            List<Block> blocks = dbAccess.blockPagination(10, pageNum);
+            return new ResultDto(ResultEnum.SUCCESS.getCode(), blocks);
+        } catch (Exception e) {
+            return new ResultDto(ResultEnum.SYS_ERROR);
+        }
+    }
 }
