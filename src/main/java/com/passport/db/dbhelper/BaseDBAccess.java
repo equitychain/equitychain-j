@@ -100,12 +100,6 @@ public abstract class BaseDBAccess implements DBAccess {
                     handleMap.put(name, handler);
                 });
             }
-            String las = getLastBlockHeight().get().toString();
-            System.out.println("last"+las);
-            RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("blockHeader","timeStamp")));
-            for (iterator.seekToFirst();iterator.isValid();iterator.next()){
-                System.out.println("key:"+new String(iterator.key())+"   value:"+new String(iterator.value()));
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -294,6 +288,7 @@ public abstract class BaseDBAccess implements DBAccess {
                                         Object item = field.get(o);
                                         //只保存对应的主键
                                         value.add(item);
+                                        addObj(o);
                                     }
                                 }
                                 if (!hasKey) break;
@@ -537,9 +532,8 @@ public abstract class BaseDBAccess implements DBAccess {
                         }
                         String finalKeyFieldKey = keyFieldKey;
                         keyList.forEach((k) -> {
-                            String keyFieldValue = k.toString();
                             try {
-                                Object item = getObj(finalKeyFieldKey, keyFieldValue, listGen);
+                                Object item = getObj(finalKeyFieldKey, k instanceof byte[]?(byte[])k:k.toString(), listGen);
                                 valList.add(item);
                             } catch (Exception e) {
                                 e.printStackTrace();

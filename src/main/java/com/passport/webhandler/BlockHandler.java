@@ -300,7 +300,7 @@ public class BlockHandler {
     public void produceNextBlock() {
         //当前区块周期
         Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
-        if(lastBlockOptional.isPresent()){
+        if(!lastBlockOptional.isPresent()){
             return;
         }
         Block block = lastBlockOptional.get();
@@ -354,6 +354,8 @@ public class BlockHandler {
 
                 //更新101个受托人，已经出块人的状态
                 trusteeHandler.changeStatus(trustee, blockCycle);
+
+                logger.info("第{}个区块出块成功", newBlockHeight);
 
                 provider.publishEvent(new GenerateNextBlockEvent(0L));
             }

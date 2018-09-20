@@ -37,6 +37,7 @@ public class BlockController {
         return new ResultDto(ResultEnum.SUCCESS);
     }
 
+
     /**
      * 查询区块列表
      *
@@ -85,6 +86,7 @@ public class BlockController {
         return resultDto;
     }
 
+
     /**
      * 获取最新区块高度
      *
@@ -101,4 +103,6 @@ public class BlockController {
         resultDto.setData(blockHeight);
         return resultDto;
     }
+
+
 }
