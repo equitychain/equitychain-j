@@ -300,7 +300,7 @@ public class BlockHandler {
     public void produceNextBlock() {
         //当前区块周期
         Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
-        if(lastBlockOptional.isPresent()){
+        if(!lastBlockOptional.isPresent()){
             return;
         }
         Block block = lastBlockOptional.get();
@@ -330,7 +330,7 @@ public class BlockHandler {
         long timeGap = currentTimestamp - lastTimestamp;
         if(timeGap < Constant.BLOCK_GENERATE_TIMEGAP*1000){//间隔小于10秒，则睡眠等待
             try {
-                TimeUnit.MILLISECONDS.sleep(timeGap);
+                TimeUnit.MILLISECONDS.sleep(Constant.BLOCK_GENERATE_TIMEGAP*1000 - timeGap);
             } catch (InterruptedException e) {
                 logger.error("生产区块睡眠等待异常", e);
             }
@@ -354,6 +354,8 @@ public class BlockHandler {
 
                 //更新101个受托人，已经出块人的状态
                 trusteeHandler.changeStatus(trustee, blockCycle);
+
+                logger.info("第{}个区块出块成功", newBlockHeight);
 
                 provider.publishEvent(new GenerateNextBlockEvent(0L));
             }
