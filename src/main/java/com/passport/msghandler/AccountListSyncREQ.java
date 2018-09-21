@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public class AccountListSyncREQ extends Strategy {
             AccountMessage.Account.Builder builder = AccountMessage.Account.newBuilder();
             builder.setAddress(ByteString.copyFrom(account.getAddress().getBytes()));
 //            builder.setPrivateKey(ByteString.copyFrom(account.getPrivateKey().getBytes()));
-            builder.setBalance(ByteString.copyFrom(String.valueOf(account.getBalance()).getBytes()));
+            builder.setBalance(ByteString.copyFrom(String.valueOf(BigDecimal.ZERO).getBytes()));
             dataBuilder.addAccounts(builder.build());
         }
 
