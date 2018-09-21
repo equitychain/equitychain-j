@@ -5,6 +5,7 @@ import com.passport.core.Account;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.proto.AccountMessage;
 import com.passport.proto.NettyMessage;
+import com.passport.utils.DataFormatUtil;
 import com.passport.utils.GsonUtils;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ public class AccountListSyncRESP extends Strategy {
 
         List<AccountMessage.Account> accountsList = message.getData().getAccountsList();
         for (AccountMessage.Account account : accountsList) {
-            Optional<Account> accountOptional = dbAccess.getAccount(account.getAddress().toString());
+            Optional<Account> accountOptional = dbAccess.getAccount(DataFormatUtil.byteStringToString(account.getAddress()));
             if(!accountOptional.isPresent()){//同步不存在本地数据库的账户
                 Account acc = new Account();
                 acc.setAddress(new String(account.getAddress().toByteArray()));

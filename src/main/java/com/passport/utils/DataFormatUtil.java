@@ -1,5 +1,7 @@
 package com.passport.utils;
 
+import com.google.protobuf.ByteString;
+
 import java.math.BigDecimal;
 
 /**
@@ -8,5 +10,8 @@ import java.math.BigDecimal;
 public class DataFormatUtil {
     public static BigDecimal byteAsBigDecimal(byte[] bytes) {
         return new BigDecimal(bytes == null || bytes.length == 0 ? "0" : new String(bytes));
+    }
+    public static String byteStringToString(ByteString byteString){
+        return new String(byteString.toByteArray());
     }
 }
