@@ -6,13 +6,20 @@ import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.crypto.eth.ECKeyPair;
 import com.passport.crypto.eth.WalletUtils;
+import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.db.transaction.RocksdbTransaction;
 import com.passport.enums.TransactionTypeEnum;
 import com.passport.exception.CipherException;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.utils.GsonUtils;
+import com.passport.utils.SerializeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.mockito.internal.util.StringUtil;
+import org.rocksdb.ReadOptions;
+import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
+import org.rocksdb.RocksIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +39,7 @@ public class AccountHandler {
     private static final Logger logger = LoggerFactory.getLogger(AccountHandler.class);
 
     @Autowired
-    private DBAccess dbAccess;
+    private BaseDBAccess dbAccess;
     @Autowired
     private RocksdbTransaction rocksDBTr;
     //广播event用的
@@ -47,12 +54,30 @@ public class AccountHandler {
 
     @RocksTransaction
     public void test() throws RocksDBException {
-//        for(int i = 0;i<10;i++){
-//            rocksDBTr.add("gg".getBytes(),"4".getBytes());
-////            if(i==9) throw new RocksDBException("shib");
-//        }
-        System.out.println(dbAccess.get("gg"));
+        for(int i = 0;i<10;i++){
+            System.out.println("----->"+i);
+            rocksDBTr.add(("gg"+i).getBytes(),(i+"").getBytes());
+//            if(i==9) throw new RocksDBException("shib");
+        }
+//        seekB(rocksDBTr.getRocksDB());
+//        System.out.println(dbAccess.get("gg"));
     }
+
+    public void test2() throws RocksDBException {
+        seekB(rocksDBTr.getRocksDB());
+    }
+
+    public void seekB(RocksDB rocksDB) {
+        ReadOptions options = new ReadOptions();
+        options.setPrefixSameAsStart(true);
+        RocksIterator iterator = rocksDB.newIterator(options);
+        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+
+            System.out.println(new String(iterator.key())+"<==>"+new String(iterator.value()));
+        }
+    }
+
+
     /**
      * 新增账号
      * @return 账号

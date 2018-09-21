@@ -48,7 +48,7 @@
 
     <dependency>
       <groupId>org.rocksdb</groupId>
-      <artifactId>rocksdbjni-repair</artifactId>
+      <artifactId>rocksdbjni</artifactId>
       <version>5.13.4</version>
     </dependency>
 
@@ -209,7 +209,7 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-test</artifactId>
+      <artifactId>spring-boot-starter-test</artifactId>
     </dependency>
     <dependency>
       <groupId>com.esotericsoftware</groupId>
@@ -239,6 +239,7 @@
       <artifactId>kotlin-reflect</artifactId>
       <version>1.2.31</version>
     </dependency>
+
 
   </dependencies>
 

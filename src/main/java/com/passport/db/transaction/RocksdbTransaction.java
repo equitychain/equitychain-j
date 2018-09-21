@@ -102,7 +102,7 @@ public class RocksdbTransaction {
         //在一个事务的最后调用该方法,由切面决定调用时间(当事务注解的方法完成的时候执行)
         //关闭DB对象实例,情况Keyset,快照
         //todo 接下来还要加入清空实例化对象文件, 记录keySet对象的实例化对象文件之后如果事务正确执行完毕, 则清除该文件,如果执行过程中出现 问题,则在启动的时候逐一回复, 逐一回复的会后应从linkedList最后开始一次恢复
-        rocksDB.close();
+//        rocksDB.close();
         setKeysSet(new HashSet());
         setRocksBackup(new RocksBackup());
         setSnapshot(null);

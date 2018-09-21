@@ -100,6 +100,13 @@ public abstract class BaseDBAccess implements DBAccess {
                     handleMap.put(name, handler);
                 }
             }
+
+            if(rocksDB!=null){
+                transaction.setRocksDB(rocksDB);
+                transaction.setHandleMap(handleMap);
+                transaction.initRocksDB();
+
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
