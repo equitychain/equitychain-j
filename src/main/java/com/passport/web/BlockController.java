@@ -9,6 +9,7 @@ import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
 import com.passport.utils.CheckUtils;
 import com.passport.webhandler.MinerHandler;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -115,8 +116,18 @@ public class BlockController {
     @ResponseBody
     public ResultDto<?> getBlockByHeight(@PathVariable(value="blockHeight") long blockHeight) {
         Optional<Block> blockOptional = dbAccess.getBlock(blockHeight);
-        Block block = blockOptional.get();
+        com.passport.dto.coreobject.Block newBlock = getBlockObject(blockOptional.get());
 
+        return new ResultDto(ResultEnum.SUCCESS.getCode(), newBlock);
+    }
+
+    /**
+     * 反射取byte数组对应的数据
+     * @param block
+     * @return
+     */
+    @NotNull
+    private com.passport.dto.coreobject.Block getBlockObject(Block block) {
         com.passport.dto.coreobject.Block newBlock = new com.passport.dto.coreobject.Block();
         BeanUtils.copyProperties(block, newBlock);
 
@@ -131,8 +142,7 @@ public class BlockController {
             newTransactions.add(newTransaction);
         });
         newBlock.setTransactions(newTransactions);
-
-        return new ResultDto(ResultEnum.SUCCESS.getCode(), newBlock);
+        return newBlock;
     }
 
     /**
@@ -142,7 +152,13 @@ public class BlockController {
     @GetMapping("getTransactionsByBlockHeight/{blockHeight}")
     public ResultDto<?> getTransactionsByBlockHeight(@PathVariable(value="blockHeight") long blockHeight) {
         List<Transaction> transactions = dbAccess.getTransactionsByBlockHeight(blockHeight);
-        return new ResultDto(ResultEnum.SUCCESS.getCode(), transactions);
+        List<com.passport.dto.coreobject.Transaction> newTransactions = new ArrayList<>();
+        transactions.forEach(transaction -> {
+            com.passport.dto.coreobject.Transaction newTransaction = new com.passport.dto.coreobject.Transaction();
+            BeanUtils.copyProperties(transaction, newTransaction);
+            newTransactions.add(newTransaction);
+        });
+        return new ResultDto(ResultEnum.SUCCESS.getCode(), newTransactions);
     }
 
     /**
@@ -153,7 +169,11 @@ public class BlockController {
     public ResultDto<?> getBlockByPage(@PathVariable(value="pageNum") int pageNum) {
         try {
             List<Block> blocks = dbAccess.blockPagination(10, pageNum);
-            return new ResultDto(ResultEnum.SUCCESS.getCode(), blocks);
+            List<com.passport.dto.coreobject.Block> newBlocks = new ArrayList<>();
+            blocks.forEach(block -> {
+                newBlocks.add(getBlockObject(block));
+            });
+            return new ResultDto(ResultEnum.SUCCESS.getCode(), newBlocks);
         } catch (Exception e) {
             return new ResultDto(ResultEnum.SYS_ERROR);
         }
