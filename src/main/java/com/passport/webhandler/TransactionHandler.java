@@ -89,7 +89,8 @@ public class TransactionHandler {
             //4.使用支付方的私钥加密数据 TODO 构造签名数据
             Transaction transaction = generateTransaction(payAddress, receiptAddress, value, extarData, accountPay);
             transaction.setTradeType(TransactionTypeEnum.statusOf(tradeType).toString().getBytes());
-
+            transaction.setEggMax(Constant.TRANS_EGG_MAXDEFALT.toString().getBytes());
+            transaction.setEggPrice(Constant.TRANS_EGG_PRICEDEFALT.toString().getBytes());
             //5.放到本地未确认流水中
             dbAccess.putUnconfirmTransaction(transaction);
 
@@ -209,14 +210,14 @@ public class TransactionHandler {
      * @param list
      */
     public void exec(List<Transaction> list) {
-        //需要清空，不然会冗余很多
-        eggUsedTemp.clear();
         for (Transaction transaction : list) {
             TransactionStrategy transactionStrategy = transactionStrategyContext.getTransactionStrategy(new String(transaction.getTradeType()));
             if(transactionStrategy != null){
                 transactionStrategy.handleTransaction(transaction);
             }
         }
+        //需要清空，不然会冗余很多
+        eggUsedTemp.clear();
     }
 
     //获取需要打包的流水
@@ -239,7 +240,7 @@ public class TransactionHandler {
             if(eggUsed.compareTo(BigDecimal.ZERO)> 0 && blockMaxEgg.compareTo(eggUsed)>=0 && transactions.size() < Constant.TRANS_SIZE){
                 System.out.println("======add======="+eggUsed);
                 transactions.add(tran);
-                eggUsedTemp.put(tran.getHash(),eggUsed);
+                eggUsedTemp.put(tran.getHash(),eggUsed.multiply(new BigDecimal(new String(tran.getEggPrice()))));
                 blockMaxEgg = blockMaxEgg.subtract(eggUsed);
                 if(blockMaxEgg.compareTo(BigDecimal.ZERO) == 0){
                     break;

@@ -87,11 +87,21 @@ public class MinerHandler {
             //矿工费付给矿工  注意!无论流水是否成功被打包该矿工费是必须给的,因为已经扣了,
             Transaction feeTrans = new Transaction();
             feeTrans.setTime(ByteUtil.longToBytesNoLeadZeroes(System.currentTimeMillis()));
-            feeTrans.setExtarData("流水矿工费获得".getBytes());
+            feeTrans.setPayAddress(null);
+            feeTrans.setExtarData(tran.getHash());
             BigDecimal valueDec = transactionHandler.getTempEggByHash(tran.getHash());
             valueDec = valueDec == null?BigDecimal.ZERO:valueDec;
             feeTrans.setValue(String.valueOf(valueDec).getBytes());
+            feeTrans.setBlockHeight(((prevBlock.getBlockHeight() + 1)+"").getBytes());
             feeTrans.setReceiptAddress(minerAccount.getAddress().getBytes());
+
+            //生成hash和生成签名sign使用的基础数据都应该一样
+            String tranJson = GsonUtils.toJson(feeTrans);
+            //计算交易hash
+            feeTrans.setHash(ECDSAUtil.applySha256(tranJson).getBytes());
+            feeTrans.setTradeType(TransactionTypeEnum.CONFIRM_REWARD.toString().getBytes());
+
+            tran.setBlockHeight(((prevBlock.getBlockHeight() + 1)+"").getBytes());
             //添加奖励和需要确认的流水
             currentBlock.getTransactions().add(feeTrans);
             currentBlock.getTransactions().add(tran);
@@ -162,7 +172,7 @@ public class MinerHandler {
             //矿工费付给矿工  注意!无论流水是否成功被打包该矿工费是必须给的,因为已经扣了,
             Transaction feeTrans = new Transaction();
             feeTrans.setTime(ByteUtil.longToBytesNoLeadZeroes(System.currentTimeMillis()));
-            feeTrans.setExtarData("流水矿工费获得".getBytes());
+            feeTrans.setExtarData(tran.getHash());
             BigDecimal valueDec = transactionHandler.getTempEggByHash(tran.getHash());
             valueDec = valueDec == null?BigDecimal.ZERO:valueDec;
             feeTrans.setValue(String.valueOf(valueDec).getBytes());

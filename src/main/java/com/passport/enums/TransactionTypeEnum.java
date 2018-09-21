@@ -12,7 +12,8 @@ public enum TransactionTypeEnum {
     TRUSTEE_CANNEL("受托人撤销注册"),
     VOTER_REGISTER("投票人注册"),
     VOTER_CANNEL("投票人撤销注册"),
-    BLOCK_REWARD("出块奖励");
+    BLOCK_REWARD("出块奖励"),
+    CONFIRM_REWARD("确认流水奖励");
 
 
     TransactionTypeEnum(String desc){
@@ -22,7 +23,7 @@ public enum TransactionTypeEnum {
 
     public static TransactionTypeEnum statusOf(String tradeType){
         for (TransactionTypeEnum transactionTypeEnum : TransactionTypeEnum.values()) {
-            if(transactionTypeEnum.getDesc().equals(tradeType)){
+            if(transactionTypeEnum.toString().equals(tradeType)){
                 return transactionTypeEnum;
             }
         }
