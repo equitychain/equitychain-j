@@ -42,8 +42,8 @@ public class TransactionController {
 
         boolean flag =false;
         //若流水类型为 委托人注册 或 投票人注册的时候 不校验receiptAddress
-        if(TransactionTypeEnum.TRUSTEE_REGISTER.getDesc().equals(tradeType)
-                ||TransactionTypeEnum.VOTER_REGISTER.getDesc().equals(tradeType)){
+        if(TransactionTypeEnum.TRUSTEE_REGISTER.toString().equals(tradeType)
+                ||TransactionTypeEnum.VOTER_REGISTER.toString().equals(tradeType)){
             flag = CheckUtils.checkParamIfEmpty(payAddress, value, extarData);
         }else{
             //非空检验

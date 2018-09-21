@@ -113,11 +113,11 @@ public class TransactionHandler {
         if(transactionTypeEnum == null){
             return new CommonException(ResultEnum.TRADETYPE_NOTFOUND);
         }
-        if(TransactionTypeEnum.TRUSTEE_REGISTER.getDesc().equals(transactionTypeEnum.getDesc())){
+        if(TransactionTypeEnum.TRUSTEE_REGISTER.toString().equals(transactionTypeEnum.toString())){
             if(new BigDecimal(value).compareTo(Constant.FEE_4_REGISTER_TRUSTEE) != 0){
                 return new CommonException(ResultEnum.TRADEAMOUNT_ILLEGAL);
             }
-        }else if(TransactionTypeEnum.VOTER_REGISTER.getDesc().equals(transactionTypeEnum.getDesc())){
+        }else if(TransactionTypeEnum.VOTER_REGISTER.toString().equals(transactionTypeEnum.toString())){
             if(new BigDecimal(value).compareTo(Constant.FEE_4_REGISTER_VOTER) != 0){
                 return new CommonException(ResultEnum.TRADEAMOUNT_ILLEGAL);
             }
@@ -138,27 +138,27 @@ public class TransactionHandler {
         }
 
         TransactionTypeEnum transactionTypeEnum = TransactionTypeEnum.statusOf(tradeType);
-        if(TransactionTypeEnum.TRUSTEE_REGISTER.getDesc().equals(transactionTypeEnum.getDesc())){//已是委托人则不能重复注册
+        if(TransactionTypeEnum.TRUSTEE_REGISTER.toString().equals(transactionTypeEnum.toString())){//已是委托人则不能重复注册
             Optional<Trustee> trusteeOptional = dbAccess.getTrustee(payAddress);
             if(trusteeOptional.isPresent() && trusteeOptional.get().getStatus() == 1){
                 return new CommonException(ResultEnum.TRUSTEE_EXISTS);
             }
-        }else if(TransactionTypeEnum.TRUSTEE_CANNEL.getDesc().equals(transactionTypeEnum.getDesc())){//只有受托人才能发起取消注册
+        }else if(TransactionTypeEnum.TRUSTEE_CANNEL.toString().equals(transactionTypeEnum.toString())){//只有受托人才能发起取消注册
             Optional<Trustee> trusteeOptional = dbAccess.getTrustee(payAddress);
             if(!trusteeOptional.isPresent() || trusteeOptional.get().getStatus() == 0){
                 return new CommonException(ResultEnum.TRUSTEE_NOTEXISTS);
             }
-        }else if(TransactionTypeEnum.VOTER_REGISTER.getDesc().equals(transactionTypeEnum.getDesc())){//已是投票人则不能重复注册
+        }else if(TransactionTypeEnum.VOTER_REGISTER.toString().equals(transactionTypeEnum.toString())){//已是投票人则不能重复注册
             Optional<Voter> voterOptional = dbAccess.getVoter(payAddress);
             if(voterOptional.isPresent() && voterOptional.get().getStatus() == 1){
                 return new CommonException(ResultEnum.VOTER_EXISTS);
             }
-        }else if(TransactionTypeEnum.VOTER_CANNEL.getDesc().equals(transactionTypeEnum.getDesc())){//只有投票人才能发起取消注册
+        }else if(TransactionTypeEnum.VOTER_CANNEL.toString().equals(transactionTypeEnum.toString())){//只有投票人才能发起取消注册
             Optional<Voter> voterOptional = dbAccess.getVoter(payAddress);
             if(!voterOptional.isPresent() || voterOptional.get().getStatus() == 0){
                 return new CommonException(ResultEnum.VOTER_NOTEXISTS);
             }
-        }else if(TransactionTypeEnum.VOTE.getDesc().equals(transactionTypeEnum.getDesc())){//只能给受托人投票
+        }else if(TransactionTypeEnum.VOTE.toString().equals(transactionTypeEnum.toString())){//只能给受托人投票
             //给受托人投票，需判断受托人是否存在
             Optional<Trustee> trusteeOptional = dbAccess.getTrustee(receiptAddress);
             if(!trusteeOptional.isPresent() || trusteeOptional.get().getStatus() == 0){
