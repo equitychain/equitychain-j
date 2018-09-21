@@ -36,7 +36,7 @@ public class AccountListSyncREQ extends Strategy {
         for (Account account : accounts) {
             AccountMessage.Account.Builder builder = AccountMessage.Account.newBuilder();
             builder.setAddress(ByteString.copyFrom(account.getAddress().getBytes()));
-            builder.setPrivateKey(ByteString.copyFrom(account.getPrivateKey().getBytes()));
+//            builder.setPrivateKey(ByteString.copyFrom(account.getPrivateKey().getBytes()));
             builder.setBalance(ByteString.copyFrom(String.valueOf(account.getBalance()).getBytes()));
             dataBuilder.addAccounts(builder.build());
         }

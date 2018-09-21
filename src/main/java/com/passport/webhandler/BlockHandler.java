@@ -365,7 +365,7 @@ public class BlockHandler {
     public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) {
         Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
         Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
-        if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null){//出块人属于本节点
+        if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
             Account account = accountOptional.get();
             if(account.getPrivateKey() != null){
                 //打包区块
