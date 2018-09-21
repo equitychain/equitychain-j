@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.utils.SerializeUtils;
+import org.apache.zookeeper.Op;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
@@ -255,6 +256,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             Transaction transaction = getObj("hash", txHash, Transaction.class);
             if (transaction != null) {
                 if (transaction.getBlockHeight() == null || transaction.getBlockHeight().length == 0) {
+                    if(transaction.isNullContent()){
+                        return Optional.absent();
+                    }
                     return Optional.of(transaction);
                 }
             }
@@ -285,7 +289,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             try {
                 Transaction transaction = getObj("hash", hash, Transaction.class);
                 if (transaction.getBlockHeight() == null || transaction.getBlockHeight().length == 0) {
-                    transactions.add(transaction);
+                    if(!transaction.isNullContent()) {
+                        transactions.add(transaction);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -315,6 +321,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             Transaction transaction = getObj("hash", txHash, Transaction.class);
             if (transaction != null) {
                 if (transaction.getBlockHeight() != null && transaction.getBlockHeight().length > 0) {
+                    if(transaction.isNullContent()){
+                        return Optional.absent();
+                    }
                     return Optional.of(transaction);
                 }
             }
@@ -330,7 +339,10 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         List<Transaction> result = new ArrayList<>();
         for (iterator.seekToFirst();iterator.isValid();iterator.next()){
             try {
-                result.add(getObj("hash",iterator.key(),Transaction.class));
+                Transaction transaction = getObj("hash",iterator.key(),Transaction.class);
+                if(!transaction.isNullContent()) {
+                    result.add(transaction);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -371,6 +383,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public Optional<Trustee> getTrustee(String address) {
         try {
             Trustee trustee = getObj("address",address,Trustee.class);
+            if(trustee.isNullContent()){
+                return Optional.absent();
+            }
             return Optional.of(trustee);
         } catch (Exception e) {
             e.printStackTrace();
@@ -402,6 +417,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public Optional<Voter> getVoter(String address) {
         try {
             Voter voter = getObj("address",address,Voter.class);
+            if(voter.isNullContent()){
+                return Optional.absent();
+            }
             return Optional.of(voter);
         } catch (Exception e) {
             e.printStackTrace();
@@ -431,7 +449,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 }
                 //求和
                 trustee.setVotes(trustee.getVotes()+Integer.parseInt(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord","voteNum")),iterator.key()))));
-                allVoters.add(trustee);
+                if(!trustee.isNullContent()) {
+                    allVoters.add(trustee);
+                }
             }
         }
         //排序
