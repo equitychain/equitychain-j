@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 
 /**
  * 区块奖励
+ *
  * @author: xujianfeng
  * @create: 2018-09-10 17:46
  **/
@@ -31,13 +32,13 @@ public class BlockRewardHandler extends TransactionStrategy {
     protected void handle(Transaction transaction) {
         byte[] payAddressByte = transaction.getPayAddress();
         //挖矿奖励 TODO 出块同时奖励投票人
-        if (payAddressByte == null) {
+        if (payAddressByte == null || payAddressByte.length == 0) {
             Optional<Account> accountOptional = dbAccess.getAccount(new String(transaction.getReceiptAddress()));
-            if(accountOptional.isPresent()){
+            if (accountOptional.isPresent()) {
                 String blockHeight = new String(transaction.getBlockHeight());
                 BigDecimal reward = blockHandler.getReward(CastUtils.castLong(blockHeight));
                 BigDecimal valueBigDecimal = CastUtils.castBigDecimal(new String(transaction.getValue()));//交易金额
-                if(reward.compareTo(valueBigDecimal) != 0){//出块奖励
+                if (reward.compareTo(valueBigDecimal) != 0) {//出块奖励
                     return;
                 }
 
