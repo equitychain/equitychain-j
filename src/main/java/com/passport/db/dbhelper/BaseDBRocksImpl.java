@@ -1,6 +1,7 @@
 package com.passport.db.dbhelper;
 
 import com.google.common.base.Optional;
+import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.ColumnFamilyHandle;
@@ -379,7 +380,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     public List<Trustee> listTrustees() {
-        return trusteePagination(101,1,0,null,null);
+        return trusteePagination(Constant.TRUSTEES_INIT_NUM,1,0,null,null);
     }
 
     @Override
@@ -441,7 +442,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             }
         });
         //获取前101个
-        voters.addAll(allVoters.size()>=101?allVoters.subList(0,101):allVoters);
+        voters.addAll(allVoters.size()>=Constant.TRUSTEES_INIT_NUM?allVoters.subList(0,Constant.TRUSTEES_INIT_NUM):allVoters);
         return voters;
     }
 
