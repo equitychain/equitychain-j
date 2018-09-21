@@ -87,7 +87,7 @@ public class TransactionHandler {
 
             //4.使用支付方的私钥加密数据 TODO 构造签名数据
             Transaction transaction = generateTransaction(payAddress, receiptAddress, value, extarData, accountPay);
-            transaction.setTradeType(TransactionTypeEnum.statusOf(tradeType).getDesc().getBytes());
+            transaction.setTradeType(TransactionTypeEnum.statusOf(tradeType).toString().getBytes());
             transaction.setEggMax(Constant.TRANS_EGG_MAXDEFALT.toString().getBytes());
             transaction.setEggPrice(Constant.TRANS_EGG_PRICEDEFALT.toString().getBytes());
             //5.放到本地未确认流水中

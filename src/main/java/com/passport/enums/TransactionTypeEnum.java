@@ -23,7 +23,7 @@ public enum TransactionTypeEnum {
 
     public static TransactionTypeEnum statusOf(String tradeType){
         for (TransactionTypeEnum transactionTypeEnum : TransactionTypeEnum.values()) {
-            if(transactionTypeEnum.getDesc().equals(tradeType)){
+            if(transactionTypeEnum.toString().equals(tradeType)){
                 return transactionTypeEnum;
             }
         }

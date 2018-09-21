@@ -88,7 +88,7 @@ public class MinerHandler {
             Transaction feeTrans = new Transaction();
             feeTrans.setTime(ByteUtil.longToBytesNoLeadZeroes(System.currentTimeMillis()));
             feeTrans.setPayAddress(null);
-            feeTrans.setExtarData("流水矿工费获得".getBytes());
+            feeTrans.setExtarData(tran.getHash());
             BigDecimal valueDec = transactionHandler.getTempEggByHash(tran.getHash());
             valueDec = valueDec == null?BigDecimal.ZERO:valueDec;
             feeTrans.setValue(String.valueOf(valueDec).getBytes());

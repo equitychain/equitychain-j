@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 /**
  * 确认流水奖励
  *
- * @author: xujianfeng
+ * @author: linqihong
  * @create: 2018-09-10 17:46
  **/
 @Component("CONFIRM_REWARD")
@@ -39,7 +39,7 @@ public class TransactionRewardHandler extends TransactionStrategy {
             Optional<Account> accountOptional = dbAccess.getAccount(new String(transaction.getReceiptAddress()));
             if (accountOptional.isPresent()) {
                 BigDecimal reward = new BigDecimal(new String(transaction.getValue()));
-                BigDecimal valueBigDecimal = transactionHandler.getTempEggByHash(transaction.getHash());
+                BigDecimal valueBigDecimal = transactionHandler.getTempEggByHash(transaction.getExtarData());
                 if (valueBigDecimal == null || reward.compareTo(valueBigDecimal) != 0) {//校验奖励金额未通过
                     return;
                 }
