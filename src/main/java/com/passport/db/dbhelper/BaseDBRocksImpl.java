@@ -550,7 +550,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    public List<Transaction> transactionPagination(int pageCount, int pageNumber, int orderByType, List<String> screens, List<byte[][]> screenVals) {
+    public List<Transaction> transactionPagination(int pageCount, int pageNumber, int orderByType, List<String> screens, List<byte[][]> screenVals,int screenType) {
         List<ColumnFamilyHandle> screenHanles = new ArrayList<>();
         if (screens != null && screenVals != null) {
             for (int i = 0; i < screens.size(); i++) {
@@ -562,7 +562,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         }
         try {
             return getDtoOrderByHandle(pageCount, pageNumber, handleMap.get(IndexColumnNames.TRANSTIMEINDEX.indexName)
-                    , screenHanles, screenVals,0, handleMap.get(IndexColumnNames.TRANSTIMEINDEX.overAndNextName),
+                    , screenHanles, screenVals,screenType, handleMap.get(IndexColumnNames.TRANSTIMEINDEX.overAndNextName),
                     Transaction.class, "hash", orderByType, 150, 0,handleMap.get(getColName("transaction","time")));
 
         } catch (Exception e) {
@@ -598,7 +598,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         }
     }
     @Override
-    public List<Transaction> getNewBlocksTransactions(int pageCount, int pageNumber) {
+    public List<Transaction> getNewBlocksTransactions(int pageCount, int pageNumber,int nBlock) {
         List<ColumnFamilyHandle> screenHandles = new ArrayList<>();
         screenHandles.add(handleMap.get(getColName("transaction", "blockHeight")));
         Optional<Object> lastBlockHeightOpt = getLastBlockHeight();
@@ -607,9 +607,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         if (lastBlockHeightOpt.isPresent()) {
             lastBlockHeight = Long.parseLong(lastBlockHeightOpt.get().toString());
         }
-        int size = lastBlockHeight >= 0 ? (int) (lastBlockHeight <= 100 ? lastBlockHeight : 100) : 1;
+        int size = lastBlockHeight >= 0 ? (int) (lastBlockHeight <= nBlock ? lastBlockHeight : nBlock) : 1;
         byte[][] val = new byte[size][];
-        for (int i = 0; lastBlockHeight >= 0 && i < 100; i++) {
+        for (int i = 0; lastBlockHeight >= 0 && i < nBlock; i++) {
             val[i] = (lastBlockHeight + "").getBytes();
             lastBlockHeight--;
         }

@@ -16,6 +16,7 @@ import com.passport.listener.ApplicationContextProvider;
 import com.passport.transactionhandler.TransactionStrategy;
 import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.CastUtils;
+import com.passport.utils.DataFormatUtil;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.eth.ByteUtil;
 import org.slf4j.Logger;
@@ -224,8 +225,8 @@ public class TransactionHandler {
         Collections.sort(unconfirmTrans, new Comparator<Transaction>() {
             @Override
             public int compare(Transaction o1, Transaction o2) {
-                BigDecimal price1 = o1 == null || o1.getEggPrice() == null ? BigDecimal.ZERO : new BigDecimal(new String(o1.getEggPrice()));
-                BigDecimal price2 = o2 == null || o2.getEggPrice() == null ? BigDecimal.ZERO : new BigDecimal(new String(o2.getEggPrice()));
+;                 BigDecimal price1 = o1 == null || o1.getEggPrice() == null || o1.getEggPrice().length == 0 ? BigDecimal.ZERO : new BigDecimal(new String(o1.getEggPrice()));
+                BigDecimal price2 = o2 == null || o2.getEggPrice() == null|| o2.getEggPrice().length == 0 ? BigDecimal.ZERO : new BigDecimal(new String(o2.getEggPrice()));
                 return price2.compareTo(price1);
             }
         });
@@ -257,8 +258,8 @@ public class TransactionHandler {
             e.printStackTrace();
         }
         long end = System.currentTimeMillis();
-        BigDecimal eggUsed = new BigDecimal(transaction.getEggUsed() == null ? "0" : new String(transaction.getEggUsed()));
-        BigDecimal eggMax = new BigDecimal(transaction.getEggMax() == null ? "0" : new String(transaction.getEggMax()));
+        BigDecimal eggUsed = DataFormatUtil.byteAsBigDecimal(transaction.getEggUsed());
+        BigDecimal eggMax =DataFormatUtil.byteAsBigDecimal(transaction.getEggMax());
         BigDecimal curUse = new BigDecimal(end - begin);
         if (eggMax.compareTo(eggUsed.add(curUse)) >= 0) {
             //消耗燃料

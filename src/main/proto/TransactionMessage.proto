@@ -15,4 +15,7 @@ message Transaction {
     bytes publicKey = 10;
     bytes tradeType = 11;
     bytes blockHeight = 12;
+    bytes eggUsed = 13;
+    bytes nonce = 14;
+    bytes status = 15;
 }

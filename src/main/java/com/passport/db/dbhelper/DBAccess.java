@@ -293,7 +293,7 @@ public interface DBAccess {
 	 * @param  screenVals  筛选字段对应的值
 	 * @return
 	 */
-	List<Transaction> transactionPagination(int pageCount, int pageNumber, int orderByType,List<String> screens,List<byte[][]> screenVals);
+	List<Transaction> transactionPagination(int pageCount, int pageNumber, int orderByType,List<String> screens,List<byte[][]> screenVals,int screenType);
 
     /**
      * 根据地址查询流水
@@ -310,9 +310,10 @@ public interface DBAccess {
      * 查询前100个区块的流水
      * @param pageCount
      * @param pageNumber
+	 * @param nBlock:区块数量
      * @return
      */
-	List<Transaction> getNewBlocksTransactions(int pageCount, int pageNumber);
+	List<Transaction> getNewBlocksTransactions(int pageCount, int pageNumber,int nBlock);
 	/**
 	 * 委托人分页查询
 	 * @param pageCount：每页记录数

@@ -261,6 +261,11 @@ public class BlockHandler {
             transaction.setEggMax(trans.getEggMax().toByteArray());
             transaction.setTime(trans.getTimeStamp().toByteArray());
             transaction.setTradeType(trans.getTradeType().toByteArray());
+            transaction.setBlockHeight(trans.getBlockHeight().toByteArray());
+            transaction.setEggUsed(trans.getEggUsed().toByteArray());
+            if(trans.getNonce().toByteArray() != null && trans.getNonce().toByteArray().length != 0 )transaction.setNonce(Integer.parseInt(new String(trans.getNonce().toByteArray())));
+            transaction.setPublicKey(trans.getPublicKey().toByteArray());
+            if(trans.getStatus().toByteArray() != null && trans.getStatus().toByteArray().length != 0) transaction.setStatus(Integer.parseInt(new String(trans.getStatus().toByteArray())));
             block.getTransactions().add(transaction);
         });
 
@@ -300,6 +305,11 @@ public class BlockHandler {
             if(trans.getEggPrice()!=null)transactionBuilder.setEggPrice(ByteString.copyFrom(trans.getEggPrice()));
             if(trans.getEggMax()!=null)transactionBuilder.setEggMax(ByteString.copyFrom(trans.getEggMax()));
             if(trans.getTradeType()!=null)transactionBuilder.setTradeType(ByteString.copyFrom(trans.getTradeType()));
+            if(trans.getBlockHeight()!=null)transactionBuilder.setBlockHeight(ByteString.copyFrom(trans.getBlockHeight()));
+            if(trans.getEggUsed() != null) transactionBuilder.setEggUsed(ByteString.copyFrom(trans.getEggUsed()));
+            if (trans.getNonce()!=null) transactionBuilder.setNonce(ByteString.copyFrom(trans.getNonce().toString().getBytes()));
+            if(trans.getPublicKey()!=null)transactionBuilder.setPublicKey(ByteString.copyFrom(trans.getPublicKey()));
+            if(trans.getStatus()!=null)transactionBuilder.setStatus(ByteString.copyFrom(trans.getStatus().toString().getBytes()));
             blockBuilder.addTransactions(transactionBuilder.build());
         });
 
@@ -355,7 +365,7 @@ public class BlockHandler {
     public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) {
         Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
         Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
-        if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null){//出块人属于本节点
+        if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
             Account account = accountOptional.get();
             if(account.getPrivateKey() != null){
                 //打包区块
