@@ -338,7 +338,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     public Optional<Account> getMinerAccount(){
-        Optional<Object> getMinerAccount = (Optional<Object>) SerializeUtils.unSerialize(get(MINERACCOUNT.getBytes()));
+        Optional<Object> getMinerAccount = get(MINERACCOUNT.getBytes())==null||get(MINERACCOUNT.getBytes()).length==0?Optional.absent():Optional.of(SerializeUtils.unSerialize(get(MINERACCOUNT.getBytes())));
         if(getMinerAccount != null && getMinerAccount.isPresent()){
             return Optional.of((Account) getMinerAccount.get());
         }
@@ -347,7 +347,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     public boolean putMinerAccount(Account account) {
-        return put(MINERACCOUNT.getBytes(),SerializeUtils.serialize(Optional.of(account)));
+        return put(MINERACCOUNT.getBytes(),SerializeUtils.serialize(account));
     }
 
     @Override
