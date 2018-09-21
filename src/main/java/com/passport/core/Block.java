@@ -83,7 +83,7 @@ public class Block {
     List<byte[]> bytes = merkleTree.buildMerkleTree();
     //设置merkleRoot
     if(bytes.size() > 0){
-      blockHeader.setHashMerkleRoot(bytes.get(bytes.size() - 1));
+      blockHeader.setHashMerkleRoot(bytes.get(0));
     }
 
     //生成区块hash

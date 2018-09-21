@@ -3,8 +3,8 @@ package com.passport.core;
 import com.passport.annotations.EntityClaz;
 import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
-import com.passport.crypto.eth.Hash;
-import com.passport.utils.rpc.SerializationUtil;
+import com.passport.crypto.ECDSAUtil;
+import com.passport.utils.GsonUtils;
 
 /**
  * 区块头信息
@@ -80,6 +80,7 @@ public class BlockHeader {
         blockHeader.setTimeStamp(this.timeStamp);
         blockHeader.setHashPrevBlock(this.hashPrevBlock);
         blockHeader.setHashMerkleRoot(this.hashMerkleRoot);
-        this.hash = Hash.sha3(SerializationUtil.serialize(blockHeader));
+        //this.hash = Hash.sha3(GsonUtils.toJson(blockHeader).getBytes());
+        this.hash = ECDSAUtil.applySha256(GsonUtils.toJson(blockHeader)).getBytes();
     }
 }

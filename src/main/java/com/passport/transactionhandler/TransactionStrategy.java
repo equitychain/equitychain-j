@@ -1,6 +1,7 @@
 package com.passport.transactionhandler;
 
 import com.passport.core.Transaction;
+import com.passport.crypto.eth.Keys;
 import com.passport.crypto.eth.Sign;
 import com.passport.enums.TransactionTypeEnum;
 import com.passport.utils.GsonUtils;
@@ -39,7 +40,7 @@ public abstract class TransactionStrategy {
         String transactionJson = GsonUtils.toJson(trans);
         try {
             if(transaction.getPayAddress() == null && transaction.getTradeType().equals(TransactionTypeEnum.BLOCK_REWARD.toString())){
-                if (!Sign.verify(transaction.getPublicKey(), new String(transaction.getSignature()), transactionJson)) {
+                if (!Sign.verify(Keys.publicKeyDecode(new String(transaction.getPublicKey())), new String(transaction.getSignature()), transactionJson)) {
                     return false;
                 }
             }

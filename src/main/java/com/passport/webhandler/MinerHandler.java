@@ -62,7 +62,7 @@ public class MinerHandler {
         transaction.setReceiptAddress(minerAccount.getAddress().getBytes());//奖励接收者是挖矿账号
         transaction.setValue(String.valueOf(RawardUtil.getRewardByHeight(prevBlock.getBlockHeight() + 1).toString()).getBytes());//TODO 挖矿奖励取值优化
         transaction.setExtarData("挖矿奖励".getBytes());
-        transaction.setTime(ByteUtil.longToBytesNoLeadZeroes(System.currentTimeMillis()));
+        transaction.setTime(String.valueOf(System.currentTimeMillis()).getBytes());
         transaction.setBlockHeight(((prevBlock.getBlockHeight() + 1)+"").getBytes());
         //生成hash和生成签名sign使用的基础数据都应该一样
         String transactionJson = GsonUtils.toJson(transaction);

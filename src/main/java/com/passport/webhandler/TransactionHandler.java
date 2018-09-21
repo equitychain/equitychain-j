@@ -5,6 +5,7 @@ import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.crypto.ECDSAUtil;
 import com.passport.crypto.eth.Credentials;
+import com.passport.crypto.eth.Keys;
 import com.passport.crypto.eth.Sign;
 import com.passport.crypto.eth.WalletUtils;
 import com.passport.db.dbhelper.DBAccess;
@@ -18,7 +19,7 @@ import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.CastUtils;
 import com.passport.utils.DataFormatUtil;
 import com.passport.utils.GsonUtils;
-import com.passport.utils.eth.ByteUtil;
+import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +88,7 @@ public class TransactionHandler {
 
             //4.使用支付方的私钥加密数据 TODO 构造签名数据
             Transaction transaction = generateTransaction(payAddress, receiptAddress, value, extarData, accountPay);
-            transaction.setTradeType(TransactionTypeEnum.statusOf(tradeType).getDesc().getBytes());
+            transaction.setTradeType(TransactionTypeEnum.statusOf(tradeType).toString().getBytes());
 
             //5.放到本地未确认流水中
             dbAccess.putUnconfirmTransaction(transaction);
@@ -182,16 +183,17 @@ public class TransactionHandler {
         transaction.setReceiptAddress(receiptAddress == null?null:receiptAddress.getBytes());
         transaction.setValue(value.getBytes());
         transaction.setExtarData(extarData.getBytes());
-        transaction.setTime(ByteUtil.longToBytesNoLeadZeroes(System.currentTimeMillis()));
+        transaction.setTime(String.valueOf(System.currentTimeMillis()).getBytes());
         //生成hash和生成签名sign使用的基础数据都应该一样
         String transactionJson = GsonUtils.toJson(transaction);
         try {
             //使用私钥签名数据
             PrivateKey privateKey = Sign.privateKeyFromString(accountPay.getPrivateKey());
-            transaction.setSignature(ECDSAUtil.applyECDSASig(privateKey, transactionJson));
+            transaction.setSignature(HexBin.encode(ECDSAUtil.applyECDSASig(privateKey, transactionJson)).getBytes());
             //设置交易公钥
             Credentials credentials = Credentials.create(accountPay.getPrivateKey());
-            transaction.setPublicKey(credentials.getEcKeyPair().getPublicKey().getEncoded());
+            //transaction.setPublicKey(credentials.getEcKeyPair().getPublicKey().getEncoded());
+            transaction.setPublicKey(Keys.publicKeyEncode(credentials.getEcKeyPair().getPublicKey().getEncoded()).getBytes());
         } catch (Exception e) {
             logger.error("处理私钥信息异常", e);
             throw new CommonException(ResultEnum.SYS_ERROR);
