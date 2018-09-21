@@ -94,10 +94,10 @@ public abstract class BaseDBAccess implements DBAccess {
                 //打开数据库
                 List<ColumnFamilyHandle> handleList = new ArrayList<>();
                 rocksDB = RocksDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
-                handleList.forEach((handler) -> {
+                for(ColumnFamilyHandle handler : handleList){
                     String name = new String(handler.getName());
                     handleMap.put(name, handler);
-                });
+                }
             }
 
             if(rocksDB!=null){

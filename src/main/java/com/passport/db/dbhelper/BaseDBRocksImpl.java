@@ -223,7 +223,11 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public Optional<Account> getAccount(String address) {
         try {
-            return Optional.of(getObj("address", address, Account.class));
+            Account account = getObj("address", address, Account.class);
+            if(account.isNullContent()){
+                return Optional.absent();
+            }
+            return Optional.of(account);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -538,7 +542,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             long curHeight = (long) curHeightOpt.get();
             long end = curHeight - pageCount * (pageNumber - 1);
             long begin = curHeight - pageCount * pageNumber + 1;
-            for (long cur = end; cur >= begin; cur++) {
+            for (long cur = end; cur >= begin; cur --) {
                 blocks.add(getObj("blockHeight", "" + cur, Block.class));
             }
         }

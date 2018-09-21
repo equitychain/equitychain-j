@@ -4,6 +4,7 @@ import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
+import com.passport.enums.TransactionTypeEnum;
 import com.passport.utils.CheckUtils;
 import com.passport.webhandler.TransactionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +38,16 @@ public class TransactionController {
         String extarData = request.getParameter("extarData");
         String password = request.getParameter("password");
         String tradeType = request.getParameter("tradeType");
+        boolean flag =false;
+        //若流水类型为 委托人注册 或 投票人注册的时候 不校验receiptAddress
+        if(TransactionTypeEnum.TRUSTEE_REGISTER.getDesc().equals(tradeType)
+                ||TransactionTypeEnum.VOTER_REGISTER.getDesc().equals(tradeType)){
+            flag = CheckUtils.checkParamIfEmpty(payAddress, value, extarData);
+        }else{
+            //非空检验
+            flag = CheckUtils.checkParamIfEmpty(payAddress, receiptAddress, value, extarData);
+        }
 
-        //非空检验
-        boolean flag = CheckUtils.checkParamIfEmpty(payAddress, receiptAddress, value, extarData);
         if(flag){
             return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
         }

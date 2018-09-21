@@ -2,6 +2,7 @@ package com.passport.transactionhandler;
 
 import com.passport.core.Transaction;
 import com.passport.crypto.eth.Sign;
+import com.passport.enums.TransactionTypeEnum;
 import com.passport.utils.GsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +38,10 @@ public abstract class TransactionStrategy {
         //生成hash和生成签名sign使用的基础数据都应该一样 TODO 使用多语言开发时应使用同样的序列化算法
         String transactionJson = GsonUtils.toJson(trans);
         try {
-            boolean flag = Sign.verify(transaction.getPublicKey(), new String(transaction.getSignature()), transactionJson);
-            if (!flag) {
-                return false;
+            if(transaction.getPayAddress() == null && transaction.getTradeType().equals(TransactionTypeEnum.BLOCK_REWARD.toString())){
+                if (!Sign.verify(transaction.getPublicKey(), new String(transaction.getSignature()), transactionJson)) {
+                    return false;
+                }
             }
         } catch (Exception e) {
             logger.error("交易流水验签异常", e);
