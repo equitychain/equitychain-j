@@ -233,6 +233,13 @@
       <version>3.8.0</version>
       <scope>test</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect -->
+    <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-reflect</artifactId>
+      <version>1.2.31</version>
+    </dependency>
+
   </dependencies>
 
   <build>
