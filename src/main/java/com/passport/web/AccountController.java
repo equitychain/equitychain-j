@@ -2,10 +2,11 @@ package com.passport.web;
 
 import com.google.common.base.Optional;
 import com.passport.core.Account;
-import com.passport.core.Block;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
+import com.passport.event.SyncAccountEvent;
+import com.passport.listener.ApplicationContextProvider;
 import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.CheckUtils;
 import com.passport.webhandler.AccountHandler;
@@ -39,6 +40,8 @@ public class AccountController {
     TransactionStrategyContext transactionStrategyContext;
     @Autowired
     DBAccess dbAccess;
+    @Autowired
+    private ApplicationContextProvider provider;
 
     @Value("${wallet.keystoreDir}")
     private String walletDir;
@@ -64,6 +67,7 @@ public class AccountController {
         if (account != null) {
             //当挖矿账户不存在时设置为挖矿账户
             accountHandler.setMinerAccountIfNotExists(account);
+            provider.publishEvent(new SyncAccountEvent(account));
 
             return new ResultDto(ResultEnum.SUCCESS.getCode(), account);
         }

@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 /**
  * 监听器处理新增账户事件
  */
@@ -32,8 +34,9 @@ public class AccountEventListener {
 		//把新增账户广播到其它节点
 		AccountMessage.Account.Builder accountBuilder = AccountMessage.Account.newBuilder();
 		accountBuilder.setAddress(ByteString.copyFrom(account.getAddress().getBytes()));
-		accountBuilder.setPrivateKey(ByteString.copyFrom(account.getPrivateKey().getBytes()));
-		accountBuilder.setBalance(ByteString.copyFrom(String.valueOf(account.getBalance()).getBytes()));
+		//accountBuilder.setPrivateKey(ByteString.copyFrom(account.getPrivateKey().getBytes()));
+		//accountBuilder.setBalance(ByteString.copyFrom(String.valueOf(account.getBalance()).getBytes()));
+		accountBuilder.setBalance(ByteString.copyFrom(String.valueOf(BigDecimal.ZERO).getBytes()));
 
 		NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
 		dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNT_SYNC);
