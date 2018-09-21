@@ -441,7 +441,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             }
         });
         //获取前101个
-        voters.addAll(allVoters.size()>=101?allVoters.subList(0,100):allVoters);
+        voters.addAll(allVoters.size()>=101?allVoters.subList(0,101):allVoters);
         return voters;
     }
 
