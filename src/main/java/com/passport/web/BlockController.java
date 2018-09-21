@@ -9,15 +9,12 @@ import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
 import com.passport.utils.CheckUtils;
 import com.passport.webhandler.MinerHandler;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-
 import java.util.List;
 
 /**
@@ -114,9 +111,27 @@ public class BlockController {
      * @return
      */
     @GetMapping("getBlockByHeight/{blockHeight}")
+    @ResponseBody
     public ResultDto<?> getBlockByHeight(@PathVariable(value="blockHeight") long blockHeight) {
-        Optional<Block> block = dbAccess.getBlock(blockHeight);
-        return new ResultDto(ResultEnum.SUCCESS.getCode(), block.get());
+        Optional<Block> blockOptional = dbAccess.getBlock(blockHeight);
+        Block block = blockOptional.get();
+
+        com.passport.dto.coreobject.Block newBlock = new com.passport.dto.coreobject.Block();
+        BeanUtils.copyProperties(block, newBlock);
+
+        com.passport.dto.coreobject.BlockHeader newBlockHeader = new com.passport.dto.coreobject.BlockHeader();
+        BeanUtils.copyProperties(block.getBlockHeader(), newBlockHeader);
+        newBlock.setBlockHeader(newBlockHeader);
+
+        List<com.passport.dto.coreobject.Transaction> newTransactions = new ArrayList<>();
+        block.getTransactions().forEach(transaction -> {
+            com.passport.dto.coreobject.Transaction newTransaction = new com.passport.dto.coreobject.Transaction();
+            BeanUtils.copyProperties(transaction, newTransaction);
+            newTransactions.add(newTransaction);
+        });
+        newBlock.setTransactions(newTransactions);
+
+        return new ResultDto(ResultEnum.SUCCESS.getCode(), newBlock);
     }
 
     /**
