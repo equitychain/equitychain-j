@@ -42,7 +42,6 @@ public class TransactionEventListener {
 		transactionBuilder.setEggPrice(ByteString.copyFrom(transaction.getEggPrice()));
 		transactionBuilder.setEggMax(ByteString.copyFrom(transaction.getEggMax()));
 		transactionBuilder.setTradeType(ByteString.copyFrom(transaction.getTradeType()));
-		transactionBuilder.setBlockHeight(ByteString.copyFrom(transaction.getBlockHeight()));
 
 		NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
 		dataBuilder.setDataType(DataTypeEnum.DataType.SEND_TRANSACTION);
