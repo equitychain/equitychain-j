@@ -1,6 +1,7 @@
 package com.passport.peer;
 
 import com.passport.constant.NodeListConstant;
+import com.passport.event.GenerateBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.proto.DataTypeEnum;
@@ -43,7 +44,7 @@ public class Connector implements InitializingBean {
         //启动服务并注册到discover节点
         asyncTask.startServer();
 
-        TimeUnit.SECONDS.sleep(3);
+        TimeUnit.MILLISECONDS.sleep(3000);
 
         //连接discover节点
         Set<String> set = nodeListConstant.getAll();
@@ -60,6 +61,19 @@ public class Connector implements InitializingBean {
     @EventListener(ApplicationReadyEvent.class)
     public void syncNextBlock() {
         provider.publishEvent(new SyncNextBlockEvent(0L));
+
+        try {
+            TimeUnit.MILLISECONDS.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        provider.publishEvent(new GenerateBlockEvent(0L));
+    }
+
+    //生成下一个区块
+    //@EventListener(ApplicationReadyEvent.class)
+    public void generateNextBlock() {
+        provider.publishEvent(new GenerateBlockEvent(0L));
     }
 
     @EventListener(ApplicationReadyEvent.class)

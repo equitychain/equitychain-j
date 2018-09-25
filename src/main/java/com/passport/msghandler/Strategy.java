@@ -14,16 +14,4 @@ public abstract class Strategy {
      * @param message
      */
     void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message){}
-
-    /**
-     * 服务端处理请求消息
-     * @param message
-     */
-    void handleReqMsg(ChannelHandlerContext ctx, NettyMessage.Message message){}
-
-    /**
-     * 客户端处理响应消息
-     * @param message
-     */
-    void handleRespMsg(ChannelHandlerContext ctx, NettyMessage.Message message){}
 }

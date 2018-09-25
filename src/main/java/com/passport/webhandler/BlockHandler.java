@@ -4,22 +4,30 @@ import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.protobuf.ByteString;
 import com.passport.constant.Constant;
-import com.passport.core.Block;
-import com.passport.core.BlockHeader;
-import com.passport.core.Transaction;
+import com.passport.core.*;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.event.GenerateNextBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.proto.BlockHeaderMessage;
 import com.passport.proto.BlockMessage;
 import com.passport.proto.TransactionMessage;
+import com.passport.transactionhandler.TransactionStrategy;
+import com.passport.transactionhandler.TransactionStrategyContext;
+import com.passport.utils.BlockUtils;
+import com.passport.utils.CastUtils;
 import com.passport.utils.RawardUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class BlockHandler {
@@ -29,7 +37,31 @@ public class BlockHandler {
     private DBAccess dbAccess;
     @Autowired
     private ApplicationContextProvider provider;
+    @Autowired
+    private MinerHandler minerHandler;
+    @Autowired
+    private TrusteeHandler trusteeHandler;
+    @Autowired
+    private BlockUtils blockUtils;
+    @Autowired
+    private TransactionStrategyContext transactionStrategyContext;
+
     public volatile boolean padding = false;
+
+    /**
+     * 根据区块高度获取出块奖励，每年递减，第6年及以后奖励恒定
+     * @param blockHeight
+     * @return
+     */
+    public BigDecimal getReward(Long blockHeight){
+        Long index = blockHeight/Constant.BLOCK_DISTANCE;
+        if(index > Constant.REWARD_ARRAY.length-1){
+            return Constant.REWARD_ARRAY[Constant.REWARD_ARRAY.length-1];
+        }else{
+            return Constant.REWARD_ARRAY[index.intValue()];
+        }
+    }
+
     /**
      * 校验区块是否合法
      * @param block
@@ -106,16 +138,33 @@ public class BlockHandler {
             public void run() {
                 try{
                     //todo 校验 目前是获取相同的区块高度
-                    Set<Block> successBlocks = getShareBlocks();
+                    List<Block> successBlocks = getShareBlocks();
                     //存储区块到本地
                     for(Block blockLocal : successBlocks) {
-                        dbAccess.putBlock(blockLocal);
-                        dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
+                        Optional<Object> optHeigth = dbAccess.getLastBlockHeight();
+                        if(optHeigth.isPresent()) {
+                            Long height = (Long)optHeigth.get();
+                            if(height != null) {
+                                if((blockLocal.getBlockHeight() - height) == 1) {
+                                    dbAccess.putBlock(blockLocal);
+                                    dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
 
-                        //同时保存区块中的流水到已确认流水列表中
-                        blockLocal.getTransactions().forEach(transaction -> {
-                            dbAccess.putConfirmTransaction(transaction);
-                        });
+                                    //同时保存区块中的流水到已确认流水列表中
+                                    blockLocal.getTransactions().forEach(transaction -> {
+                                        TransactionStrategy transactionStrategy = transactionStrategyContext.getTransactionStrategy(new String(transaction.getTradeType()));
+                                        if(transactionStrategy != null){
+                                            transactionStrategy.handleTransaction(transaction);
+
+                                            dbAccess.putConfirmTransaction(transaction);
+                                        }
+                                    });
+                                }
+                            }else{
+                                break;
+                            }
+                        }else{
+                            break;
+                        }
                     }
                     //继续同步下组区块
                     provider.publishEvent(new SyncNextBlockEvent(0L));
@@ -131,34 +180,52 @@ public class BlockHandler {
         });
         handlerThread.start();
     }
-    //检查各节点区块，取出共用的区块高度
-    protected Set<Block> getShareBlocks(){
-        Set<Block> list = new HashSet<>();
+    //检查各节点区块，取出共用的区块高度 并是连续的
+    protected List<Block> getShareBlocks(){
         Iterator<List<Block>> iterator = Constant.BLOCK_QUEUE.iterator();
         List<Block> baseBlocks = null;
         //获取第一个节点的数据
         if(iterator.hasNext()){
-            baseBlocks = iterator.next();
+            List<Block> blocks = iterator.next();
+            baseBlocks = new ArrayList<>();
+            //连续
+            for (int i = 0; i < blocks.size(); i ++){
+                if(i == 0){
+                    baseBlocks.add(blocks.get(i));
+                }else{
+                    Block b1 = blocks.get(i);
+                    Block b2 = blocks.get(i-1);
+                    if(b1.getBlockHeight()-b2.getBlockHeight() == 1){
+                        baseBlocks.add(blocks.get(i));
+                    }else {
+                        break;
+                    }
+                }
+            }
         }else{
-            return list;
+            return new ArrayList<>();
         }
         if(iterator.hasNext()) {
             //某个节点的区块与其余节点的区块进行比较
             while (iterator.hasNext()) {
                 List<Block> blocks = iterator.next();
-                for (Block b : baseBlocks) {
-                    if (blocks.contains(b)) {
-                        list.add(b);
-                    } else {
-                        list.remove(b);
+                //判断哪个高度不一致,不一致的以下全部丢弃,只保留公共的/连续的
+                int subIndex = 0;
+                for (int i = 0; i < baseBlocks.size(); i ++) {
+                    Block hasBlock = baseBlocks.get(i);
+                    if(blocks.contains(hasBlock)){
+                        subIndex = i;
+                        break;
+                    }
+                }
+                if(subIndex != 0){
+                    for(int j = subIndex ; j < baseBlocks.size(); j ++) {
+                        baseBlocks.remove(j);
                     }
                 }
             }
-        }else{
-            //如果就只连接了一个节点，那就同步这个节点的区块
-            list.addAll(baseBlocks);
         }
-        return list;
+        return baseBlocks;
     }
     /**
      * protobuf block转成本地block
@@ -193,7 +260,12 @@ public class BlockHandler {
             transaction.setEggPrice(trans.getEggPrice().toByteArray());
             transaction.setEggMax(trans.getEggMax().toByteArray());
             transaction.setTime(trans.getTimeStamp().toByteArray());
-
+            transaction.setTradeType(trans.getTradeType().toByteArray());
+            transaction.setBlockHeight(trans.getBlockHeight().toByteArray());
+            transaction.setEggUsed(trans.getEggUsed().toByteArray());
+            if(trans.getNonce().toByteArray() != null && trans.getNonce().toByteArray().length != 0 )transaction.setNonce(Integer.parseInt(new String(trans.getNonce().toByteArray())));
+            transaction.setPublicKey(trans.getPublicKey().toByteArray());
+            if(trans.getStatus().toByteArray() != null && trans.getStatus().toByteArray().length != 0) transaction.setStatus(Integer.parseInt(new String(trans.getStatus().toByteArray())));
             block.getTransactions().add(transaction);
         });
 
@@ -232,10 +304,81 @@ public class BlockHandler {
             if(trans.getSignature()!=null)transactionBuilder.setSignature(ByteString.copyFrom(trans.getSignature()));
             if(trans.getEggPrice()!=null)transactionBuilder.setEggPrice(ByteString.copyFrom(trans.getEggPrice()));
             if(trans.getEggMax()!=null)transactionBuilder.setEggMax(ByteString.copyFrom(trans.getEggMax()));
-
+            if(trans.getTradeType()!=null)transactionBuilder.setTradeType(ByteString.copyFrom(trans.getTradeType()));
+            if(trans.getBlockHeight()!=null)transactionBuilder.setBlockHeight(ByteString.copyFrom(trans.getBlockHeight()));
+            if(trans.getEggUsed() != null) transactionBuilder.setEggUsed(ByteString.copyFrom(trans.getEggUsed()));
+            if (trans.getNonce()!=null) transactionBuilder.setNonce(ByteString.copyFrom(trans.getNonce().toString().getBytes()));
+            if(trans.getPublicKey()!=null)transactionBuilder.setPublicKey(ByteString.copyFrom(trans.getPublicKey()));
+            if(trans.getStatus()!=null)transactionBuilder.setStatus(ByteString.copyFrom(trans.getStatus().toString().getBytes()));
             blockBuilder.addTransactions(transactionBuilder.build());
         });
 
         return blockBuilder;
     }
+
+    public void produceNextBlock() {
+        //当前区块周期
+        Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
+        if(!lastBlockOptional.isPresent()){
+            return;
+        }
+        Block block = lastBlockOptional.get();
+
+        long blockHeight = CastUtils.castLong(block.getBlockHeight());
+        long newBlockHeight = blockHeight + 1;
+        int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
+
+        //出块完成后，计算出的下一个出块人如果是自己则继续发布出块事件
+        List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
+        if(trustees.size() == 0){
+            trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
+        }
+
+        waitIfNotArrived(block);
+
+        produceBlock(newBlockHeight, trustees, blockCycle);
+    }
+
+    /**
+     * 未到出块时间则睡眠等待
+     * @param block
+     */
+    private void waitIfNotArrived(Block block) {
+        long lastTimestamp = block.getBlockHeader().getTimeStamp();
+        long currentTimestamp = System.currentTimeMillis();
+        long timeGap = currentTimestamp - lastTimestamp;
+        if(timeGap < Constant.BLOCK_GENERATE_TIMEGAP*1000){//间隔小于10秒，则睡眠等待
+            try {
+                TimeUnit.MILLISECONDS.sleep(Constant.BLOCK_GENERATE_TIMEGAP*1000 - timeGap);
+            } catch (InterruptedException e) {
+                logger.error("生产区块睡眠等待异常", e);
+            }
+        }
+    }
+
+    /**
+     * 打包区块、寻找下一个出块人是否在本节点
+     * @param newBlockHeight 准备出块高度
+     * @param list
+     * @param blockCycle
+     */
+    public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) {
+        Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
+        Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
+        if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
+            Account account = accountOptional.get();
+            if(account.getPrivateKey() != null){
+                //打包区块
+                minerHandler.packagingBlock(account);
+
+                //更新101个受托人，已经出块人的状态
+                trusteeHandler.changeStatus(trustee, blockCycle);
+
+                logger.info("第{}个区块出块成功", newBlockHeight);
+
+                provider.publishEvent(new GenerateNextBlockEvent(0L));
+            }
+        }
+    }
+
 }

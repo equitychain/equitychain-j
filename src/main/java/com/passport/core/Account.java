@@ -1,5 +1,9 @@
 package com.passport.core;
 
+import com.passport.annotations.EntityClaz;
+import com.passport.annotations.FaildClaz;
+import com.passport.annotations.KeyField;
+
 import java.math.BigDecimal;
 
 /**
@@ -7,10 +11,16 @@ import java.math.BigDecimal;
  * @author: xujianfeng
  * @create: 2018-07-26 11:20
  **/
-public class Account {
+@EntityClaz(name = "account")
+public class Account{
+    @KeyField
+    @FaildClaz(name = "address",type = String.class)
     private String address;//地址
+    @FaildClaz(name = "privateKey",type = String.class)
     private String privateKey;//私钥
+    @FaildClaz(name = "balance",type = BigDecimal.class)
     private BigDecimal balance;//余额
+    @FaildClaz(name = "password",type = String.class)
     private String password;//交易密码
 
     public Account() {
@@ -58,5 +68,19 @@ public class Account {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "address='" + address + '\'' +
+                ", privateKey='" + privateKey + '\'' +
+                ", balance=" + balance +
+                ", password='" + password + '\'' +
+                '}';
+    }
+
+    public boolean isNullContent() {
+        return privateKey == null && balance == null && password == null;
     }
 }

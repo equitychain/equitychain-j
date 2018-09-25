@@ -67,6 +67,31 @@ public final class TransactionMessage {
      * <code>bytes publicKey = 10;</code>
      */
     com.google.protobuf.ByteString getPublicKey();
+
+    /**
+     * <code>bytes tradeType = 11;</code>
+     */
+    com.google.protobuf.ByteString getTradeType();
+
+    /**
+     * <code>bytes blockHeight = 12;</code>
+     */
+    com.google.protobuf.ByteString getBlockHeight();
+
+    /**
+     * <code>bytes eggUsed = 13;</code>
+     */
+    com.google.protobuf.ByteString getEggUsed();
+
+    /**
+     * <code>bytes nonce = 14;</code>
+     */
+    com.google.protobuf.ByteString getNonce();
+
+    /**
+     * <code>bytes status = 15;</code>
+     */
+    com.google.protobuf.ByteString getStatus();
   }
   /**
    * Protobuf type {@code Transaction}
@@ -90,6 +115,11 @@ public final class TransactionMessage {
       timeStamp_ = com.google.protobuf.ByteString.EMPTY;
       extarData_ = com.google.protobuf.ByteString.EMPTY;
       publicKey_ = com.google.protobuf.ByteString.EMPTY;
+      tradeType_ = com.google.protobuf.ByteString.EMPTY;
+      blockHeight_ = com.google.protobuf.ByteString.EMPTY;
+      eggUsed_ = com.google.protobuf.ByteString.EMPTY;
+      nonce_ = com.google.protobuf.ByteString.EMPTY;
+      status_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @Override
@@ -165,6 +195,31 @@ public final class TransactionMessage {
             case 82: {
 
               publicKey_ = input.readBytes();
+              break;
+            }
+            case 90: {
+
+              tradeType_ = input.readBytes();
+              break;
+            }
+            case 98: {
+
+              blockHeight_ = input.readBytes();
+              break;
+            }
+            case 106: {
+
+              eggUsed_ = input.readBytes();
+              break;
+            }
+            case 114: {
+
+              nonce_ = input.readBytes();
+              break;
+            }
+            case 122: {
+
+              status_ = input.readBytes();
               break;
             }
           }
@@ -280,6 +335,51 @@ public final class TransactionMessage {
       return publicKey_;
     }
 
+    public static final int TRADETYPE_FIELD_NUMBER = 11;
+    private com.google.protobuf.ByteString tradeType_;
+    /**
+     * <code>bytes tradeType = 11;</code>
+     */
+    public com.google.protobuf.ByteString getTradeType() {
+      return tradeType_;
+    }
+
+    public static final int BLOCKHEIGHT_FIELD_NUMBER = 12;
+    private com.google.protobuf.ByteString blockHeight_;
+    /**
+     * <code>bytes blockHeight = 12;</code>
+     */
+    public com.google.protobuf.ByteString getBlockHeight() {
+      return blockHeight_;
+    }
+
+    public static final int EGGUSED_FIELD_NUMBER = 13;
+    private com.google.protobuf.ByteString eggUsed_;
+    /**
+     * <code>bytes eggUsed = 13;</code>
+     */
+    public com.google.protobuf.ByteString getEggUsed() {
+      return eggUsed_;
+    }
+
+    public static final int NONCE_FIELD_NUMBER = 14;
+    private com.google.protobuf.ByteString nonce_;
+    /**
+     * <code>bytes nonce = 14;</code>
+     */
+    public com.google.protobuf.ByteString getNonce() {
+      return nonce_;
+    }
+
+    public static final int STATUS_FIELD_NUMBER = 15;
+    private com.google.protobuf.ByteString status_;
+    /**
+     * <code>bytes status = 15;</code>
+     */
+    public com.google.protobuf.ByteString getStatus() {
+      return status_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -321,6 +421,21 @@ public final class TransactionMessage {
       }
       if (!publicKey_.isEmpty()) {
         output.writeBytes(10, publicKey_);
+      }
+      if (!tradeType_.isEmpty()) {
+        output.writeBytes(11, tradeType_);
+      }
+      if (!blockHeight_.isEmpty()) {
+        output.writeBytes(12, blockHeight_);
+      }
+      if (!eggUsed_.isEmpty()) {
+        output.writeBytes(13, eggUsed_);
+      }
+      if (!nonce_.isEmpty()) {
+        output.writeBytes(14, nonce_);
+      }
+      if (!status_.isEmpty()) {
+        output.writeBytes(15, status_);
       }
     }
 
@@ -369,6 +484,26 @@ public final class TransactionMessage {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(10, publicKey_);
       }
+      if (!tradeType_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(11, tradeType_);
+      }
+      if (!blockHeight_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(12, blockHeight_);
+      }
+      if (!eggUsed_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(13, eggUsed_);
+      }
+      if (!nonce_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(14, nonce_);
+      }
+      if (!status_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(15, status_);
+      }
       memoizedSize = size;
       return size;
     }
@@ -405,6 +540,16 @@ public final class TransactionMessage {
           .equals(other.getExtarData());
       result = result && getPublicKey()
           .equals(other.getPublicKey());
+      result = result && getTradeType()
+          .equals(other.getTradeType());
+      result = result && getBlockHeight()
+          .equals(other.getBlockHeight());
+      result = result && getEggUsed()
+          .equals(other.getEggUsed());
+      result = result && getNonce()
+          .equals(other.getNonce());
+      result = result && getStatus()
+          .equals(other.getStatus());
       return result;
     }
 
@@ -435,6 +580,16 @@ public final class TransactionMessage {
       hash = (53 * hash) + getExtarData().hashCode();
       hash = (37 * hash) + PUBLICKEY_FIELD_NUMBER;
       hash = (53 * hash) + getPublicKey().hashCode();
+      hash = (37 * hash) + TRADETYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getTradeType().hashCode();
+      hash = (37 * hash) + BLOCKHEIGHT_FIELD_NUMBER;
+      hash = (53 * hash) + getBlockHeight().hashCode();
+      hash = (37 * hash) + EGGUSED_FIELD_NUMBER;
+      hash = (53 * hash) + getEggUsed().hashCode();
+      hash = (37 * hash) + NONCE_FIELD_NUMBER;
+      hash = (53 * hash) + getNonce().hashCode();
+      hash = (37 * hash) + STATUS_FIELD_NUMBER;
+      hash = (53 * hash) + getStatus().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -584,6 +739,16 @@ public final class TransactionMessage {
 
         publicKey_ = com.google.protobuf.ByteString.EMPTY;
 
+        tradeType_ = com.google.protobuf.ByteString.EMPTY;
+
+        blockHeight_ = com.google.protobuf.ByteString.EMPTY;
+
+        eggUsed_ = com.google.protobuf.ByteString.EMPTY;
+
+        nonce_ = com.google.protobuf.ByteString.EMPTY;
+
+        status_ = com.google.protobuf.ByteString.EMPTY;
+
         return this;
       }
 
@@ -616,6 +781,11 @@ public final class TransactionMessage {
         result.timeStamp_ = timeStamp_;
         result.extarData_ = extarData_;
         result.publicKey_ = publicKey_;
+        result.tradeType_ = tradeType_;
+        result.blockHeight_ = blockHeight_;
+        result.eggUsed_ = eggUsed_;
+        result.nonce_ = nonce_;
+        result.status_ = status_;
         onBuilt();
         return result;
       }
@@ -686,6 +856,21 @@ public final class TransactionMessage {
         }
         if (other.getPublicKey() != com.google.protobuf.ByteString.EMPTY) {
           setPublicKey(other.getPublicKey());
+        }
+        if (other.getTradeType() != com.google.protobuf.ByteString.EMPTY) {
+          setTradeType(other.getTradeType());
+        }
+        if (other.getBlockHeight() != com.google.protobuf.ByteString.EMPTY) {
+          setBlockHeight(other.getBlockHeight());
+        }
+        if (other.getEggUsed() != com.google.protobuf.ByteString.EMPTY) {
+          setEggUsed(other.getEggUsed());
+        }
+        if (other.getNonce() != com.google.protobuf.ByteString.EMPTY) {
+          setNonce(other.getNonce());
+        }
+        if (other.getStatus() != com.google.protobuf.ByteString.EMPTY) {
+          setStatus(other.getStatus());
         }
         onChanged();
         return this;
@@ -1002,6 +1187,151 @@ public final class TransactionMessage {
         onChanged();
         return this;
       }
+
+      private com.google.protobuf.ByteString tradeType_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes tradeType = 11;</code>
+       */
+      public com.google.protobuf.ByteString getTradeType() {
+        return tradeType_;
+      }
+      /**
+       * <code>bytes tradeType = 11;</code>
+       */
+      public Builder setTradeType(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+
+        tradeType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes tradeType = 11;</code>
+       */
+      public Builder clearTradeType() {
+
+        tradeType_ = getDefaultInstance().getTradeType();
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.ByteString blockHeight_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes blockHeight = 12;</code>
+       */
+      public com.google.protobuf.ByteString getBlockHeight() {
+        return blockHeight_;
+      }
+      /**
+       * <code>bytes blockHeight = 12;</code>
+       */
+      public Builder setBlockHeight(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+
+        blockHeight_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes blockHeight = 12;</code>
+       */
+      public Builder clearBlockHeight() {
+
+        blockHeight_ = getDefaultInstance().getBlockHeight();
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.ByteString eggUsed_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes eggUsed = 13;</code>
+       */
+      public com.google.protobuf.ByteString getEggUsed() {
+        return eggUsed_;
+      }
+      /**
+       * <code>bytes eggUsed = 13;</code>
+       */
+      public Builder setEggUsed(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+
+        eggUsed_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes eggUsed = 13;</code>
+       */
+      public Builder clearEggUsed() {
+
+        eggUsed_ = getDefaultInstance().getEggUsed();
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.ByteString nonce_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes nonce = 14;</code>
+       */
+      public com.google.protobuf.ByteString getNonce() {
+        return nonce_;
+      }
+      /**
+       * <code>bytes nonce = 14;</code>
+       */
+      public Builder setNonce(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+
+        nonce_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes nonce = 14;</code>
+       */
+      public Builder clearNonce() {
+
+        nonce_ = getDefaultInstance().getNonce();
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.ByteString status_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes status = 15;</code>
+       */
+      public com.google.protobuf.ByteString getStatus() {
+        return status_;
+      }
+      /**
+       * <code>bytes status = 15;</code>
+       */
+      public Builder setStatus(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+
+        status_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes status = 15;</code>
+       */
+      public Builder clearStatus() {
+
+        status_ = getDefaultInstance().getStatus();
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -1065,13 +1395,16 @@ public final class TransactionMessage {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\030TransactionMessage.proto\"\304\001\n\013Transacti" +
+      "\n\030TransactionMessage.proto\"\234\002\n\013Transacti" +
       "on\022\014\n\004hash\030\001 \001(\014\022\021\n\tsignature\030\002 \001(\014\022\r\n\005v" +
       "alue\030\003 \001(\014\022\022\n\npayAddress\030\004 \001(\014\022\026\n\016receip" +
       "tAddress\030\005 \001(\014\022\020\n\010eggPrice\030\006 \001(\014\022\016\n\006eggM" +
       "ax\030\007 \001(\014\022\021\n\ttimeStamp\030\010 \001(\014\022\021\n\textarData" +
-      "\030\t \001(\014\022\021\n\tpublicKey\030\n \001(\014B(\n\022com.passpor" +
-      "t.protoB\022TransactionMessageb\006proto3"
+      "\030\t \001(\014\022\021\n\tpublicKey\030\n \001(\014\022\021\n\ttradeType\030\013" +
+      " \001(\014\022\023\n\013blockHeight\030\014 \001(\014\022\017\n\007eggUsed\030\r \001" +
+      "(\014\022\r\n\005nonce\030\016 \001(\014\022\016\n\006status\030\017 \001(\014B(\n\022com" +
+      ".passport.protoB\022TransactionMessageb\006pro" +
+      "to3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1090,7 +1423,7 @@ public final class TransactionMessage {
     internal_static_Transaction_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Transaction_descriptor,
-        new String[] { "Hash", "Signature", "Value", "PayAddress", "ReceiptAddress", "EggPrice", "EggMax", "TimeStamp", "ExtarData", "PublicKey", });
+        new String[] { "Hash", "Signature", "Value", "PayAddress", "ReceiptAddress", "EggPrice", "EggMax", "TimeStamp", "ExtarData", "PublicKey", "TradeType", "BlockHeight", "EggUsed", "Nonce", "Status", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
