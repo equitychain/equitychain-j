@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.security.PublicKey;
 
 /**
@@ -48,6 +49,15 @@ public class SendTransactionREQ extends Strategy {
         trans.setValue(transaction.getValue().toByteArray());
         trans.setExtarData(transaction.getExtarData().toByteArray());
         trans.setTime(transaction.getTimeStamp().toByteArray());
+        trans.setStatus(Integer.parseInt(transaction.getStatus().toByteArray().toString()));
+        trans.setPublicKey(transaction.getPublicKey().toByteArray());
+        trans.setNonce(Integer.parseInt(transaction.getNonce().toByteArray().toString()));
+        trans.setEggUsed(transaction.getEggUsed().toByteArray());
+        trans.setEggMax(transaction.getEggMax().toByteArray());
+        trans.setEggPrice(transaction.getEggPrice().toByteArray());
+        trans.setTradeType(transaction.getTradeType().toByteArray());
+        trans.setHash(transaction.getHash().toByteArray());
+        trans.setBlockHeight(trans.getBlockHeight());
 
         //使用公钥验签
         String transactionJson = GsonUtils.toJson(trans);
