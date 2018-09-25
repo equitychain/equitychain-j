@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 /**
  * 服务端处理账户同步请求
  * @author: xujianfeng
@@ -30,7 +32,10 @@ public class AccountSyncREQ extends Strategy {
         AccountMessage.Account account = message.getData().getAccount();
         Optional<Account> accountOptional = dbAccess.getAccount(String.valueOf(account.getAddress()));
         if(!accountOptional.isPresent()){
-            Account acc = accountOptional.get();
+//            Account acc = accountOptional.get();
+            Account acc = new Account();
+            acc.setAddress(new String(account.getAddress().toByteArray()));
+            acc.setBalance(BigDecimal.ZERO);
              if(dbAccess.putAccount(acc)){
                 logger.info("接收广播账户{}成功", acc.getAddress());
              }
