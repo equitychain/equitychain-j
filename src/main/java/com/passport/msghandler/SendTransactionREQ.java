@@ -49,9 +49,9 @@ public class SendTransactionREQ extends Strategy {
         trans.setValue(transaction.getValue().toByteArray());
         trans.setExtarData(transaction.getExtarData().toByteArray());
         trans.setTime(transaction.getTimeStamp().toByteArray());
-        trans.setStatus(Integer.parseInt(transaction.getStatus().toByteArray().toString()));
+        trans.setStatus(Integer.parseInt(new String(transaction.getStatus().toByteArray())));
         trans.setPublicKey(transaction.getPublicKey().toByteArray());
-        trans.setNonce(Integer.parseInt(transaction.getNonce().toByteArray().toString()));
+        trans.setNonce(Integer.parseInt(new String(transaction.getNonce().toByteArray())));
         trans.setEggUsed(transaction.getEggUsed().toByteArray());
         trans.setEggMax(transaction.getEggMax().toByteArray());
         trans.setEggPrice(transaction.getEggPrice().toByteArray());
