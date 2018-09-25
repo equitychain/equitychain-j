@@ -39,6 +39,10 @@ public class TransactionEventListener {
 		transactionBuilder.setSignature(ByteString.copyFrom(transaction.getSignature()));
 		transactionBuilder.setHash(ByteString.copyFrom(transaction.getHash()));
 		transactionBuilder.setPublicKey(ByteString.copyFrom(transaction.getPublicKey()));
+		transactionBuilder.setEggPrice(ByteString.copyFrom(transaction.getEggPrice()));
+		transactionBuilder.setEggMax(ByteString.copyFrom(transaction.getEggMax()));
+		transactionBuilder.setTradeType(ByteString.copyFrom(transaction.getTradeType()));
+		transactionBuilder.setBlockHeight(ByteString.copyFrom(transaction.getBlockHeight()));
 
 		NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
 		dataBuilder.setDataType(DataTypeEnum.DataType.SEND_TRANSACTION);
