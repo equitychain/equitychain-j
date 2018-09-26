@@ -200,7 +200,12 @@ public class Transaction {
   public Transaction() {
 
   }
-
+  public boolean isNullContent(){
+    return nonce == null && signature == null
+            && value==null&& payAddress==null&& receiptAddress==null&& eggPrice==null&& eggMax==null
+            && time==null&& extarData==null&& publicKey==null&& eggUsed==null&& tradeType==null
+            && blockHeight==null&& status==null;
+  }
   private void validate(){
     if (this.hash.length != BYTE_HASH_LENGTH) logger.info("1");
     if(this.payAddress.length != BYTE_ADDRESS_LENGTH) logger.info("2");

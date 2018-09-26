@@ -35,7 +35,7 @@ public class TransactionRewardHandler extends TransactionStrategy {
     protected void handle(Transaction transaction) {
         byte[] payAddressByte = transaction.getPayAddress();
         // 确认流水奖励
-        if (payAddressByte == null) {
+        if (payAddressByte == null || payAddressByte.length == 0) {
             Optional<Account> accountOptional = dbAccess.getAccount(new String(transaction.getReceiptAddress()));
             if (accountOptional.isPresent()) {
                 BigDecimal reward = new BigDecimal(new String(transaction.getValue()));

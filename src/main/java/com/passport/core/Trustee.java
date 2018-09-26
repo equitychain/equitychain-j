@@ -94,4 +94,7 @@ public class Trustee {
         }
         return false;
     }
+    public boolean isNullContent(){
+        return votes == null && generateRate == null && income == null && status == null;
+    }
 }

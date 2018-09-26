@@ -226,6 +226,11 @@ public interface DBAccess {
 	 * @return
 	 */
 	List<Trustee> listTrustees();
+	/**
+	 * 获取受托人列表
+	 * @return
+	 */
+	List<Trustee> listTrustees(int count);
 
 	/**
 	 * 添加一个投票人

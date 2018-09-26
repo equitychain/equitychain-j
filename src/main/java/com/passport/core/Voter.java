@@ -55,7 +55,9 @@ public class Voter {
     public int hashCode() {
         return status;
     }
-
+    public boolean isNullContent(){
+        return voteNum == null && status == null;
+    }
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof Voter){

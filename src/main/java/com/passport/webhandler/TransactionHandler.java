@@ -287,31 +287,31 @@ public class TransactionHandler {
     public void matchUnConfirmTransactions(Block blockLocal) {
         //取区块流水列表
         List<Transaction> transactions = blockLocal.getTransactions();
-        List<byte[]> hashBytes = transactions.stream().map(Transaction::getHash).collect(Collectors.toList());
+//        List<byte[]> hashBytes = transactions.stream().map(Transaction::getHash).collect(Collectors.toList());
 
         //匹配区块流水和未确认流水
-        List<Transaction> matchTransactions = new ArrayList<>();
-        List<Transaction> unconfirmTransactions = dbAccess.listUnconfirmTransactions();
-        for (Transaction untrans : unconfirmTransactions) {
-            if(untrans.getPayAddress() == null){//挖矿流水直接成功
-                matchTransactions.add(untrans);
-                continue;
-            }
-            if(hashBytes.contains(untrans.getHash())){
-                matchTransactions.add(untrans);
-            }
-        }
-
-        //删除未确认流水
-        deleteUnconfirmTransactions(matchTransactions);
+//        List<Transaction> matchTransactions = new ArrayList<>();
+//        List<Transaction> unconfirmTransactions = dbAccess.listUnconfirmTransactions();
+//        for (Transaction untrans : unconfirmTransactions) {
+//            if(untrans.getPayAddress() == null){//挖矿流水直接成功
+//                matchTransactions.add(untrans);
+//                continue;
+//            }
+//            if(hashBytes.contains(untrans.getHash())){
+//                matchTransactions.add(untrans);
+//            }
+//        }
+//
+//        //删除未确认流水
+//        deleteUnconfirmTransactions(matchTransactions);
 
         //匹配成功的流水放到已确认流水列表
-        matchTransactions.forEach(transaction -> {
+        transactions.forEach(transaction -> {
             dbAccess.putConfirmTransaction(transaction);
         });
 
         //执行流水
-        exec(matchTransactions);
+        exec(transactions);
     }
 
     /**
