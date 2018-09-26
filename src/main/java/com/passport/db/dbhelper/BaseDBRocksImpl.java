@@ -399,6 +399,11 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
+    public List<Trustee> listTrustees(int count) {
+        return trusteePagination(count,1,0,null,null);
+    }
+
+    @Override
     public boolean putVoter(Voter voter) {
         try {
             addObj(voter);
@@ -469,6 +474,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public boolean putVoteRecord(VoteRecord voteRecord) {
         try {
+            voteRecord.setId();
             addObj(voteRecord);
             putSuoyinKey(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName),
                     voteRecord.getVoteNum().toString().getBytes(),voteRecord.getPayAddress().getBytes());

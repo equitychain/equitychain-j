@@ -32,6 +32,7 @@ public class VoteRecord {
         this.receiptAddress = receiptAddress;
         this.voteNum = voteNum;
         this.status = status;
+        this.time = System.currentTimeMillis();
     }
 
     public String getPayAddress() {
