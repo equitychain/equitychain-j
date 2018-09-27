@@ -12,6 +12,7 @@ import com.passport.webhandler.TransactionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,19 +33,13 @@ public class VoteController {
     private TransactionHandler transactionHandler;
 
     /**
-     * 查询委托人列表
-     * @param request
+     * 查询投票人列表
+     * @param address
      * @return
      */
-    @GetMapping("vote")
-    public ResultDto getTransactionByNBlock(HttpServletRequest request) {
+    @GetMapping("voteList")
+    public ResultDto voteList(@RequestParam("address") String address) {
         ResultDto resultDto =new ResultDto();
-        String address = request.getParameter("address");
-
-        boolean flag =CheckUtils.checkParamIfEmpty(address);
-        if(flag){
-            return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
-        }
         Optional<Voter> voterOptional =  dbAccess.getVoter(address);
         if(voterOptional.isPresent()){
             resultDto = new ResultDto(ResultEnum.SUCCESS);
