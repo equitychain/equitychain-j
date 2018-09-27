@@ -143,7 +143,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         try {
             byte[] objByt = rocksDB.get(key.getBytes());
             if (objByt != null) {
-                Optional.of(SerializeUtils.unSerialize(objByt));
+                return Optional.of(SerializeUtils.unSerialize(objByt));
             }
         } catch (RocksDBException e) {
             e.printStackTrace();
