@@ -6,6 +6,7 @@ import com.google.protobuf.ByteString;
 import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.db.dbhelper.IndexColumnNames;
 import com.passport.event.GenerateNextBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
@@ -154,7 +155,12 @@ public class BlockHandler {
                                         TransactionStrategy transactionStrategy = transactionStrategyContext.getTransactionStrategy(new String(transaction.getTradeType()));
                                         if(transactionStrategy != null){
                                             transactionStrategy.handleTransaction(transaction);
-
+                                            try {
+                                                dbAccess.addIndex(transaction, IndexColumnNames.TRANSTIMEINDEX,transaction.getTime());
+                                                dbAccess.addIndex(transaction,IndexColumnNames.TRANSBLOCKHEIGHTINDEX,transaction.getBlockHeight());
+                                            } catch (IllegalAccessException e) {
+                                                e.printStackTrace();
+                                            }
                                             dbAccess.putConfirmTransaction(transaction);
                                         }
                                     });
