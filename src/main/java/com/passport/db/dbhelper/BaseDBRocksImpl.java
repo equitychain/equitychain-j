@@ -693,4 +693,14 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             return new ArrayList<>();
         }
     }
+
+    @Override
+    public <T> void addIndex(T t, IndexColumnNames columnNames,byte[] indexKey) {
+        try {
+            putSuoyinKey(handleMap.get(columnNames.indexName),indexKey,getKeyValByDto(t));
+            putOverAndNext(handleMap.get(columnNames.overAndNextName),indexKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

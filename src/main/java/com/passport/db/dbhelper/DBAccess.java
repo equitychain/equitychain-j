@@ -375,4 +375,5 @@ public interface DBAccess {
                                          List<byte[][]> vals, int screenType,
                                          ColumnFamilyHandle overAndNextHandle, Class<T> tClass, String keyFiledName,
                                          int orderByType, int flushSize, int dtoType, ColumnFamilyHandle orderByFieldHandle) throws Exception;
+    <T> void addIndex(T t, IndexColumnNames columnNames,byte[] indexKey) throws IllegalAccessException;
 }
