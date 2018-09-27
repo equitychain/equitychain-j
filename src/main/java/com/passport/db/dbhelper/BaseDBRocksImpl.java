@@ -577,6 +577,19 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
+    public List<Block> getBlocksByHeight(int blockHeight, int blockCount) throws Exception {
+        List<Block> blocks = new ArrayList<>();
+        for(int i = 0; i < blockCount; i ++){
+            int curBlockHeight = blockHeight-i;
+            Block block = getObj("blockHeight", "" + curBlockHeight, Block.class);
+            if(!block.isNullContent()) {
+                blocks.add(block);
+            }
+        }
+        return blocks;
+    }
+
+    @Override
     public List<Transaction> transactionPagination(int pageCount, int pageNumber, int orderByType, List<String> screens, List<byte[][]> screenVals,int screenType) {
         List<ColumnFamilyHandle> screenHanles = new ArrayList<>();
         if (screens != null && screenVals != null) {

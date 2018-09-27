@@ -178,5 +178,15 @@ public class BlockController {
             return new ResultDto(ResultEnum.SYS_ERROR);
         }
     }
+    @GetMapping("getBlocksByHeight/{blockHeight}-{blockCount}")
+    @ResponseBody
+    public List<Block> getBlocksByHeight(@PathVariable("blockHeight") int blockHeight,@PathVariable("blockCount") int blockCount){
+        List<Block> result = new ArrayList<>();
+        try{
+            result.addAll(dbAccess.getBlocksByHeight(blockHeight,blockCount));
+        }catch (Exception e){
 
+        }
+        return result;
+    }
 }
