@@ -7,6 +7,7 @@ import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.db.dbhelper.IndexColumnNames;
+import com.passport.enums.TransactionTypeEnum;
 import com.passport.event.GenerateNextBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
@@ -98,16 +99,27 @@ public class BlockHandler {
             }
             //奖励金额的合法性判断
             boolean reword = false;
+            String receiptAddress = null;
             for(Transaction tran : transactions) {
                 byte[] payAddr = tran.getPayAddress();
-                byte[] compByt = "挖矿奖励".getBytes();
+                byte[] compByt = TransactionTypeEnum.BLOCK_REWARD.toString().getBytes();
                 if ((payAddr == null||payAddr.length==0) && tran.getExtarData() != null && Arrays.equals(compByt, tran.getExtarData())) {
                     //奖励的流水
                     byte[] value = tran.getValue();
+                    receiptAddress = new String(tran.getReceiptAddress());
                     reword = RawardUtil.checkReward(blockHeight, value);
                     break;
                 }
             }
+            /*if(reword){
+                //校验是否轮到该用户出块
+                int blockCycle = blockUtils.getBlockCycle(blockHeight);
+                List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
+                Trustee trustee = blockUtils.randomPickBlockProducer(trustees, blockHeight);
+                if(trustee == null || !trustee.getAddress().equals(receiptAddress)){
+                    return false;
+                }
+            }*/
             return reword;
         }
 
