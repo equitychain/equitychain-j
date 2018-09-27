@@ -29,7 +29,7 @@ public abstract class BaseDBAccess implements DBAccess {
     ThreadPoolExecutor executor = new ThreadPoolExecutor(100, 100, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1000));
     @Autowired
     public RocksdbTransaction transaction;
-    protected RocksDB rocksDB;
+    protected OptimisticTransactionDB rocksDB;
     @Value("${db.dataDir}")
     private String dataDir;
     //列的handler
@@ -61,7 +61,7 @@ public abstract class BaseDBAccess implements DBAccess {
             dtoClasses.add(new VoteRecord().getClass());
             dtoClasses.add(new Voter().getClass());
             try {
-                rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), dataDir);
+                rocksDB = OptimisticTransactionDB.open(new Options().setCreateIfMissing(true), dataDir);
                 System.out.println("========create fields=========");
                 //添加默认的列族
                 handleMap.put("default", rocksDB.getDefaultColumnFamily());
@@ -94,7 +94,7 @@ public abstract class BaseDBAccess implements DBAccess {
                 }
                 //打开数据库
                 List<ColumnFamilyHandle> handleList = new ArrayList<>();
-                rocksDB = RocksDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
+                rocksDB = OptimisticTransactionDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
                 for(ColumnFamilyHandle handler : handleList){
                     String name = new String(handler.getName());
                     handleMap.put(name, handler);
@@ -103,8 +103,8 @@ public abstract class BaseDBAccess implements DBAccess {
 
             if(rocksDB!=null){
                 transaction.setRocksDB(rocksDB);
-                transaction.setHandleMap(handleMap);
-                transaction.initRocksDB();
+//                transaction.setHandleMap(handleMap);
+//                transaction.initRocksDB();
 
             }
         } catch (Exception e) {
