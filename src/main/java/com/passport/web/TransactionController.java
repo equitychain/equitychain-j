@@ -53,7 +53,9 @@ public class TransactionController {
         }
 
         Transaction transaction = transactionHandler.sendTransaction(payAddress, receiptAddress, value, extarData, password, tradeType);
-        return new ResultDto(ResultEnum.SUCCESS.getCode(), transaction);
+        com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
+        BeanUtils.copyProperties(transaction,transactionDto);
+        return new ResultDto(ResultEnum.SUCCESS.getCode(), transactionDto);
     }
 
     /**
@@ -74,8 +76,14 @@ public class TransactionController {
         screenVals.add(bytes1);
         screenVals.add(bytes1);
         List<Transaction> transactions = dbAccess.transactionPagination(pageCount, pageNumber, 0, screens, screenVals, 1);
+        List<com.passport.dto.coreobject.Transaction> transactionsDto =new ArrayList<>();
+        for (Transaction transaction:transactions){
+            com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
+            BeanUtils.copyProperties(transaction,transactionDto);
+            transactionsDto.add(transactionDto);
+        }
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
-        resultDto.setData(transactions);
+        resultDto.setData(transactionsDto);
         return resultDto;
     }
 
@@ -106,16 +114,16 @@ public class TransactionController {
      * @return
      */
     @GetMapping("getTransactionByBlockHeight")
-    public ResultDto getTransactionByBlockHeight(HttpServletRequest request) {
-        String blockHeight = request.getParameter("blockHeight");
-        //非空检验
-        boolean flag = CheckUtils.checkParamIfEmpty(blockHeight);
-        if (flag) {
-            return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
+    public ResultDto getTransactionByBlockHeight(@RequestParam("blockHeight") int blockHeight) {
+        List<Transaction> transactions = dbAccess.getTransactionsByBlockHeight(blockHeight);
+         List<com.passport.dto.coreobject.Transaction> transactionsDto =new ArrayList<>();
+        for (Transaction transaction:transactions){
+            com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
+            BeanUtils.copyProperties(transaction,transactionDto);
+            transactionsDto.add(transactionDto);
         }
-        List<Transaction> transactions = dbAccess.getTransactionsByBlockHeight(Long.valueOf(blockHeight));
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
-        resultDto.setData(transactions);
+        resultDto.setData(transactionsDto);
         return resultDto;
     }
 }

@@ -8,11 +8,9 @@ import com.passport.enums.ResultEnum;
 import com.passport.enums.TransactionTypeEnum;
 import com.passport.utils.CheckUtils;
 import com.passport.webhandler.TransactionHandler;
+import org.apache.commons.collections4.list.TreeList;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -33,16 +31,30 @@ public class TrusteeController {
     private TransactionHandler transactionHandler;
 
     /**
-     * 查询委托人列表
-     * @param request
+     *  查询前n个委托人
+     * @param n
      * @return
      */
-    @GetMapping("getTrusteeList")
-    public ResultDto getTransactionByNBlock(HttpServletRequest request) {
-        List<Trustee> transactions = dbAccess.listTrustees(1000);
+    @GetMapping("getTrusteeByN")
+    public ResultDto getTrusteeByN(@RequestParam("n") int n) {
+        List<Trustee> transactions = dbAccess.listTrustees(n);
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
         resultDto.setData(transactions);
         return resultDto;
     }
 
+
+    /**
+     * 委托人列表
+     * @param pageCount
+     * @param pageNumber
+     * @return
+     */
+    @GetMapping("getTrusteeList")
+    public ResultDto getTrusteeList(@RequestParam("pageCount") int pageCount,@RequestParam("pageNumber") int pageNumber) {
+        List<Trustee> trustees = dbAccess.trusteePagination(pageCount,pageNumber,0,null,null);
+        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
+        resultDto.setData(trustees);
+        return resultDto;
+    }
 }
