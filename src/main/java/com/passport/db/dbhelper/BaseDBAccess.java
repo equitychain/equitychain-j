@@ -211,7 +211,30 @@ public abstract class BaseDBAccess implements DBAccess {
         }
         return null;
     }
-
+    protected <T> byte[] getKeyValByDto(T t) throws IllegalAccessException {
+        Class tClas = t.getClass();
+        if (tClas.isAnnotationPresent(EntityClaz.class)) {
+            Field[] fields = tClas.getDeclaredFields();
+            Field keyField = null;
+            for (Field f : fields) {
+                f.setAccessible(true);
+                if (f.isAnnotationPresent(KeyField.class)) {
+                    keyField = f;
+                    break;
+                }
+            }
+            if(keyField != null){
+                keyField.setAccessible(true);
+                Object keyVal = keyField.get(t);
+                if(keyVal instanceof byte[]){
+                    return (byte[])keyVal;
+                }else{
+                    return keyVal.toString().getBytes();
+                }
+            }
+        }
+        return null;
+    }
     public final void addObjs(List objs) throws Exception {
         WriteBatch batch = new WriteBatch();
         int count = 0;

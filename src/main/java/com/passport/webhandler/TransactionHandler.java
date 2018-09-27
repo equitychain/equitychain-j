@@ -9,6 +9,7 @@ import com.passport.crypto.eth.Keys;
 import com.passport.crypto.eth.Sign;
 import com.passport.crypto.eth.WalletUtils;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.db.dbhelper.IndexColumnNames;
 import com.passport.enums.ResultEnum;
 import com.passport.enums.TransactionTypeEnum;
 import com.passport.event.SendTransactionEvent;
@@ -214,6 +215,12 @@ public class TransactionHandler {
             TransactionStrategy transactionStrategy = transactionStrategyContext.getTransactionStrategy(new String(transaction.getTradeType()));
             if(transactionStrategy != null){
                 transactionStrategy.handleTransaction(transaction);
+            }
+            try {
+                dbAccess.addIndex(transaction,IndexColumnNames.TRANSTIMEINDEX,transaction.getTime());
+                dbAccess.addIndex(transaction,IndexColumnNames.TRANSBLOCKHEIGHTINDEX,transaction.getBlockHeight());
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
             }
         }
         //需要清空，不然会冗余很多

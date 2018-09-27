@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.security.PublicKey;
 
 /**
@@ -59,16 +58,6 @@ public class SendTransactionREQ extends Strategy {
                 //放到未确认交易流水里面
                 Optional<Transaction> transactionOptional = dbAccess.getUnconfirmTransaction(transaction.getHash().toString());
                 if (!transactionOptional.isPresent()) {
-                    //特殊流水校验
-                    CommonException commonException = transactionHandler.check4AllTradeType(
-                            new String(transaction.getTradeType().toByteArray()),
-                            new String(transaction.getValue().toByteArray()),
-                            new String(transaction.getPayAddress().toByteArray()),
-                            new String(transaction.getReceiptAddress().toByteArray()));
-                    if(commonException != null){
-                        return;
-                    }
-
                     trans.setSignature(transaction.getSignature().toByteArray());
                     trans.setPublicKey(transaction.getPublicKey().toByteArray());
                     trans.setStatus(Integer.parseInt(new String(transaction.getStatus().toByteArray())));
@@ -79,6 +68,16 @@ public class SendTransactionREQ extends Strategy {
                     trans.setTradeType(transaction.getTradeType().toByteArray());
                     trans.setHash(transaction.getHash().toByteArray());
                     trans.setBlockHeight(trans.getBlockHeight());
+
+                    //特殊流水校验
+                    CommonException commonException = transactionHandler.check4AllTradeType(
+                            new String(trans.getTradeType()),
+                            new String(trans.getValue()),
+                            new String(trans.getPayAddress()),
+                            new String(trans.getReceiptAddress()));
+                    if(commonException != null){
+                        return;
+                    }
 
                     flag = dbAccess.putUnconfirmTransaction(trans);
                     logger.info("交易流水不存在，放到未确认流水中，结果：" + flag);
