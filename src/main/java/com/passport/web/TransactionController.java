@@ -7,11 +7,9 @@ import com.passport.enums.ResultEnum;
 import com.passport.enums.TransactionTypeEnum;
 import com.passport.utils.CheckUtils;
 import com.passport.webhandler.TransactionHandler;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -59,32 +57,23 @@ public class TransactionController {
     }
 
     /**
-     * 根据from跟to查流水
-     * @param request
+     * 根据地址查流水
+     * @param pageCount
+     * @param pageNumber
+     * @param address
      * @return
      */
     @GetMapping("getTransactionByAddress")
-    public ResultDto getTransactionByAddress(HttpServletRequest request) {
-        String pageSize = request.getParameter("pageSize");
-        String pageNumber = request.getParameter("pageNumber");
-        String payAddress = request.getParameter("payAddress");
-        String receiptAddress = request.getParameter("receiptAddress");
-        //非空检验
-        boolean flag = CheckUtils.checkParamIfEmpty(pageSize, pageNumber, payAddress, receiptAddress);
-        if (flag) {
-            return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
-        }
+    public ResultDto getTransactionByAddress(@RequestParam("pageCount") int pageCount,@RequestParam("pageNumber") int pageNumber,@RequestParam("address") String address ) {
         List<String> screens = new ArrayList<>();
         List<byte[][]> screenVals = new ArrayList<>();
         screens.add("payAddress");
         screens.add("receiptAddress");
         byte[][] bytes1 = new byte[1][];
-        bytes1[1] = payAddress.getBytes();
+        bytes1[0] = address.getBytes();
         screenVals.add(bytes1);
-        byte[][] bytes2 = new byte[1][];
-        bytes2[1] = receiptAddress.getBytes();
-        screenVals.add(bytes2);
-        List<Transaction> transactions = dbAccess.transactionPagination(Integer.valueOf(pageSize), Integer.valueOf(pageNumber), 0, screens, screenVals, 1);
+        screenVals.add(bytes1);
+        List<Transaction> transactions = dbAccess.transactionPagination(pageCount, pageNumber, 0, screens, screenVals, 1);
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
         resultDto.setData(transactions);
         return resultDto;
@@ -92,22 +81,22 @@ public class TransactionController {
 
     /**
      * 查询前n个区块的流水
-     * @param request
+     * @param pageCount
+     * @param pageNumber
+     * @param nBlock
      * @return
      */
     @GetMapping("getTransactionByNBlock")
-    public ResultDto getTransactionByNBlock(HttpServletRequest request) {
-        String pageSize = request.getParameter("pageSize");
-        String pageNumber = request.getParameter("pageNumber");
-        String nBlock = request.getParameter("nBlock");
-        //非空检验
-        boolean flag = CheckUtils.checkParamIfEmpty(pageSize, pageNumber,nBlock);
-        if (flag) {
-            return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
+    public ResultDto getTransactionByNBlock(@RequestParam("pageCount") int pageCount,@RequestParam("pageNumber") int pageNumber,@RequestParam("nBlock") int nBlock) {
+        List<Transaction> transactions = dbAccess.getNewBlocksTransactions(pageCount,pageNumber,nBlock);
+        List<com.passport.dto.coreobject.Transaction> transactionsDto =new ArrayList<>();
+        for (Transaction transaction:transactions){
+            com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
+            BeanUtils.copyProperties(transaction,transactionDto);
+            transactionsDto.add(transactionDto);
         }
-        List<Transaction> transactions = dbAccess.getNewBlocksTransactions(Integer.valueOf(pageSize),Integer.valueOf(pageNumber),Integer.valueOf(nBlock));
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
-        resultDto.setData(transactions);
+        resultDto.setData(transactionsDto);
         return resultDto;
     }
 
