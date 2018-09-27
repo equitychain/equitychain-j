@@ -102,6 +102,8 @@ public class MinerHandler {
             feeTrans.setTradeType(TransactionTypeEnum.CONFIRM_REWARD.toString().getBytes());
 
             tran.setBlockHeight(((prevBlock.getBlockHeight() + 1)+"").getBytes());
+            feeTrans.setTime((System.currentTimeMillis()+"").getBytes());
+            tran.setTime(feeTrans.getTime());
             //添加奖励和需要确认的流水
             currentBlock.getTransactions().add(feeTrans);
             currentBlock.getTransactions().add(tran);
