@@ -1,6 +1,13 @@
 package com.passport.utils;
 
+import com.passport.core.Transaction;
+import com.passport.crypto.eth.Keys;
+import com.passport.crypto.eth.Sign;
+import com.passport.enums.TransactionTypeEnum;
+import com.passport.transactionhandler.TransactionStrategy;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -12,6 +19,7 @@ import java.util.regex.Pattern;
  * @date 创建时间：2016年12月22日 下午2:14:49
  */
 public class CheckUtils {
+	private static final Logger logger = LoggerFactory.getLogger(CheckUtils.class);
 	
 	/**
 	 * 是否为9位数字旧汇生活码
@@ -80,4 +88,32 @@ public class CheckUtils {
         }
         return flag;
     }
+
+	/**
+	 * 交易数据验签
+	 * @param transaction
+	 * @return
+	 */
+	public static boolean checkTransaction(Transaction transaction){
+		//验证签名
+		Transaction trans = new Transaction();
+		trans.setPayAddress(transaction.getPayAddress());
+		trans.setReceiptAddress(transaction.getReceiptAddress());
+		trans.setValue(transaction.getValue());
+		trans.setExtarData(transaction.getExtarData());
+		trans.setTime(transaction.getTime());
+		//生成hash和生成签名sign使用的基础数据都应该一样 TODO 使用多语言开发时应使用同样的序列化算法
+		String transactionJson = GsonUtils.toJson(trans);
+		try {
+			if(transaction.getPayAddress() == null && transaction.getTradeType().equals(TransactionTypeEnum.BLOCK_REWARD.toString())){
+				if (!Sign.verify(Keys.publicKeyDecode(new String(transaction.getPublicKey())), new String(transaction.getSignature()), transactionJson)) {
+					return false;
+				}
+			}
+		} catch (Exception e) {
+			logger.error("交易流水验签异常", e);
+			return false;
+		}
+		return true;
+	}
 }

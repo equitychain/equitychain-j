@@ -88,6 +88,7 @@ public class BlockSyncREQ extends Strategy {
 
             //存储区块到本地
             dbAccess.putBlock(blockLocal);
+
             dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
 
             //流水匹配，和区块中流水一样的未确认流水将放到已确认流水中

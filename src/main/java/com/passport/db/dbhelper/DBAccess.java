@@ -226,6 +226,11 @@ public interface DBAccess {
 	 * @return
 	 */
 	List<Trustee> listTrustees();
+	/**
+	 * 获取受托人列表
+	 * @return
+	 */
+	List<Trustee> listTrustees(int count);
 
 	/**
 	 * 添加一个投票人
@@ -284,6 +289,13 @@ public interface DBAccess {
 	 * @return
 	 */
 	List<Block> blockPagination(int pageCount, int pageNumber) throws Exception;
+	/**
+	 * 区块分页查询
+	 * @param blockHeight：区块高度
+	 * @param blockCount：多少个区块
+	 * @return
+	 */
+	List<Block> getBlocksByHeight(int blockHeight, int blockCount) throws Exception;
 	/**
 	 * 交易流水分页查询
 	 * @param pageCount：每页记录数
@@ -363,4 +375,5 @@ public interface DBAccess {
                                          List<byte[][]> vals, int screenType,
                                          ColumnFamilyHandle overAndNextHandle, Class<T> tClass, String keyFiledName,
                                          int orderByType, int flushSize, int dtoType, ColumnFamilyHandle orderByFieldHandle) throws Exception;
+    <T> void addIndex(T t, IndexColumnNames columnNames,byte[] indexKey) throws IllegalAccessException;
 }
