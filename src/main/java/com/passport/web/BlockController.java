@@ -2,21 +2,17 @@ package com.passport.web;
 
 import com.google.common.base.Optional;
 import com.passport.core.Block;
-
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
-import com.passport.utils.CheckUtils;
 import com.passport.webhandler.MinerHandler;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-
 import java.util.List;
 
 /**
@@ -33,13 +29,6 @@ public class BlockController {
     private MinerHandler minerHandler;
     @Autowired
     private DBAccess dbAccess;
-
-    @GetMapping("/mine")
-    public ResultDto mine(HttpServletRequest request) throws Exception {
-        minerHandler.mining();
-        return new ResultDto(ResultEnum.SUCCESS);
-    }
-
 
     /**
      *  查询区块列表

@@ -266,6 +266,7 @@ public class BlockHandler {
         block.setTransactionCount(blockMessage.getTransactionsCount());
         block.setBlockHeight(blockMessage.getBlockHeight());
         block.setTransactions(new ArrayList<>());
+        block.setProducer(blockMessage.getProducer());
         //区块流水记录
         blockMessage.getTransactionsList().forEach((TransactionMessage.Transaction trans) -> {
             Transaction transaction = new Transaction();
@@ -310,6 +311,8 @@ public class BlockHandler {
         blockBuilder.setBlockHeader(blockHeaderBuilder.build());
         blockBuilder.setTransactionCount(block.getTransactionCount());
         blockBuilder.setBlockHeight(block.getBlockHeight());
+        blockBuilder.setProducer(block.getProducer());
+
         //设置包含在区块中的流水记录
         block.getTransactions().forEach((Transaction trans) -> {
             TransactionMessage.Transaction.Builder transactionBuilder = TransactionMessage.Transaction.newBuilder();

@@ -11,4 +11,5 @@ message Block {
     BlockHeader blockHeader = 4;
     int32 transactionCount = 5;
     repeated Transaction transactions = 6;
+    string producer = 7;
 }

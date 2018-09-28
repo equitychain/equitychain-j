@@ -74,6 +74,16 @@ public final class BlockMessage {
      */
     TransactionMessage.TransactionOrBuilder getTransactionsOrBuilder(
             int index);
+
+    /**
+     * <code>string producer = 7;</code>
+     */
+    String getProducer();
+    /**
+     * <code>string producer = 7;</code>
+     */
+    com.google.protobuf.ByteString
+        getProducerBytes();
   }
   /**
    * Protobuf type {@code Block}
@@ -92,6 +102,7 @@ public final class BlockMessage {
       blockHeight_ = 0L;
       transactionCount_ = 0;
       transactions_ = java.util.Collections.emptyList();
+      producer_ = "";
     }
 
     @Override
@@ -159,6 +170,12 @@ public final class BlockMessage {
               }
               transactions_.add(
                   input.readMessage(TransactionMessage.Transaction.parser(), extensionRegistry));
+              break;
+            }
+            case 58: {
+              String s = input.readStringRequireUtf8();
+
+              producer_ = s;
               break;
             }
           }
@@ -280,6 +297,40 @@ public final class BlockMessage {
       return transactions_.get(index);
     }
 
+    public static final int PRODUCER_FIELD_NUMBER = 7;
+    private volatile Object producer_;
+    /**
+     * <code>string producer = 7;</code>
+     */
+    public String getProducer() {
+      Object ref = producer_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        producer_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string producer = 7;</code>
+     */
+    public com.google.protobuf.ByteString
+        getProducerBytes() {
+      Object ref = producer_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b =
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (String) ref);
+        producer_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -309,6 +360,9 @@ public final class BlockMessage {
       }
       for (int i = 0; i < transactions_.size(); i++) {
         output.writeMessage(6, transactions_.get(i));
+      }
+      if (!getProducerBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, producer_);
       }
     }
 
@@ -341,6 +395,9 @@ public final class BlockMessage {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(6, transactions_.get(i));
       }
+      if (!getProducerBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, producer_);
+      }
       memoizedSize = size;
       return size;
     }
@@ -372,6 +429,8 @@ public final class BlockMessage {
           == other.getTransactionCount());
       result = result && getTransactionsList()
           .equals(other.getTransactionsList());
+      result = result && getProducer()
+          .equals(other.getProducer());
       return result;
     }
 
@@ -401,6 +460,8 @@ public final class BlockMessage {
         hash = (37 * hash) + TRANSACTIONS_FIELD_NUMBER;
         hash = (53 * hash) + getTransactionsList().hashCode();
       }
+      hash = (37 * hash) + PRODUCER_FIELD_NUMBER;
+      hash = (53 * hash) + getProducer().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -551,6 +612,8 @@ public final class BlockMessage {
         } else {
           transactionsBuilder_.clear();
         }
+        producer_ = "";
+
         return this;
       }
 
@@ -593,6 +656,7 @@ public final class BlockMessage {
         } else {
           result.transactions_ = transactionsBuilder_.build();
         }
+        result.producer_ = producer_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -675,6 +739,10 @@ public final class BlockMessage {
               transactionsBuilder_.addAllMessages(other.transactions_);
             }
           }
+        }
+        if (!other.getProducer().isEmpty()) {
+          producer_ = other.producer_;
+          onChanged();
         }
         onChanged();
         return this;
@@ -1163,6 +1231,75 @@ public final class BlockMessage {
         }
         return transactionsBuilder_;
       }
+
+      private Object producer_ = "";
+      /**
+       * <code>string producer = 7;</code>
+       */
+      public String getProducer() {
+        Object ref = producer_;
+        if (!(ref instanceof String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          String s = bs.toStringUtf8();
+          producer_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      /**
+       * <code>string producer = 7;</code>
+       */
+      public com.google.protobuf.ByteString
+          getProducerBytes() {
+        Object ref = producer_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b =
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (String) ref);
+          producer_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string producer = 7;</code>
+       */
+      public Builder setProducer(
+          String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+
+        producer_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string producer = 7;</code>
+       */
+      public Builder clearProducer() {
+
+        producer_ = getDefaultInstance().getProducer();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string producer = 7;</code>
+       */
+      public Builder setProducerBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+
+        producer_ = value;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -1227,13 +1364,13 @@ public final class BlockMessage {
   static {
     String[] descriptorData = {
       "\n\022BlockMessage.proto\032\030BlockHeaderMessage" +
-      ".proto\032\030TransactionMessage.proto\"\245\001\n\005Blo" +
+      ".proto\032\030TransactionMessage.proto\"\267\001\n\005Blo" +
       "ck\022\021\n\tblockSize\030\001 \001(\003\022\023\n\013blockNumber\030\002 \001" +
       "(\003\022\023\n\013blockHeight\030\003 \001(\003\022!\n\013blockHeader\030\004" +
       " \001(\0132\014.BlockHeader\022\030\n\020transactionCount\030\005" +
       " \001(\005\022\"\n\014transactions\030\006 \003(\0132\014.Transaction" +
-      "B\"\n\022com.passport.protoB\014BlockMessageb\006pr" +
-      "oto3"
+      "\022\020\n\010producer\030\007 \001(\tB\"\n\022com.passport.proto" +
+      "B\014BlockMessageb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1254,7 +1391,7 @@ public final class BlockMessage {
     internal_static_Block_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Block_descriptor,
-        new String[] { "BlockSize", "BlockNumber", "BlockHeight", "BlockHeader", "TransactionCount", "Transactions", });
+        new String[] { "BlockSize", "BlockNumber", "BlockHeight", "BlockHeader", "TransactionCount", "Transactions", "Producer", });
     BlockHeaderMessage.getDescriptor();
     TransactionMessage.getDescriptor();
   }

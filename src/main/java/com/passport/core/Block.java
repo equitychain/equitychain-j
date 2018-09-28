@@ -27,6 +27,9 @@ public class Block {
   @KeyField
   @FaildClaz(name = "blockHeight",type = Long.class)
   private Long blockHeight;
+  @KeyField
+  @FaildClaz(name = "producer",type = String.class)
+  private String producer;
 
   public static Logger getLogger() {
     return logger;
@@ -74,6 +77,14 @@ public class Block {
 
   public void setBlockHeight(Long blockHeight) {
     this.blockHeight = blockHeight;
+  }
+
+  public String getProducer() {
+    return producer;
+  }
+
+  public void setProducer(String producer) {
+    this.producer = producer;
   }
 
   //计算block对象缺少的字段值,且返回区块hash
