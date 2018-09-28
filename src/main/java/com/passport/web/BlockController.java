@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 区块
@@ -50,8 +52,11 @@ public class BlockController {
     @GetMapping("getBlockList")
     public ResultDto getBlockList(@RequestParam("pageCount") int pageCount, @RequestParam("pageNumber") int pageNumber) {
         List<Block> blocks = new ArrayList<>();
+        Map resultMap = new HashMap();
         List<com.passport.dto.coreobject.Block> newBlocks = new ArrayList<>();
+        long lastBlockHeight = 0;
         try {
+            lastBlockHeight = Long.valueOf(dbAccess.getLastBlockHeight().get().toString()) ;
             blocks = dbAccess.blockPagination(pageCount, pageNumber);
             blocks.forEach(block -> {
                 newBlocks.add(getBlockObject(block));
@@ -60,8 +65,10 @@ public class BlockController {
             e.printStackTrace();
             return new ResultDto(ResultEnum.SYS_ERROR);
         }
+        resultMap.put("blockList",newBlocks);
+        resultMap.put("count",lastBlockHeight);
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
-        resultDto.setData(newBlocks);
+        resultDto.setData(resultMap);
         return resultDto;
     }
 

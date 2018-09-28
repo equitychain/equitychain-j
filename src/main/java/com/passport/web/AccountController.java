@@ -10,11 +10,17 @@ import com.passport.listener.ApplicationContextProvider;
 import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.CheckUtils;
 import com.passport.webhandler.AccountHandler;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 账户
@@ -128,4 +134,29 @@ public class AccountController {
         return resultDto;
     }
 
+    /**
+     * 账户列表
+     * @return
+     */
+    @GetMapping("accountList")
+    public ResultDto accountList() {
+        Map resultMap = new HashMap();
+        List<Map> accounts = new ArrayList<>();
+        List<Account> accountList = dbAccess.listAccounts();
+        BigDecimal sumBalance = BigDecimal.ZERO;
+        for(Account account:accountList){
+            if(!StringUtils.isEmpty(account.getPrivateKey())){
+                Map accountMap = new HashMap();
+                accountMap.put("address",account.getAddress());
+                accountMap.put("balance",account.getBalance());
+                accounts.add(accountMap);
+                sumBalance = sumBalance.add(account.getBalance());
+            }
+        }
+        resultMap.put("accounts",accounts);
+        resultMap.put("sumBalance",sumBalance);
+        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
+        resultDto.setData(resultMap);
+        return resultDto;
+    }
 }
