@@ -1,6 +1,7 @@
 package com.passport.msghandler;
 
 import com.google.common.base.Optional;
+import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Block;
@@ -47,7 +48,7 @@ public class BlockSyncREQ extends Strategy {
 
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块广播请求数据：{}", GsonUtils.toJson(message));
-        if(!SyncFlag.isNextBlockSyncFlag()){
+        if(SyncFlag.isNextBlockSyncFlag()){
             logger.info("正在主动同步区块，暂时不处理流水广播消息");
             return;
         }

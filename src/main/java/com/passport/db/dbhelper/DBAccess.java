@@ -71,6 +71,12 @@ public interface DBAccess {
 	Optional<Object> getLastBlockHeight();
 
 	/**
+	 * 获取最新一个区块的Hash值-shiwu
+	 * @return
+	 */
+	Optional<Object> getLastBlockHeightT();
+
+	/**
 	 * 保存区块
 	 * @param block
 	 * @return
