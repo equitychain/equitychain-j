@@ -11,6 +11,7 @@ public class Block {
   private Integer transactionCount;//交易流水数量
   List<Transaction> transactions;//交易流水
   private Long blockHeight;
+  private String producer;
 
   public Long getBlockSize() {
     return blockSize;
@@ -50,5 +51,13 @@ public class Block {
 
   public void setBlockHeight(Long blockHeight) {
     this.blockHeight = blockHeight;
+  }
+
+  public String getProducer() {
+    return producer;
+  }
+
+  public void setProducer(String producer) {
+    this.producer = producer;
   }
 }
