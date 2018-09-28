@@ -4,7 +4,6 @@ import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.utils.SerializeUtils;
-import org.apache.zookeeper.Op;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
@@ -118,7 +117,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public boolean putNodeList(List<String> nodes) {
         try {
 
-            rocksDB.put(CLIENT_NODES_LIST_KEY.getBytes(), SerializeUtils.serialize(nodes));
+            transaction.put(CLIENT_NODES_LIST_KEY.getBytes(), SerializeUtils.serialize(nodes));
             return true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -130,7 +129,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public boolean put(String key, Object value) {
         try {
             KeysSet.add(key);//存储key到文件
-            rocksDB.put(key.getBytes(), SerializeUtils.serialize(value));
+            transaction.put(key.getBytes(), SerializeUtils.serialize(value));
             return true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -170,7 +169,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public boolean delete(String key) {
         try {
-            rocksDB.delete(key.getBytes());
+            transaction.delete(key.getBytes());
             return true;
         } catch (RocksDBException e) {
             e.printStackTrace();

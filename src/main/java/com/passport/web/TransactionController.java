@@ -1,5 +1,6 @@
 package com.passport.web;
 
+import com.passport.annotations.RocksTransaction;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
@@ -32,6 +33,7 @@ public class TransactionController {
     private TransactionHandler transactionHandler;
 
     @PostMapping("/send")
+    @RocksTransaction
     public ResultDto send(HttpServletRequest request) throws Exception {
         String payAddress = request.getParameter("payAddress");
         String receiptAddress = request.getParameter("receiptAddress");
