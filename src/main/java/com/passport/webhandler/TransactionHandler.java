@@ -211,6 +211,13 @@ public class TransactionHandler {
      */
     public void exec(List<Transaction> list) {
         for (Transaction transaction : list) {
+//            try {
+//                Thread.sleep(3000);
+//                logger.error("---------------!!!!");
+//            }catch (Exception e){
+//
+//            }
+
             TransactionStrategy transactionStrategy = transactionStrategyContext.getTransactionStrategy(new String(transaction.getTradeType()));
             if(transactionStrategy != null){
                 transactionStrategy.handleTransaction(transaction);

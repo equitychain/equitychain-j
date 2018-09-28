@@ -1,5 +1,6 @@
 package com.passport.peer;
 
+import com.passport.annotations.RocksTransaction;
 import com.passport.constant.NodeListConstant;
 import com.passport.event.GenerateBlockEvent;
 import com.passport.event.SyncNextBlockEvent;

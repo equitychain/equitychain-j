@@ -25,7 +25,7 @@ import java.util.Set;
 public class RocksdbTransaction {
 
     private Set<String> KeysSet;
-    private RocksDB rocksDB;
+    private OptimisticTransactionDB rocksDB;
     private Snapshot snapshot ;
     private RocksBackup rocksBackup = new RocksBackup();
     private Map<String,ColumnFamilyHandle> handleMap = new HashMap<>();
@@ -40,11 +40,11 @@ public class RocksdbTransaction {
         this.rocksBackup = rocksBackup;
     }
 
-    public RocksDB getRocksDB() {
+    public OptimisticTransactionDB getRocksDB() {
         return rocksDB;
     }
 
-    public void setRocksDB(RocksDB rocksDB) {
+    public void setRocksDB(OptimisticTransactionDB rocksDB) {
         this.rocksDB = rocksDB;
     }
 

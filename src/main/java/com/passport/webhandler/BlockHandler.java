@@ -2,9 +2,11 @@ package com.passport.webhandler;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.google.common.util.concurrent.Futures;
 import com.google.protobuf.ByteString;
 import com.passport.constant.Constant;
 import com.passport.core.*;
+import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.GenerateNextBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
@@ -17,9 +19,12 @@ import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.RawardUtil;
+import org.rocksdb.RocksDBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -30,11 +35,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@EnableAsync
 public class BlockHandler {
     private static final Logger logger = LoggerFactory.getLogger(BlockHandler.class);
 
     @Autowired
-    private DBAccess dbAccess;
+    private BaseDBAccess dbAccess;
     @Autowired
     private ApplicationContextProvider provider;
     @Autowired
@@ -316,7 +322,7 @@ public class BlockHandler {
         return blockBuilder;
     }
 
-    public void produceNextBlock() {
+    public void produceNextBlock() throws InterruptedException {
         //当前区块周期
         Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
         if(!lastBlockOptional.isPresent()){
@@ -362,23 +368,36 @@ public class BlockHandler {
      * @param list
      * @param blockCycle
      */
-    public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) {
-        Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
-        Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
-        if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
-            Account account = accountOptional.get();
-            if(account.getPrivateKey() != null){
-                //打包区块
-                minerHandler.packagingBlock(account);
+    public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) throws InterruptedException {
+//        try{
+            Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
+            Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
+            if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
+                Account account = accountOptional.get();
+                if(account.getPrivateKey() != null){
+                    //打包区块
+                    minerHandler.packagingBlock(account);
 
-                //更新101个受托人，已经出块人的状态
-                trusteeHandler.changeStatus(trustee, blockCycle);
+                    //更新101个受托人，已经出块人的状态
+                    trusteeHandler.changeStatus(trustee, blockCycle);
 
-                logger.info("第{}个区块出块成功", newBlockHeight);
-
-                provider.publishEvent(new GenerateNextBlockEvent(0L));
+                    logger.info("第{}个区块出块成功", newBlockHeight);
+                    System.out.println("-------1");
+                    provider.publishEvent(new GenerateNextBlockEvent(0L));
+                    System.out.println("-------2");
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                                provider.publishEvent(new GenerateNextBlockEvent(0L));
+//                        }
+//                    }).start();
+                }
             }
-        }
+//        }catch (RocksDBException e){
+//            e.printStackTrace();
+//        }
+
     }
+
 
 }

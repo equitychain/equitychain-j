@@ -1,6 +1,7 @@
 package com.passport.listener;
 
 import com.google.common.base.Optional;
+import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.db.dbhelper.DBAccess;
@@ -19,6 +20,7 @@ import io.netty.channel.group.ChannelGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +46,7 @@ public class BlockEventListener {
 	@Autowired
 	private ChannelsManager channelsManager;
 	@Autowired
+	@Lazy
 	private BlockHandler blockHandler;
 	@Autowired
 	private BlockUtils blockUtils;
@@ -56,6 +59,7 @@ public class BlockEventListener {
 	 * @param event
 	 */
 	@EventListener(SyncNextBlockEvent.class)
+	@RocksTransaction
 	public void syncNextBlock(SyncNextBlockEvent event) throws ParseException {
 		Long blockHeight = CastUtils.castLong(event.getSource());
 		if (blockHeight == 0) {
@@ -174,7 +178,8 @@ public class BlockEventListener {
 	 * @param event
 	 */
 	@EventListener(GenerateNextBlockEvent.class)
-	public void generateNextBlock(GenerateNextBlockEvent event) {
+	@RocksTransaction
+	public void generateNextBlock(GenerateNextBlockEvent event) throws InterruptedException {
 		blockHandler.produceNextBlock();
 	}
 
@@ -183,7 +188,8 @@ public class BlockEventListener {
 	 * @param event
 	 */
 	@EventListener(GenerateBlockEvent.class)
-	public void generateBlock(GenerateBlockEvent event) {
+	@RocksTransaction
+	public void generateBlock(GenerateBlockEvent event) throws InterruptedException {
 		ChannelGroup channels = channelsManager.getChannels();
 		//第一个启动的节点，负责生成区块
 		if(channels.size() == 0){

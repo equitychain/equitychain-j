@@ -1,6 +1,7 @@
 package com.passport.web;
 
 import com.google.common.base.Optional;
+import com.passport.annotations.RocksTransaction;
 import com.passport.core.Account;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
@@ -49,12 +50,18 @@ public class AccountController {
 
     @GetMapping("/test")
     public @ResponseBody
-    Object test() throws Exception {
-        accountHandler.test();
+    Object test()  {
+        try{
+            accountHandler.test();
+        }catch (Exception e){
+
+        }
+
         return "sdfasdf";
     }
 
     @GetMapping("/new")
+    @RocksTransaction
     public ResultDto newAccount(HttpServletRequest request) throws Exception {
         String password = request.getParameter("password");
         //非空检验
@@ -76,6 +83,7 @@ public class AccountController {
     }
 
     @GetMapping("/setMinerAccount")
+    @RocksTransaction
     public ResultDto setMinerAccount(HttpServletRequest request) throws Exception {
         String address = request.getParameter("address");
         if (address != null && !"".equalsIgnoreCase(address)) {
@@ -88,6 +96,7 @@ public class AccountController {
     }
 
     @GetMapping("/generateGenesis")
+    @RocksTransaction
     public ResultDto generateGenesis(HttpServletRequest request) throws Exception {
         accountHandler.generateTrustees();
         return new ResultDto(ResultEnum.SUCCESS);
