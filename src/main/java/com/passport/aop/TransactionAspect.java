@@ -33,8 +33,6 @@ public class TransactionAspect {
     public void deBefore(JoinPoint joinPoint) throws Throwable {
 
         dbAccess.transaction = dbAccess.rocksDB.beginTransaction(new WriteOptions());
-        System.out.println( dbAccess.transaction.getName()+"================="+dbAccess.transaction.getID());
-        System.out.println("----开启事务----");
         // 接收到请求，记录请求内容
 //        rocksdbTransaction.setSnapshot(rocksdbTransaction.getRocksDB().getSnapshot());
 //        rocksdbTransaction.getRocksBackup().setSnapshots(rocksdbTransaction.getSnapshot());//断电回滚快照
@@ -46,7 +44,6 @@ public class TransactionAspect {
      */
     @AfterThrowing(value = "sig()", throwing = "e")//传到 after snapshot
     public void throwingMethod(Exception e) throws RocksDBException {
-        System.out.println("----回滚事务----");
         dbAccess.transaction.rollback();
 //        System.err.println("--------------事务出错 开始回滚--------------"+e.getMessage());
 //        org.rocksdb.ReadOptions options = new org.rocksdb.ReadOptions();
@@ -76,7 +73,6 @@ public class TransactionAspect {
     }
     @AfterReturning(returning = "ret", pointcut = "sig()")
     public void doAfterReturning(Object ret) throws Throwable {
-        System.out.println("----提交事务----");
         dbAccess.transaction.commit();
 
         //测试查询

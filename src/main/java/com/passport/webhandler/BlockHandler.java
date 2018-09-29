@@ -414,9 +414,7 @@ public class BlockHandler {
                     trusteeHandler.changeStatus(trustee, blockCycle);
 
                     logger.info("第{}个区块出块成功", newBlockHeight);
-                    System.out.println("-------1");
                     provider.publishEvent(new GenerateNextBlockEvent(0L));
-                    System.out.println("-------2");
 //                    new Thread(new Runnable() {
 //                        @Override
 //                        public void run() {

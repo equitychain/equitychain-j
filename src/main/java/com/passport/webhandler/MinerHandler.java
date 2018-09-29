@@ -10,6 +10,7 @@ import com.passport.db.dbhelper.DBAccess;
 import com.passport.enums.TransactionTypeEnum;
 import com.passport.event.SyncBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
+import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.RawardUtil;
 import com.passport.utils.eth.ByteUtil;
@@ -38,6 +39,9 @@ public class MinerHandler {
     @Autowired
     private ApplicationContextProvider provider;
 
+    @Autowired
+    private BlockHandler blockHandler;
+
     /**
      * 流水打包
      */
@@ -59,7 +63,9 @@ public class MinerHandler {
         Transaction transaction = new Transaction();
         transaction.setPayAddress(null);
         transaction.setReceiptAddress(minerAccount.getAddress().getBytes());//奖励接收者是挖矿账号
-        transaction.setValue(String.valueOf(RawardUtil.getRewardByHeight(prevBlock.getBlockHeight() + 1).toString()).getBytes());//TODO 挖矿奖励取值优化
+
+
+        transaction.setValue(String.valueOf(blockHandler.getReward(CastUtils.castLong(prevBlock.getBlockHeight() + 1))).getBytes());//TODO 挖矿奖励取值优化
         transaction.setExtarData(TransactionTypeEnum.BLOCK_REWARD.toString().getBytes());
         transaction.setTime(String.valueOf(System.currentTimeMillis()).getBytes());
         transaction.setBlockHeight(((prevBlock.getBlockHeight() + 1)+"").getBytes());
