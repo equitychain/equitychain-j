@@ -37,7 +37,7 @@ public class MonitoringIfProducerDead {
     private BlockHandler blockHandler;
 
     @Scheduled(cron = "0/10 * * * * ?")
-    public void monitor() {
+    public void monitor() throws InterruptedException {
         //已同步完成，切换到接收区块和流水广播状态
         if (SyncFlag.isNextBlockSyncFlag()) {
             return;
