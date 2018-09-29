@@ -34,7 +34,7 @@ public class VoteHandler extends TransactionStrategy {
             return;
         }
         Voter voter = voterOptional.get();
-        if(voter.getVoteNum() >= Constant.CHANCE_4_VOTER){
+        if(voter.getVoteNum() < 1){
             return;
         }
 

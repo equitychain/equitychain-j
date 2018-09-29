@@ -142,7 +142,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         try {
             byte[] objByt = rocksDB.get(key.getBytes());
             if (objByt != null) {
-                Optional.of(SerializeUtils.unSerialize(objByt));
+                return Optional.of(SerializeUtils.unSerialize(objByt));
             }
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -398,6 +398,11 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
+    public List<Trustee> listTrustees(int count) {
+        return trusteePagination(count,1,0,null,null);
+    }
+
+    @Override
     public boolean putVoter(Voter voter) {
         try {
             addObj(voter);
@@ -468,6 +473,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public boolean putVoteRecord(VoteRecord voteRecord) {
         try {
+            voteRecord.setId();
             addObj(voteRecord);
             putSuoyinKey(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName),
                     voteRecord.getVoteNum().toString().getBytes(),voteRecord.getPayAddress().getBytes());
@@ -564,6 +570,19 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             long begin = curHeight - pageCount * pageNumber + 1;
             for (long cur = end; cur >= begin; cur --) {
                 blocks.add(getObj("blockHeight", "" + cur, Block.class));
+            }
+        }
+        return blocks;
+    }
+
+    @Override
+    public List<Block> getBlocksByHeight(int blockHeight, int blockCount) throws Exception {
+        List<Block> blocks = new ArrayList<>();
+        for(int i = 0; i < blockCount; i ++){
+            int curBlockHeight = blockHeight-i;
+            Block block = getObj("blockHeight", "" + curBlockHeight, Block.class);
+            if(!block.isNullContent()) {
+                blocks.add(block);
             }
         }
         return blocks;
@@ -671,6 +690,16 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public <T> void addIndex(T t, IndexColumnNames columnNames,byte[] indexKey) {
+        try {
+            putSuoyinKey(handleMap.get(columnNames.indexName),indexKey,getKeyValByDto(t));
+            putOverAndNext(handleMap.get(columnNames.overAndNextName),indexKey);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

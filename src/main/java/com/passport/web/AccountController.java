@@ -13,10 +13,7 @@ import com.passport.utils.CheckUtils;
 import com.passport.webhandler.AccountHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -122,22 +119,18 @@ public class AccountController {
     }*/
 
     /**
-     * 根据获取账户信息
-     *
-     * @param request
+     * 根据地址获取账户信息
+     * @param address ：地址
      * @return
      */
     @GetMapping("getAccountByAddress")
-    public ResultDto getAccountByAddress(HttpServletRequest request) {
-        String address = request.getParameter("address");
-        boolean flag = CheckUtils.checkParamIfEmpty(address);
-        if (flag) {
-            return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
-        }
+    public ResultDto getAccountByAddress(@RequestParam("address") String address) {
         Account account = new Account();
         Optional<Account> blockOptional = dbAccess.getAccount(address);
         if (blockOptional.isPresent()) {
             account = blockOptional.get();
+            account.setPassword("");
+            account.setPrivateKey("");
         }
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
         resultDto.setData(account);

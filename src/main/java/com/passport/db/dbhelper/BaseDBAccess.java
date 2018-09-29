@@ -208,7 +208,30 @@ public abstract class BaseDBAccess implements DBAccess {
         }
         return null;
     }
-
+    protected <T> byte[] getKeyValByDto(T t) throws IllegalAccessException {
+        Class tClas = t.getClass();
+        if (tClas.isAnnotationPresent(EntityClaz.class)) {
+            Field[] fields = tClas.getDeclaredFields();
+            Field keyField = null;
+            for (Field f : fields) {
+                f.setAccessible(true);
+                if (f.isAnnotationPresent(KeyField.class)) {
+                    keyField = f;
+                    break;
+                }
+            }
+            if(keyField != null){
+                keyField.setAccessible(true);
+                Object keyVal = keyField.get(t);
+                if(keyVal instanceof byte[]){
+                    return (byte[])keyVal;
+                }else{
+                    return keyVal.toString().getBytes();
+                }
+            }
+        }
+        return null;
+    }
     public final void addObjs(List objs) throws Exception {
 //        WriteBatch batch = new WriteBatch();
 //        int count = 0;
@@ -588,24 +611,24 @@ public abstract class BaseDBAccess implements DBAccess {
             valK = valK / Constant.INDEX_GROUPSIZE;
             valK = valK * Constant.INDEX_GROUPSIZE;
             byte[] listByte = getByColumnFamilyHandle(handle, ("" + valK).getBytes());
-            Set<byte[]> valueList = new HashSet<>();
+            Set<String> valueList = new HashSet<>();
             if (listByte != null && listByte.length != 0) {
-                valueList = (Set<byte[]>) SerializeUtils.unSerialize(listByte);
+                valueList = (Set<String>) SerializeUtils.unSerialize(listByte);
             }
-            valueList.add(valueItem);
+            valueList.add(new String(valueItem));
             putByColumnFamilyHandle(handle, ("" + valK).getBytes(), SerializeUtils.serialize(valueList));
         }
     }
 
     //索引数据的获取
-    protected final Set<byte[]> getSuoyinValue(ColumnFamilyHandle handle, byte[] key) throws RocksDBException {
+    protected final Set<String> getSuoyinValue(ColumnFamilyHandle handle, byte[] key) throws RocksDBException {
         long valK = Long.parseLong(new String(key));
         valK = valK / Constant.INDEX_GROUPSIZE;
         valK = valK * Constant.INDEX_GROUPSIZE;
         byte[] listByte = getByColumnFamilyHandle(handle, ("" + valK).getBytes());
-        Set<byte[]> valueList = null;
+        Set<String> valueList = null;
         if (listByte != null && listByte.length != 0) {
-            valueList = (Set<byte[]>) SerializeUtils.unSerialize(listByte);
+            valueList = (Set<String>) SerializeUtils.unSerialize(listByte);
         }
         return valueList;
     }
@@ -757,13 +780,14 @@ public abstract class BaseDBAccess implements DBAccess {
                     continue;
                 }
                 //这是改排序字段类型的主键集合
-                Set<byte[]> shaixuanSet = getSuoyinValue(indexHandle, suoyinKey);
+                Set<String> shaixuanSet = getSuoyinValue(indexHandle, suoyinKey);
                 if (shaixuanSet == null || shaixuanSet.size() == 0) {
                     continue;
                 }
                 //筛选主键集合，根据需要的筛选字段进行筛选，重新装入到集合
-                Set<byte[]> heightList = new HashSet<>();
-                for (byte[] bytes : shaixuanSet) {
+                Set<String> heightList = new HashSet<>();
+                for (String heightS : shaixuanSet) {
+                    byte[] bytes = heightS.getBytes();
                     boolean add = true;
                     for (int k = 0; k < fields.size(); k++) {
                         ColumnFamilyHandle handle = handleMap.get(getColName(className, fields.get(k)));
@@ -817,7 +841,7 @@ public abstract class BaseDBAccess implements DBAccess {
                         }
                     }
                     if (add) {
-                        heightList.add(bytes);
+                        heightList.add(new String(bytes));
                     }
                 }
                 //释放内存，这时我们只需要筛选后的集合，大的集合可以释放
@@ -826,12 +850,12 @@ public abstract class BaseDBAccess implements DBAccess {
                     continue;
                 }
                 long t1 = System.currentTimeMillis();
-                byte[][] paixuHeight = longOrder(heightList, orderByFieldHandle);
+                String[] paixuHeight = longOrder(heightList, orderByFieldHandle);
                 long t2 = System.currentTimeMillis();
                 System.out.println("==========================time:" + (t2 - t1));
                 String keyFiledName = getKeyFieldByClass(tClass);
-                for (byte[] heightByt : paixuHeight) {
-                    T tObj = getObj(keyFiledName, new String(heightByt), tClass);
+                for (String heightByt : paixuHeight) {
+                    T tObj = getObj(keyFiledName, heightByt, tClass);
                     tList.add(tObj);
                 }
             }
@@ -908,13 +932,13 @@ public abstract class BaseDBAccess implements DBAccess {
                     continue;
                 }
                 //这是改排序字段类型的主键集合
-                Set<byte[]> shaixuanSet = getSuoyinValue(indexHandle, suoyinKey);
+                Set<String> shaixuanSet = getSuoyinValue(indexHandle, suoyinKey);
                 if (shaixuanSet == null || shaixuanSet.size() == 0) {
                     continue;
                 }
                 //筛选主键集合，根据需要的筛选字段进行筛选，重新装入到集合
-                Set<byte[]> heightList = new HashSet<>();
-                for (byte[] bytes : shaixuanSet) {
+                Set<String> heightList = new HashSet<>();
+                for (String bytes : shaixuanSet) {
                     boolean add = true;
                     switch (screenType) {
                         case 0:
@@ -922,7 +946,7 @@ public abstract class BaseDBAccess implements DBAccess {
                             //and
                             for (int k = 0; k < screenHands.size(); k++) {
                                 ColumnFamilyHandle handle = screenHands.get(k);
-                                byte[] val = getByColumnFamilyHandle(handle, bytes);
+                                byte[] val = getByColumnFamilyHandle(handle, bytes.getBytes());
                                 boolean valInVals = false;
                                 for (byte[] inByte : vals.get(k)) {
                                     if (val == null || val.length == 0) {
@@ -949,7 +973,7 @@ public abstract class BaseDBAccess implements DBAccess {
                                 add = false;
                                 for (int k = 0; k < screenHands.size(); k++) {
                                     ColumnFamilyHandle handle = screenHands.get(k);
-                                    byte[] val = getByColumnFamilyHandle(handle, bytes);
+                                    byte[] val = getByColumnFamilyHandle(handle, bytes.getBytes());
                                     boolean valInVals = false;
                                     for (byte[] inByte : vals.get(k)) {
                                         if (val == null || val.length == 0) {
@@ -1023,7 +1047,7 @@ public abstract class BaseDBAccess implements DBAccess {
                     continue;
                 } else {
                     //todo 排序方式是以long类型排序
-                    byte[][] paixuHeight = null;
+                    String[] paixuHeight = null;
                     if (dtoType == 0) {
                         paixuHeight = longOrder(heightList, orderByFieldHandle);
 
@@ -1032,8 +1056,8 @@ public abstract class BaseDBAccess implements DBAccess {
                     }
                     //循环需要的元素进行添加
                     for (int index = curSetBeginIndex; index <= curSetEndIndex; index++) {
-                        byte[] heightByt = paixuHeight[index];
-                        T tObj = getObj(keyFiledName, new String(heightByt), tClass);
+                        String heightByt = paixuHeight[index];
+                        T tObj = getObj(keyFiledName, heightByt, tClass);
                         tList.add(curIndex, tObj);
                         curIndex++;
                         if (curIndex == pageCount) {
@@ -1133,22 +1157,22 @@ public abstract class BaseDBAccess implements DBAccess {
      * @param longBytes 需要排序的byte[]
      * @return
      */
-    public byte[][] longOrder(Set<byte[]> longBytes, ColumnFamilyHandle orderbyHandle) throws RocksDBException {
-        byte[][] result = new byte[longBytes.size()][];
+    public String[] longOrder(Set<String> longBytes, ColumnFamilyHandle orderbyHandle) throws RocksDBException {
+        String[] result = new String[longBytes.size()];
         result = longBytes.toArray(result);
         //冒泡排序
         for (int i = 0; i < result.length; i++) {
-            byte[] cur = result[i];
-            long curVal = Long.parseLong(new String(getByColumnFamilyHandle(orderbyHandle, cur)));
+            String cur = result[i];
+            long curVal = Long.parseLong(new String(getByColumnFamilyHandle(orderbyHandle, cur.getBytes())));
             for (int j = i + 1; j < result.length; j++) {
-                byte[] place = result[j];
+                byte[] place = result[j].getBytes();
                 long placeHeight = Long.parseLong(new String(getByColumnFamilyHandle(orderbyHandle, place)));
                 if (placeHeight > curVal) {
-                    byte[] temp = result[i];
+                    String temp = result[i];
                     result[i] = result[j];
                     result[j] = temp;
                     cur = result[i];
-                    curVal = Long.parseLong(new String(getByColumnFamilyHandle(orderbyHandle, cur)));
+                    curVal = Long.parseLong(new String(getByColumnFamilyHandle(orderbyHandle, cur.getBytes())));
                 }
             }
         }

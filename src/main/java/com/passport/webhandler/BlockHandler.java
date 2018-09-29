@@ -8,6 +8,8 @@ import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.db.dbhelper.IndexColumnNames;
+import com.passport.enums.TransactionTypeEnum;
 import com.passport.event.GenerateNextBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
@@ -103,16 +105,27 @@ public class BlockHandler {
             }
             //奖励金额的合法性判断
             boolean reword = false;
+            String receiptAddress = null;
             for(Transaction tran : transactions) {
                 byte[] payAddr = tran.getPayAddress();
-                byte[] compByt = "挖矿奖励".getBytes();
+                byte[] compByt = TransactionTypeEnum.BLOCK_REWARD.toString().getBytes();
                 if ((payAddr == null||payAddr.length==0) && tran.getExtarData() != null && Arrays.equals(compByt, tran.getExtarData())) {
                     //奖励的流水
                     byte[] value = tran.getValue();
+                    receiptAddress = new String(tran.getReceiptAddress());
                     reword = RawardUtil.checkReward(blockHeight, value);
                     break;
                 }
             }
+            /*if(reword){
+                //校验是否轮到该用户出块
+                int blockCycle = blockUtils.getBlockCycle(blockHeight);
+                List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
+                Trustee trustee = blockUtils.randomPickBlockProducer(trustees, blockHeight);
+                if(trustee == null || !trustee.getAddress().equals(receiptAddress)){
+                    return false;
+                }
+            }*/
             return reword;
         }
 
@@ -160,7 +173,12 @@ public class BlockHandler {
                                         TransactionStrategy transactionStrategy = transactionStrategyContext.getTransactionStrategy(new String(transaction.getTradeType()));
                                         if(transactionStrategy != null){
                                             transactionStrategy.handleTransaction(transaction);
-
+                                            try {
+                                                dbAccess.addIndex(transaction, IndexColumnNames.TRANSTIMEINDEX,transaction.getTime());
+                                                dbAccess.addIndex(transaction,IndexColumnNames.TRANSBLOCKHEIGHTINDEX,transaction.getBlockHeight());
+                                            } catch (IllegalAccessException e) {
+                                                e.printStackTrace();
+                                            }
                                             dbAccess.putConfirmTransaction(transaction);
                                         }
                                     });
@@ -254,6 +272,7 @@ public class BlockHandler {
         block.setTransactionCount(blockMessage.getTransactionsCount());
         block.setBlockHeight(blockMessage.getBlockHeight());
         block.setTransactions(new ArrayList<>());
+        block.setProducer(blockMessage.getProducer());
         //区块流水记录
         blockMessage.getTransactionsList().forEach((TransactionMessage.Transaction trans) -> {
             Transaction transaction = new Transaction();
@@ -298,6 +317,8 @@ public class BlockHandler {
         blockBuilder.setBlockHeader(blockHeaderBuilder.build());
         blockBuilder.setTransactionCount(block.getTransactionCount());
         blockBuilder.setBlockHeight(block.getBlockHeight());
+        blockBuilder.setProducer(block.getProducer());
+
         //设置包含在区块中的流水记录
         block.getTransactions().forEach((Transaction trans) -> {
             TransactionMessage.Transaction.Builder transactionBuilder = TransactionMessage.Transaction.newBuilder();
