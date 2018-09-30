@@ -1,6 +1,8 @@
 package com.passport.web;
 
+import ch.qos.logback.core.rolling.helper.FileStoreUtil;
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.core.Account;
@@ -11,9 +13,11 @@ import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
 import com.passport.event.SyncAccountEvent;
+import com.passport.exception.CipherException;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.CheckUtils;
+import com.passport.utils.StoryFileUtil;
 import com.passport.webhandler.AccountHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,15 +137,29 @@ public class AccountController {
      */
     @GetMapping("getAccountByAddress")
     public ResultDto getAccountByAddress(@RequestParam("address") String address) {
-        Account account = new Account();
+        Map accountAccount = new HashMap();
         Optional<Account> blockOptional = dbAccess.getAccount(address);
         if (blockOptional.isPresent()) {
-            account = blockOptional.get();
-            account.setPassword("");
-            account.setPrivateKey("");
+            Account account = blockOptional.get();
+            String publicKey = "";
+            if (!StringUtils.isEmpty(account.getPrivateKey())) {
+                ECKeyPair ecKeyPair = null;
+                try {
+                    ecKeyPair = ECKeyPair.create(Numeric.toBigIntNoPrefix(account.getPrivateKey()));
+                    publicKey = Numeric.toHexStringNoPrefix(ecKeyPair.getPrivateKeyValue());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("私钥解析异常："+e.getMessage());
+                }
+            }
+            accountAccount.put("balance", account.getBalance());
+            accountAccount.put("address", account.getAddress());
+            accountAccount.put("publicKey", publicKey);
+        }else {
+            return new ResultDto(ResultEnum.ACCOUNT_NOT_EXISTS);
         }
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
-        resultDto.setData(account);
+        resultDto.setData(accountAccount);
         return resultDto;
     }
 
@@ -216,19 +234,19 @@ public class AccountController {
      * @return
      */
     @PostMapping("backupWallet")
-    public ResultDto backupWallet(@RequestParam("pwd") String pwd, @RequestParam("walletPath") String walletPath) {
+    public ResultDto backupWallet(@RequestParam("pwd") String pwd, @RequestParam("address") String address, @RequestParam("targePath") String targePath) {
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
         WalletFile walletFile = null;
+        String fileName = "";
         try {
-            Bip39Wallet bip39Wallet = WalletUtils.generateBip39Wallet(pwd, new File(walletPath));
-            String mnem = bip39Wallet.getMnemonic();
-            ECKeyPair ecKeyPair = bip39Wallet.getKeyPair();
-            walletFile = Wallet.createLight(pwd, ecKeyPair);
+            walletFile = StoryFileUtil.getStoryFileUtil(new File(keystoreDir)).getAddressInfo(address);
+            ECKeyPair ecKeyPair = Wallet.decrypt(pwd, walletFile);
+            fileName = WalletUtils.generateWalletFile(pwd, ecKeyPair, new File(targePath), true);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResultDto(ResultEnum.WALLET_BACKUP_EXCEP);
         }
-        resultDto.setData(walletFile);
+        resultDto.setData(fileName);
         return resultDto;
     }
 
@@ -241,36 +259,44 @@ public class AccountController {
      */
     @PostMapping("importWallet")
     public ResultDto importWallet(@RequestParam("pwd") String pwd, @RequestParam("mnemonic") String mnemonic) {
-        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
-        String address = "";
-        try {
-            Bip39Wallet bip39Wallet = WalletUtils.generateBip39Wallet(pwd, mnemonic);
-            String fileName = WalletUtils.generateWalletFile(pwd, bip39Wallet.getKeyPair(), new File(keystoreDir), true);
-            address = bip39Wallet.getKeyPair().getAddress();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResultDto(ResultEnum.WALLET_IMPORT_EXCEP);
-        }
-        resultDto.setData(address);
+        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);//TODO:待实现
         return resultDto;
     }
+
 
     /**
      * 导入钱包（密码+秘钥文件）
      *
      * @param pwd
-     * @param fileJson
+     * @param walletPath
      * @return
      */
     @PostMapping("importWalletByFile")
-    public ResultDto importWalletByFile(@RequestParam("pwd") String pwd, @RequestParam("fileJson") String fileJson) {
+    public ResultDto importWalletByFile(@RequestParam("pwd") String pwd, @RequestParam("walletPath") String walletPath) {
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
         String address = "";
         try {
-            WalletFile walletFile = JSON.parseObject(fileJson, WalletFile.class);
+            File file = new File(walletPath);
+            WalletFile walletFile = new ObjectMapper().readValue(file, WalletFile.class);
+            Optional<Account> accountOptional = dbAccess.getAccount(Numeric.HEX_PREFIX + walletFile.getAddress());
+            if (accountOptional.isPresent()) {
+                return new ResultDto(ResultEnum.WALLET_ACCOUNT_EXISTS);
+            }
             ECKeyPair ecKeyPair = Wallet.decrypt(pwd, walletFile);
             address = ecKeyPair.getAddress();
             String fileName = WalletUtils.generateWalletFile(pwd, ecKeyPair, new File(keystoreDir), true);
+            Account account = new Account(ecKeyPair.getAddress(), ecKeyPair.exportPrivateKey(), BigDecimal.ZERO);
+            boolean res = dbAccess.putAccount(account);
+            if (!res) {
+                File walletfile = new File(walletPath + File.separator + fileName);
+                if (walletfile.exists()) {
+                    walletfile.delete();
+                }
+                return new ResultDto(ResultEnum.WALLET_IMPORT_EXCEP);
+            }
+        } catch (CipherException e) {
+            e.printStackTrace();
+            return new ResultDto(ResultEnum.WALLET_PWD_ERROR);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResultDto(ResultEnum.WALLET_IMPORT_EXCEP);

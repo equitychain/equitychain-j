@@ -1,5 +1,6 @@
 package com.passport.web;
 
+import com.passport.constant.Constant;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,6 +75,7 @@ public class TransactionController {
     public ResultDto getTransactionByAddress(@RequestParam("pageCount") int pageCount, @RequestParam("pageNumber") int pageNumber, @RequestParam("address") String address) {
         List<String> screens = new ArrayList<>();
         List<byte[][]> screenVals = new ArrayList<>();
+        Integer lashBlockHeight = Integer.valueOf(dbAccess.getLastBlockHeight().get().toString());
         screens.add("payAddress");
         screens.add("receiptAddress");
         byte[][] bytes1 = new byte[1][];
@@ -84,6 +87,13 @@ public class TransactionController {
         for (Transaction transaction : transactions) {
             com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
             BeanUtils.copyProperties(transaction, transactionDto);
+            transactionDto.setConfirms(lashBlockHeight-Integer.valueOf(transactionDto.getBlockHeight().toString()));
+            BigDecimal eggUsed = transactionDto.getEggUsed()==null||transactionDto.getEggUsed().equals("") ? BigDecimal.ZERO : new BigDecimal(transactionDto.getEggUsed().toString());
+            BigDecimal eggPrice = transactionDto.getEggPrice()==null||transactionDto.getEggPrice().equals("")  ? BigDecimal.ZERO : new BigDecimal(transactionDto.getEggPrice().toString());
+            BigDecimal fee = eggPrice.multiply(eggUsed).setScale(8, BigDecimal.ROUND_HALF_UP);
+            transactionDto.setFee(fee);
+            transactionDto.setTokenName(Constant.MAIN_COIN);
+            transactionsDto.add(transactionDto);
             transactionsDto.add(transactionDto);
         }
         Map resultMap = new HashMap();
@@ -113,6 +123,11 @@ public class TransactionController {
             com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
             BeanUtils.copyProperties(transaction, transactionDto);
             transactionDto.setConfirms(lashBlockHeight-Integer.valueOf(transactionDto.getBlockHeight().toString()));
+            BigDecimal eggUsed = transactionDto.getEggUsed()==null||transactionDto.getEggUsed().equals("") ? BigDecimal.ZERO : new BigDecimal(transactionDto.getEggUsed().toString());
+            BigDecimal eggPrice = transactionDto.getEggPrice()==null||transactionDto.getEggPrice().equals("")  ? BigDecimal.ZERO : new BigDecimal(transactionDto.getEggPrice().toString());
+            BigDecimal fee = eggPrice.multiply(eggUsed).setScale(8, BigDecimal.ROUND_HALF_UP);
+            transactionDto.setFee(fee);
+            transactionDto.setTokenName(Constant.MAIN_COIN);
             transactionsDto.add(transactionDto);
         }
         Map resultMap = new HashMap();

@@ -20,6 +20,24 @@ public class Transaction {
   private Object blockHeight;//已确认流水打包到哪个区块
   private Integer status;
   private Object confirms;
+  private Object fee;
+  private Object tokenName;
+
+  public Object getTokenName() {
+    return tokenName;
+  }
+
+  public void setTokenName(Object tokenName) {
+    this.tokenName = tokenName;
+  }
+
+  public Object getFee() {
+    return fee;
+  }
+
+  public void setFee(Object fee) {
+    this.fee = fee;
+  }
 
   public Object getConfirms() {
     return confirms;
