@@ -765,4 +765,20 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         jsonObject.put("blockTimeDiff",blockTimeDiff);
         return jsonObject.toJSONString();
     }
+
+    @Override
+    public long getTransCountByAddress(String address) throws RocksDBException {
+        if(address == null || "".equalsIgnoreCase(address)) return 0;
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("transaction","hash")));
+        long count = 0l;
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            byte[] hashKey = iterator.key();
+            byte[] fromByt = rocksDB.get(handleMap.get(getColName("transaction","payAddress")),hashKey);
+            byte[] toByt = rocksDB.get(handleMap.get(getColName("transaction","receiptAddress")),hashKey);
+            if((fromByt != null && fromByt.length != 0 && address.equalsIgnoreCase(new String(fromByt))) || (toByt != null && toByt.length!=0&&address.equalsIgnoreCase(new String(toByt)))){
+                count ++;
+            }
+        }
+        return count;
+    }
 }

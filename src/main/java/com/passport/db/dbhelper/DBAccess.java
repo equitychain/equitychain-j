@@ -383,4 +383,11 @@ public interface DBAccess {
 	 * @return
 	 */
 	String censesData() throws RocksDBException;
+
+	/**
+	 * 查询地址的流水总数
+	 * @param address
+	 * @return
+	 */
+	long getTransCountByAddress(String address) throws RocksDBException;
 }
