@@ -1,7 +1,12 @@
 package com.passport.web;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.base.Optional;
+import com.passport.constant.Constant;
 import com.passport.core.Account;
+import com.passport.core.Trustee;
+import com.passport.core.Voter;
+import com.passport.crypto.eth.*;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
@@ -16,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +38,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/account")
 public class AccountController {
+
+    @Value("${wallet.keystoreDir}")
+    public String keystoreDir;
+
     @Autowired
     AccountHandler accountHandler;
 //    @Autowired
@@ -117,6 +127,7 @@ public class AccountController {
 
     /**
      * 根据地址获取账户信息
+     *
      * @param address ：地址
      * @return
      */
@@ -136,6 +147,7 @@ public class AccountController {
 
     /**
      * 账户列表
+     *
      * @return
      */
     @GetMapping("accountList")
@@ -144,19 +156,126 @@ public class AccountController {
         List<Map> accounts = new ArrayList<>();
         List<Account> accountList = dbAccess.listAccounts();
         BigDecimal sumBalance = BigDecimal.ZERO;
-        for(Account account:accountList){
-            if(!StringUtils.isEmpty(account.getPrivateKey())){
+        for (Account account : accountList) {
+            if (!StringUtils.isEmpty(account.getPrivateKey())) {
                 Map accountMap = new HashMap();
-                accountMap.put("address",account.getAddress());
-                accountMap.put("balance",account.getBalance());
+                accountMap.put("address", account.getAddress());
+                accountMap.put("balance", account.getBalance());
                 accounts.add(accountMap);
                 sumBalance = sumBalance.add(account.getBalance());
             }
         }
-        resultMap.put("accounts",accounts);
-        resultMap.put("sumBalance",sumBalance);
+        resultMap.put("accounts", accounts);
+        resultMap.put("sumBalance", sumBalance);
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
         resultDto.setData(resultMap);
+        return resultDto;
+    }
+
+    /**
+     * 获取账户身份
+     *
+     * @param address
+     * @return
+     */
+    @GetMapping("getAccountIdentity")
+    public ResultDto getAccountIdentity(@RequestParam("address") String address) {
+        ResultDto resultDto = new ResultDto();
+        Map resultMap = new HashMap();
+        Account account = null;
+        Optional<Account> accountOptional = dbAccess.getAccount(address);
+        if (accountOptional.isPresent()) {
+            account = accountOptional.get();
+        }
+        Trustee trustee = null;
+        Optional<Trustee> trusteeOptional = dbAccess.getTrustee(address);
+        if (trusteeOptional.isPresent()) {
+            trustee = trusteeOptional.get();
+        }
+        Voter voter = null;
+        Optional<Voter> voterOptional = dbAccess.getVoter(address);
+        if (voterOptional.isPresent()) {
+            voter = voterOptional.get();
+        }
+        resultMap.put("address", address);
+        resultMap.put("balance", account == null ? BigDecimal.ZERO : account.getBalance());
+        resultMap.put("isTrustee", trustee == null ? false : true);//是否为委托人
+        resultMap.put("trusteeDeposit", Constant.FEE_4_REGISTER_TRUSTEE);//委托人押金
+        resultMap.put("isVoter", voter == null ? false : true);//是否为投票人
+        resultMap.put("voterDeposit", voter == null ? BigDecimal.ZERO : voter.getVoteNum());//投票人剩余票数
+        resultDto = new ResultDto(ResultEnum.SUCCESS);
+        resultDto.setData(resultMap);
+        return resultDto;
+    }
+
+    /**
+     * 备份钱包
+     *
+     * @param pwd
+     * @param walletPath
+     * @return
+     */
+    @PostMapping("backupWallet")
+    public ResultDto backupWallet(@RequestParam("pwd") String pwd, @RequestParam("walletPath") String walletPath) {
+        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
+        WalletFile walletFile = null;
+        try {
+            Bip39Wallet bip39Wallet = WalletUtils.generateBip39Wallet(pwd, new File(walletPath));
+            String mnem = bip39Wallet.getMnemonic();
+            ECKeyPair ecKeyPair = bip39Wallet.getKeyPair();
+            walletFile = Wallet.createLight(pwd, ecKeyPair);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResultDto(ResultEnum.WALLET_BACKUP_EXCEP);
+        }
+        resultDto.setData(walletFile);
+        return resultDto;
+    }
+
+    /**
+     * 导入钱包（密码+助记词）
+     *
+     * @param pwd
+     * @param mnemonic
+     * @return
+     */
+    @PostMapping("importWallet")
+    public ResultDto importWallet(@RequestParam("pwd") String pwd, @RequestParam("mnemonic") String mnemonic) {
+        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
+        String address = "";
+        try {
+            Bip39Wallet bip39Wallet = WalletUtils.generateBip39Wallet(pwd, mnemonic);
+            String fileName = WalletUtils.generateWalletFile(pwd, bip39Wallet.getKeyPair(), new File(keystoreDir), true);
+            address = bip39Wallet.getKeyPair().getAddress();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResultDto(ResultEnum.WALLET_IMPORT_EXCEP);
+        }
+        resultDto.setData(address);
+        return resultDto;
+    }
+
+    /**
+     * 导入钱包（密码+秘钥文件）
+     *
+     * @param pwd
+     * @param fileJson
+     * @return
+     */
+    @PostMapping("importWalletByFile")
+    public ResultDto importWalletByFile(@RequestParam("pwd") String pwd, @RequestParam("fileJson") String fileJson) {
+        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
+        String address = "";
+        try {
+            WalletFile walletFile = JSON.parseObject(fileJson, WalletFile.class);
+            ECKeyPair ecKeyPair = Wallet.decrypt(pwd, walletFile);
+            address = ecKeyPair.getAddress();
+            String fileName = WalletUtils.generateWalletFile(pwd, ecKeyPair, new File(keystoreDir), true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResultDto(ResultEnum.WALLET_IMPORT_EXCEP);
+        }
+        resultDto.setData(address);
         return resultDto;
     }
 }

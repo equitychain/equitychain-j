@@ -88,7 +88,7 @@ public class TransactionController {
         }
         Map resultMap = new HashMap();
         resultMap.put("transactionList", transactionsDto);
-        resultMap.put("count", 10000);
+        resultMap.put("count", 10000);//TODO:待解决
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
         resultDto.setData(resultMap);
         return resultDto;
@@ -104,13 +104,15 @@ public class TransactionController {
      */
     @GetMapping("getTransactionByNBlock")
     public ResultDto getTransactionByNBlock(@RequestParam("pageCount") int pageCount, @RequestParam("pageNumber") int pageNumber, @RequestParam("nBlock") int nBlock) {
-        nBlock = nBlock > Integer.valueOf(dbAccess.getLastBlockHeight().get().toString()) ?  Integer.valueOf(dbAccess.getLastBlockHeight().get().toString()) : nBlock;
+        Integer lashBlockHeight = Integer.valueOf(dbAccess.getLastBlockHeight().get().toString());
+        nBlock = nBlock >lashBlockHeight  ?  lashBlockHeight : nBlock;
         List<Transaction> transactionAll = dbAccess.getNewBlocksTransactions(1000 * nBlock, 1, nBlock);
         List<Transaction> transactions = dbAccess.getNewBlocksTransactions(pageCount, pageNumber, nBlock);
         List<com.passport.dto.coreobject.Transaction> transactionsDto = new ArrayList<>();
         for (Transaction transaction : transactions) {
             com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
             BeanUtils.copyProperties(transaction, transactionDto);
+            transactionDto.setConfirms(lashBlockHeight-Integer.valueOf(transactionDto.getBlockHeight().toString()));
             transactionsDto.add(transactionDto);
         }
         Map resultMap = new HashMap();

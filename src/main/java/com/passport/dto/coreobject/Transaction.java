@@ -19,6 +19,15 @@ public class Transaction {
   private Object tradeType;//交易类型
   private Object blockHeight;//已确认流水打包到哪个区块
   private Integer status;
+  private Object confirms;
+
+  public Object getConfirms() {
+    return confirms;
+  }
+
+  public void setConfirms(Object confirms) {
+    this.confirms = confirms;
+  }
 
   public Integer getNonce() {
     return nonce;

@@ -72,6 +72,7 @@ public class BlockController {
         Optional<Block> blockOptional = dbAccess.getBlock(blockHeight);
         if (blockOptional.isPresent()) {
             newBlock =getBlockObject( blockOptional.get());
+
         }
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
         resultDto.setData(newBlock);
