@@ -746,13 +746,14 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                             sumFee = sumFee.add(new BigDecimal(new String(transUsed)).multiply(new BigDecimal(new String(transPrice))));
                         }
                     }
-                }
-                byte[] timeByt = rocksDB.get(handleMap.get(getColName("transaction","time")),hashKey);
-                if(timeByt != null && timeByt.length != 0){
-                    long time = Long.parseLong(new String(timeByt));
-                    if(time >= timeSpli){
-                        //一小时内的交易流水   进行统计
-                        count ++;
+
+                    byte[] timeByt = rocksDB.get(handleMap.get(getColName("transaction","time")),hashKey);
+                    if(timeByt != null && timeByt.length != 0){
+                        long time = Long.parseLong(new String(timeByt));
+                        if(time >= timeSpli){
+                            //一小时内的交易流水   进行统计
+                            count ++;
+                        }
                     }
                 }
             }
