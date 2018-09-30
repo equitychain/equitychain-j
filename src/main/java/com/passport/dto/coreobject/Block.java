@@ -1,5 +1,6 @@
 package com.passport.dto.coreobject;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -12,6 +13,24 @@ public class Block {
   List<Transaction> transactions;//交易流水
   private Long blockHeight;
   private String producer;
+  private BigDecimal totalValue;//总交易额
+  private BigDecimal totalFee;//总矿工费
+
+  public BigDecimal getTotalValue() {
+    return totalValue;
+  }
+
+  public void setTotalValue(BigDecimal totalValue) {
+    this.totalValue = totalValue;
+  }
+
+  public BigDecimal getTotalFee() {
+    return totalFee;
+  }
+
+  public void setTotalFee(BigDecimal totalFee) {
+    this.totalFee = totalFee;
+  }
 
   public Long getBlockSize() {
     return blockSize;

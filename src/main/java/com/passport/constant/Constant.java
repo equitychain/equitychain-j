@@ -59,4 +59,6 @@ public interface Constant {
   BigDecimal[] REWARD_ARRAY = {new BigDecimal(10), new BigDecimal(8), new BigDecimal(6), new BigDecimal(4), new BigDecimal(2), new BigDecimal(1)};
   //索引set集合分割大小
   int INDEX_GROUPSIZE = 1000;
+  //主币
+  String MAIN_COIN = "BCP";
 }

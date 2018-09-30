@@ -2,9 +2,12 @@ package com.passport.webhandler;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.google.common.util.concurrent.Futures;
 import com.google.protobuf.ByteString;
+import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.core.*;
+import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.db.dbhelper.IndexColumnNames;
 import com.passport.enums.TransactionTypeEnum;
@@ -19,9 +22,13 @@ import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.RawardUtil;
+import org.rocksdb.RocksDBException;
+import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -32,11 +39,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@EnableAsync
 public class BlockHandler {
     private static final Logger logger = LoggerFactory.getLogger(BlockHandler.class);
 
     @Autowired
-    private DBAccess dbAccess;
+    private BaseDBAccess dbAccess;
     @Autowired
     private ApplicationContextProvider provider;
     @Autowired
@@ -139,22 +147,27 @@ public class BlockHandler {
                 padding = true;
                 //异步处理,不然其他的都在处于等待
                 synHandlerBlock();
+                //继续同步下组区块
+                provider.publishEvent(new SyncNextBlockEvent(0L));
             }
         }else{
             //todo 满了，正在处理
         }
     }
+
     public void synHandlerBlock(){
         //TODO 需不需要额外开线程，需要的话可以写个线程工具类
         Thread handlerThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                dbAccess.transaction =dbAccess.rocksDB.beginTransaction(new WriteOptions());;
+
                 try{
                     //todo 校验 目前是获取相同的区块高度
                     List<Block> successBlocks = getShareBlocks();
                     //存储区块到本地
                     for(Block blockLocal : successBlocks) {
-                        Optional<Object> optHeigth = dbAccess.getLastBlockHeight();
+                        Optional<Object> optHeigth = dbAccess.getLastBlockHeightT();
                         if(optHeigth.isPresent()) {
                             Long height = (Long)optHeigth.get();
                             if(height != null) {
@@ -184,9 +197,13 @@ public class BlockHandler {
                             break;
                         }
                     }
-                    //继续同步下组区块
-                    provider.publishEvent(new SyncNextBlockEvent(0L));
+                    dbAccess.transaction.commit();
                 }catch (Exception e){
+                    try {
+                        dbAccess.transaction.rollback();
+                    } catch (RocksDBException e1) {
+                        e1.printStackTrace();
+                    }
                     logger.warn("synchronization block error", e);
                 }finally {
                     //更改状态
@@ -337,7 +354,7 @@ public class BlockHandler {
         return blockBuilder;
     }
 
-    public void produceNextBlock() {
+    public void produceNextBlock() throws InterruptedException {
         //当前区块周期
         Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
         if(!lastBlockOptional.isPresent()){
@@ -383,23 +400,34 @@ public class BlockHandler {
      * @param list
      * @param blockCycle
      */
-    public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) {
-        Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
-        Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
-        if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
-            Account account = accountOptional.get();
-            if(account.getPrivateKey() != null){
-                //打包区块
-                minerHandler.packagingBlock(account);
+    public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) throws InterruptedException {
+//        try{
+            Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
+            Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
+            if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
+                Account account = accountOptional.get();
+                if(account.getPrivateKey() != null){
+                    //打包区块
+                    minerHandler.packagingBlock(account);
 
-                //更新101个受托人，已经出块人的状态
-                trusteeHandler.changeStatus(trustee, blockCycle);
+                    //更新101个受托人，已经出块人的状态
+                    trusteeHandler.changeStatus(trustee, blockCycle);
 
-                logger.info("第{}个区块出块成功", newBlockHeight);
-
-                provider.publishEvent(new GenerateNextBlockEvent(0L));
+                    logger.info("第{}个区块出块成功", newBlockHeight);
+                    provider.publishEvent(new GenerateNextBlockEvent(0L));
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                                provider.publishEvent(new GenerateNextBlockEvent(0L));
+//                        }
+//                    }).start();
+                }
             }
-        }
+//        }catch (RocksDBException e){
+//            e.printStackTrace();
+//        }
+
     }
+
 
 }

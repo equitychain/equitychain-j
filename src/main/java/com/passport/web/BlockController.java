@@ -1,20 +1,25 @@
 package com.passport.web;
 
 import com.google.common.base.Optional;
+import com.passport.constant.Constant;
 import com.passport.core.Block;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
 import com.passport.webhandler.MinerHandler;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.rocksdb.RocksDBException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 区块
@@ -32,16 +37,20 @@ public class BlockController {
     private DBAccess dbAccess;
 
     /**
-     *  查询区块列表
-     * @param pageCount :每页记录数
+     * 查询区块列表
+     *
+     * @param pageCount     :每页记录数
      * @param pageNumber：页码
      * @return
      */
     @GetMapping("getBlockList")
     public ResultDto getBlockList(@RequestParam("pageCount") int pageCount, @RequestParam("pageNumber") int pageNumber) {
         List<Block> blocks = new ArrayList<>();
+        Map resultMap = new HashMap();
         List<com.passport.dto.coreobject.Block> newBlocks = new ArrayList<>();
+        long lastBlockHeight = 0;
         try {
+            lastBlockHeight = Long.valueOf(dbAccess.getLastBlockHeight().get().toString());
             blocks = dbAccess.blockPagination(pageCount, pageNumber);
             blocks.forEach(block -> {
                 newBlocks.add(getBlockObject(block));
@@ -50,22 +59,44 @@ public class BlockController {
             e.printStackTrace();
             return new ResultDto(ResultEnum.SYS_ERROR);
         }
+        resultMap.put("blockList", newBlocks);
+        resultMap.put("count", lastBlockHeight);
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
-        resultDto.setData(newBlocks);
+        resultDto.setData(resultMap);
         return resultDto;
     }
 
     /**
      * 根据区块高度查询区块信息
+     *
      * @param blockHeight:区块高度
      * @return
      */
     @GetMapping("getBlockByHeight")
     public ResultDto getBlockByHeight(@RequestParam("blockHeight") int blockHeight) {
-        com.passport.dto.coreobject.Block newBlock  = new com.passport.dto.coreobject.Block();
+        long lastBlockHeight = 0;
+        Optional<Object> objectOptional = dbAccess.getLastBlockHeight();
+        if (objectOptional.isPresent()) {
+            lastBlockHeight = Long.valueOf(objectOptional.get().toString());
+        }
+        com.passport.dto.coreobject.Block newBlock = new com.passport.dto.coreobject.Block();
         Optional<Block> blockOptional = dbAccess.getBlock(blockHeight);
+        BigDecimal totalValue = BigDecimal.ZERO;
+        BigDecimal totalFee = BigDecimal.ZERO;
         if (blockOptional.isPresent()) {
-            newBlock =getBlockObject( blockOptional.get());
+            newBlock = getBlockObject(blockOptional.get());
+            for (com.passport.dto.coreobject.Transaction transaction : newBlock.getTransactions()) {
+                totalValue = totalValue.add(transaction.getValue() == null ? BigDecimal.ZERO : new BigDecimal(transaction.getValue().toString()));
+                BigDecimal eggUsed = transaction.getEggUsed()==null||transaction.getEggUsed().equals("") ? BigDecimal.ZERO : new BigDecimal(transaction.getEggUsed().toString());
+                BigDecimal eggPrice = transaction.getEggPrice()==null||transaction.getEggPrice().equals("")  ? BigDecimal.ZERO : new BigDecimal(transaction.getEggPrice().toString());
+                BigDecimal fee = eggPrice.multiply(eggUsed).setScale(8, BigDecimal.ROUND_HALF_UP);
+                totalValue = totalValue.add(fee);
+                transaction.setConfirms(lastBlockHeight - blockHeight);
+                transaction.setFee(fee);
+                transaction.setTokenName(Constant.MAIN_COIN);
+            }
+            newBlock.setTotalValue(totalValue);
+            newBlock.setTotalFee(totalFee);
         }
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
         resultDto.setData(newBlock);
@@ -165,13 +196,14 @@ public class BlockController {
             return new ResultDto(ResultEnum.SYS_ERROR);
         }
     }
+
     @GetMapping("getBlocksByHeight/{blockHeight}-{blockCount}")
     @ResponseBody
-    public List<Block> getBlocksByHeight(@PathVariable("blockHeight") int blockHeight,@PathVariable("blockCount") int blockCount){
+    public List<Block> getBlocksByHeight(@PathVariable("blockHeight") int blockHeight, @PathVariable("blockCount") int blockCount) {
         List<Block> result = new ArrayList<>();
-        try{
-            result.addAll(dbAccess.getBlocksByHeight(blockHeight,blockCount));
-        }catch (Exception e){
+        try {
+            result.addAll(dbAccess.getBlocksByHeight(blockHeight, blockCount));
+        } catch (Exception e) {
 
         }
         return result;

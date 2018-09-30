@@ -6,15 +6,13 @@ import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
 import com.passport.constant.Constant;
 import com.passport.core.*;
-import com.passport.core.Transaction;
-import com.passport.db.transaction.RocksdbTransaction;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.*;
+import org.rocksdb.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -27,9 +25,8 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class BaseDBAccess implements DBAccess {
     ThreadPoolExecutor executor = new ThreadPoolExecutor(100, 100, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1000));
-    @Autowired
-    public RocksdbTransaction transaction;
-    protected RocksDB rocksDB;
+    public Transaction transaction;
+    public OptimisticTransactionDB rocksDB;
     @Value("${db.dataDir}")
     private String dataDir;
     //列的handler
@@ -53,7 +50,7 @@ public abstract class BaseDBAccess implements DBAccess {
             fields.addAll(getClassCols(new Account().getClass()));
             fields.addAll(getClassCols(new VoteRecord().getClass()));
             fields.addAll(getClassCols(new Voter().getClass()));
-            dtoClasses.add(new Transaction().getClass());
+//            dtoClasses.add(new Transaction().getClass());
             dtoClasses.add(new Block().getClass());
             dtoClasses.add(new BlockHeader().getClass());
             dtoClasses.add(new Account().getClass());
@@ -61,7 +58,7 @@ public abstract class BaseDBAccess implements DBAccess {
             dtoClasses.add(new VoteRecord().getClass());
             dtoClasses.add(new Voter().getClass());
             try {
-                rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), dataDir);
+                rocksDB = OptimisticTransactionDB.open(new Options().setCreateIfMissing(true), dataDir);
                 System.out.println("========create fields=========");
                 //添加默认的列族
                 handleMap.put("default", rocksDB.getDefaultColumnFamily());
@@ -94,19 +91,19 @@ public abstract class BaseDBAccess implements DBAccess {
                 }
                 //打开数据库
                 List<ColumnFamilyHandle> handleList = new ArrayList<>();
-                rocksDB = RocksDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
+                rocksDB = OptimisticTransactionDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
                 for(ColumnFamilyHandle handler : handleList){
                     String name = new String(handler.getName());
                     handleMap.put(name, handler);
                 }
             }
-
-            if(rocksDB!=null){
-                transaction.setRocksDB(rocksDB);
-                transaction.setHandleMap(handleMap);
-                transaction.initRocksDB();
-
-            }
+//
+//            if(rocksDB!=null){
+//                transaction.setRocksDB(rocksDB);
+////                transaction.setHandleMap(handleMap);
+////                transaction.initRocksDB();
+//
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -236,16 +233,20 @@ public abstract class BaseDBAccess implements DBAccess {
         return null;
     }
     public final void addObjs(List objs) throws Exception {
-        WriteBatch batch = new WriteBatch();
-        int count = 0;
+//        WriteBatch batch = new WriteBatch();
+//        int count = 0;
+//        for (Object o : objs) {
+//            count += addObj(o, batch);
+//            if (count >= 1000) {
+//                rocksDB.write(new WriteOptions(), batch);
+//                batch = new WriteBatch();
+//            }
+//        }
+//        rocksDB.write(new WriteOptions(), batch);
+
         for (Object o : objs) {
-            count += addObj(o, batch);
-            if (count >= 1000) {
-                rocksDB.write(new WriteOptions(), batch);
-                batch = new WriteBatch();
-            }
+             addObj(o);
         }
-        rocksDB.write(new WriteOptions(), batch);
     }
 
     public final void addObj(Object obj) throws Exception {
@@ -1198,7 +1199,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public boolean put(byte[] key, byte[] value) {
         boolean res = false;
         try {
-            rocksDB.put(key, value);
+            transaction.put(key, value);
             res = true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -1210,7 +1211,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public boolean putByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle, byte[] key, byte[] value) {
         boolean res = false;
         try {
-            rocksDB.put(columnFamilyHandle, key, value);
+            transaction.put(columnFamilyHandle, key, value);
             res = true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -1244,7 +1245,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public boolean delete(byte[] key) {
         boolean res = false;
         try {
-            rocksDB.delete(key);
+            transaction.delete(key);
             res = true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -1256,7 +1257,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public boolean deleteByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         boolean res = false;
         try {
-            rocksDB.delete(columnFamilyHandle, key);
+            transaction.delete(columnFamilyHandle, key);
             res = true;
         } catch (RocksDBException e) {
             e.printStackTrace();

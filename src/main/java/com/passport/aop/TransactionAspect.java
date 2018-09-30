@@ -6,10 +6,7 @@ import com.passport.db.dbhelper.BaseDBRocksImpl;
 import com.passport.db.transaction.RocksdbTransaction;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
-import org.rocksdb.ColumnFamilyDescriptor;
-import org.rocksdb.ColumnFamilyHandle;
-import org.rocksdb.RocksIterator;
-import org.rocksdb.Snapshot;
+import org.rocksdb.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +23,7 @@ import org.springframework.stereotype.Component;
 public class TransactionAspect {
 
     @Autowired
-    RocksdbTransaction rocksdbTransaction;
+    BaseDBAccess dbAccess;
 
     @Pointcut("@annotation(com.passport.annotations.RocksTransaction)")
     private void sig() {
@@ -34,9 +31,11 @@ public class TransactionAspect {
 
     @Before("sig()")//snapshot
     public void deBefore(JoinPoint joinPoint) throws Throwable {
+
+        dbAccess.transaction = dbAccess.rocksDB.beginTransaction(new WriteOptions());
         // 接收到请求，记录请求内容
-        rocksdbTransaction.setSnapshot(rocksdbTransaction.getRocksDB().getSnapshot());
-        rocksdbTransaction.getRocksBackup().setSnapshots(rocksdbTransaction.getSnapshot());//断电回滚快照
+//        rocksdbTransaction.setSnapshot(rocksdbTransaction.getRocksDB().getSnapshot());
+//        rocksdbTransaction.getRocksBackup().setSnapshots(rocksdbTransaction.getSnapshot());//断电回滚快照
         // 记录下请求内容
     }
     /**
@@ -44,49 +43,51 @@ public class TransactionAspect {
      * 通过实例化的文件来启动
      */
     @AfterThrowing(value = "sig()", throwing = "e")//传到 after snapshot
-    public void throwingMethod(Exception e) {
-        System.err.println("--------------事务出错 开始回滚--------------"+e.getMessage());
-        org.rocksdb.ReadOptions options = new org.rocksdb.ReadOptions();
-        options.setSnapshot(rocksdbTransaction.getSnapshot());
-        try {
-            for (String s : rocksdbTransaction.getKeysSet()) {
-                System.out.println("事务key：" + s);
-                String[] c = s.split(",");
-                byte[] old;
-                ColumnFamilyHandle columnFamilyHandle =rocksdbTransaction.getHandleMap().get(c[1])!=null? rocksdbTransaction.getHandleMap().get(c[1]):
-                        rocksdbTransaction.getRocksDB(). createColumnFamily(new ColumnFamilyDescriptor(c[1].getBytes()));
-                old = rocksdbTransaction.getRocksDB().get(columnFamilyHandle, options, c[0].getBytes());
-                if (old != null) {
-                    rocksdbTransaction.getRocksDB().put(columnFamilyHandle, c[0].getBytes(), old);
-                } else {
-                    rocksdbTransaction.getRocksDB().delete(columnFamilyHandle,c[0].getBytes());
-                }
-            }
-        }catch (Exception e1){
-            e1.printStackTrace();
-        }
-//        RocksIterator iterator = baseDBAccess.seekByKey("".getBytes());
-//        for(iterator.seekToFirst();iterator.isValid();iterator.next()){
-//            System.out.println(("真实数据：")+new String(iterator.key())+"---"+new String(iterator.value()));
+    public void throwingMethod(Exception e) throws RocksDBException {
+        dbAccess.transaction.rollback();
+//        System.err.println("--------------事务出错 开始回滚--------------"+e.getMessage());
+//        org.rocksdb.ReadOptions options = new org.rocksdb.ReadOptions();
+//        options.setSnapshot(rocksdbTransaction.getSnapshot());
+//        try {
+//            for (String s : rocksdbTransaction.getKeysSet()) {
+//                System.out.println("事务key：" + s);
+//                String[] c = s.split(",");
+//                byte[] old;
+//                ColumnFamilyHandle columnFamilyHandle =rocksdbTransaction.getHandleMap().get(c[1])!=null? rocksdbTransaction.getHandleMap().get(c[1]):
+//                        rocksdbTransaction.getRocksDB(). createColumnFamily(new ColumnFamilyDescriptor(c[1].getBytes()));
+//                old = rocksdbTransaction.getRocksDB().get(columnFamilyHandle, options, c[0].getBytes());
+//                if (old != null) {
+//                    rocksdbTransaction.getRocksDB().put(columnFamilyHandle, c[0].getBytes(), old);
+//                } else {
+//                    rocksdbTransaction.getRocksDB().delete(columnFamilyHandle,c[0].getBytes());
+//                }
+//            }
+//        }catch (Exception e1){
+//            e1.printStackTrace();
 //        }
-        rocksdbTransaction.close();
-        System.err.println("--------------事务出错 回滚成功--------------");
+////        RocksIterator iterator = baseDBAccess.seekByKey("".getBytes());
+////        for(iterator.seekToFirst();iterator.isValid();iterator.next()){
+////            System.out.println(("真实数据：")+new String(iterator.key())+"---"+new String(iterator.value()));
+////        }
+//        rocksdbTransaction.close();
     }
     @AfterReturning(returning = "ret", pointcut = "sig()")
     public void doAfterReturning(Object ret) throws Throwable {
+        dbAccess.transaction.commit();
+
         //测试查询
-        System.out.println("测试AfterReturning");
-//        RocksDB rocksDB = baseDBAccess.getRocksDB();
-//        try {
-//            RocksIterator iterator = rocksDB.newIterator(new ReadOptions());
-//            for(iterator.seekToFirst();iterator.isValid();iterator.next()){
-//                System.out.println(new String(iterator.key())+"---"+new String(iterator.value()));
-//            }
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
-        // 处理完请求，关闭close
-        rocksdbTransaction.close();
+//        System.out.println("测试AfterReturning");
+////        RocksDB rocksDB = baseDBAccess.getRocksDB();
+////        try {
+////            RocksIterator iterator = rocksDB.newIterator(new ReadOptions());
+////            for(iterator.seekToFirst();iterator.isValid();iterator.next()){
+////                System.out.println(new String(iterator.key())+"---"+new String(iterator.value()));
+////            }
+////        }catch (Exception e){
+////            e.printStackTrace();
+////        }
+//        // 处理完请求，关闭close
+//        rocksdbTransaction.close();
 
     }
 
