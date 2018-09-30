@@ -3,6 +3,7 @@ package com.passport.db.dbhelper;
 import com.google.common.base.Optional;
 import com.passport.core.*;
 import org.rocksdb.ColumnFamilyHandle;
+import org.rocksdb.RocksDBException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -376,4 +377,10 @@ public interface DBAccess {
                                          ColumnFamilyHandle overAndNextHandle, Class<T> tClass, String keyFiledName,
                                          int orderByType, int flushSize, int dtoType, ColumnFamilyHandle orderByFieldHandle) throws Exception;
     <T> void addIndex(T t, IndexColumnNames columnNames,byte[] indexKey) throws IllegalAccessException;
+
+	/**
+	 * 统计数据方法
+	 * @return
+	 */
+	String censesData() throws RocksDBException;
 }

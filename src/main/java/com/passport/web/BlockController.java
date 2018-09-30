@@ -8,6 +8,7 @@ import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
 import com.passport.webhandler.MinerHandler;
 import org.jetbrains.annotations.NotNull;
+import org.rocksdb.RocksDBException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -174,5 +175,15 @@ public class BlockController {
 
         }
         return result;
+    }
+    @GetMapping("getCensesData")
+    @ResponseBody
+    public String getCensesData(){
+        try {
+            return dbAccess.censesData();
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.passport.db.dbhelper;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.core.*;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -702,5 +704,64 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String censesData() throws RocksDBException {
+        //获取当前最新高度，根据最新高度进行统计
+        Optional lastHeightOpt = getLastBlockHeight();
+        //总金额
+        BigDecimal sumMoney = BigDecimal.ZERO;
+        //总手续费
+        BigDecimal sumFee = BigDecimal.ZERO;
+        long timeSpli = System.currentTimeMillis() - 60*60*1000;
+        long count = 0l;
+        long blockTimeDiff = 0l;
+        Optional<Block> blockOptional = getLastBlock();
+        if(blockOptional.isPresent()){
+            Block lastBlock = blockOptional.get();
+            Optional<Block> block = getBlock(lastBlock.getBlockHeight()-1);
+            if(block.isPresent()){
+                blockTimeDiff = lastBlock.getBlockHeader().getTimeStamp();
+                blockTimeDiff = blockTimeDiff - block.get().getBlockHeader().getTimeStamp();
+            }
+        }
+        if(lastHeightOpt.isPresent()) {
+            long lastHeight = (Long)lastHeightOpt.get();
+            RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("transaction", "hash")));
+            for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+                byte[] hashKey = iterator.key();
+                byte[] transHeight = rocksDB.get(handleMap.get(getColName("transaction","blockHeight")),hashKey);
+                if(transHeight != null && transHeight.length > 0) {
+                    Long curHeight = Long.parseLong(new String(transHeight));
+                    //获取高度进行判断，只统计最新高度的数据
+                    if (curHeight <= lastHeight) {
+                        byte[] transVal = rocksDB.get(handleMap.get(getColName("transaction", "value")),hashKey);
+                        byte[] transUsed = rocksDB.get(handleMap.get(getColName("transaction","eggUsed")),hashKey);
+                        byte[] transPrice = rocksDB.get(handleMap.get(getColName("transaction","eggPrice")),hashKey);
+                        if(transVal != null && transVal.length!=0) {
+                            sumMoney = sumMoney.add(new BigDecimal(new String(transVal)));
+                        }
+                        if(transUsed != null && transUsed.length!=0 && transPrice != null && transPrice.length!=0) {
+                            sumFee = sumFee.add(new BigDecimal(new String(transUsed)).multiply(new BigDecimal(new String(transPrice))));
+                        }
+                    }
+                }
+                byte[] timeByt = rocksDB.get(handleMap.get(getColName("transaction","time")),hashKey);
+                if(timeByt != null && timeByt.length != 0){
+                    long time = Long.parseLong(new String(timeByt));
+                    if(time >= timeSpli){
+                        //一小时内的交易流水   进行统计
+                        count ++;
+                    }
+                }
+            }
+        }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("avgMoney",lastHeightOpt.isPresent()?sumMoney.divide(new BigDecimal(lastHeightOpt.get().toString()),3,BigDecimal.ROUND_DOWN):sumMoney);
+        jsonObject.put("avgFee",lastHeightOpt.isPresent()?sumFee.divide(new BigDecimal(lastHeightOpt.get().toString()),3,BigDecimal.ROUND_DOWN):sumFee);
+        jsonObject.put("countTrans",count);
+        jsonObject.put("blockTimeDiff",blockTimeDiff);
+        return jsonObject.toJSONString();
     }
 }
