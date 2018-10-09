@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.passport.annotations.RocksTransaction;
+import com.passport.constant.Constant;
 import com.passport.core.Account;
 import com.passport.core.Trustee;
 import com.passport.core.Voter;
