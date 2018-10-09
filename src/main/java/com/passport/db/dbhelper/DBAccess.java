@@ -390,4 +390,10 @@ public interface DBAccess {
 	String censesData() throws RocksDBException;
 
 	List<VoteRecord> votingRecord(String address,int pageCount, int pageNumber);
+	/**
+	 * 查询地址的流水总数
+	 * @param address
+	 * @return
+	 */
+	long getTransCountByAddress(String address) throws RocksDBException;
 }

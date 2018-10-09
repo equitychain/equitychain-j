@@ -9,6 +9,7 @@ import com.passport.enums.ResultEnum;
 import com.passport.enums.TransactionTypeEnum;
 import com.passport.utils.CheckUtils;
 import com.passport.webhandler.TransactionHandler;
+import org.rocksdb.RocksDBException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -74,7 +75,7 @@ public class TransactionController {
      * @return
      */
     @GetMapping("getTransactionByAddress")
-    public ResultDto getTransactionByAddress(@RequestParam("pageCount") int pageCount, @RequestParam("pageNumber") int pageNumber, @RequestParam("address") String address) {
+    public ResultDto getTransactionByAddress(@RequestParam("pageCount") int pageCount, @RequestParam("pageNumber") int pageNumber, @RequestParam("address") String address) throws RocksDBException {
         List<String> screens = new ArrayList<>();
         List<byte[][]> screenVals = new ArrayList<>();
         Integer lashBlockHeight = Integer.valueOf(dbAccess.getLastBlockHeight().get().toString());
@@ -100,7 +101,7 @@ public class TransactionController {
         }
         Map resultMap = new HashMap();
         resultMap.put("transactionList", transactionsDto);
-        resultMap.put("count", 10000);//TODO:待解决
+        resultMap.put("count", dbAccess.getTransCountByAddress(address));//TODO:待解决
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
         resultDto.setData(resultMap);
         return resultDto;
