@@ -604,7 +604,7 @@ public abstract class BaseDBAccess implements DBAccess {
     }
 
     //索引数据的添加
-    protected final void putSuoyinKey(ColumnFamilyHandle handle, byte[] key, byte[] valueItem) throws RocksDBException {
+    protected final void putIndexesKey(ColumnFamilyHandle handle, byte[] key, byte[] valueItem) throws RocksDBException {
         synchronized (handle) {
             long valK = Long.parseLong(new String(key));
             valK = valK / Constant.INDEX_GROUPSIZE;
@@ -618,9 +618,22 @@ public abstract class BaseDBAccess implements DBAccess {
             putByColumnFamilyHandle(handle, ("" + valK).getBytes(), SerializeUtils.serialize(valueList));
         }
     }
-
+    protected final void removeIndexesKey(ColumnFamilyHandle handle, byte[] key, byte[] valueItem){
+        synchronized (handle) {
+            long valK = Long.parseLong(new String(key));
+            valK = valK / Constant.INDEX_GROUPSIZE;
+            valK = valK * Constant.INDEX_GROUPSIZE;
+            byte[] listByte = getByColumnFamilyHandle(handle, ("" + valK).getBytes());
+            if(listByte == null || listByte.length == 0){
+                return;
+            }
+            Set<String> valueList = (Set<String>)SerializeUtils.unSerialize(listByte);
+            valueList.remove(new String(valueItem));
+            putByColumnFamilyHandle(handle, ("" + valK).getBytes(), SerializeUtils.serialize(valueList));
+        }
+    }
     //索引数据的获取
-    protected final Set<String> getSuoyinValue(ColumnFamilyHandle handle, byte[] key) throws RocksDBException {
+    protected final Set<String> getIndexesValue(ColumnFamilyHandle handle, byte[] key) throws RocksDBException {
         long valK = Long.parseLong(new String(key));
         valK = valK / Constant.INDEX_GROUPSIZE;
         valK = valK * Constant.INDEX_GROUPSIZE;
@@ -781,7 +794,7 @@ public abstract class BaseDBAccess implements DBAccess {
                     continue;
                 }
                 //这是改排序字段类型的主键集合
-                Set<String> shaixuanSet = getSuoyinValue(indexHandle, suoyinKey);
+                Set<String> shaixuanSet = getIndexesValue(indexHandle, suoyinKey);
                 if (shaixuanSet == null || shaixuanSet.size() == 0) {
                     continue;
                 }
@@ -933,7 +946,7 @@ public abstract class BaseDBAccess implements DBAccess {
                     continue;
                 }
                 //这是改排序字段类型的主键集合
-                Set<String> shaixuanSet = getSuoyinValue(indexHandle, suoyinKey);
+                Set<String> shaixuanSet = getIndexesValue(indexHandle, suoyinKey);
                 if (shaixuanSet == null || shaixuanSet.size() == 0) {
                     continue;
                 }
@@ -1235,7 +1248,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public byte[] getByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         byte[] res = null;
         try {
-            res = rocksDB.get(columnFamilyHandle, key);
+            res = transaction.get(columnFamilyHandle,new ReadOptions(), key);
         } catch (RocksDBException e) {
             e.printStackTrace();
         }
