@@ -199,14 +199,16 @@ public class BlockController {
 
     @GetMapping("getBlocksByHeight/{blockHeight}-{blockCount}")
     @ResponseBody
-    public List<Block> getBlocksByHeight(@PathVariable("blockHeight") int blockHeight, @PathVariable("blockCount") int blockCount) {
-        List<Block> result = new ArrayList<>();
+    public List<com.passport.dto.coreobject.Block> getBlocksByHeight(@PathVariable("blockHeight") int blockHeight, @PathVariable("blockCount") int blockCount) {
+        List<com.passport.dto.coreobject.Block> list = new ArrayList<>();
         try {
-            result.addAll(dbAccess.getBlocksByHeight(blockHeight, blockCount));
+            dbAccess.getBlocksByHeight(blockHeight, blockCount).forEach(block -> {
+                list.add(getBlockObject(block));
+            });
         } catch (Exception e) {
 
         }
-        return result;
+        return list;
     }
     @GetMapping("getCensesData")
     @ResponseBody
