@@ -516,9 +516,12 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             voteRecord.setId();
             addObj(voteRecord);
             putSuoyinKey(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName),
-                    voteRecord.getVoteNum().toString().getBytes(), voteRecord.getPayAddress().getBytes());
+                    voteRecord.getVoteNum().toString().getBytes(), voteRecord.getId().getBytes());
             putOverAndNext(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.overAndNextName),
                     voteRecord.getVoteNum().toString().getBytes());
+            putSuoyinKey(handleMap.get(IndexColumnNames.VOTERECORDTIME.indexName),
+                    voteRecord.getTime().toString().getBytes(),voteRecord.getId().getBytes());
+            putOverAndNext(handleMap.get(IndexColumnNames.VOTERECORDTIME.overAndNextName),voteRecord.getTime().toString().getBytes());
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -808,13 +811,15 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public List<VoteRecord> votingRecord(String address, int pageCount, int pageNumber) {
         try {
             List<ColumnFamilyHandle> screenHands = new ArrayList<>();
-            screenHands.add(handleMap.get(getColName("voteRecord","payAddress")));
-            screenHands.add(handleMap.get(getColName("voteRecord","receiptAddress")));
-
             List<byte[][]> vals = new ArrayList<>();
-            byte[] val = address.getBytes();
-            vals.add(new byte[][]{val});
-            vals.add(new byte[][]{val});
+            if(address != null && !"".equals(address)) {
+                screenHands.add(handleMap.get(getColName("voteRecord", "payAddress")));
+                screenHands.add(handleMap.get(getColName("voteRecord", "receiptAddress")));
+
+                byte[] val = address.getBytes();
+                vals.add(new byte[][]{val});
+                vals.add(new byte[][]{val});
+            }
             return getDtoOrderByHandle(pageCount,pageNumber,handleMap.get(IndexColumnNames.VOTERECORDTIME.indexName),screenHands,vals,1,handleMap.get(IndexColumnNames.VOTERECORDTIME.overAndNextName),VoteRecord.class,0,300,0,handleMap.get(getColName("voteRecord","time")));
         } catch (Exception e) {
             return new ArrayList<>();
