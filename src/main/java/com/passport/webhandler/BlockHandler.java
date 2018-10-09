@@ -147,8 +147,6 @@ public class BlockHandler {
                 padding = true;
                 //异步处理,不然其他的都在处于等待
                 synHandlerBlock();
-                //继续同步下组区块
-                provider.publishEvent(new SyncNextBlockEvent(0L));
             }
         }else{
             //todo 满了，正在处理
@@ -210,6 +208,9 @@ public class BlockHandler {
                     padding = false;
                     //清空队列
                     Constant.BLOCK_QUEUE.clear();
+
+                    //继续同步下组区块
+                    provider.publishEvent(new SyncNextBlockEvent(0L));
                 }
             }
         });
