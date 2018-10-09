@@ -1,23 +1,25 @@
 package com.passport.web;
 
 import com.google.common.base.Optional;
+import com.passport.constant.Constant;
 import com.passport.core.Block;
-
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
-import com.passport.utils.CheckUtils;
 import com.passport.webhandler.MinerHandler;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.rocksdb.RocksDBException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.ArrayList;
-
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 区块
@@ -34,58 +36,70 @@ public class BlockController {
     @Autowired
     private DBAccess dbAccess;
 
-    @GetMapping("/mine")
-    public ResultDto mine(HttpServletRequest request) throws Exception {
-        minerHandler.mining();
-        return new ResultDto(ResultEnum.SUCCESS);
-    }
-
-
     /**
      * 查询区块列表
      *
-     * @param request
+     * @param pageCount     :每页记录数
+     * @param pageNumber：页码
      * @return
      */
     @GetMapping("getBlockList")
-    public ResultDto getBlockList(HttpServletRequest request) {
-        String pageSize = request.getParameter("pageSize");
-        String pageNumber = request.getParameter("pageNumber");
+    public ResultDto getBlockList(@RequestParam("pageCount") int pageCount, @RequestParam("pageNumber") int pageNumber) {
         List<Block> blocks = new ArrayList<>();
-        boolean flag = CheckUtils.checkParamIfEmpty(pageSize, pageNumber);
-        if (flag) {
-            return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
-        }
+        Map resultMap = new HashMap();
+        List<com.passport.dto.coreobject.Block> newBlocks = new ArrayList<>();
+        long lastBlockHeight = 0;
         try {
-            blocks = dbAccess.blockPagination(Integer.valueOf(pageSize), Integer.valueOf(pageNumber));
+            lastBlockHeight = Long.valueOf(dbAccess.getLastBlockHeight().get().toString());
+            blocks = dbAccess.blockPagination(pageCount, pageNumber);
+            blocks.forEach(block -> {
+                newBlocks.add(getBlockObject(block));
+            });
         } catch (Exception e) {
             e.printStackTrace();
+            return new ResultDto(ResultEnum.SYS_ERROR);
         }
+        resultMap.put("blockList", newBlocks);
+        resultMap.put("count", lastBlockHeight);
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
-        resultDto.setData(blocks);
+        resultDto.setData(resultMap);
         return resultDto;
     }
 
     /**
      * 根据区块高度查询区块信息
      *
-     * @param request
+     * @param blockHeight:区块高度
      * @return
      */
     @GetMapping("getBlockByHeight")
-    public ResultDto getBlockByHeight(HttpServletRequest request) {
-        String blockHeight = request.getParameter("blockHeight");
-        boolean flag = CheckUtils.checkParamIfEmpty(blockHeight);
-        if (flag) {
-            return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
+    public ResultDto getBlockByHeight(@RequestParam("blockHeight") int blockHeight) {
+        long lastBlockHeight = 0;
+        Optional<Object> objectOptional = dbAccess.getLastBlockHeight();
+        if (objectOptional.isPresent()) {
+            lastBlockHeight = Long.valueOf(objectOptional.get().toString());
         }
-        Block block = new Block();
+        com.passport.dto.coreobject.Block newBlock = new com.passport.dto.coreobject.Block();
         Optional<Block> blockOptional = dbAccess.getBlock(blockHeight);
+        BigDecimal totalValue = BigDecimal.ZERO;
+        BigDecimal totalFee = BigDecimal.ZERO;
         if (blockOptional.isPresent()) {
-            block = blockOptional.get();
+            newBlock = getBlockObject(blockOptional.get());
+            for (com.passport.dto.coreobject.Transaction transaction : newBlock.getTransactions()) {
+                totalValue = totalValue.add(transaction.getValue() == null ? BigDecimal.ZERO : new BigDecimal(transaction.getValue().toString()));
+                BigDecimal eggUsed = transaction.getEggUsed()==null||transaction.getEggUsed().equals("") ? BigDecimal.ZERO : new BigDecimal(transaction.getEggUsed().toString());
+                BigDecimal eggPrice = transaction.getEggPrice()==null||transaction.getEggPrice().equals("")  ? BigDecimal.ZERO : new BigDecimal(transaction.getEggPrice().toString());
+                BigDecimal fee = eggPrice.multiply(eggUsed).setScale(8, BigDecimal.ROUND_HALF_UP);
+                totalValue = totalValue.add(fee);
+                transaction.setConfirms(lastBlockHeight - blockHeight);
+                transaction.setFee(fee);
+                transaction.setTokenName(Constant.MAIN_COIN);
+            }
+            newBlock.setTotalValue(totalValue);
+            newBlock.setTotalFee(totalFee);
         }
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
-        resultDto.setData(block);
+        resultDto.setData(newBlock);
         return resultDto;
     }
 
@@ -110,11 +124,12 @@ public class BlockController {
 
     /**
      * 根据区块高度获取区块
+     *
      * @return
      */
     @GetMapping("getBlockByHeight/{blockHeight}")
     @ResponseBody
-    public ResultDto<?> getBlockByHeight(@PathVariable(value="blockHeight") long blockHeight) {
+    public ResultDto<?> getBlockByHeight(@PathVariable(value = "blockHeight") long blockHeight) {
         Optional<Block> blockOptional = dbAccess.getBlock(blockHeight);
         com.passport.dto.coreobject.Block newBlock = getBlockObject(blockOptional.get());
 
@@ -123,6 +138,7 @@ public class BlockController {
 
     /**
      * 反射取byte数组对应的数据
+     *
      * @param block
      * @return
      */
@@ -147,10 +163,11 @@ public class BlockController {
 
     /**
      * 根据区块高度获取流水列表
+     *
      * @return
      */
     @GetMapping("getTransactionsByBlockHeight/{blockHeight}")
-    public ResultDto<?> getTransactionsByBlockHeight(@PathVariable(value="blockHeight") long blockHeight) {
+    public ResultDto<?> getTransactionsByBlockHeight(@PathVariable(value = "blockHeight") long blockHeight) {
         List<Transaction> transactions = dbAccess.getTransactionsByBlockHeight(blockHeight);
         List<com.passport.dto.coreobject.Transaction> newTransactions = new ArrayList<>();
         transactions.forEach(transaction -> {
@@ -163,10 +180,11 @@ public class BlockController {
 
     /**
      * 分页查询区块
+     *
      * @return
      */
     @GetMapping("getBlockByPage/{pageNum}")
-    public ResultDto<?> getBlockByPage(@PathVariable(value="pageNum") int pageNum) {
+    public ResultDto<?> getBlockByPage(@PathVariable(value = "pageNum") int pageNum) {
         try {
             List<Block> blocks = dbAccess.blockPagination(10, pageNum);
             List<com.passport.dto.coreobject.Block> newBlocks = new ArrayList<>();
@@ -179,4 +197,27 @@ public class BlockController {
         }
     }
 
+    @GetMapping("getBlocksByHeight/{blockHeight}-{blockCount}")
+    @ResponseBody
+    public List<com.passport.dto.coreobject.Block> getBlocksByHeight(@PathVariable("blockHeight") int blockHeight, @PathVariable("blockCount") int blockCount) {
+        List<com.passport.dto.coreobject.Block> list = new ArrayList<>();
+        try {
+            dbAccess.getBlocksByHeight(blockHeight, blockCount).forEach(block -> {
+                list.add(getBlockObject(block));
+            });
+        } catch (Exception e) {
+
+        }
+        return list;
+    }
+    @GetMapping("getCensesData")
+    @ResponseBody
+    public String getCensesData(){
+        try {
+            return dbAccess.censesData();
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }

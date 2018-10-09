@@ -2,10 +2,15 @@ package com.passport.webhandler;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.google.common.util.concurrent.Futures;
 import com.google.protobuf.ByteString;
+import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.core.*;
+import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.db.dbhelper.IndexColumnNames;
+import com.passport.enums.TransactionTypeEnum;
 import com.passport.event.GenerateNextBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
@@ -17,9 +22,13 @@ import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.RawardUtil;
+import org.rocksdb.RocksDBException;
+import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -30,11 +39,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@EnableAsync
 public class BlockHandler {
     private static final Logger logger = LoggerFactory.getLogger(BlockHandler.class);
 
     @Autowired
-    private DBAccess dbAccess;
+    private BaseDBAccess dbAccess;
     @Autowired
     private ApplicationContextProvider provider;
     @Autowired
@@ -97,16 +107,27 @@ public class BlockHandler {
             }
             //奖励金额的合法性判断
             boolean reword = false;
+            String receiptAddress = null;
             for(Transaction tran : transactions) {
                 byte[] payAddr = tran.getPayAddress();
-                byte[] compByt = "挖矿奖励".getBytes();
+                byte[] compByt = TransactionTypeEnum.BLOCK_REWARD.toString().getBytes();
                 if ((payAddr == null||payAddr.length==0) && tran.getExtarData() != null && Arrays.equals(compByt, tran.getExtarData())) {
                     //奖励的流水
                     byte[] value = tran.getValue();
+                    receiptAddress = new String(tran.getReceiptAddress());
                     reword = RawardUtil.checkReward(blockHeight, value);
                     break;
                 }
             }
+            /*if(reword){
+                //校验是否轮到该用户出块
+                int blockCycle = blockUtils.getBlockCycle(blockHeight);
+                List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
+                Trustee trustee = blockUtils.randomPickBlockProducer(trustees, blockHeight);
+                if(trustee == null || !trustee.getAddress().equals(receiptAddress)){
+                    return false;
+                }
+            }*/
             return reword;
         }
 
@@ -131,17 +152,20 @@ public class BlockHandler {
             //todo 满了，正在处理
         }
     }
+
     public void synHandlerBlock(){
         //TODO 需不需要额外开线程，需要的话可以写个线程工具类
         Thread handlerThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                dbAccess.transaction =dbAccess.rocksDB.beginTransaction(new WriteOptions());;
+
                 try{
                     //todo 校验 目前是获取相同的区块高度
                     List<Block> successBlocks = getShareBlocks();
                     //存储区块到本地
                     for(Block blockLocal : successBlocks) {
-                        Optional<Object> optHeigth = dbAccess.getLastBlockHeight();
+                        Optional<Object> optHeigth = dbAccess.getLastBlockHeightT();
                         if(optHeigth.isPresent()) {
                             Long height = (Long)optHeigth.get();
                             if(height != null) {
@@ -154,7 +178,12 @@ public class BlockHandler {
                                         TransactionStrategy transactionStrategy = transactionStrategyContext.getTransactionStrategy(new String(transaction.getTradeType()));
                                         if(transactionStrategy != null){
                                             transactionStrategy.handleTransaction(transaction);
-
+                                            try {
+                                                dbAccess.addIndex(transaction, IndexColumnNames.TRANSTIMEINDEX,transaction.getTime());
+                                                dbAccess.addIndex(transaction,IndexColumnNames.TRANSBLOCKHEIGHTINDEX,transaction.getBlockHeight());
+                                            } catch (IllegalAccessException e) {
+                                                e.printStackTrace();
+                                            }
                                             dbAccess.putConfirmTransaction(transaction);
                                         }
                                     });
@@ -166,15 +195,22 @@ public class BlockHandler {
                             break;
                         }
                     }
-                    //继续同步下组区块
-                    provider.publishEvent(new SyncNextBlockEvent(0L));
+                    dbAccess.transaction.commit();
                 }catch (Exception e){
+                    try {
+                        dbAccess.transaction.rollback();
+                    } catch (RocksDBException e1) {
+                        e1.printStackTrace();
+                    }
                     logger.warn("synchronization block error", e);
                 }finally {
                     //更改状态
                     padding = false;
                     //清空队列
                     Constant.BLOCK_QUEUE.clear();
+
+                    //继续同步下组区块
+                    provider.publishEvent(new SyncNextBlockEvent(0L));
                 }
             }
         });
@@ -248,6 +284,7 @@ public class BlockHandler {
         block.setTransactionCount(blockMessage.getTransactionsCount());
         block.setBlockHeight(blockMessage.getBlockHeight());
         block.setTransactions(new ArrayList<>());
+        block.setProducer(blockMessage.getProducer());
         //区块流水记录
         blockMessage.getTransactionsList().forEach((TransactionMessage.Transaction trans) -> {
             Transaction transaction = new Transaction();
@@ -292,6 +329,8 @@ public class BlockHandler {
         blockBuilder.setBlockHeader(blockHeaderBuilder.build());
         blockBuilder.setTransactionCount(block.getTransactionCount());
         blockBuilder.setBlockHeight(block.getBlockHeight());
+        blockBuilder.setProducer(block.getProducer());
+
         //设置包含在区块中的流水记录
         block.getTransactions().forEach((Transaction trans) -> {
             TransactionMessage.Transaction.Builder transactionBuilder = TransactionMessage.Transaction.newBuilder();
@@ -316,7 +355,7 @@ public class BlockHandler {
         return blockBuilder;
     }
 
-    public void produceNextBlock() {
+    public void produceNextBlock() throws InterruptedException {
         //当前区块周期
         Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
         if(!lastBlockOptional.isPresent()){
@@ -362,23 +401,34 @@ public class BlockHandler {
      * @param list
      * @param blockCycle
      */
-    public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) {
-        Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
-        Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
-        if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
-            Account account = accountOptional.get();
-            if(account.getPrivateKey() != null){
-                //打包区块
-                minerHandler.packagingBlock(account);
+    public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) throws InterruptedException {
+//        try{
+            Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
+            Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
+            if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
+                Account account = accountOptional.get();
+                if(account.getPrivateKey() != null){
+                    //打包区块
+                    minerHandler.packagingBlock(account);
 
-                //更新101个受托人，已经出块人的状态
-                trusteeHandler.changeStatus(trustee, blockCycle);
+                    //更新101个受托人，已经出块人的状态
+                    trusteeHandler.changeStatus(trustee, blockCycle);
 
-                logger.info("第{}个区块出块成功", newBlockHeight);
-
-                provider.publishEvent(new GenerateNextBlockEvent(0L));
+                    logger.info("第{}个区块出块成功", newBlockHeight);
+                    provider.publishEvent(new GenerateNextBlockEvent(0L));
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                                provider.publishEvent(new GenerateNextBlockEvent(0L));
+//                        }
+//                    }).start();
+                }
             }
-        }
+//        }catch (RocksDBException e){
+//            e.printStackTrace();
+//        }
+
     }
+
 
 }

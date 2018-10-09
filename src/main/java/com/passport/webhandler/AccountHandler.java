@@ -2,6 +2,7 @@ package com.passport.webhandler;
 
 import com.google.common.base.Optional;
 import com.passport.annotations.RocksTransaction;
+import com.passport.aop.TransactionAspect;
 import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.crypto.eth.ECKeyPair;
@@ -54,13 +55,17 @@ public class AccountHandler {
 
     @RocksTransaction
     public void test() throws RocksDBException {
-        for(int i = 0;i<10;i++){
-            System.out.println("----->"+i);
-            rocksDBTr.add(("gg"+i).getBytes(),(i+"").getBytes());
-//            if(i==9) throw new RocksDBException("shib");
+//        System.out.println(new String(dbAccess.rocksDB.get("gg0".getBytes())));
+        for (int i = 0; i < 10; i++) {
+            dbAccess.transaction.put(("gg" + i).getBytes(), (i + "_aaa").getBytes());
+
+
+//            dbAccess.transaction.put(("gg" + i).getBytes(), (i + "_g").getBytes());
+//            dbAccess.put(("gg" + i).getBytes(), (i + "_f").getBytes());
+            System.out.println("----->" + i);
+//            if (i == 9) throw new RocksDBException("shib");
         }
-//        seekB(rocksDBTr.getRocksDB());
-//        System.out.println(dbAccess.get("gg"));
+//        System.out.println(new String(dbAccess.rocksDB.get("gg0".getBytes())));
     }
 
     public void test2() throws RocksDBException {
@@ -73,13 +78,14 @@ public class AccountHandler {
         RocksIterator iterator = rocksDB.newIterator(options);
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
 
-            System.out.println(new String(iterator.key())+"<==>"+new String(iterator.value()));
+            System.out.println(new String(iterator.key()) + "<==>" + new String(iterator.value()));
         }
     }
 
 
     /**
      * 新增账号
+     *
      * @return 账号
      */
     public Account newAccount(String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, CipherException, IOException {
@@ -89,7 +95,6 @@ public class AccountHandler {
         }
         return null;
     }
-
     private Account generateAccount(String password) throws CipherException, IOException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         File file = new File(walletDir);
         if (!file.exists()) {
@@ -104,11 +109,11 @@ public class AccountHandler {
     }
 
     //用户替换挖矿账号
-    public Account setMinerAccount(String address){
+    public Account setMinerAccount(String address) {
         Optional<Account> addAccount = dbAccess.getAccount(address);
-        if(addAccount.isPresent()){
+        if (addAccount.isPresent()) {
             Account account = addAccount.get();
-            if(dbAccess.putMinerAccount(account)){
+            if (dbAccess.putMinerAccount(account)) {
                 return account;
             }
         }
@@ -116,9 +121,9 @@ public class AccountHandler {
     }
 
     //用户设置默认挖矿账号（第一个创建的账户默认为挖矿账户）
-    public void setMinerAccountIfNotExists(Account account){
+    public void setMinerAccountIfNotExists(Account account) {
         Optional<Account> minerAccount = dbAccess.getMinerAccount();
-        if(!minerAccount.isPresent()){
+        if (!minerAccount.isPresent()) {
             dbAccess.putMinerAccount(account);
         }
     }
@@ -126,7 +131,7 @@ public class AccountHandler {
     /**
      * 初始化受托人
      */
-    public void generateTrustees(){
+    public void generateTrustees() {
         GenesisBlockInfo genesisBlockInfo = new GenesisBlockInfo();
         List<Account> accounts = new ArrayList<>();
         List<Transaction> transactions = new ArrayList<>();
@@ -137,7 +142,7 @@ public class AccountHandler {
                 //创建账户
                 Account account = generateAccount("123456");
                 dbAccess.putAccount(account);
-                accounts.add(new Account(account.getAddress(), account.getBalance()));//不保存私钥
+                accounts.add(new Account(account.getAddress(),null, account.getBalance()));//不保存私钥
 
                 //创建注册为受托人交易
                 Transaction transaction = transactionHandler.generateTransaction(account.getAddress(), null, "0", "", account);
@@ -156,7 +161,7 @@ public class AccountHandler {
                 voteRecords.add(voteRecord);
 
                 //把新增的受托人放到受托人列表
-                Trustee trustee = new Trustee(account.getAddress(), 0L, 0f, new BigDecimal(0), 1);
+                Trustee trustee = new Trustee(account.getAddress(), 1L, 0f, new BigDecimal(0), 1);
                 trustees.add(trustee);
             } catch (Exception e) {
                 e.printStackTrace();

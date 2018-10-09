@@ -3,6 +3,7 @@ package com.passport.db.dbhelper;
 import com.google.common.base.Optional;
 import com.passport.core.*;
 import org.rocksdb.ColumnFamilyHandle;
+import org.rocksdb.RocksDBException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +70,12 @@ public interface DBAccess {
 	 * @return
 	 */
 	Optional<Object> getLastBlockHeight();
+
+	/**
+	 * 获取最新一个区块的Hash值-shiwu
+	 * @return
+	 */
+	Optional<Object> getLastBlockHeightT();
 
 	/**
 	 * 保存区块
@@ -226,6 +233,11 @@ public interface DBAccess {
 	 * @return
 	 */
 	List<Trustee> listTrustees();
+	/**
+	 * 获取受托人列表
+	 * @return
+	 */
+	List<Trustee> listTrustees(int count);
 
 	/**
 	 * 添加一个投票人
@@ -284,6 +296,13 @@ public interface DBAccess {
 	 * @return
 	 */
 	List<Block> blockPagination(int pageCount, int pageNumber) throws Exception;
+	/**
+	 * 区块分页查询
+	 * @param blockHeight：区块高度
+	 * @param blockCount：多少个区块
+	 * @return
+	 */
+	List<Block> getBlocksByHeight(int blockHeight, int blockCount) throws Exception;
 	/**
 	 * 交易流水分页查询
 	 * @param pageCount：每页记录数
@@ -350,7 +369,6 @@ public interface DBAccess {
      *@param screenType        筛选类型   0 and   1 or  （注意，要么全是and，要么全是or）
      * @param overAndNextHandle 索引字段的排序关系handle
      * @param tClass            对象的字节码
-     * @param keyFiledName      主键字段的名
      * @param orderByType       排序类型 1升序,0降序
      * @param flushSize         排序字段区间的缓存
      * @param dtoType           对象主键的类型  根据这个类型匹配不同的排序方法
@@ -361,6 +379,21 @@ public interface DBAccess {
     <T> ArrayList<T> getDtoOrderByHandle(int pageCount, int pageNumber,
                                          ColumnFamilyHandle indexHandle, List<ColumnFamilyHandle> screenHands,
                                          List<byte[][]> vals, int screenType,
-                                         ColumnFamilyHandle overAndNextHandle, Class<T> tClass, String keyFiledName,
+                                         ColumnFamilyHandle overAndNextHandle, Class<T> tClass,
                                          int orderByType, int flushSize, int dtoType, ColumnFamilyHandle orderByFieldHandle) throws Exception;
+    <T> void addIndex(T t, IndexColumnNames columnNames,byte[] indexKey) throws IllegalAccessException;
+
+	/**
+	 * 统计数据方法
+	 * @return
+	 */
+	String censesData() throws RocksDBException;
+
+	List<VoteRecord> votingRecord(String address,int pageCount, int pageNumber);
+	/**
+	 * 查询地址的流水总数
+	 * @param address
+	 * @return
+	 */
+	long getTransCountByAddress(String address) throws RocksDBException;
 }

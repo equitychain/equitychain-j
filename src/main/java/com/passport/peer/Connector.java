@@ -1,6 +1,8 @@
 package com.passport.peer;
 
+import com.passport.annotations.RocksTransaction;
 import com.passport.constant.NodeListConstant;
+import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.GenerateBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
@@ -38,6 +40,8 @@ public class Connector implements InitializingBean {
     private ApplicationContextProvider provider;
     @Autowired
     private ChannelsManager channelsManager;
+    @Autowired
+    private DBAccess dbAccess;
 
     @Override
     public void afterPropertiesSet() throws Exception {

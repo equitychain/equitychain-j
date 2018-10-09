@@ -1,6 +1,7 @@
 package com.passport.msghandler;
 
 import com.google.common.base.Optional;
+import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Block;
@@ -17,6 +18,7 @@ import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.locks.Lock;
@@ -35,6 +37,7 @@ public class BlockSyncREQ extends Strategy {
     @Autowired
     private DBAccess dbAccess;
     @Autowired
+    @Lazy
     private BlockHandler blockHandler;
     @Autowired
     private TransactionHandler transactionHandler;
@@ -86,6 +89,7 @@ public class BlockSyncREQ extends Strategy {
 
             //存储区块到本地
             dbAccess.putBlock(blockLocal);
+
             dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
 
             //流水匹配，和区块中流水一样的未确认流水将放到已确认流水中
