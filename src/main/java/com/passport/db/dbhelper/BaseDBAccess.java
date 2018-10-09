@@ -6,6 +6,7 @@ import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
 import com.passport.constant.Constant;
 import com.passport.core.*;
+import com.passport.utils.ClassUtil;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.*;
 import org.rocksdb.Transaction;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.*;
 import java.util.Comparator;
@@ -42,31 +44,20 @@ public abstract class BaseDBAccess implements DBAccess {
             }
             List<String> fields = new ArrayList<>();
             IndexColumnNames[] indexColumnNames = IndexColumnNames.values();
-            //TODO 添加dto的字节码
-            fields.addAll(getClassCols(new com.passport.core.Transaction().getClass()));
-            fields.addAll(getClassCols(new Block().getClass()));
-            fields.addAll(getClassCols(new BlockHeader().getClass()));
-            fields.addAll(getClassCols(new Trustee().getClass()));
-            fields.addAll(getClassCols(new Account().getClass()));
-            fields.addAll(getClassCols(new VoteRecord().getClass()));
-            fields.addAll(getClassCols(new Voter().getClass()));
-//            dtoClasses.add(new Transaction().getClass());
-            dtoClasses.add(new Block().getClass());
-            dtoClasses.add(new BlockHeader().getClass());
-            dtoClasses.add(new Account().getClass());
-            dtoClasses.add(new Trustee().getClass());
-            dtoClasses.add(new VoteRecord().getClass());
-            dtoClasses.add(new Voter().getClass());
+            //添加字节码,加载dto属性
+            List<Class<?>> classes = ClassUtil.getClasses("com.passport.core");
+            for(Class c : classes){
+                fields.addAll(getClassCols(c));
+                dtoClasses.add(c);
+            }
             try {
                 rocksDB = OptimisticTransactionDB.open(new Options().setCreateIfMissing(true), dataDir);
-                System.out.println("========create fields=========");
                 //添加默认的列族
                 handleMap.put("default", rocksDB.getDefaultColumnFamily());
                 for (String field : fields) {
                     ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(field.getBytes());
                     ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
                     handleMap.put(field, handle);
-                    System.out.println("====field:" + field);
                 }
                 for (IndexColumnNames columnNames : indexColumnNames) {
                     ColumnFamilyHandle indexNameHandle = rocksDB.createColumnFamily(columnNames.getIndexName());
@@ -76,22 +67,41 @@ public abstract class BaseDBAccess implements DBAccess {
                 }
             } catch (Exception e) {
                 //列集合
-                List<ColumnFamilyDescriptor> descriptorList = new ArrayList<>();
+                List<ColumnFamilyDescriptor> curHasColumns = new ArrayList<>();
+                List<ColumnFamilyDescriptor> curDontHasColumns = new ArrayList<>();
+                List<byte[]> curColbyts = RocksDB.listColumnFamilies(new Options(), dataDir);
+                List<String> curColStrs = new ArrayList<>();
+                for (byte[] byts : curColbyts){
+                    curColStrs.add(new String(byts));
+                }
                 ColumnFamilyDescriptor defaultDescriptor = new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY);
-                descriptorList.add(defaultDescriptor);
-                System.out.println("========load fields=========");
+                curHasColumns.add(defaultDescriptor);
                 for (String s : fields) {
-                    ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(s.getBytes());
-                    descriptorList.add(descriptor);
-                    System.out.println("====field:" + s);
+                    if(curColStrs.contains(s)) {
+                        ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(s.getBytes());
+                        curHasColumns.add(descriptor);
+                    }else{
+                        curDontHasColumns.add(defaultDescriptor);
+                    }
                 }
                 for (IndexColumnNames names : indexColumnNames) {
-                    descriptorList.add(names.getIndexName());
-                    descriptorList.add(names.getOverAndNextName());
+                    if(curColStrs.contains(names.indexName)) {
+                        curHasColumns.add(names.getIndexName());
+                        curHasColumns.add(names.getOverAndNextName());
+                    }else{
+                        curDontHasColumns.add(names.getIndexName());
+                        curDontHasColumns.add(names.getOverAndNextName());
+                    }
                 }
-                //打开数据库
+                //打开数据库  加载旧列族,创建新列族
                 List<ColumnFamilyHandle> handleList = new ArrayList<>();
-                rocksDB = OptimisticTransactionDB.open(new DBOptions().setCreateIfMissing(true), dataDir, descriptorList, handleList);
+                rocksDB = OptimisticTransactionDB.open(new DBOptions().setCreateIfMissing(true), dataDir, curHasColumns, handleList);
+                for(ColumnFamilyDescriptor descriptor : curDontHasColumns) {
+                    ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
+                    String name = new String(handle.getName());
+                    handleMap.put(name, handle);
+                    System.out.println("load new col=="+name);
+                }
                 for(ColumnFamilyHandle handler : handleList){
                     String name = new String(handler.getName());
                     handleMap.put(name, handler);
@@ -233,17 +243,6 @@ public abstract class BaseDBAccess implements DBAccess {
         return null;
     }
     public final void addObjs(List objs) throws Exception {
-//        WriteBatch batch = new WriteBatch();
-//        int count = 0;
-//        for (Object o : objs) {
-//            count += addObj(o, batch);
-//            if (count >= 1000) {
-//                rocksDB.write(new WriteOptions(), batch);
-//                batch = new WriteBatch();
-//            }
-//        }
-//        rocksDB.write(new WriteOptions(), batch);
-
         for (Object o : objs) {
              addObj(o);
         }
@@ -729,9 +728,11 @@ public abstract class BaseDBAccess implements DBAccess {
     }
 
     /**
+     * 排序/筛选查询
      * @param fields
      * @param values
      * @param screenTypes        0 =     1 >=     2 <=
+     *                           如果是0,那么比较的可以是任意的类型,如果是1或者2比较的只能是数字
      * @param tClass
      * @param overAndNextHandle
      * @param indexHandle
@@ -874,7 +875,6 @@ public abstract class BaseDBAccess implements DBAccess {
      * @param screenType        筛选类型   0 and   1 or  （注意，要么全是and，要么全是or）
      * @param overAndNextHandle 索引字段的排序关系handle
      * @param tClass            对象的字节码
-     * @param keyFiledName      主键字段的名
      * @param orderByType       排序类型 1升序,0降序
      * @param flushSize         排序字段区间的缓存
      * @param dtoType           对象主键的类型  根据这个类型匹配不同的排序方法
@@ -885,7 +885,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public final <T> ArrayList<T> getDtoOrderByHandle(int pageCount, int pageNumber,
                                                       ColumnFamilyHandle indexHandle, List<ColumnFamilyHandle> screenHands,
                                                       List<byte[][]> vals, int screenType,
-                                                      ColumnFamilyHandle overAndNextHandle, Class<T> tClass, String keyFiledName,
+                                                      ColumnFamilyHandle overAndNextHandle, Class<T> tClass,
                                                       int orderByType, int flushSize, int dtoType, ColumnFamilyHandle orderByFieldHandle) throws Exception {
         //段判断筛选的字和字段对应的值是否匹配
         if (screenHands != null && vals != null) {
@@ -898,6 +898,7 @@ public abstract class BaseDBAccess implements DBAccess {
         } else {
             throw new Exception("Filter fields and values do not match.");
         }
+        String keyFiledName = getKeyFieldByClass(tClass);
         long begin = System.currentTimeMillis();
         //当页的数据区间的开始索引
         int beginItem = pageCount * (pageNumber - 1) + 1;
