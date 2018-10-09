@@ -6,6 +6,7 @@ public enum IndexColumnNames {
     TRANSTIMEINDEX("transactionTime-index","transactionTime-overAndNext"),
     VOTERNUMBEROFVOTE("voterVoteNum-index","voterVoteNum-overAndNext"),
     VOTERECORDVOTENUMBER("voteRecordVoteNum-index","voteRecordVoteNum-overAndNext"),
+    VOTERECORDTIME("voteRecordTime-index","voteRecordTime-overAndNext"),
     TRUSTEEVOTESINDEX("trusteeVotes-index","trusteeVotes-overAndNext"),
     TRANSBLOCKHEIGHTINDEX("transactionBlockHeight-index","transactionBlockHeight-overAndNext");
     protected String indexName;

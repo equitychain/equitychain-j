@@ -369,7 +369,6 @@ public interface DBAccess {
      *@param screenType        筛选类型   0 and   1 or  （注意，要么全是and，要么全是or）
      * @param overAndNextHandle 索引字段的排序关系handle
      * @param tClass            对象的字节码
-     * @param keyFiledName      主键字段的名
      * @param orderByType       排序类型 1升序,0降序
      * @param flushSize         排序字段区间的缓存
      * @param dtoType           对象主键的类型  根据这个类型匹配不同的排序方法
@@ -380,7 +379,7 @@ public interface DBAccess {
     <T> ArrayList<T> getDtoOrderByHandle(int pageCount, int pageNumber,
                                          ColumnFamilyHandle indexHandle, List<ColumnFamilyHandle> screenHands,
                                          List<byte[][]> vals, int screenType,
-                                         ColumnFamilyHandle overAndNextHandle, Class<T> tClass, String keyFiledName,
+                                         ColumnFamilyHandle overAndNextHandle, Class<T> tClass,
                                          int orderByType, int flushSize, int dtoType, ColumnFamilyHandle orderByFieldHandle) throws Exception;
     <T> void addIndex(T t, IndexColumnNames columnNames,byte[] indexKey) throws IllegalAccessException;
 
@@ -389,4 +388,6 @@ public interface DBAccess {
 	 * @return
 	 */
 	String censesData() throws RocksDBException;
+
+	List<VoteRecord> votingRecord(String address,int pageCount, int pageNumber);
 }

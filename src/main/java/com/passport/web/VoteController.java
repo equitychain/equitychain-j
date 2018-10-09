@@ -2,6 +2,7 @@ package com.passport.web;
 
 import com.google.common.base.Optional;
 import com.passport.core.Trustee;
+import com.passport.core.VoteRecord;
 import com.passport.core.Voter;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
@@ -47,5 +48,11 @@ public class VoteController {
         }
         return resultDto;
     }
-
+    @GetMapping("votingRecord")
+    public ResultDto votingRecord(@RequestParam("address") String address,@RequestParam("pageCount") int pageCount, @RequestParam("pageNumber") int pageNumber){
+        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
+        List<VoteRecord> voters = dbAccess.votingRecord(address, pageCount,pageNumber);
+        resultDto.setData(voters);
+        return resultDto;
+    }
 }

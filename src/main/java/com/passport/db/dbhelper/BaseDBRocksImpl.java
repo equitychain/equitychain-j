@@ -640,7 +640,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         try {
             return getDtoOrderByHandle(pageCount, pageNumber, handleMap.get(IndexColumnNames.TRANSTIMEINDEX.indexName)
                     , screenHanles, screenVals, screenType, handleMap.get(IndexColumnNames.TRANSTIMEINDEX.overAndNextName),
-                    Transaction.class, "hash", orderByType, 150, 0, handleMap.get(getColName("transaction", "time")));
+                    Transaction.class, orderByType, 150, 0, handleMap.get(getColName("transaction", "time")));
 
         } catch (Exception e) {
             return new ArrayList<>();
@@ -660,7 +660,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         try {
             return getDtoOrderByHandle(pageCount, pageNumber, handleMap.get(IndexColumnNames.TRANSTIMEINDEX.indexName),
                     screenHands, vals, 1, handleMap.get(IndexColumnNames.TRANSTIMEINDEX.overAndNextName),
-                    Transaction.class, "hash", orderByType, 300, 0, handleMap.get(getColName("transaction", "time")));
+                    Transaction.class, orderByType, 300, 0, handleMap.get(getColName("transaction", "time")));
         } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList<>();
@@ -697,8 +697,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             return getDtoOrderByHandle(pageCount, pageNumber,
                     handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.indexName),
                     screenHandles, vals, 0,
-                    handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.overAndNextName), Transaction.class,
-                    "hash", 0, 300, 0,
+                    handleMap.get(IndexColumnNames.TRANSBLOCKHEIGHTINDEX.overAndNextName), Transaction.class, 0, 300, 0,
                     handleMap.get(getColName("transaction", "blockHeight")));
 
         } catch (Exception e) {
@@ -725,7 +724,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                     handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName)
                     , screenHanles, screenVals, 0,
                     handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.overAndNextName),
-                    Trustee.class, "votes", orderByType, 100, 0,
+                    Trustee.class, orderByType, 100, 0,
                     handleMap.get(getColName("trustee", "votes")));
         } catch (Exception e) {
             e.printStackTrace();
@@ -736,7 +735,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public <T> void addIndex(T t, IndexColumnNames columnNames,byte[] indexKey) {
         try {
-            System.out.println(getKeyValByDto(t));
+//            System.out.println(getKeyValByDto(t));
             putSuoyinKey(handleMap.get(columnNames.indexName),indexKey,getKeyValByDto(t));
 
             putOverAndNext(handleMap.get(columnNames.overAndNextName),indexKey);
@@ -803,5 +802,22 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         jsonObject.put("countTrans",count);
         jsonObject.put("blockTimeDiff",blockTimeDiff);
         return jsonObject.toJSONString();
+    }
+
+    @Override
+    public List<VoteRecord> votingRecord(String address, int pageCount, int pageNumber) {
+        try {
+            List<ColumnFamilyHandle> screenHands = new ArrayList<>();
+            screenHands.add(handleMap.get(getColName("voteRecord","payAddress")));
+            screenHands.add(handleMap.get(getColName("voteRecord","receiptAddress")));
+
+            List<byte[][]> vals = new ArrayList<>();
+            byte[] val = address.getBytes();
+            vals.add(new byte[][]{val});
+            vals.add(new byte[][]{val});
+            return getDtoOrderByHandle(pageCount,pageNumber,handleMap.get(IndexColumnNames.VOTERECORDTIME.indexName),screenHands,vals,1,handleMap.get(IndexColumnNames.VOTERECORDTIME.overAndNextName),VoteRecord.class,0,300,0,handleMap.get(getColName("voteRecord","time")));
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 }

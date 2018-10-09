@@ -65,7 +65,7 @@ public class AccountHandler {
             System.out.println("----->" + i);
 //            if (i == 9) throw new RocksDBException("shib");
         }
-        System.out.println(new String(dbAccess.rocksDB.get("gg0".getBytes())));
+//        System.out.println(new String(dbAccess.rocksDB.get("gg0".getBytes())));
     }
 
     public void test2() throws RocksDBException {
