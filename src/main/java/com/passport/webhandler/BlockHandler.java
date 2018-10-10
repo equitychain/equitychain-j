@@ -418,7 +418,6 @@ public class BlockHandler {
                     trusteeHandler.changeStatus(trustee, blockCycle);
 
                     logger.info("第{}个区块出块成功", newBlockHeight);
-                    MonitoringIfProducerDead.nextBlockFlag = true;
                     provider.publishEvent(new GenerateNextBlockEvent(0L));
 //                    new Thread(new Runnable() {
 //                        @Override
@@ -427,6 +426,8 @@ public class BlockHandler {
 //                        }
 //                    }).start();
                 }
+            }else {
+                MonitoringIfProducerDead.nextBlockFlag = true;
             }
 //        }catch (RocksDBException e){
 //            e.printStackTrace();

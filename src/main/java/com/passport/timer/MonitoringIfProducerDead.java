@@ -6,10 +6,14 @@ import com.passport.constant.Constant;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Block;
 import com.passport.core.Trustee;
+import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.utils.BlockUtils;
 import com.passport.webhandler.BlockHandler;
 import com.passport.webhandler.TrusteeHandler;
+import org.rocksdb.RocksDBException;
+import org.rocksdb.Transaction;
+import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +36,7 @@ public class MonitoringIfProducerDead {
     private static final Logger logger = LoggerFactory.getLogger(MonitoringIfProducerDead.class);
 
     @Autowired
-    private DBAccess dbAccess;
+    private BaseDBAccess dbAccess;
     @Autowired
     private BlockUtils blockUtils;
     @Autowired
@@ -75,13 +79,13 @@ public class MonitoringIfProducerDead {
 
     public static volatile boolean nextBlockFlag = true;//默认处理发布主动同步区块事件，为false则处理组2接收广播区块、接收广播流水
 
-    @RocksTransaction
     public void checkBlock() throws InterruptedException {
         if(nextBlockFlag){
             Timer timer = new Timer ( );
             timer.schedule ( new TimerTask( ) {
                 @Override
                 public void run() {
+                  dbAccess.transaction =  dbAccess.rocksDB.beginTransaction(new WriteOptions().setSync(true));
                     //已同步完成，切换到接收区块和流水广播状态
                     if (SyncFlag.isNextBlockSyncFlag()) {
                         return;
@@ -112,7 +116,14 @@ public class MonitoringIfProducerDead {
                     //再次选出出块账户
                     try {
                         blockHandler.produceNextBlock();
-                    } catch (InterruptedException e) {
+                        dbAccess.transaction.commit();
+                        System.out.println();
+                    } catch (Exception e) {
+                        try {
+                            dbAccess.transaction.rollback();
+                        } catch (RocksDBException e1) {
+                            e1.printStackTrace();
+                        }
                         e.printStackTrace();
                     }
                 }

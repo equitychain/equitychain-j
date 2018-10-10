@@ -27,7 +27,6 @@ public class TrusteeHandler {
      * @param trustee
      * @param blockCycle
      */
-    @RocksTransaction
     public void changeStatus(Trustee trustee, int blockCycle) {
         Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
         if(objectOptional.isPresent()){
@@ -60,7 +59,7 @@ public class TrusteeHandler {
         }
         return trustees;
     }
-    @RocksTransaction
+
     public List<Trustee> getTrusteesBeforeTime(long newBlockHeight, int blockCycle) {
         Long timestamp = blockUtils.getTimestamp4BlockCycle(newBlockHeight);
         //查询投票记录（status==1）,时间小于等于timestamp，按投票票数从高到低排列的101个受托人，放到101个受托人列表中
