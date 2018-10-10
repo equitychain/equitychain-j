@@ -8,6 +8,7 @@ import com.passport.db.dbhelper.DBAccess;
 import com.passport.enums.TransactionTypeEnum;
 import com.passport.event.SyncBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
+import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.RawardUtil;
@@ -36,7 +37,8 @@ public class MinerHandler {
     private TransactionHandler transactionHandler;
     @Autowired
     private ApplicationContextProvider provider;
-
+    @Autowired
+    private BlockUtils blockUtils;
     @Autowired
     private BlockHandler blockHandler;
 
@@ -91,7 +93,7 @@ public class MinerHandler {
         for(Transaction tran : blockTrans){
             //矿工费付给矿工  注意!无论流水是否成功被打包该矿工费是必须给的,因为已经扣了,
             Transaction feeTrans = new Transaction();
-            feeTrans.setTime(ByteUtil.longToBytesNoLeadZeroes(System.currentTimeMillis()));
+            feeTrans.setTime((System.currentTimeMillis()+"").getBytes());
             feeTrans.setPayAddress(null);
             feeTrans.setExtarData(tran.getHash());
             BigDecimal valueDec = transactionHandler.getTempEggByHash(tran.getHash());
@@ -108,7 +110,6 @@ public class MinerHandler {
             feeTrans.setTradeType(TransactionTypeEnum.CONFIRM_REWARD.toString().getBytes());
 
             tran.setBlockHeight(((prevBlock.getBlockHeight() + 1)+"").getBytes());
-//            feeTrans.setTime((System.currentTimeMillis()+"").getBytes());
             tran.setTime(feeTrans.getTime());
             //添加奖励和需要确认的流水
             currentBlock.getTransactions().add(feeTrans);
@@ -116,9 +117,10 @@ public class MinerHandler {
             //计算分发的流水奖励金额的比例
             sumTransMoney = sumTransMoney.add(valueDec.multiply(Constant.CONFIRM_TRANS_PROPORTION));
         }
+        long time = blockUtils.getTimestamp4BlockCycle(prevBlock.getBlockHeight() + 1);
         //获取受托人的投票记录  某个时间前的
         List<VoteRecord> voteRecords = dbAccess.listVoteRecords(minerAccount.getAddress(),
-                "receiptAddress",1000,2);
+                "receiptAddress",time,2);
         //计算每个投票人应该获得多少奖励
         BigDecimal voterReward = sumTransMoney.divide(new BigDecimal(voteRecords.size()),Constant.PROPORTION_ACCURACY,BigDecimal.ROUND_DOWN);
         //差值计算
@@ -126,7 +128,7 @@ public class MinerHandler {
         for(int i = 0; i < voteRecords.size(); i ++){
             VoteRecord record = voteRecords.get(i);
             Transaction feeTrans = new Transaction();
-            feeTrans.setTime(ByteUtil.longToBytesNoLeadZeroes(System.currentTimeMillis()));
+            feeTrans.setTime((System.currentTimeMillis()+"").getBytes());
             feeTrans.setPayAddress(null);
             feeTrans.setExtarData(Constant.VOTER_TRANS_PROPORTION_EXTAR_DATA.getBytes());
             feeTrans.setBlockHeight(((prevBlock.getBlockHeight() + 1)+"").getBytes());
