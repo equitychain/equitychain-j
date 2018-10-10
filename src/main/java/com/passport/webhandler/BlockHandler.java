@@ -39,6 +39,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 @EnableAsync
@@ -59,6 +61,8 @@ public class BlockHandler {
     private TransactionStrategyContext transactionStrategyContext;
 
     public volatile boolean padding = false;
+
+    private Lock lock = new ReentrantLock();
 
     /**
      * 根据区块高度获取出块奖励，每年递减，第6年及以后奖励恒定
@@ -160,6 +164,7 @@ public class BlockHandler {
         Thread handlerThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                lock.lock();
                 dbAccess.transaction =dbAccess.rocksDB.beginTransaction(new WriteOptions());;
 
                 try{
@@ -210,6 +215,8 @@ public class BlockHandler {
                     padding = false;
                     //清空队列
                     Constant.BLOCK_QUEUE.clear();
+
+                    lock.unlock();
 
                     //继续同步下组区块
                     provider.publishEvent(new SyncNextBlockEvent(0L));
