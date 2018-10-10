@@ -232,9 +232,9 @@ public class AccountController {
 
     /**
      * 备份钱包
-     *
      * @param pwd
-     * @param walletPath
+     * @param address
+     * @param targePath
      * @return
      */
     @PostMapping("backupWallet")

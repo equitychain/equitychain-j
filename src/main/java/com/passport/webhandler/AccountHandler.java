@@ -142,7 +142,7 @@ public class AccountHandler {
                 //创建账户
                 Account account = generateAccount("123456");
                 dbAccess.putAccount(account);
-                accounts.add(new Account(account.getAddress(),account.getPrivateKey(), account.getBalance()));//不保存私钥
+                accounts.add(new Account(account.getAddress(),null, account.getBalance()));//不保存私钥
 
                 //创建注册为受托人交易
                 Transaction transaction = transactionHandler.generateTransaction(account.getAddress(), null, "0", "", account);
