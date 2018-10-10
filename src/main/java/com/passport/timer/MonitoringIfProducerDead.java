@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 监控出块人有没按时出块
@@ -44,6 +46,7 @@ public class MonitoringIfProducerDead {
     @Autowired
     private BlockHandler blockHandler;
 
+    private Lock lock = new ReentrantLock();
     @RocksTransaction
     public void monitor() throws InterruptedException {
         //已同步完成，切换到接收区块和流水广播状态
@@ -85,7 +88,6 @@ public class MonitoringIfProducerDead {
             timer.schedule ( new TimerTask( ) {
                 @Override
                 public void run() {
-                  dbAccess.transaction =  dbAccess.rocksDB.beginTransaction(new WriteOptions().setSync(true));
                     //已同步完成，切换到接收区块和流水广播状态
                     if (SyncFlag.isNextBlockSyncFlag()) {
                         return;
@@ -102,7 +104,8 @@ public class MonitoringIfProducerDead {
                     if (currentTimeStamp <= timeStamp + Constant.BLOCK_GENERATE_TIMEGAP * 1000) {
                         return;
                     }
-
+                    lock.lock();
+                    dbAccess.transaction =  dbAccess.rocksDB.beginTransaction(new WriteOptions().setSync(true));
                     //算出原本应该出块的账户，把这个账户从委托人中剔除
                     Long newBlockHeight = block.getBlockHeight();
                     int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
@@ -125,6 +128,8 @@ public class MonitoringIfProducerDead {
                             e1.printStackTrace();
                         }
                         e.printStackTrace();
+                    }finally {
+                        lock.unlock();
                     }
                 }
             }, 10000, 10000 );

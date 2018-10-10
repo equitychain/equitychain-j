@@ -51,7 +51,7 @@ public abstract class BaseDBAccess implements DBAccess {
                 dtoClasses.add(c);
             }
             try {
-                rocksDB = TransactionDB.open(new Options().setCreateIfMissing(true),new TransactionDBOptions().setWritePolicy(TxnDBWritePolicy.WRITE_PREPARED).setDefaultLockTimeout(10000).setTransactionLockTimeout(10000),dataDir);
+                rocksDB = TransactionDB.open(new Options().setCreateIfMissing(true),new TransactionDBOptions().setDefaultLockTimeout(10000).setTransactionLockTimeout(10000),dataDir);
                 //添加默认的列族
                 handleMap.put("default", rocksDB.getDefaultColumnFamily());
                 for (String field : fields) {
@@ -96,7 +96,7 @@ public abstract class BaseDBAccess implements DBAccess {
                 //打开数据库  加载旧列族,创建新列族
                 List<ColumnFamilyHandle> handleList = new ArrayList<>();
 //                rocksDB = OptimisticTransactionDB.open(new DBOptions().setCreateIfMissing(true), dataDir, curHasColumns, handleList);
-                rocksDB = TransactionDB.open(new DBOptions().setCreateIfMissing(true),new TransactionDBOptions().setWritePolicy(TxnDBWritePolicy.WRITE_PREPARED).setDefaultLockTimeout(10000).setTransactionLockTimeout(10000), dataDir, curHasColumns, handleList);
+                rocksDB = TransactionDB.open(new DBOptions().setCreateIfMissing(true),new TransactionDBOptions().setDefaultLockTimeout(10000).setTransactionLockTimeout(10000), dataDir, curHasColumns, handleList);
                 for(ColumnFamilyDescriptor descriptor : curDontHasColumns) {
                     ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
                     String name = new String(handle.getName());
