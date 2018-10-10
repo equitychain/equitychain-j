@@ -33,7 +33,7 @@ public class StrategyContext {
      * @param ctx
      * @param message
      */
-    @RocksTransaction
+
     public void handleMsgMain(ChannelHandlerContext ctx, NettyMessage.Message message) {
 //        System.out.println(message.getMessageType());
 //        System.out.println(message.getData().getDataType());

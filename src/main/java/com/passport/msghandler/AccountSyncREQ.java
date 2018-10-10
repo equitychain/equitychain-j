@@ -27,7 +27,7 @@ public class AccountSyncREQ extends Strategy {
     @Autowired
     private DBAccess dbAccess;
 
-
+    @RocksTransaction
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理账户同步请求数据：{}", GsonUtils.toJson(message));
 
