@@ -6,6 +6,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.protobuf.ByteString;
 import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
+import com.passport.constant.SyncFlag;
 import com.passport.core.*;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
@@ -17,6 +18,7 @@ import com.passport.listener.ApplicationContextProvider;
 import com.passport.proto.BlockHeaderMessage;
 import com.passport.proto.BlockMessage;
 import com.passport.proto.TransactionMessage;
+import com.passport.timer.MonitoringIfProducerDead;
 import com.passport.transactionhandler.TransactionStrategy;
 import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.BlockUtils;
@@ -406,6 +408,7 @@ public class BlockHandler {
             Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
             Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
             if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
+                MonitoringIfProducerDead.nextBlockFlag = false;
                 Account account = accountOptional.get();
                 if(account.getPrivateKey() != null){
                     //打包区块
@@ -415,6 +418,7 @@ public class BlockHandler {
                     trusteeHandler.changeStatus(trustee, blockCycle);
 
                     logger.info("第{}个区块出块成功", newBlockHeight);
+                    MonitoringIfProducerDead.nextBlockFlag = true;
                     provider.publishEvent(new GenerateNextBlockEvent(0L));
 //                    new Thread(new Runnable() {
 //                        @Override
