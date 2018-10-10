@@ -409,6 +409,7 @@ public class BlockHandler {
             Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
             if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
                 MonitoringIfProducerDead.nextBlockFlag = false;
+                SyncFlag.setNextBlockSyncFlag(false);
                 Account account = accountOptional.get();
                 if(account.getPrivateKey() != null){
                     //打包区块

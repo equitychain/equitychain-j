@@ -28,7 +28,7 @@ public class AccountListSyncRESP extends Strategy {
 
     @Autowired
     private DBAccess dbAccess;
-    @RocksTransaction
+
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理账户列表同步请求数据：{}", GsonUtils.toJson(message));
 
