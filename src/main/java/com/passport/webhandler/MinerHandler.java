@@ -91,31 +91,40 @@ public class MinerHandler {
         List<Transaction> blockTrans = transactionHandler.getBlockTrans(transactions,new BigDecimal(currentBlockHeader.getEggMax()));
         BigDecimal sumTransMoney = BigDecimal.ZERO;
         for(Transaction tran : blockTrans){
-            //矿工费付给矿工  注意!无论流水是否成功被打包该矿工费是必须给的,因为已经扣了,
-            Transaction feeTrans = new Transaction();
-            feeTrans.setTime((System.currentTimeMillis()+"").getBytes());
-            feeTrans.setPayAddress(null);
-            feeTrans.setExtarData(tran.getHash());
+            //矿工费
             BigDecimal valueDec = transactionHandler.getTempEggByHash(tran.getHash());
             valueDec = valueDec == null?BigDecimal.ZERO:valueDec;
-            //受托人获取确认流水矿工费的一定比例的奖励
-            feeTrans.setValue(String.valueOf(valueDec.multiply(BigDecimal.ONE.subtract(Constant.CONFIRM_TRANS_PROPORTION))).getBytes());
-            feeTrans.setBlockHeight(((prevBlock.getBlockHeight() + 1)+"").getBytes());
-            feeTrans.setReceiptAddress(minerAccount.getAddress().getBytes());
+            Optional<Account> account = dbAccess.getAccount(new String(tran.getPayAddress()));
+            if(!account.isPresent()){
+                continue;
+            }
+            Account acc = account.get();
+            //判断金额是否足够扣除矿工费
+            if(valueDec.add(new BigDecimal(new String(tran.getValue()))).compareTo(acc.getBalance()) <=  0) {
+                //矿工费付给矿工  注意!无论流水是否成功被打包该矿工费是必须给的,因为已经扣了,
+                Transaction feeTrans = new Transaction();
+                feeTrans.setTime((System.currentTimeMillis() + "").getBytes());
+                feeTrans.setPayAddress(null);
+                feeTrans.setExtarData(tran.getHash());
+                //受托人获取确认流水矿工费的一定比例的奖励
+                feeTrans.setValue(String.valueOf(valueDec.multiply(BigDecimal.ONE.subtract(Constant.CONFIRM_TRANS_PROPORTION))).getBytes());
+                feeTrans.setBlockHeight(((prevBlock.getBlockHeight() + 1) + "").getBytes());
+                feeTrans.setReceiptAddress(minerAccount.getAddress().getBytes());
 
-            //生成hash和生成签名sign使用的基础数据都应该一样
-            String tranJson = GsonUtils.toJson(feeTrans);
-            //计算交易hash
-            feeTrans.setHash(ECDSAUtil.applySha256(tranJson).getBytes());
-            feeTrans.setTradeType(TransactionTypeEnum.CONFIRM_REWARD.toString().getBytes());
+                //生成hash和生成签名sign使用的基础数据都应该一样
+                String tranJson = GsonUtils.toJson(feeTrans);
+                //计算交易hash
+                feeTrans.setHash(ECDSAUtil.applySha256(tranJson).getBytes());
+                feeTrans.setTradeType(TransactionTypeEnum.CONFIRM_REWARD.toString().getBytes());
 
-            tran.setBlockHeight(((prevBlock.getBlockHeight() + 1)+"").getBytes());
-            tran.setTime(feeTrans.getTime());
-            //添加奖励和需要确认的流水
-            currentBlock.getTransactions().add(feeTrans);
-            currentBlock.getTransactions().add(tran);
-            //计算分发的流水奖励金额的比例
-            sumTransMoney = sumTransMoney.add(valueDec.multiply(Constant.CONFIRM_TRANS_PROPORTION));
+                tran.setBlockHeight(((prevBlock.getBlockHeight() + 1) + "").getBytes());
+                tran.setTime(feeTrans.getTime());
+                //添加奖励和需要确认的流水
+                currentBlock.getTransactions().add(feeTrans);
+                currentBlock.getTransactions().add(tran);
+                //计算分发的流水奖励金额的比例
+                sumTransMoney = sumTransMoney.add(valueDec.multiply(Constant.CONFIRM_TRANS_PROPORTION));
+            }
         }
         long time = blockUtils.getTimestamp4BlockCycle(prevBlock.getBlockHeight() + 1);
         //获取受托人的投票记录  某个时间前的

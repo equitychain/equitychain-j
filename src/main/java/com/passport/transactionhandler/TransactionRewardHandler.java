@@ -43,7 +43,7 @@ public class TransactionRewardHandler extends TransactionStrategy {
                 if(!Constant.VOTER_TRANS_PROPORTION_EXTAR_DATA.equals(new String(transaction.getExtarData()))) {
                     BigDecimal valueBigDecimal = transactionHandler.getTempEggByHash(transaction.getExtarData());
                     if (valueBigDecimal == null ||
-                            reward.multiply(BigDecimal.ONE.subtract(
+                            reward.divide(BigDecimal.ONE.subtract(
                                     Constant.CONFIRM_TRANS_PROPORTION)).
                                     compareTo(valueBigDecimal) != 0) {//校验奖励金额未通过
                         return;

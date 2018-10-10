@@ -5,6 +5,7 @@ import com.passport.core.Account;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.utils.CastUtils;
+import com.passport.webhandler.TransactionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ public class TransferHandler extends TransactionStrategy {
 
     @Autowired
     private DBAccess dbAccess;
+    @Autowired
+    private TransactionHandler transactionHandler;
 
     @Override
     protected void handle(Transaction transaction) {
@@ -41,7 +44,9 @@ public class TransferHandler extends TransactionStrategy {
 
         BigDecimal valueBigDecimal = CastUtils.castBigDecimal(new String(transaction.getValue()));//交易金额
         Account payAddressAccount = payAddressOptional.get();
-        BigDecimal result = payAddressAccount.getBalance().subtract(valueBigDecimal);
+        BigDecimal valueDec = transactionHandler.getTempEggByHash(transaction.getHash());
+        valueDec = valueDec == null?BigDecimal.ZERO:valueDec;
+        BigDecimal result = payAddressAccount.getBalance().subtract(valueBigDecimal.add(valueDec));
         if(result.compareTo(new BigDecimal(0)) == -1){//余额不足
             return;
         }
