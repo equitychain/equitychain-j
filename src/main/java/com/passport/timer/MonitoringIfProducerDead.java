@@ -46,7 +46,7 @@ public class MonitoringIfProducerDead {
     @Autowired
     private BlockHandler blockHandler;
 
-    private Lock lock = new ReentrantLock();
+//    private Lock lock = new ReentrantLock();
     @RocksTransaction
     public void monitor() throws InterruptedException {
         //已同步完成，切换到接收区块和流水广播状态
@@ -104,7 +104,6 @@ public class MonitoringIfProducerDead {
                     if (currentTimeStamp <= timeStamp + Constant.BLOCK_GENERATE_TIMEGAP * 1000) {
                         return;
                     }
-                    lock.lock();
                     dbAccess.transaction =  dbAccess.rocksDB.beginTransaction(new WriteOptions().setSync(true));
                     //算出原本应该出块的账户，把这个账户从委托人中剔除
                     Long newBlockHeight = block.getBlockHeight();
@@ -128,8 +127,6 @@ public class MonitoringIfProducerDead {
                             e1.printStackTrace();
                         }
                         e.printStackTrace();
-                    }finally {
-                        lock.unlock();
                     }
                 }
             }, 10000, 10000 );

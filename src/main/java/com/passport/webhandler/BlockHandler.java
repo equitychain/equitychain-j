@@ -62,8 +62,6 @@ public class BlockHandler {
 
     public volatile boolean padding = false;
 
-    private Lock lock = new ReentrantLock();
-
     /**
      * 根据区块高度获取出块奖励，每年递减，第6年及以后奖励恒定
      * @param blockHeight
@@ -164,7 +162,6 @@ public class BlockHandler {
         Thread handlerThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                lock.lock();
                 dbAccess.transaction =dbAccess.rocksDB.beginTransaction(new WriteOptions());;
 
                 try{
@@ -215,8 +212,6 @@ public class BlockHandler {
                     padding = false;
                     //清空队列
                     Constant.BLOCK_QUEUE.clear();
-
-                    lock.unlock();
 
                     //继续同步下组区块
                     provider.publishEvent(new SyncNextBlockEvent(0L));

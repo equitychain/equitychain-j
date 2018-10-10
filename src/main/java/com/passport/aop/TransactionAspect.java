@@ -28,7 +28,7 @@ public class TransactionAspect {
     @Autowired
     BaseDBAccess dbAccess;
 
-    private Lock lock = new ReentrantLock();
+//    private Lock lock = new ReentrantLock();
 
     @Pointcut("@annotation(com.passport.annotations.RocksTransaction)")
     private void sig() {
@@ -36,7 +36,6 @@ public class TransactionAspect {
 
     @Before("sig()")//snapshot
     public void deBefore(JoinPoint joinPoint) throws Throwable {
-        lock.lock();
         dbAccess.transaction = dbAccess.rocksDB.beginTransaction(new WriteOptions());
         // 接收到请求，记录请求内容
 //        rocksdbTransaction.setSnapshot(rocksdbTransaction.getRocksDB().getSnapshot());
@@ -50,7 +49,6 @@ public class TransactionAspect {
     @AfterThrowing(value = "sig()", throwing = "e")//传到 after snapshot
     public void throwingMethod(Exception e) throws RocksDBException {
         dbAccess.transaction.rollback();
-        lock.unlock();
 //        System.err.println("--------------事务出错 开始回滚--------------"+e.getMessage());
 //        org.rocksdb.ReadOptions options = new org.rocksdb.ReadOptions();
 //        options.setSnapshot(rocksdbTransaction.getSnapshot());
@@ -80,7 +78,6 @@ public class TransactionAspect {
     @AfterReturning(returning = "ret", pointcut = "sig()")
     public void doAfterReturning(Object ret) throws Throwable {
         dbAccess.transaction.commit();
-        lock.unlock();
         //测试查询
 //        System.out.println("测试AfterReturning");
 ////        RocksDB rocksDB = baseDBAccess.getRocksDB();
