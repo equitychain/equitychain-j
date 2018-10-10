@@ -44,8 +44,8 @@ public class TransferHandler extends TransactionStrategy {
 
         BigDecimal valueBigDecimal = CastUtils.castBigDecimal(new String(transaction.getValue()));//交易金额
         Account payAddressAccount = payAddressOptional.get();
-        BigDecimal valueDec = transactionHandler.getTempEggByHash(transaction.getHash());
-        valueDec = valueDec == null?BigDecimal.ZERO:valueDec;
+        BigDecimal valueDec = new BigDecimal(new String(transaction.getEggUsed())).
+                multiply(new BigDecimal(new String(transaction.getEggPrice())));
         BigDecimal result = payAddressAccount.getBalance().subtract(valueBigDecimal.add(valueDec));
         if(result.compareTo(new BigDecimal(0)) == -1){//余额不足
             return;
