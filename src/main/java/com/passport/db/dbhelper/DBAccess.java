@@ -389,6 +389,13 @@ public interface DBAccess {
 	 */
 	String censesData() throws RocksDBException;
 
+	/**
+	 * 投票列表
+	 * @param address
+	 * @param pageCount
+	 * @param pageNumber
+	 * @return
+	 */
 	List<VoteRecord> votingRecord(String address,int pageCount, int pageNumber);
 	/**
 	 * 查询地址的流水总数
@@ -396,4 +403,5 @@ public interface DBAccess {
 	 * @return
 	 */
 	long getTransCountByAddress(String address) throws RocksDBException;
+	//根据地址和时间获取当时受托人的投票人集合
 }

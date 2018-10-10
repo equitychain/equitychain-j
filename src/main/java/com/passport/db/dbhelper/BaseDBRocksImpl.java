@@ -210,20 +210,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    public <T> List<T> seekByKey(String keyPrefix) {
-        ArrayList<T> ts = new ArrayList<>();
-        ReadOptions options = new ReadOptions();
-        options.setPrefixSameAsStart(true);
-        RocksIterator iterator = rocksDB.newIterator(options);
-        byte[] key = keyPrefix.getBytes();
-        for (iterator.seek(key); iterator.isValid(); iterator.next()) {
-            if (!new String(iterator.key()).startsWith(keyPrefix)) continue;
-            ts.add((T) SerializeUtils.unSerialize(iterator.value()));
-        }
-        return ts;
-    }
-
-    @Override
     public List<Account> listAccounts() {
         RocksIterator accountIter;
 //        if(transaction!=null){
@@ -744,19 +730,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    public <T> void addIndex(T t, IndexColumnNames columnNames,byte[] indexKey) {
-        try {
-//            System.out.println(getKeyValByDto(t));
-            removeIndexesKey(handleMap.get(columnNames.indexName),indexKey,getKeyValByDto(t));
-            putIndexesKey(handleMap.get(columnNames.indexName),indexKey,getKeyValByDto(t));
-
-            putOverAndNext(handleMap.get(columnNames.overAndNextName),indexKey);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
     public String censesData() throws RocksDBException {
         //获取当前最新高度，根据最新高度进行统计
         Optional lastHeightOpt = getLastBlockHeight();
@@ -848,4 +821,5 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         }
         return count;
     }
+
 }

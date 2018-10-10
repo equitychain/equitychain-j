@@ -1,6 +1,7 @@
 package com.passport.transactionhandler;
 
 import com.google.common.base.Optional;
+import com.passport.constant.Constant;
 import com.passport.core.Account;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
@@ -39,13 +40,17 @@ public class TransactionRewardHandler extends TransactionStrategy {
             Optional<Account> accountOptional = dbAccess.getAccount(new String(transaction.getReceiptAddress()));
             if (accountOptional.isPresent()) {
                 BigDecimal reward = new BigDecimal(new String(transaction.getValue()));
-                BigDecimal valueBigDecimal = transactionHandler.getTempEggByHash(transaction.getExtarData());
-                if (valueBigDecimal == null || reward.compareTo(valueBigDecimal) != 0) {//校验奖励金额未通过
-                    return;
+                if(!Constant.VOTER_TRANS_PROPORTION_EXTAR_DATA.equals(new String(transaction.getExtarData()))) {
+                    BigDecimal valueBigDecimal = transactionHandler.getTempEggByHash(transaction.getExtarData());
+                    if (valueBigDecimal == null ||
+                            reward.multiply(BigDecimal.ONE.subtract(
+                                    Constant.CONFIRM_TRANS_PROPORTION)).
+                                    compareTo(valueBigDecimal) != 0) {//校验奖励金额未通过
+                        return;
+                    }
                 }
-
                 Account account = accountOptional.get();
-                account.setBalance(account.getBalance().add(valueBigDecimal));
+                account.setBalance(account.getBalance().add(reward));
                 dbAccess.putAccount(account);
             }
         }

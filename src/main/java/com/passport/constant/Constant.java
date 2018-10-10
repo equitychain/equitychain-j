@@ -61,4 +61,10 @@ public interface Constant {
   int INDEX_GROUPSIZE = 1000;
   //主币
   String MAIN_COIN = "BCP";
+  //投票人奖励流水判断标记
+  String VOTER_TRANS_PROPORTION_EXTAR_DATA = "voter trans proportion extarData";
+  //投票人奖励比例
+  BigDecimal CONFIRM_TRANS_PROPORTION = new BigDecimal("0.2");
+  //投票人奖励精度
+  int PROPORTION_ACCURACY = 8;
 }

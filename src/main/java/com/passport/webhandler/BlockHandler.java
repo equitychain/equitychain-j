@@ -183,7 +183,7 @@ public class BlockHandler {
                                             try {
                                                 dbAccess.addIndex(transaction, IndexColumnNames.TRANSTIMEINDEX,transaction.getTime());
                                                 dbAccess.addIndex(transaction,IndexColumnNames.TRANSBLOCKHEIGHTINDEX,transaction.getBlockHeight());
-                                            } catch (IllegalAccessException e) {
+                                            } catch (Exception e) {
                                                 e.printStackTrace();
                                             }
                                             dbAccess.putConfirmTransaction(transaction);
