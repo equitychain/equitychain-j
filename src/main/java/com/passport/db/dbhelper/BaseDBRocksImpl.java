@@ -174,7 +174,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 objByt = rocksDB.get(key.getBytes());
             }
             if (objByt != null) {
-              return Optional.of(SerializeUtils.unSerialize(objByt));
+               return Optional.of(SerializeUtils.unSerialize(objByt));
             }
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -406,8 +406,10 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public boolean putTrustee(Trustee trustee) {
         try {
             addObj(trustee);
+            removeIndexesKey(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName),
+                    (trustee.getVotes() + "").getBytes(), trustee.getAddress().getBytes());
             //添加索引
-            putSuoyinKey(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName),
+            putIndexesKey(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.indexName),
                     (trustee.getVotes() + "").getBytes(), trustee.getAddress().getBytes());
             putOverAndNext(handleMap.get(IndexColumnNames.TRUSTEEVOTESINDEX.overAndNextName),
                     (trustee.getVotes() + "").getBytes());
@@ -446,7 +448,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public boolean putVoter(Voter voter) {
         try {
             addObj(voter);
-            putSuoyinKey(handleMap.get(IndexColumnNames.VOTERNUMBEROFVOTE.indexName),
+            removeIndexesKey(handleMap.get(IndexColumnNames.VOTERNUMBEROFVOTE.indexName),
+                    voter.getVoteNum().toString().getBytes(), voter.getAddress().getBytes());
+            putIndexesKey(handleMap.get(IndexColumnNames.VOTERNUMBEROFVOTE.indexName),
                     voter.getVoteNum().toString().getBytes(), voter.getAddress().getBytes());
             putOverAndNext(handleMap.get(IndexColumnNames.VOTERNUMBEROFVOTE.overAndNextName),
                     voter.getVoteNum().toString().getBytes());
@@ -515,11 +519,15 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         try {
             voteRecord.setId();
             addObj(voteRecord);
-            putSuoyinKey(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName),
+            removeIndexesKey(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName),
+                    voteRecord.getVoteNum().toString().getBytes(), voteRecord.getId().getBytes());
+            putIndexesKey(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.indexName),
                     voteRecord.getVoteNum().toString().getBytes(), voteRecord.getId().getBytes());
             putOverAndNext(handleMap.get(IndexColumnNames.VOTERECORDVOTENUMBER.overAndNextName),
                     voteRecord.getVoteNum().toString().getBytes());
-            putSuoyinKey(handleMap.get(IndexColumnNames.VOTERECORDTIME.indexName),
+            removeIndexesKey(handleMap.get(IndexColumnNames.VOTERECORDTIME.indexName),
+                    voteRecord.getTime().toString().getBytes(),voteRecord.getId().getBytes());
+            putIndexesKey(handleMap.get(IndexColumnNames.VOTERECORDTIME.indexName),
                     voteRecord.getTime().toString().getBytes(),voteRecord.getId().getBytes());
             putOverAndNext(handleMap.get(IndexColumnNames.VOTERECORDTIME.overAndNextName),voteRecord.getTime().toString().getBytes());
             return true;
@@ -739,7 +747,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public <T> void addIndex(T t, IndexColumnNames columnNames,byte[] indexKey) {
         try {
 //            System.out.println(getKeyValByDto(t));
-            putSuoyinKey(handleMap.get(columnNames.indexName),indexKey,getKeyValByDto(t));
+            removeIndexesKey(handleMap.get(columnNames.indexName),indexKey,getKeyValByDto(t));
+            putIndexesKey(handleMap.get(columnNames.indexName),indexKey,getKeyValByDto(t));
 
             putOverAndNext(handleMap.get(columnNames.overAndNextName),indexKey);
         } catch (Exception e) {
