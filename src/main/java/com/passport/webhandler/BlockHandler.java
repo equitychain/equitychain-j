@@ -162,7 +162,7 @@ public class BlockHandler {
         Thread handlerThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                dbAccess.transaction =dbAccess.rocksDB.beginTransaction(new WriteOptions());;
+//                dbAccess.transaction =dbAccess.rocksDB.beginTransaction(new WriteOptions());;
 
                 try{
                     //todo 校验 目前是获取相同的区块高度
@@ -199,13 +199,13 @@ public class BlockHandler {
                             break;
                         }
                     }
-                    dbAccess.transaction.commit();
+//                    dbAccess.transaction.commit();
                 }catch (Exception e){
-                    try {
-                        dbAccess.transaction.rollback();
-                    } catch (RocksDBException e1) {
-                        e1.printStackTrace();
-                    }
+//                    try {
+//                        dbAccess.transaction.rollback();
+//                    } catch (RocksDBException e1) {
+//                        e1.printStackTrace();
+//                    }
                     logger.warn("synchronization block error", e);
                 }finally {
                     //更改状态

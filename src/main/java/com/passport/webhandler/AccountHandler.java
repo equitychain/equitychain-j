@@ -57,7 +57,7 @@ public class AccountHandler {
     public void test() throws RocksDBException {
 //        System.out.println(new String(dbAccess.rocksDB.get("gg0".getBytes())));
         for (int i = 0; i < 10; i++) {
-            dbAccess.transaction.put(("gg" + i).getBytes(), (i + "_aaa").getBytes());
+//            dbAccess.transaction.put(("gg" + i).getBytes(), (i + "_aaa").getBytes());
 
 
 //            dbAccess.transaction.put(("gg" + i).getBytes(), (i + "_g").getBytes());

@@ -104,7 +104,7 @@ public class MonitoringIfProducerDead {
                     if (currentTimeStamp <= timeStamp + Constant.BLOCK_GENERATE_TIMEGAP * 1000) {
                         return;
                     }
-                    dbAccess.transaction =  dbAccess.rocksDB.beginTransaction(new WriteOptions().setSync(true));
+//                    dbAccess.transaction =  dbAccess.rocksDB.beginTransaction(new WriteOptions().setSync(true));
                     //算出原本应该出块的账户，把这个账户从委托人中剔除
                     Long newBlockHeight = block.getBlockHeight();
                     int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
@@ -118,14 +118,14 @@ public class MonitoringIfProducerDead {
                     //再次选出出块账户
                     try {
                         blockHandler.produceNextBlock();
-                        dbAccess.transaction.commit();
+//                        dbAccess.transaction.commit();
                         System.out.println();
                     } catch (Exception e) {
-                        try {
-                            dbAccess.transaction.rollback();
-                        } catch (RocksDBException e1) {
-                            e1.printStackTrace();
-                        }
+//                        try {
+//                            dbAccess.transaction.rollback();
+//                        } catch (RocksDBException e1) {
+//                            e1.printStackTrace();
+//                        }
                         e.printStackTrace();
                     }
                 }

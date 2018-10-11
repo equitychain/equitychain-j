@@ -27,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class BaseDBAccess implements DBAccess {
     ThreadPoolExecutor executor = new ThreadPoolExecutor(100, 100, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1000));
-    public Transaction transaction;
     public TransactionDB rocksDB;
     @Value("${db.dataDir}")
     private String dataDir;
@@ -51,7 +50,12 @@ public abstract class BaseDBAccess implements DBAccess {
                 dtoClasses.add(c);
             }
             try {
-                rocksDB = TransactionDB.open(new Options().setCreateIfMissing(true),new TransactionDBOptions().setDefaultLockTimeout(10000).setTransactionLockTimeout(10000),dataDir);
+                Options options = new Options();
+                options.setWalTtlSeconds(0).setWalSizeLimitMB(0).setCreateIfMissing(true);
+                Env env = options.getEnv();
+                env.setBackgroundThreads(10,Env.COMPACTION_POOL);
+                options.setEnv(env);
+                rocksDB = TransactionDB.open(options,new TransactionDBOptions().setDefaultLockTimeout(10000).setTransactionLockTimeout(10000),dataDir);
                 //添加默认的列族
                 handleMap.put("default", rocksDB.getDefaultColumnFamily());
                 for (String field : fields) {
@@ -1214,7 +1218,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public boolean put(byte[] key, byte[] value) {
         boolean res = false;
         try {
-            transaction.put(key, value);
+            rocksDB.put(key, value);
             res = true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -1226,7 +1230,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public boolean putByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle, byte[] key, byte[] value) {
         boolean res = false;
         try {
-            transaction.put(columnFamilyHandle, key, value);
+            rocksDB.put(columnFamilyHandle, key, value);
             res = true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -1249,7 +1253,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public byte[] getByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         byte[] res = null;
         try {
-            res = transaction.get(columnFamilyHandle,new ReadOptions(), key);
+            res = rocksDB.get(columnFamilyHandle,new ReadOptions(), key);
         } catch (RocksDBException e) {
             e.printStackTrace();
         }
@@ -1260,7 +1264,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public boolean delete(byte[] key) {
         boolean res = false;
         try {
-            transaction.delete(key);
+            rocksDB.delete(key);
             res = true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -1272,7 +1276,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public boolean deleteByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         boolean res = false;
         try {
-            transaction.delete(columnFamilyHandle, key);
+            rocksDB.delete(columnFamilyHandle, key);
             res = true;
         } catch (RocksDBException e) {
             e.printStackTrace();

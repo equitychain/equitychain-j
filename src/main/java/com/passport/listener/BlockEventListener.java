@@ -75,7 +75,7 @@ public class BlockEventListener {
             }
             if (blockHeight == 0) {
                 //创建创世块
-                dbAccess.transaction = dbAccess.rocksDB.beginTransaction(new WriteOptions());
+//                dbAccess.transaction = dbAccess.rocksDB.beginTransaction(new WriteOptions());
                 try {
                     Block block = createGenesisBlock();
                     blockHeight = block.getBlockHeight();
@@ -84,9 +84,9 @@ public class BlockEventListener {
                     dbAccess.putBlock(block);
                     //保存区块高度到本地
                     dbAccess.putLastBlockHeight(blockHeight);
-                    dbAccess.transaction.commit();
+//                    dbAccess.transaction.commit();
                 } catch (Exception e) {
-                    dbAccess.transaction.rollback();
+//                    dbAccess.transaction.rollback();
                 }
 
             }

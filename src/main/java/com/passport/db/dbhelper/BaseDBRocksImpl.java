@@ -74,7 +74,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         ColumnFamilyHandle handle = handleMap.get(getColName("block", "blockHeight"));
         RocksIterator heightIter;
 //        if (transaction != null) {
-            heightIter = transaction.getIterator(new ReadOptions(),handle);
+            heightIter = rocksDB.newIterator(handle);
 //        }else{
 //        heightIter = rocksDB.newIterator(handle);
 //        }
@@ -144,7 +144,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public boolean putNodeList(List<String> nodes) {
         try {
 
-            transaction.put(CLIENT_NODES_LIST_KEY.getBytes(), SerializeUtils.serialize(nodes));
+            rocksDB.put(CLIENT_NODES_LIST_KEY.getBytes(), SerializeUtils.serialize(nodes));
             return true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -156,7 +156,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public boolean put(String key, Object value) {
         try {
             KeysSet.add(key);//存储key到文件
-            transaction.put(key.getBytes(), SerializeUtils.serialize(value));
+            rocksDB.put(key.getBytes(), SerializeUtils.serialize(value));
             return true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -168,11 +168,11 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public Optional<Object> get(String key) {
         try {
             byte[] objByt = rocksDB.get(key.getBytes());
-            if(transaction!=null){
-                objByt = transaction.get(new ReadOptions(),key.getBytes());
-            }else{
+//            if(rocksDB!=null){
+//                objByt = rocksDB.get(new ReadOptions(),key.getBytes());
+//            }else{
                 objByt = rocksDB.get(key.getBytes());
-            }
+//            }
             if (objByt != null) {
                return Optional.of(SerializeUtils.unSerialize(objByt));
             }
@@ -201,7 +201,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public boolean delete(String key) {
         try {
-            transaction.delete(key.getBytes());
+            rocksDB.delete(key.getBytes());
             return true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -319,8 +319,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     public List<Transaction> listUnconfirmTransactions() {
-        if (transaction.isDeadlockDetect()) {
-        }
+//        if (transaction.isDeadlockDetect()) {
+//        }
         RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("transaction", "hash")));
         List<Transaction> transactions = new ArrayList<>();
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
