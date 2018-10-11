@@ -185,7 +185,7 @@ public class BlockHandler {
                                             try {
                                                 dbAccess.addIndex(transaction, IndexColumnNames.TRANSTIMEINDEX,transaction.getTime());
                                                 dbAccess.addIndex(transaction,IndexColumnNames.TRANSBLOCKHEIGHTINDEX,transaction.getBlockHeight());
-                                            } catch (IllegalAccessException e) {
+                                            } catch (Exception e) {
                                                 e.printStackTrace();
                                             }
                                             dbAccess.putConfirmTransaction(transaction);
@@ -411,7 +411,7 @@ public class BlockHandler {
             Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
             if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
                 MonitoringIfProducerDead.nextBlockFlag = false;
-                SyncFlag.setNextBlockSyncFlag(false);
+//                SyncFlag.setNextBlockSyncFlag(false);
                 Account account = accountOptional.get();
                 if(account.getPrivateKey() != null){
                     //打包区块

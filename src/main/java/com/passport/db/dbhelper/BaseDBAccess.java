@@ -760,7 +760,10 @@ public abstract class BaseDBAccess implements DBAccess {
      * @return
      * @throws Exception
      */
-    public <T> List<T> getDtoListByField(List<String> fields, List<byte[]> values, List<Integer> screenTypes, Class<T> tClass, ColumnFamilyHandle overAndNextHandle, ColumnFamilyHandle indexHandle, ColumnFamilyHandle orderByFieldHandle, int orderByType) throws Exception {
+    public <T> List<T> getDtoListByField(List<String> fields, List<byte[]> values,
+                                         List<Integer> screenTypes, Class<T> tClass,
+                                         ColumnFamilyHandle overAndNextHandle, ColumnFamilyHandle indexHandle,
+                                         ColumnFamilyHandle orderByFieldHandle, int orderByType) throws Exception {
         String className = getClassNameByClass(tClass);
         int flushSize = 300;
         //段判断筛选的字和字段对应的值是否匹配
@@ -871,7 +874,6 @@ public abstract class BaseDBAccess implements DBAccess {
                 long t1 = System.currentTimeMillis();
                 String[] paixuHeight = longOrder(heightList, orderByFieldHandle);
                 long t2 = System.currentTimeMillis();
-                System.out.println("==========================time:" + (t2 - t1));
                 String keyFiledName = getKeyFieldByClass(tClass);
                 for (String heightByt : paixuHeight) {
                     T tObj = getObj(keyFiledName, heightByt, tClass);
@@ -1198,22 +1200,6 @@ public abstract class BaseDBAccess implements DBAccess {
         return result;
     }
 
-    public byte[][] longOrderByListSort(Set<byte[]> longBytes, ColumnFamilyHandle orderbyHandle) throws RocksDBException {
-        byte[][] result = new byte[longBytes.size()][];
-        List<byte[]> tempList = new ArrayList(longBytes);
-        tempList.sort(new Comparator() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                byte[] ob1 = (byte[]) o1;
-                byte[] ob2 = (byte[]) o2;
-                long height1 = Long.parseLong(new String(getByColumnFamilyHandle(orderbyHandle, ob1)));
-                long height2 = Long.parseLong(new String(getByColumnFamilyHandle(orderbyHandle, ob2)));
-                return height1 > height2 ? 1 : 0;
-            }
-        });
-        return tempList.toArray(result);
-    }
-
     @Override
     public boolean put(byte[] key, byte[] value) {
         boolean res = false;
@@ -1314,5 +1300,31 @@ public abstract class BaseDBAccess implements DBAccess {
         setSnapshot(null);
 
     }
+
     // transaction end
+    @Override
+    public <T> void addIndex(T t, IndexColumnNames columnNames,byte[] indexKey) {
+        try {
+//            System.out.println(getKeyValByDto(t));
+            removeIndexesKey(handleMap.get(columnNames.indexName),indexKey,getKeyValByDto(t));
+            putIndexesKey(handleMap.get(columnNames.indexName),indexKey,getKeyValByDto(t));
+
+            putOverAndNext(handleMap.get(columnNames.overAndNextName),indexKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @Override
+    public <T> List<T> seekByKey(String keyPrefix) {
+        ArrayList<T> ts = new ArrayList<>();
+        ReadOptions options = new ReadOptions();
+        options.setPrefixSameAsStart(true);
+        RocksIterator iterator = rocksDB.newIterator(options);
+        byte[] key = keyPrefix.getBytes();
+        for (iterator.seek(key); iterator.isValid(); iterator.next()) {
+            if (!new String(iterator.key()).startsWith(keyPrefix)) continue;
+            ts.add((T) SerializeUtils.unSerialize(iterator.value()));
+        }
+        return ts;
+    }
 }
