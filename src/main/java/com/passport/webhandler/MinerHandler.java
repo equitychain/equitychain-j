@@ -1,6 +1,7 @@
 package com.passport.webhandler;
 
 import com.google.common.base.Optional;
+import com.passport.annotations.RocksTransaction;
 import com.passport.core.Account;
 import com.passport.core.Block;
 import com.passport.core.BlockHeader;

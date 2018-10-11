@@ -1,6 +1,7 @@
 package com.passport.msghandler;
 
 import com.google.common.base.Optional;
+import com.passport.annotations.RocksTransaction;
 import com.passport.core.Block;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.proto.*;
@@ -27,6 +28,7 @@ public class NextBlockSyncREQ extends Strategy {
     @Autowired
     private BlockHandler blockHdandler;
 
+    @RocksTransaction
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块同步请求数据：{}", GsonUtils.toJson(message));
 
