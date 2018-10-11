@@ -10,6 +10,7 @@ import com.passport.proto.DataTypeEnum;
 import com.passport.proto.MessageTypeEnum;
 import com.passport.proto.NettyData;
 import com.passport.proto.NettyMessage;
+import com.passport.timer.MonitoringIfProducerDead;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.HttpUtils;
 import com.passport.zookeeper.ServiceRegistry;
@@ -61,6 +62,8 @@ public class Connector implements InitializingBean {
         }
     }
 
+    @Autowired
+    MonitoringIfProducerDead monitoringIfProducerDead;
     //启动的时候自动开始区块同步
     @EventListener(ApplicationReadyEvent.class)
     public void syncNextBlock() {
@@ -75,6 +78,8 @@ public class Connector implements InitializingBean {
 
         try {
             TimeUnit.MILLISECONDS.sleep(3000);
+
+            monitoringIfProducerDead.checkBlock();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

@@ -1,5 +1,6 @@
 package com.passport.msghandler;
 
+import com.passport.annotations.RocksTransaction;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Block;
 import com.passport.db.dbhelper.DBAccess;
@@ -33,6 +34,7 @@ public class NextBlockSyncRESP extends Strategy {
     @Autowired
     private BlockHandler blockHandler;
     @Override
+    @RocksTransaction
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块同步响应结果：{}", GsonUtils.toJson(message));
         if(blockHandler.padding){

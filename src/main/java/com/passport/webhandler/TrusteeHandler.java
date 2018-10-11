@@ -1,6 +1,7 @@
 package com.passport.webhandler;
 
 import com.google.common.base.Optional;
+import com.passport.annotations.RocksTransaction;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.utils.BlockUtils;
