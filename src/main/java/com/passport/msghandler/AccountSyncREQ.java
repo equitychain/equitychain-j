@@ -1,6 +1,7 @@
 package com.passport.msghandler;
 
 import com.google.common.base.Optional;
+import com.passport.annotations.RocksTransaction;
 import com.passport.core.Account;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.proto.AccountMessage;
@@ -26,6 +27,7 @@ public class AccountSyncREQ extends Strategy {
     @Autowired
     private DBAccess dbAccess;
 
+    @RocksTransaction
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理账户同步请求数据：{}", GsonUtils.toJson(message));
 

@@ -41,7 +41,7 @@ public class BlockUtils {
         int blockCycle = getBlockCycle(blockHeight);
         //第一个出块周期以创世块的投票记录为依据，每个出块周期的投票截止时间计算公式：（周期数-1）*101*10+创世时间
         long timeGapSecond = (blockCycle - 1) * Constant.TRUSTEES_INIT_NUM * Constant.BLOCK_GENERATE_TIMEGAP * 1000;
-        Optional<Block> block = dbAccess.getBlock(1);
+        Optional<Block> block = dbAccess.getBlock(blockHeight-1);
         if(block.isPresent()){
             Block block1 = block.get();
             BlockHeader handler = block1.getBlockHeader();
@@ -58,7 +58,7 @@ public class BlockUtils {
      * @return
      */
     public Trustee randomPickBlockProducer(List<Trustee> trustees, long blockHeight){
-        Long index = blockHeight * 100 % trustees.size();
+        Long index = blockHeight * (Constant.TRUSTEES_INIT_NUM-1) % trustees.size();
         return trustees.get(index.intValue());
     }
 }
