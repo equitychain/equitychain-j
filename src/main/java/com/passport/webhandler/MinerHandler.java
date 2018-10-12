@@ -95,6 +95,16 @@ public class MinerHandler {
         List<Transaction> transactions = dbAccess.listUnconfirmTransactions();
         List<Transaction> blockTrans = transactionHandler.getBlockTrans(transactions,new BigDecimal(currentBlockHeader.getEggMax()));
         BigDecimal sumTransMoney = BigDecimal.ZERO;
+        long time = blockUtils.getTimestamp4BlockCycle(prevBlock.getBlockHeight() + 1);
+        //获取受托人的投票记录  某个时间前的
+        List<VoteRecord> voteRecords = dbAccess.listVoteRecords(minerAccount.getAddress(),
+                "receiptAddress",time,2);
+        for(int i = 0; i < voteRecords.size(); i ++){
+            VoteRecord record = voteRecords.get(i);
+            if(record.getPayAddress() == null || "".equals(record.getPayAddress())) {
+                voteRecords.remove(record);
+            }
+        }
         for(Transaction tran : blockTrans){
             //矿工费
             BigDecimal valueDec = transactionHandler.getTempEggByHash(tran.getHash());
@@ -111,8 +121,8 @@ public class MinerHandler {
                 feeTrans.setTime((System.currentTimeMillis() + "").getBytes());
                 feeTrans.setPayAddress(null);
                 feeTrans.setExtarData(tran.getHash());
-                //受托人获取确认流水矿工费的一定比例的奖励
-                feeTrans.setValue(String.valueOf(valueDec.multiply(BigDecimal.ONE.subtract(Constant.CONFIRM_TRANS_PROPORTION))).getBytes());
+                //受托人获取确认流水矿工费的一定比例的奖励  如果投票人没有则全额奖励给受托人
+                feeTrans.setValue(String.valueOf(voteRecords.size()==0?valueDec:valueDec.multiply(BigDecimal.ONE.subtract(Constant.CONFIRM_TRANS_PROPORTION))).getBytes());
                 feeTrans.setBlockHeight(((prevBlock.getBlockHeight() + 1) + "").getBytes());
                 feeTrans.setReceiptAddress(minerAccount.getAddress().getBytes());
 
@@ -131,31 +141,29 @@ public class MinerHandler {
                 sumTransMoney = sumTransMoney.add(valueDec.multiply(Constant.CONFIRM_TRANS_PROPORTION));
             }
         }
-        long time = blockUtils.getTimestamp4BlockCycle(prevBlock.getBlockHeight() + 1);
-        //获取受托人的投票记录  某个时间前的
-        List<VoteRecord> voteRecords = dbAccess.listVoteRecords(minerAccount.getAddress(),
-                "receiptAddress",time,2);
-        //计算每个投票人应该获得多少奖励
-        BigDecimal voterReward = sumTransMoney.divide(new BigDecimal(voteRecords.size()),Constant.PROPORTION_ACCURACY,BigDecimal.ROUND_DOWN);
-        //差值计算
-        BigDecimal diffReward = sumTransMoney.subtract(voterReward.multiply(new BigDecimal(voteRecords.size())));
-        for(int i = 0; i < voteRecords.size(); i ++){
-            VoteRecord record = voteRecords.get(i);
-            Transaction feeTrans = new Transaction();
-            feeTrans.setTime((System.currentTimeMillis()+"").getBytes());
-            feeTrans.setPayAddress(null);
-            feeTrans.setExtarData(Constant.VOTER_TRANS_PROPORTION_EXTAR_DATA.getBytes());
-            feeTrans.setBlockHeight(((prevBlock.getBlockHeight() + 1)+"").getBytes());
-            if(i != voteRecords.size()-1) {
-                feeTrans.setValue(String.valueOf(voterReward).getBytes());
-            }else{
-                feeTrans.setValue(String.valueOf(voterReward.add(diffReward)).getBytes());
+        if(voteRecords.size()!=0){
+            //计算每个投票人应该获得多少奖励
+            BigDecimal voterReward = sumTransMoney.divide(new BigDecimal(voteRecords.size()), Constant.PROPORTION_ACCURACY, BigDecimal.ROUND_DOWN);
+            //差值计算
+            BigDecimal diffReward = sumTransMoney.subtract(voterReward.multiply(new BigDecimal(voteRecords.size())));
+            for (int i = 0; i < voteRecords.size(); i++) {
+                VoteRecord record = voteRecords.get(i);
+                Transaction feeTrans = new Transaction();
+                feeTrans.setTime((System.currentTimeMillis() + "").getBytes());
+                feeTrans.setPayAddress(null);
+                feeTrans.setExtarData(Constant.VOTER_TRANS_PROPORTION_EXTAR_DATA.getBytes());
+                feeTrans.setBlockHeight(((prevBlock.getBlockHeight() + 1) + "").getBytes());
+                if (i != voteRecords.size() - 1) {
+                    feeTrans.setValue(String.valueOf(voterReward).getBytes());
+                } else {
+                    feeTrans.setValue(String.valueOf(voterReward.add(diffReward)).getBytes());
+                }
+                feeTrans.setReceiptAddress(record.getPayAddress().getBytes());
+                String tranJson = GsonUtils.toJson(feeTrans);
+                feeTrans.setHash(ECDSAUtil.applySha256(tranJson).getBytes());
+                feeTrans.setTradeType(TransactionTypeEnum.CONFIRM_REWARD.toString().getBytes());
+                currentBlock.getTransactions().add(feeTrans);
             }
-            feeTrans.setReceiptAddress(record.getPayAddress().getBytes());
-            String tranJson = GsonUtils.toJson(feeTrans);
-            feeTrans.setHash(ECDSAUtil.applySha256(tranJson).getBytes());
-            feeTrans.setTradeType(TransactionTypeEnum.CONFIRM_REWARD.toString().getBytes());
-            currentBlock.getTransactions().add(feeTrans);
         }
         //执行流水
         transactionHandler.exec(currentBlock.getTransactions());

@@ -97,7 +97,6 @@ public class TransactionController {
             transactionDto.setFee(fee);
             transactionDto.setTokenName(Constant.MAIN_COIN);
             transactionsDto.add(transactionDto);
-            transactionsDto.add(transactionDto);
         }
         Map resultMap = new HashMap();
         resultMap.put("transactionList", transactionsDto);
