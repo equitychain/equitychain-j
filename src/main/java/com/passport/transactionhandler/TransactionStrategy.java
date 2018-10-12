@@ -25,6 +25,6 @@ public abstract class TransactionStrategy {
 
     protected abstract void handle(Transaction transaction);
     protected BigDecimal getFee(Transaction transaction){
-        return CastUtils.castBigDecimal(transaction.getEggUsed()).multiply(CastUtils.castBigDecimal(transaction.getEggPrice()));
+        return new BigDecimal(new String(transaction.getEggUsed())).multiply(new BigDecimal(new String(transaction.getEggPrice())));
     }
 }
