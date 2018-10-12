@@ -25,7 +25,9 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 处理
@@ -105,17 +107,34 @@ public class MinerHandler {
                 voteRecords.remove(record);
             }
         }
+        Map<String, BigDecimal> tempBalances = new HashMap<>();
         for(Transaction tran : blockTrans){
             //矿工费
             BigDecimal valueDec = transactionHandler.getTempEggByHash(tran.getHash());
             valueDec = valueDec == null?BigDecimal.ZERO:valueDec;
-            Optional<Account> account = dbAccess.getAccount(new String(tran.getPayAddress()));
-            if(!account.isPresent()){
-                continue;
+            String payAddr = new String(tran.getPayAddress());
+            if(!tempBalances.containsKey(payAddr)) {
+                Optional<Account> account = dbAccess.getAccount(payAddr);
+                if (!account.isPresent()) {
+                    continue;
+                }
+                Account acc = account.get();
+                BigDecimal tempBalance = acc.getBalance();
+                tempBalances.put(payAddr,tempBalance);
             }
-            Account acc = account.get();
-            //判断金额是否足够扣除矿工费
-            if(valueDec.add(new BigDecimal(new String(tran.getValue()))).compareTo(acc.getBalance()) <=  0) {
+
+            //判断金额是否足够扣除矿工费  如果是投票流水只需要足够支付矿工费即可
+            BigDecimal curTotalPay = valueDec.add(new BigDecimal(new String(tran.getValue())));
+            String tradeType = new String(tran.getTradeType());
+            //投票流水和撤销投票人流水不需要扣除balance的value，只需要扣除fee
+            boolean canSubVal = "VOTE".equals(tradeType)||"VOTER_CANNEL".equals(tradeType);
+            if(curTotalPay.compareTo(tempBalances.get(payAddr)) <=  0 ||
+                    (tran.getTradeType() != null && canSubVal
+                            && valueDec.compareTo(tempBalances.get(payAddr)) <=0)) {
+                //累计扣除相关金额进行暂时缓存用于判断资金够不够
+                tempBalances.put(payAddr,canSubVal?
+                        tempBalances.get(payAddr).subtract(valueDec):
+                        tempBalances.get(payAddr).subtract(curTotalPay));
                 //矿工费付给矿工  注意!无论流水是否成功被打包该矿工费是必须给的,因为已经扣了,
                 Transaction feeTrans = new Transaction();
                 feeTrans.setTime((System.currentTimeMillis() + "").getBytes());

@@ -35,7 +35,7 @@ public class TrusteeRegisterHandler extends TransactionStrategy {
             if (accountOptional.isPresent()) {
                 Account account = accountOptional.get();
                 BigDecimal balance = account.getBalance();
-                BigDecimal result = balance.subtract(Constant.FEE_4_REGISTER_TRUSTEE);
+                BigDecimal result = balance.subtract(Constant.FEE_4_REGISTER_TRUSTEE.add(getFee(transaction)));
                 if (result.compareTo(new BigDecimal(0)) != -1) {
                     //加入到委托人列表中，如之前存在则覆盖原来记录
                     boolean flag = dbAccess.putTrustee(new Trustee(payAddress, 0L, 0F, new BigDecimal(0), 1));

@@ -2,15 +2,14 @@ package com.passport.transactionhandler;
 
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
-import com.passport.core.Transaction;
-import com.passport.core.Trustee;
-import com.passport.core.VoteRecord;
-import com.passport.core.Voter;
+import com.passport.core.*;
 import com.passport.db.dbhelper.DBAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 
 /**
  * 普通用户投票
@@ -33,6 +32,11 @@ public class VoteHandler extends TransactionStrategy {
         if(!voterOptional.isPresent() || voterOptional.get().getStatus() == 0){
             return;
         }
+        Optional<Account> accountOptional = dbAccess.getAccount(payAddress);
+        if(!accountOptional.isPresent()){
+            return;
+        }
+        Account account = accountOptional.get();
         Voter voter = voterOptional.get();
         if(voter.getVoteNum() < 1){
             return;
@@ -52,6 +56,12 @@ public class VoteHandler extends TransactionStrategy {
         voter.setVoteNum(voter.getVoteNum()-1);
         //受托人增加持票
         trustee.setVotes(trustee.getVotes()+1);
+        //扣除矿工费
+        account.setBalance(account.getBalance().subtract(getFee(transaction)));
+        if(account.getBalance().compareTo(BigDecimal.ZERO)<0){
+            return;
+        }
+        dbAccess.putAccount(account);
         dbAccess.putVoter(voter);
         dbAccess.putTrustee(trustee);
     }

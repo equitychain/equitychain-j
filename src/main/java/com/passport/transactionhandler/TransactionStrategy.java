@@ -1,10 +1,13 @@
 package com.passport.transactionhandler;
 
 import com.passport.core.Transaction;
+import com.passport.utils.CastUtils;
 import com.passport.utils.CheckUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 
 /**
  * @author: xujianfeng
@@ -21,4 +24,7 @@ public abstract class TransactionStrategy {
     }
 
     protected abstract void handle(Transaction transaction);
+    protected BigDecimal getFee(Transaction transaction){
+        return CastUtils.castBigDecimal(transaction.getEggUsed()).multiply(CastUtils.castBigDecimal(transaction.getEggPrice()));
+    }
 }

@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.utils.CastUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,10 @@ public class TrusteeCannelHandler extends TransactionStrategy {
                 //TODO 查询投票记录，归还用户投票
                 boolean flag = dbAccess.putTrustee(trustee);
                 if (flag) {
-                    account.setBalance(result);
+                    account.setBalance(result.subtract(getFee(transaction)));
+                    if(account.getBalance().compareTo(BigDecimal.ZERO) < 0){
+                        return;
+                    }
                     dbAccess.putAccount(account);
                     //撤销注册为受托人成功后需要返还票数
                     List<VoteRecord> voteRecords = dbAccess.listVoteRecords(payAddress,"receiptAddress");

@@ -42,7 +42,10 @@ public class VoterCannelHandler extends TransactionStrategy {
                 //TODO 查询投票记录，归还用户投票
                 boolean flag = dbAccess.putVoter(voter);
                 if (flag) {
-                    account.setBalance(result);
+                    account.setBalance(result.subtract(getFee(transaction)));
+                    if(account.getBalance().compareTo(BigDecimal.ZERO) < 0){
+                        return;
+                    }
                     dbAccess.putAccount(account);
                     //撤消相对应的投票
                     List<VoteRecord> voteRecords = dbAccess.listVoteRecords(payAddress,"payAddress");

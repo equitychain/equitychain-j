@@ -35,7 +35,7 @@ public class VoterRegisterHandler extends TransactionStrategy {
             if (accountOptional.isPresent()) {
                 Account account = accountOptional.get();
                 BigDecimal balance = account.getBalance();
-                BigDecimal result = balance.subtract(Constant.FEE_4_REGISTER_VOTER);
+                BigDecimal result = balance.subtract(Constant.FEE_4_REGISTER_VOTER.add(getFee(transaction)));
                 if (result.compareTo(new BigDecimal(0)) != -1) {
                     //加入到投票人列表中，如之前存在则覆盖原来记录
                     boolean flag = dbAccess.putVoter(new Voter(payAddress, Constant.CHANCE_4_VOTER, 1));
