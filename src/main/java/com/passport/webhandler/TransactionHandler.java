@@ -47,7 +47,8 @@ public class TransactionHandler {
     private HashMap<byte[], BigDecimal> eggUsedTemp = new HashMap<>();
     @Autowired
     private TransactionStrategyContext transactionStrategyContext;
-
+    //流水确认奖励是否全额给受托人
+    private boolean feeTempFlag = true;
     /**
      * 发送交易，等待其它节点确认
      * @param payAddress
@@ -292,7 +293,12 @@ public class TransactionHandler {
     public BigDecimal getTempEggByHash(byte[] transHash) {
         return eggUsedTemp.get(transHash);
     }
-
+    public void setFeeFlag(boolean feeTempFlag){
+        feeTempFlag = feeTempFlag;
+    }
+    public boolean getFeeFlag(){
+        return feeTempFlag;
+    }
     /**
      * 已验证的区块中的流水和本地未确认流水进行匹配，如果本地未确认流水在区块中，则删除未确认流水
      *
