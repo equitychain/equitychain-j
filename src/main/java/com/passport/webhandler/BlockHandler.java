@@ -63,20 +63,6 @@ public class BlockHandler {
     public volatile boolean padding = false;
 
     /**
-     * 根据区块高度获取出块奖励，每年递减，第6年及以后奖励恒定
-     * @param blockHeight
-     * @return
-     */
-    public BigDecimal getReward(Long blockHeight){
-        Long index = blockHeight/Constant.BLOCK_DISTANCE;
-        if(index > Constant.REWARD_ARRAY.length-1){
-            return Constant.REWARD_ARRAY[Constant.REWARD_ARRAY.length-1];
-        }else{
-            return Constant.REWARD_ARRAY[index.intValue()];
-        }
-    }
-
-    /**
      * 校验区块是否合法
      * @param block
      * @return
@@ -174,6 +160,9 @@ public class BlockHandler {
                             Long height = (Long)optHeigth.get();
                             if(height != null) {
                                 if((blockLocal.getBlockHeight() - height) == 1) {
+                                    if(!checkBlock(blockLocal)){
+                                        return;
+                                    }
                                     dbAccess.putBlock(blockLocal);
                                     dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
 

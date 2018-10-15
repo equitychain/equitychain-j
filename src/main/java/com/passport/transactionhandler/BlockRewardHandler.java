@@ -5,6 +5,7 @@ import com.passport.core.Account;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.utils.CastUtils;
+import com.passport.utils.RawardUtil;
 import com.passport.webhandler.BlockHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,7 @@ public class BlockRewardHandler extends TransactionStrategy {
             Optional<Account> accountOptional = dbAccess.getAccount(new String(transaction.getReceiptAddress()));
             if (accountOptional.isPresent()) {
                 String blockHeight = new String(transaction.getBlockHeight());
-                BigDecimal reward = blockHandler.getReward(CastUtils.castLong(blockHeight));
+                BigDecimal reward = RawardUtil.getRewardByHeight(CastUtils.castLong(blockHeight));
                 BigDecimal valueBigDecimal = CastUtils.castBigDecimal(new String(transaction.getValue()));//交易金额
                 if (reward.compareTo(valueBigDecimal) != 0) {//出块奖励
                     return;
