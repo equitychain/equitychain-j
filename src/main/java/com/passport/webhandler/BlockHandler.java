@@ -174,6 +174,9 @@ public class BlockHandler {
                             Long height = (Long)optHeigth.get();
                             if(height != null) {
                                 if((blockLocal.getBlockHeight() - height) == 1) {
+                                    if (!checkBlock(blockLocal)) {
+                                        return;
+                                    }
                                     dbAccess.putBlock(blockLocal);
                                     dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
 
@@ -377,8 +380,6 @@ public class BlockHandler {
             trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
         }
 
-        waitIfNotArrived(block);
-
         produceBlock(newBlockHeight, trustees, blockCycle);
     }
 
@@ -410,6 +411,8 @@ public class BlockHandler {
             Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
             Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
             if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
+
+                waitIfNotArrived(dbAccess.getBlock(newBlockHeight-1).get());
                 MonitoringIfProducerDead.nextBlockFlag = false;
 //                SyncFlag.setNextBlockSyncFlag(false);
                 Account account = accountOptional.get();

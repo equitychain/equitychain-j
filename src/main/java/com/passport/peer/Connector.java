@@ -75,10 +75,8 @@ public class Connector implements InitializingBean {
         builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
         builder.setData(dataBuilder);
         channelsManager.getChannels().writeAndFlush(builder.build());
-
         try {
             TimeUnit.MILLISECONDS.sleep(3000);
-
             monitoringIfProducerDead.checkBlock();
         } catch (InterruptedException e) {
             e.printStackTrace();
