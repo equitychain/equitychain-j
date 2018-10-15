@@ -67,14 +67,14 @@ public class BlockHandler {
      * @param blockHeight
      * @return
      */
-    public BigDecimal getReward(Long blockHeight){
-        Long index = blockHeight/Constant.BLOCK_DISTANCE;
-        if(index > Constant.REWARD_ARRAY.length-1){
-            return Constant.REWARD_ARRAY[Constant.REWARD_ARRAY.length-1];
-        }else{
-            return Constant.REWARD_ARRAY[index.intValue()];
-        }
-    }
+//    public BigDecimal getReward(Long blockHeight){
+//        Long index = blockHeight/Constant.BLOCK_DISTANCE;
+//        if(index > Constant.REWARD_ARRAY.length-1){
+//            return Constant.REWARD_ARRAY[Constant.REWARD_ARRAY.length-1];
+//        }else{
+//            return Constant.REWARD_ARRAY[index.intValue()];
+//        }
+//    }
 
     /**
      * 校验区块是否合法

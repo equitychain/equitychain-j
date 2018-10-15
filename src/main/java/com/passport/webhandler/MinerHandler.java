@@ -72,7 +72,7 @@ public class MinerHandler {
         transaction.setReceiptAddress(minerAccount.getAddress().getBytes());//奖励接收者是挖矿账号
 
 
-        transaction.setValue(String.valueOf(blockHandler.getReward(CastUtils.castLong(prevBlock.getBlockHeight() + 1))).getBytes());//TODO 挖矿奖励取值优化
+        transaction.setValue(String.valueOf(RawardUtil.getRewardByHeight(CastUtils.castLong(prevBlock.getBlockHeight() + 1))).getBytes());//TODO 挖矿奖励取值优化
         transaction.setExtarData(TransactionTypeEnum.BLOCK_REWARD.toString().getBytes());
         transaction.setTime(String.valueOf(System.currentTimeMillis()).getBytes());
         transaction.setBlockHeight(((prevBlock.getBlockHeight() + 1)+"").getBytes());
