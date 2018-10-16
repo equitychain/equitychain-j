@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.passport.core.Block;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
+import com.passport.listener.ChannelListener;
 import com.passport.msghandler.StrategyContext;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.BlockUtils;
@@ -25,7 +26,8 @@ import java.util.List;
 @Component
 public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Message> {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
-
+    @Autowired
+    ChannelListener listener;
     @Autowired
     private ChannelsManager channelsManager;
     @Autowired
@@ -42,45 +44,15 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         logger.info("server channel active服务端通道激活");
 
         logger.info("server channel id:"+ctx.channel().id().asLongText());
+        listener.channelActive(ctx);
         //保存连接的channel
         channelsManager.addChannel(ctx.channel());
     }
 
-    @Autowired
-    private BaseDBAccess dbAccess;
-    @Autowired
-    private BlockUtils blockUtils;
-    @Autowired
-    private TrusteeHandler trusteeHandler;
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        //重铸机制测试
-        InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
-        String clientIP = insocket.getAddress().getHostAddress();
-        System.out.println(clientIP);
-        List<String> removeTrustee = dbAccess.seekByKey("heartbeat"+clientIP);
-
-        Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
-        if(!lastBlockOptional.isPresent()){
-            ctx.close();
-        }
-        Block block = lastBlockOptional.get();
-        long blockHeight = CastUtils.castLong(block.getBlockHeight());
-        long newBlockHeight = blockHeight + 1;
-        int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
-        List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
-        if(trustees.size() == 0){
-            trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
-        }
-        for(Trustee trustee:trustees){
-            for(String removeAddress:removeTrustee){
-                if(trustee.getAddress().equals(removeAddress)){
-                    trusteeHandler.changeStatus(trustee, blockCycle);
-                }
-            }
-        }
-        //重铸机制测试
+        listener.channelClose(ctx);
         ctx.close();
     }
 }

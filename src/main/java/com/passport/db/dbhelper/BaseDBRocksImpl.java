@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.core.*;
+import com.passport.utils.HttpUtils;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ReadOptions;
@@ -231,6 +232,48 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             }
         }
         return accounts;
+    }
+
+    @Override
+    public List<Account> getNodeAccountList() {
+        RocksIterator accountIter;
+//        if(transaction!=null){
+//            accountIter = transaction.getIterator(new ReadOptions(),handleMap.get(getColName("account", "address")));
+//        }else{
+        accountIter = rocksDB.newIterator(handleMap.get(getColName("account", "address")));
+//        }
+
+        ArrayList<Account> accounts = new ArrayList<>();
+        for (accountIter.seekToFirst(); accountIter.isValid(); accountIter.next()) {
+            String address = new String(accountIter.key());
+            try {
+                Account account = getObj("address", address, Account.class);
+                if (account != null &&
+                        account.getPrivateKey()!=null && !"".equals(account.getPrivateKey())
+                        && account.getPassword() != null && !"".equals(account.getPassword())) {
+                    accounts.add(account);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return accounts;
+    }
+
+    @Override
+    public void saveLocalAccountIpInfo() throws Exception {
+        saveIpAccountInfos(HttpUtils.getLocalHostLANAddress().getHostAddress(),getNodeAccountList());
+    }
+
+    @Override
+    public void saveIpAccountInfos(String address, List<Account> accounts) throws Exception {
+        for (Account account : accounts){
+            AccountIp accountIp = new AccountIp();
+            accountIp.setAddress(account.getAddress());
+            accountIp.setIpAddr(address);
+            accountIp.setId();
+            addObj(accountIp);
+        }
     }
 
     @Override

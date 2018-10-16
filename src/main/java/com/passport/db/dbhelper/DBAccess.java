@@ -155,6 +155,23 @@ public interface DBAccess {
 	List<Account> listAccounts();
 
 	/**
+	 * 本节点的账号
+	 * @return
+	 */
+	List<Account> getNodeAccountList();
+
+	/**
+	 * 保存自己本机的账号ip信息
+	 */
+	void saveLocalAccountIpInfo() throws Exception;
+
+	/**
+	 * 保存其他节点的账号ip信息
+	 * @param address
+	 * @param accounts
+	 */
+	void saveIpAccountInfos(String address, List<Account> accounts) throws Exception;
+	/**
 	 * 添加一个钱包账户
 	 * @param account
 	 * @return

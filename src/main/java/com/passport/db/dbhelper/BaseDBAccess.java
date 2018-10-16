@@ -81,11 +81,11 @@ public abstract class BaseDBAccess implements DBAccess {
                 ColumnFamilyDescriptor defaultDescriptor = new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY);
                 curHasColumns.add(defaultDescriptor);
                 for (String s : fields) {
+                    ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(s.getBytes());
                     if(curColStrs.contains(s)) {
-                        ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(s.getBytes());
                         curHasColumns.add(descriptor);
                     }else{
-                        curDontHasColumns.add(defaultDescriptor);
+                        curDontHasColumns.add(descriptor);
                     }
                 }
                 for (IndexColumnNames names : indexColumnNames) {

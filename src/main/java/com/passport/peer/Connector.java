@@ -77,7 +77,7 @@ public class Connector implements InitializingBean {
         channelsManager.getChannels().writeAndFlush(builder.build());
         try {
             TimeUnit.MILLISECONDS.sleep(3000);
-            monitoringIfProducerDead.checkBlock();
+//            monitoringIfProducerDead.checkBlock();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -90,7 +90,12 @@ public class Connector implements InitializingBean {
             e.printStackTrace();
         }
         provider.publishEvent(new GenerateBlockEvent(0L));
-
+        //节点启动，把自己账号信息保存
+        try {
+            dbAccess.saveLocalAccountIpInfo();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     //生成下一个区块

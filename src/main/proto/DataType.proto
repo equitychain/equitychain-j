@@ -9,4 +9,5 @@ enum DataType {
     ACCOUNT_SYNC = 3;
     SEND_TRANSACTION = 4;
     BLOCK_SYNC = 5;
+    ACCOUNTIP_SYNC = 6;
 }

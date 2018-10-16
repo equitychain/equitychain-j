@@ -2,6 +2,7 @@ package com.passport.web;
 
 import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
+import com.passport.constant.SyncFlag;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
@@ -39,6 +40,9 @@ public class TransactionController {
     @PostMapping("/send")
     @RocksTransaction
     public ResultDto send(HttpServletRequest request) throws Exception {
+        if(SyncFlag.isNextBlockSyncFlag()){
+            return new ResultDto(ResultEnum.TRANS_UNCOMPSYN);
+        }
         String payAddress = request.getParameter("payAddress");
         String receiptAddress = request.getParameter("receiptAddress");
         String value = request.getParameter("value");
