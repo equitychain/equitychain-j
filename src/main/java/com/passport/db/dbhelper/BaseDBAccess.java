@@ -171,7 +171,7 @@ public abstract class BaseDBAccess implements DBAccess {
                     FaildClaz faildClaz = f.getAnnotation(FaildClaz.class);
                     String fieldName = faildClaz.name();
                     ColumnFamilyHandle colHandle = handleMap.get(getColName(className, fieldName));
-                    if (deleteCase && (faildClaz.type() == List.class || dtoClasses.contains(faildClaz))) {
+                    if (deleteCase && (faildClaz.type() == List.class || dtoClasses.contains(faildClaz.type()))) {
                         //删除级联
                         byte[] fieldVal = getByColumnFamilyHandle(colHandle, fieldVale.getBytes());
                         if (faildClaz.type() == List.class) {
@@ -180,7 +180,7 @@ public abstract class BaseDBAccess implements DBAccess {
                                 Class listType = faildClaz.genericParadigm();
                                 String conKeyF = getKeyFieldByClass(listType);
                                 for (Object o : list) {
-                                    String conKeyV = o.toString();
+                                    String conKeyV = o instanceof byte[]?new String((byte[])o):String.valueOf(o);
                                     delObj(conKeyF, conKeyV, listType, true);
                                 }
                             }

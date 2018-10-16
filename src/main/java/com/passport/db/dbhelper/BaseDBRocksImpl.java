@@ -822,4 +822,44 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         return count;
     }
 
+    @Override
+    public boolean delOneBlock() throws Exception {
+        Optional<Object> optional = getLastBlockHeight();
+        //这里删除单个高度只能从最高高度开始删
+        if(optional.isPresent()) {
+            delObj(getKeyFieldByClass(Block.class),String.valueOf(optional.get()),Block.class,true);
+            //todo 还需要删除索引、确认流水等信息
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean delBlocksByHeight(long beginHeight) throws Exception {
+        Optional<Object> optional = getLastBlockHeight();
+        long maxHeight = Long.parseLong(optional.get().toString());
+        if(optional.isPresent() && beginHeight <= maxHeight) {
+
+            for (long i = maxHeight; i >= beginHeight; i --){
+                delObj(getKeyFieldByClass(Block.class),String.valueOf(i),Block.class,true);
+                //todo 还需要删除索引、确认流水等信息
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean delUnconfiTrans() throws RocksDBException {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("transaction", "hash")));
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            byte[] blockHeight = rocksDB.get(handleMap.get(getColName("transaction","blockHeight")),iterator.key());
+            if(blockHeight == null || blockHeight.length == 0){
+                String hash = new String(iterator.key());
+                deleteUnconfirmTransaction(hash);
+            }
+        }
+        return true;
+    }
+
 }
