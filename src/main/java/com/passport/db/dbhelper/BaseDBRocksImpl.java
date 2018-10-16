@@ -235,6 +235,14 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
+    public void delAllAccountIps() throws Exception {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","id")));
+        for(iterator.seekToFirst();iterator.isValid();iterator.next()) {
+            delObj("id",new String(iterator.key()),AccountIp.class,true);
+        }
+    }
+
+    @Override
     public List<Account> getNodeAccountList() {
         RocksIterator accountIter;
 //        if(transaction!=null){
@@ -263,6 +271,21 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public void saveLocalAccountIpInfo() throws Exception {
         saveIpAccountInfos(HttpUtils.getLocalHostLANAddress().getHostAddress(),getNodeAccountList());
+    }
+
+    @Override
+    public List<AccountIp> delAccountIpByAddr(String ip) throws Exception {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","address")));
+        ArrayList<AccountIp> ips = new ArrayList<>();
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            String addr = new String(iterator.value());
+            String id = new String(iterator.key());
+            if(ip.equals(addr)){
+                ips.add(getObj("id",id,AccountIp.class));
+                delObj("id",id,AccountIp.class,true);
+            }
+        }
+        return ips;
     }
 
     @Override

@@ -154,6 +154,7 @@ public interface DBAccess {
 	 */
 	List<Account> listAccounts();
 
+	void delAllAccountIps() throws Exception;
 	/**
 	 * 本节点的账号
 	 * @return
@@ -164,7 +165,7 @@ public interface DBAccess {
 	 * 保存自己本机的账号ip信息
 	 */
 	void saveLocalAccountIpInfo() throws Exception;
-
+    List<AccountIp> delAccountIpByAddr(String ip) throws Exception;
 	/**
 	 * 保存其他节点的账号ip信息
 	 * @param address

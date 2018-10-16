@@ -92,6 +92,7 @@ public class Connector implements InitializingBean {
         provider.publishEvent(new GenerateBlockEvent(0L));
         //节点启动，把自己账号信息保存
         try {
+            dbAccess.delAllAccountIps();
             dbAccess.saveLocalAccountIpInfo();
         } catch (Exception e) {
             e.printStackTrace();
