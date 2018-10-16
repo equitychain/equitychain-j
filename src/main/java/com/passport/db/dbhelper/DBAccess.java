@@ -403,5 +403,10 @@ public interface DBAccess {
 	 * @return
 	 */
 	long getTransCountByAddress(String address) throws RocksDBException;
-	//根据地址和时间获取当时受托人的投票人集合
+	//删除当前最新高度的区块
+	boolean delOneBlock() throws Exception;
+	//删除一定的高度区块
+	boolean delBlocksByHeight(long beginHeight) throws Exception;
+
+	boolean delUnconfiTrans() throws RocksDBException;
 }
