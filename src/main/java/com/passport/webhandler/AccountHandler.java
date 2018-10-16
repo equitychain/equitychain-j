@@ -75,7 +75,7 @@ public class AccountHandler {
         if (dbAccess.putAccount(account)) {
             //重铸出块机制
             String ip = HttpUtils.getLocalHostLANAddress().getHostAddress();
-            dbAccess.put((ip+"_"+account.getAddress()).getBytes(),account.getAddress().getBytes());
+            dbAccess.put(("heartbeat_"+ip+"_"+account.getAddress()).getBytes(),account.getAddress().getBytes());
             //重铸出块机制
             return account;
         }
@@ -130,7 +130,7 @@ public class AccountHandler {
                 dbAccess.putAccount(account);
                 //重铸出块机制
                 String ip = HttpUtils.getLocalHostLANAddress().getHostAddress();
-                dbAccess.put((ip+"_"+account.getAddress()).getBytes(),account.getAddress().getBytes());
+                dbAccess.put(("heartbeat_"+ip+"_"+account.getAddress()).getBytes(),account.getAddress().getBytes());
                 //重铸出块机制
                 accounts.add(new Account(account.getAddress(),null, account.getBalance()));//不保存私钥
 

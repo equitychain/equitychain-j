@@ -34,7 +34,7 @@ public class StrategyContext {
      * @param message
      */
 
-    public void handleMsgMain(ChannelHandlerContext ctx, NettyMessage.Message message) {
+    public void handleMsgMain(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
 //        System.out.println(message.getMessageType());
 //        System.out.println(message.getData().getDataType());
         Strategy strategy = strategyMap.get(message.getMessageType()+"_"+message.getData().getDataType());
