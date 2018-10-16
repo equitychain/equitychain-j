@@ -207,7 +207,8 @@ public class BlockEventListener {
     public void generateBlock(GenerateBlockEvent event) throws InterruptedException {
         ChannelGroup channels = channelsManager.getChannels();
         //第一个启动的节点，负责生成区块
-        if (channels.size() == 0) {
+//        if (channels.size() == 0) {
+        if (true) {
             //当前区块周期
             Optional<Object> lastBlockHeightOptional = dbAccess.getLastBlockHeight();
             if (!lastBlockHeightOptional.isPresent()) {

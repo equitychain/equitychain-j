@@ -64,14 +64,6 @@ public class AccountController {
     @Value("${wallet.keystoreDir}")
     private String walletDir;
 
-
-    @GetMapping("/test")
-    public @ResponseBody
-    Object test() throws Exception {
-        accountHandler.test();
-        return "sdfasdf";
-    }
-
     @GetMapping("/new")
     @RocksTransaction
     public ResultDto newAccount(HttpServletRequest request) throws Exception {
@@ -87,7 +79,6 @@ public class AccountController {
             //当挖矿账户不存在时设置为挖矿账户
             accountHandler.setMinerAccountIfNotExists(account);
             provider.publishEvent(new SyncAccountEvent(account));
-
             return new ResultDto(ResultEnum.SUCCESS.getCode(), account);
         }
         return new ResultDto(ResultEnum.SYS_ERROR);

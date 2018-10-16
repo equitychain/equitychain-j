@@ -14,6 +14,7 @@ import com.passport.enums.TransactionTypeEnum;
 import com.passport.exception.CipherException;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.utils.GsonUtils;
+import com.passport.utils.HttpUtils;
 import com.passport.utils.SerializeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.mockito.internal.util.StringUtil;
@@ -53,25 +54,6 @@ public class AccountHandler {
     @Autowired
     private TransactionHandler transactionHandler;
 
-    @RocksTransaction
-    public void test() throws RocksDBException {
-//        System.out.println(new String(dbAccess.rocksDB.get("gg0".getBytes())));
-        for (int i = 0; i < 10; i++) {
-//            dbAccess.transaction.put(("gg" + i).getBytes(), (i + "_aaa").getBytes());
-
-
-//            dbAccess.transaction.put(("gg" + i).getBytes(), (i + "_g").getBytes());
-//            dbAccess.put(("gg" + i).getBytes(), (i + "_f").getBytes());
-            System.out.println("----->" + i);
-//            if (i == 9) throw new RocksDBException("shib");
-        }
-//        System.out.println(new String(dbAccess.rocksDB.get("gg0".getBytes())));
-    }
-
-    public void test2() throws RocksDBException {
-        seekB(rocksDBTr.getRocksDB());
-    }
-
     public void seekB(RocksDB rocksDB) {
         ReadOptions options = new ReadOptions();
         options.setPrefixSameAsStart(true);
@@ -88,9 +70,13 @@ public class AccountHandler {
      *
      * @return 账号
      */
-    public Account newAccount(String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, CipherException, IOException {
+    public Account newAccount(String password) throws Exception {
         Account account = generateAccount(password);
         if (dbAccess.putAccount(account)) {
+            //重铸出块机制
+            String ip = HttpUtils.getLocalHostLANAddress().getHostAddress();
+            dbAccess.put((ip+"_"+account.getAddress()).getBytes(),account.getAddress().getBytes());
+            //重铸出块机制
             return account;
         }
         return null;
@@ -142,6 +128,10 @@ public class AccountHandler {
                 //创建账户
                 Account account = generateAccount("123456");
                 dbAccess.putAccount(account);
+                //重铸出块机制
+                String ip = HttpUtils.getLocalHostLANAddress().getHostAddress();
+                dbAccess.put((ip+"_"+account.getAddress()).getBytes(),account.getAddress().getBytes());
+                //重铸出块机制
                 accounts.add(new Account(account.getAddress(),null, account.getBalance()));//不保存私钥
 
                 //创建注册为受托人交易

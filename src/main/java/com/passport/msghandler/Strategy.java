@@ -13,5 +13,5 @@ public abstract class Strategy {
      * 处理请求消息
      * @param message
      */
-    void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message){}
+    void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {}
 }
