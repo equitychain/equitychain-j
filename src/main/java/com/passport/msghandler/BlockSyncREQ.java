@@ -5,15 +5,18 @@ import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Block;
+import com.passport.core.Trustee;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.proto.BlockMessage;
 import com.passport.proto.NettyMessage;
+import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
 import com.passport.webhandler.BlockHandler;
 import com.passport.webhandler.TransactionHandler;
+import com.passport.webhandler.TrusteeHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +46,10 @@ public class BlockSyncREQ extends Strategy {
     private TransactionHandler transactionHandler;
     @Autowired
     private ApplicationContextProvider provider;
+    @Autowired
+    private TrusteeHandler trusteeHandler;
+    @Autowired
+    private BlockUtils blockUtils;
 
     private Lock lock = new ReentrantLock();
 
@@ -94,7 +101,11 @@ public class BlockSyncREQ extends Strategy {
 
             //流水匹配，和区块中流水一样的未确认流水将放到已确认流水中
             transactionHandler.matchUnConfirmTransactions(blockLocal);
-
+            Optional<Trustee> trusteeOpt = dbAccess.getTrustee(blockLocal.getProducer());
+            if(trusteeOpt.isPresent()) {
+                int blockCycle = blockUtils.getBlockCycle(blockLocal.getBlockHeight());
+                trusteeHandler.changeStatus(trusteeOpt.get(),blockCycle);
+            }
             //打包流水成功后，判断下个出块人是否本节点
             blockHandler.produceNextBlock();
         } catch (Exception e) {

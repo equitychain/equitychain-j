@@ -33,7 +33,6 @@ public class AccountListSyncRESP extends Strategy {
     @RocksTransaction
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
         logger.info("处理账户列表同步请求数据：{}", GsonUtils.toJson(message));
-
         List<AccountMessage.Account> accountsList = message.getData().getAccountsList();
         for (AccountMessage.Account account : accountsList) {
             Optional<Account> accountOptional = dbAccess.getAccount(DataFormatUtil.byteStringToString(account.getAddress()));
@@ -44,10 +43,7 @@ public class AccountListSyncRESP extends Strategy {
                 byte[] balanceByte = account.getBalance().toByteArray();
                 acc.setBalance((balanceByte==null||balanceByte.length==0)?BigDecimal.ZERO:new BigDecimal(new String(balanceByte)));
                 boolean flag = dbAccess.putAccount(acc);
-                //重铸出块机制
-                String ip = HttpUtils.getLocalHostLANAddress().getHostAddress();
-                dbAccess.put(("heartbeat_"+ip+"_"+account.getAddress()).getBytes(),account.getAddress().toByteArray());
-                //重铸出块机制
+
                 if(flag){
                     logger.info("同步账户列表地址{}成功", acc.getAddress());
                 }
