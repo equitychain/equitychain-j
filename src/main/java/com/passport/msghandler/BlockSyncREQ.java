@@ -53,7 +53,6 @@ public class BlockSyncREQ extends Strategy {
     private BlockUtils blockUtils;
 
     private Lock lock = new ReentrantLock();
-    int startCycle = 0;
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块广播请求数据：{}", GsonUtils.toJson(message));
 
@@ -117,11 +116,11 @@ public class BlockSyncREQ extends Strategy {
                 trusteeHandler.changeStatus(trusteeOpt.get(),blockCycle);
             }
             int curCycle = blockUtils.getBlockCycle(block.getBlockHeight());
-            if(startCycle != 0 && curCycle - startCycle > 0){
+            if(SyncFlag.getStarCycle() != -1 && curCycle - SyncFlag.getStarCycle() > 0){
                 //打包流水成功后，判断下个出块人是否本节点
                 blockHandler.produceNextBlock();
-            }else if(startCycle == 0){
-                startCycle = curCycle;
+            }else if(SyncFlag.getStarCycle() == -1){
+                SyncFlag.setStarCycle(curCycle);
             }
         } catch (Exception e) {
             logger.error("接收区块广播异常", e);

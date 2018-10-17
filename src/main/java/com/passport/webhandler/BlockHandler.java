@@ -384,6 +384,7 @@ public class BlockHandler {
     }
 
     /**
+     *
      * 未到出块时间则睡眠等待
      * @param block
      */
@@ -407,6 +408,7 @@ public class BlockHandler {
      * @param blockCycle
      */
     public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) throws InterruptedException {
+
 //        try{
             Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
             Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
@@ -414,6 +416,7 @@ public class BlockHandler {
 
                 waitIfNotArrived(dbAccess.getBlock(newBlockHeight-1).get());
                 SyncFlag.setNextBlockSyncFlag(false);
+                SyncFlag.setStarCycle(blockCycle - 1);
                 Account account = accountOptional.get();
                 if(account.getPrivateKey() != null){
                     //打包区块
