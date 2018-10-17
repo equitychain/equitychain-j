@@ -7,6 +7,7 @@ import com.google.common.base.Optional;
 import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.core.Account;
+import com.passport.core.AccountIp;
 import com.passport.core.Trustee;
 import com.passport.core.Voter;
 import com.passport.crypto.eth.*;
@@ -64,6 +65,11 @@ public class AccountController {
     @Value("${wallet.keystoreDir}")
     private String walletDir;
 
+    @GetMapping("/test")
+    public ResultDto ttest() throws Exception {
+        List<AccountIp> list = dbAccess.listAccountIps();
+        return new ResultDto(200,list);
+    }
     @GetMapping("/new")
     @RocksTransaction
     public ResultDto newAccount(HttpServletRequest request) throws Exception {

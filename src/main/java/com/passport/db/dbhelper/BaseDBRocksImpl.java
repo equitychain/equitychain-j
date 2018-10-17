@@ -243,6 +243,16 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
+    public List<AccountIp> listAccountIps() throws Exception {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","id")));
+        List<AccountIp> list = new ArrayList<>();
+        for(iterator.seekToFirst();iterator.isValid();iterator.next()) {
+            list.add(getObj("id",new String(iterator.key()),AccountIp.class));
+        }
+        return list;
+    }
+
+    @Override
     public List<Account> getNodeAccountList() {
         RocksIterator accountIter;
 //        if(transaction!=null){

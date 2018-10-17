@@ -155,6 +155,7 @@ public interface DBAccess {
 	List<Account> listAccounts();
 
 	void delAllAccountIps() throws Exception;
+	List<AccountIp> listAccountIps() throws Exception;
 	/**
 	 * 本节点的账号
 	 * @return
