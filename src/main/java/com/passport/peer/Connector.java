@@ -48,7 +48,8 @@ public class Connector implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         //启动服务并注册到discover节点
         asyncTask.startServer();
-
+        System.out.println("=======del all");
+        dbAccess.delAllAccountIps();
         TimeUnit.MILLISECONDS.sleep(3000);
 
         //连接discover节点
@@ -92,7 +93,6 @@ public class Connector implements InitializingBean {
         provider.publishEvent(new GenerateBlockEvent(0L));
         //节点启动，把自己账号信息保存
         try {
-            dbAccess.delAllAccountIps();
             dbAccess.saveLocalAccountIpInfo();
         } catch (Exception e) {
             e.printStackTrace();
