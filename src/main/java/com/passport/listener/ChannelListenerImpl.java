@@ -67,41 +67,41 @@ public class ChannelListenerImpl implements ChannelListener {
      * @param ctx
      */
     @Override
-    public void channelClose(ChannelHandlerContext ctx) throws Exception {
+    public synchronized void channelClose(ChannelHandlerContext ctx) throws Exception {
         //重铸机制测试
         InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
         String clientIP = insocket.getAddress().getHostAddress();
-        //删除ip信息
-        List<AccountIp> ips = dbAccess.delAccountIpByAddr(clientIP);
-        //改变状态
-        Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
-        if(!lastBlockOptional.isPresent()){
-            return;
-        }
-        Block block = lastBlockOptional.get();
-        long blockHeight = CastUtils.castLong(block.getBlockHeight());
-        long newBlockHeight = blockHeight + 1;
-        int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
-        List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
-        if(trustees.size() == 0){
-            trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
-        }
-        //下个块是由谁出
-        Trustee blockTrustee = blockUtils.randomPickBlockProducer(trustees, newBlockHeight);
-        boolean trigger = false;
-        for (AccountIp accountIp : ips){
-            if(accountIp.getAddress() == null || "".equals(accountIp.getAddress()))continue;
-            Optional<Trustee> trustee = dbAccess.getTrustee(accountIp.getAddress());
-            if(trustee.isPresent()){
-                Trustee trustee1 = trustee.get();
-                trusteeHandler.changeStatus(trustee1, blockCycle);
-                if(blockTrustee.getAddress().equals(trustee1.getAddress())){
-                    trigger = true;
+            //删除ip信息
+            List<AccountIp> ips = dbAccess.delAccountIpByAddr(clientIP);
+            //改变状态
+            Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
+            if(!lastBlockOptional.isPresent()){
+                return;
+            }
+            Block block = lastBlockOptional.get();
+            long blockHeight = CastUtils.castLong(block.getBlockHeight());
+            long newBlockHeight = blockHeight + 1;
+            int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
+            List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
+            if(trustees.size() == 0){
+                trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
+            }
+            //下个块是由谁出
+            Trustee blockTrustee = blockUtils.randomPickBlockProducer(trustees, newBlockHeight);
+            boolean trigger = false;
+            for (AccountIp accountIp : ips){
+                if(accountIp.getAddress() == null || "".equals(accountIp.getAddress()))continue;
+                Optional<Trustee> trustee = dbAccess.getTrustee(accountIp.getAddress());
+                if(trustee.isPresent()){
+                    Trustee trustee1 = trustee.get();
+                    trusteeHandler.changeStatus(trustee1, blockCycle);
+                    if(blockTrustee.getAddress().equals(trustee1.getAddress())){
+                        trigger = true;
+                    }
                 }
             }
-        }
-        if(trigger) {
-            blockHandler.produceNextBlock();
-        }
+            if(trigger) {
+                blockHandler.produceNextBlock();
+            }
     }
 }
