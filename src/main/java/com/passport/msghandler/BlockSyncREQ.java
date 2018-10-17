@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -52,17 +53,18 @@ public class BlockSyncREQ extends Strategy {
     private BlockUtils blockUtils;
 
     private Lock lock = new ReentrantLock();
-
+    int startCycle = 0;
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块广播请求数据：{}", GsonUtils.toJson(message));
-        if(SyncFlag.isNextBlockSyncFlag()){
-            logger.info("正在主动同步区块，暂时不处理流水广播消息");
-            return;
-        }
 
         try {
             lock.lock();
             BlockMessage.Block block = message.getData().getBlock();
+
+            if(SyncFlag.isNextBlockSyncFlag()){
+            logger.info("正在主动同步区块，暂时不处理流水广播消息");
+                return;
+             }
 
             //区块同步需要按顺序进行
             Optional<Object> lastBlockHeightOptional = dbAccess.getLastBlockHeight();
@@ -101,13 +103,26 @@ public class BlockSyncREQ extends Strategy {
 
             //流水匹配，和区块中流水一样的未确认流水将放到已确认流水中
             transactionHandler.matchUnConfirmTransactions(blockLocal);
+            //出块完成后，计算出的下一个出块人如果是自己则继续发布出块事件
+            int blockCycle = blockUtils.getBlockCycle(blockLocal.getBlockHeight());
+            //初始化受托人列表
+            List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
+            if(trustees.size() == 0){
+                trusteeHandler.getTrusteesBeforeTime(blockLocal.getBlockHeight(), blockCycle);
+            }
+            //改变状态
             Optional<Trustee> trusteeOpt = dbAccess.getTrustee(blockLocal.getProducer());
+
             if(trusteeOpt.isPresent()) {
-                int blockCycle = blockUtils.getBlockCycle(blockLocal.getBlockHeight());
                 trusteeHandler.changeStatus(trusteeOpt.get(),blockCycle);
             }
-            //打包流水成功后，判断下个出块人是否本节点
-            blockHandler.produceNextBlock();
+            int curCycle = blockUtils.getBlockCycle(block.getBlockHeight());
+            if(startCycle != 0 && curCycle - startCycle > 0){
+                //打包流水成功后，判断下个出块人是否本节点
+                blockHandler.produceNextBlock();
+            }else if(startCycle == 0){
+                startCycle = curCycle;
+            }
         } catch (Exception e) {
             logger.error("接收区块广播异常", e);
         } finally {
