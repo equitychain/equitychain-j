@@ -300,7 +300,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     public List<AccountIp> delAccountIpByAddr(String ip) throws Exception {
-        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","address")));
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","ipAddr")));
         ArrayList<AccountIp> ips = new ArrayList<>();
         for (iterator.seekToFirst();iterator.isValid();iterator.next()){
             String addr = new String(iterator.value());

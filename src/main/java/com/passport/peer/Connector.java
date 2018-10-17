@@ -47,9 +47,9 @@ public class Connector implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         //启动服务并注册到discover节点
-        asyncTask.startServer();
         System.out.println("=======del all");
         dbAccess.delAllAccountIps();
+        asyncTask.startServer();
         TimeUnit.MILLISECONDS.sleep(3000);
 
         //连接discover节点
