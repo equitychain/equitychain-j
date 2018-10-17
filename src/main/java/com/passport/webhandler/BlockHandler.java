@@ -413,8 +413,7 @@ public class BlockHandler {
             if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
 
                 waitIfNotArrived(dbAccess.getBlock(newBlockHeight-1).get());
-                MonitoringIfProducerDead.nextBlockFlag = false;
-//                SyncFlag.setNextBlockSyncFlag(false);
+                SyncFlag.setNextBlockSyncFlag(false);
                 Account account = accountOptional.get();
                 if(account.getPrivateKey() != null){
                     //打包区块
@@ -433,7 +432,7 @@ public class BlockHandler {
 //                    }).start();
                 }
             }else {
-                MonitoringIfProducerDead.nextBlockFlag = true;
+                logger.info("出块账号："+accountOptional.get().getAddress());
             }
 //        }catch (RocksDBException e){
 //            e.printStackTrace();
