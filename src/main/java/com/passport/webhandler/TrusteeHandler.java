@@ -5,6 +5,7 @@ import com.passport.annotations.RocksTransaction;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.utils.BlockUtils;
+import org.rocksdb.RocksDBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,12 @@ public class TrusteeHandler {
     public List<Trustee> getTrusteesBeforeTime(long newBlockHeight, int blockCycle) {
         Long timestamp = blockUtils.getTimestamp4BlockCycle(newBlockHeight);
         //查询投票记录（status==1）,时间小于等于timestamp，按投票票数从高到低排列的101个受托人，放到101个受托人列表中
-        List<Trustee> trustees = dbAccess.getTrusteeOfRangeBeforeTime(timestamp);
+        List<Trustee> trustees = new ArrayList<>();
+        try {
+            trustees = dbAccess.getTrusteeOfRangeBeforeTime(timestamp);
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+        }
         dbAccess.put(String.valueOf(blockCycle), trustees);
 
         return trustees;

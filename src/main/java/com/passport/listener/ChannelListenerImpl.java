@@ -12,6 +12,7 @@ import com.passport.proto.*;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
+import com.passport.webhandler.BlockHandler;
 import com.passport.webhandler.TrusteeHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,8 @@ public class ChannelListenerImpl implements ChannelListener {
     private BlockUtils blockUtils;
     @Autowired
     private TrusteeHandler trusteeHandler;
+    @Autowired
+    private BlockHandler blockHandler;
 
     /**
      * 通道激活  进行ip的统计，也就是本节点的账号添加信息以及获取其他节点的账号ip信息
@@ -79,13 +82,26 @@ public class ChannelListenerImpl implements ChannelListener {
         long blockHeight = CastUtils.castLong(block.getBlockHeight());
         long newBlockHeight = blockHeight + 1;
         int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
+        List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
+        if(trustees.size() == 0){
+            trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
+        }
+        //下个块是由谁出
+        Trustee blockTrustee = blockUtils.randomPickBlockProducer(trustees, newBlockHeight);
+        boolean trigger = false;
         for (AccountIp accountIp : ips){
             if(accountIp.getAddress() == null || "".equals(accountIp.getAddress()))continue;
             Optional<Trustee> trustee = dbAccess.getTrustee(accountIp.getAddress());
             if(trustee.isPresent()){
                 Trustee trustee1 = trustee.get();
                 trusteeHandler.changeStatus(trustee1, blockCycle);
+                if(blockTrustee.getAddress().equals(trustee1.getAddress())){
+                    trigger = true;
+                }
             }
+        }
+        if(trigger) {
+            blockHandler.produceNextBlock();
         }
     }
 }

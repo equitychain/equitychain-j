@@ -162,10 +162,16 @@ public interface DBAccess {
 	List<Account> getNodeAccountList();
 
 	/**
+	 * 判断账号是否有ip在线
+	 * @param address
+	 * @return
+	 */
+	boolean accountHasIp(String address) throws RocksDBException;
+	/**
 	 * 保存自己本机的账号ip信息
 	 */
 	void saveLocalAccountIpInfo() throws Exception;
-    List<AccountIp> delAccountIpByAddr(String ip) throws Exception;
+	List<AccountIp> delAccountIpByAddr(String ip) throws Exception;
 	/**
 	 * 保存其他节点的账号ip信息
 	 * @param address
@@ -275,7 +281,7 @@ public interface DBAccess {
 	 * 统计指定时间节点前的投票记录，取得票前101名委托人
 	 * @return
 	 */
-	List<Trustee> getTrusteeOfRangeBeforeTime(long time);
+	List<Trustee> getTrusteeOfRangeBeforeTime(long time) throws RocksDBException;
 
 	/**
 	 * 添加一条投票记录

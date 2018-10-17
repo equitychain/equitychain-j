@@ -269,6 +269,21 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
+    public boolean accountHasIp(String address) throws RocksDBException {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","address")));
+        for(iterator.seekToFirst();iterator.isValid();iterator.next()){
+            String addr = new String(iterator.value());
+            if(address.equals(addr)){
+                byte[] ipByt = rocksDB.get(handleMap.get(getColName("accountIp","ipAddr")),iterator.key());
+                if(ipByt != null && ipByt.length > 0 && !"".equals(new String(ipByt))){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
     public void saveLocalAccountIpInfo() throws Exception {
         saveIpAccountInfos(HttpUtils.getLocalHostLANAddress().getHostAddress(),getNodeAccountList());
     }
@@ -528,7 +543,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    public List<Trustee> getTrusteeOfRangeBeforeTime(long time) {
+    public List<Trustee> getTrusteeOfRangeBeforeTime(long time) throws RocksDBException {
         List<Trustee> voters = new ArrayList<>();
         List<Trustee> allVoters = new ArrayList<>();
         //筛选/分组/求和
@@ -536,11 +551,12 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             byte[] timeByte = getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "time")), iterator.key());
             //time的筛选
-            if (Long.parseLong(new String(timeByte)) <= time) {
+            String address = new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "receiptAddress")), iterator.key()));
+            if (Long.parseLong(new String(timeByte)) <= time && accountHasIp(address)) {
                 Trustee trustee = new Trustee();
                 trustee.setVotes(0l);
                 trustee.setStatus(1);
-                trustee.setAddress(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "receiptAddress")), iterator.key())));
+                trustee.setAddress(address);
                 int index = -1;
                 //address的分组
                 index = allVoters.indexOf(trustee);
