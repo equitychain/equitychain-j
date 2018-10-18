@@ -299,7 +299,15 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
     @Override
     public void saveLocalAccountIpInfo() throws Exception {
-        saveIpAccountInfos(HttpUtils.getLocalHostLANAddress().getHostAddress(),getNodeAccountList(),channelsManager.getChannels().size() == 0?1:0);
+        List<Account> accounts = getNodeAccountList();
+        if(accounts == null){
+            accounts = new ArrayList<>();
+        }
+        //添加一个默认的,因为要保存状态
+        Account defaultAcc = new Account();
+        defaultAcc.setAddress("defaultLocalAcc");
+        accounts.add(defaultAcc);
+        saveIpAccountInfos(HttpUtils.getLocalHostLANAddress().getHostAddress(),accounts,channelsManager.getChannels().size() == 0?1:0);
     }
 
     @Override
@@ -338,6 +346,27 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 rocksDB.put(handleMap.get(getColName("accountIp","statu")),iterator.key(),(statu+"").getBytes());
             }
         }
+    }
+
+    @Override
+    public void localAddNewAccountIp(String address) throws Exception {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","ipAddr")));
+        int statu = 0;
+        String localIp = HttpUtils.getLocalHostLANAddress().getHostName();
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            String ipAddr = new String(iterator.value());
+            if(localIp.equals(ipAddr)) {
+                statu = Integer.parseInt(new String(
+                        rocksDB.get(handleMap.get(getColName("accountIp", "statu")), iterator.key())));
+                break;
+            }
+        }
+        AccountIp ipInfo = new AccountIp();
+        ipInfo.setAddress(address);
+        ipInfo.setIpAddr(localIp);
+        ipInfo.setStatu(statu);
+        ipInfo.setId();
+        addObj(ipInfo);
     }
 
     @Override

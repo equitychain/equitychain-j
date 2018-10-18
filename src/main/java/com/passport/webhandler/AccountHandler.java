@@ -73,10 +73,11 @@ public class AccountHandler {
     public Account newAccount(String password) throws Exception {
         Account account = generateAccount(password);
         if (dbAccess.putAccount(account)) {
-            //重铸出块机制
-            String ip = HttpUtils.getLocalHostLANAddress().getHostAddress();
-            dbAccess.put(("heartbeat_"+ip+"_"+account.getAddress()).getBytes(),account.getAddress().getBytes());
-            //重铸出块机制
+            try {
+                dbAccess.localAddNewAccountIp(HttpUtils.getLocalHostLANAddress().getHostAddress());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             return account;
         }
         return null;

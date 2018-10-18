@@ -181,6 +181,7 @@ public interface DBAccess {
 	void saveIpAccountInfos(String address, List<Account> accounts,int statu) throws Exception;
 
 	void setIpAccountStatu(String ipAddr, int statu) throws RocksDBException;
+	void localAddNewAccountIp(String address) throws Exception;
 	/**
 	 * 添加一个钱包账户
 	 * @param account
