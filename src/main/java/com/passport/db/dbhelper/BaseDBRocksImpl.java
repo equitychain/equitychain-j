@@ -352,7 +352,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public void localAddNewAccountIp(String address) throws Exception {
         RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","ipAddr")));
         int statu = 0;
-        String localIp = HttpUtils.getLocalHostLANAddress().getHostName();
+        String localIp = HttpUtils.getLocalHostLANAddress().getHostAddress();
         for (iterator.seekToFirst();iterator.isValid();iterator.next()){
             String ipAddr = new String(iterator.value());
             if(localIp.equals(ipAddr)) {
