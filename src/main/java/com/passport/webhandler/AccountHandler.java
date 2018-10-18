@@ -74,7 +74,7 @@ public class AccountHandler {
         Account account = generateAccount(password);
         if (dbAccess.putAccount(account)) {
             try {
-                dbAccess.localAddNewAccountIp(HttpUtils.getLocalHostLANAddress().getHostAddress());
+                dbAccess.localAddNewAccountIp(account.getAddress());
             }catch (Exception e){
                 e.printStackTrace();
             }
