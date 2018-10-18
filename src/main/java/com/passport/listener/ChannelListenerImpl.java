@@ -101,6 +101,7 @@ public class ChannelListenerImpl implements ChannelListener {
                 }
             }
             if(trigger) {
+                System.out.println("=============检测到关闭后，重新选出块人===========");
                 blockHandler.produceNextBlock();
             }
     }

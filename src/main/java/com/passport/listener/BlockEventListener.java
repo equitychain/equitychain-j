@@ -195,6 +195,7 @@ public class BlockEventListener {
     @EventListener(GenerateNextBlockEvent.class)
     @RocksTransaction
     public void generateNextBlock(GenerateNextBlockEvent event) throws InterruptedException {
+        System.out.println("==============GenerateNextBlockEvent 自动出下个快============");
         blockHandler.produceNextBlock();
     }
 
@@ -217,9 +218,9 @@ public class BlockEventListener {
             }
             //出块后重新启动不再由初始节点主导出块
             long blockHeight = CastUtils.castLong(lastBlockHeightOptional.get());
-			if(blockHeight > 1){
-				return;
-			}
+//			if(blockHeight > 1){
+//				return;
+//			}
             long newBlockHeight = blockHeight + 1;
             int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
 
