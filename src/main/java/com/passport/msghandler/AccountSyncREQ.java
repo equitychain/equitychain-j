@@ -47,7 +47,7 @@ public class AccountSyncREQ extends Strategy {
                  String clientIP = insocket.getAddress().getHostAddress();
                  List<Account> accounts = new ArrayList<>();
                  accounts.add(acc);
-                 dbAccess.saveIpAccountInfos(clientIP,accounts);
+                 dbAccess.saveIpAccountInfos(clientIP,accounts,1);
              }
         }
     }
