@@ -303,7 +303,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         if(accounts == null){
             accounts = new ArrayList<>();
         }
-        //添加一个默认的,因为要保存状态
+        //添加一个默认的,因为
         Account defaultAcc = new Account();
         defaultAcc.setAddress("defaultLocalAcc");
         accounts.add(defaultAcc);
