@@ -4,12 +4,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.core.*;
+import com.passport.peer.ChannelsManager;
 import com.passport.utils.HttpUtils;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +28,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     private static final String MINERACCOUNT = "miner_account";
     @Value("${db.dataDir}")
     private String dataDir;
-
+    @Autowired
+    private ChannelsManager channelsManager;
     public BaseDBRocksImpl() {
 
     }
@@ -296,7 +299,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
     @Override
     public void saveLocalAccountIpInfo() throws Exception {
-        saveIpAccountInfos(HttpUtils.getLocalHostLANAddress().getHostAddress(),getNodeAccountList(),0);
+        saveIpAccountInfos(HttpUtils.getLocalHostLANAddress().getHostAddress(),getNodeAccountList(),channelsManager.getChannels().size() == 0?1:0);
     }
 
     @Override
