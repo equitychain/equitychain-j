@@ -9,6 +9,15 @@ import io.netty.channel.ChannelHandlerContext;
  * @create: 2018-07-18 14:05
  **/
 public abstract class Strategy {
+    protected String channelType;
+    /**
+     * 处理请求消息
+     * @param message
+     */
+    void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message, String channelType) throws Exception {
+        this.channelType = channelType;
+        handleMsg(ctx,message);
+    }
     /**
      * 处理请求消息
      * @param message

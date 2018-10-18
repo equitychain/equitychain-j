@@ -13,6 +13,8 @@ public class AccountIp {
     private String address;
     @FaildClaz(name = "ipAddr",type = String.class)
     private String ipAddr;
+    @FaildClaz(name = "statu",type = int.class)
+    private int statu = 0;
 
     public void setId() {
         id = address+"-"+ipAddr;
@@ -36,5 +38,13 @@ public class AccountIp {
 
     public void setIpAddr(String ipAddr) {
         this.ipAddr = ipAddr;
+    }
+
+    public int getStatu() {
+        return statu;
+    }
+
+    public void setStatu(int statu) {
+        this.statu = statu;
     }
 }

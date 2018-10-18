@@ -279,11 +279,13 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    public boolean accountHasIp(String address) throws RocksDBException {
+    public boolean accountHasOnlineIp(String address) throws RocksDBException {
         RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","address")));
         for(iterator.seekToFirst();iterator.isValid();iterator.next()){
             String addr = new String(iterator.value());
-            if(address.equals(addr)){
+            byte[] keyByt = rocksDB.get(handleMap.get(getColName("accountIp","statu")),iterator.key());
+            int statu = Integer.parseInt(new String(keyByt));
+            if(address.equals(addr) && statu == 1){
                 byte[] ipByt = rocksDB.get(handleMap.get(getColName("accountIp","ipAddr")),iterator.key());
                 if(ipByt != null && ipByt.length > 0 && !"".equals(new String(ipByt))){
                     return true;
@@ -292,10 +294,9 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         }
         return false;
     }
-
     @Override
     public void saveLocalAccountIpInfo() throws Exception {
-        saveIpAccountInfos(HttpUtils.getLocalHostLANAddress().getHostAddress(),getNodeAccountList());
+        saveIpAccountInfos(HttpUtils.getLocalHostLANAddress().getHostAddress(),getNodeAccountList(),0);
     }
 
     @Override
@@ -314,13 +315,25 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    public void saveIpAccountInfos(String address, List<Account> accounts) throws Exception {
+    public void saveIpAccountInfos(String address, List<Account> accounts, int statu) throws Exception {
         for (Account account : accounts){
             AccountIp accountIp = new AccountIp();
             accountIp.setAddress(account.getAddress());
             accountIp.setIpAddr(address);
+            accountIp.setStatu(statu);
             accountIp.setId();
             addObj(accountIp);
+        }
+    }
+
+    @Override
+    public void setIpAccountStatu(String ipAddr, int statu) throws RocksDBException {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","ipAddr")));
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            String addr = new String(iterator.value());
+            if(ipAddr.equals(addr)){
+                rocksDB.put(handleMap.get(getColName("accountIp","statu")),iterator.key(),(statu+"").getBytes());
+            }
         }
     }
 
@@ -562,7 +575,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             byte[] timeByte = getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "time")), iterator.key());
             //time的筛选
             String address = new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "receiptAddress")), iterator.key()));
-            if (Long.parseLong(new String(timeByte)) <= time && accountHasIp(address)) {
+            if (Long.parseLong(new String(timeByte)) <= time && accountHasOnlineIp(address)) {
                 Trustee trustee = new Trustee();
                 trustee.setVotes(0l);
                 trustee.setStatus(1);

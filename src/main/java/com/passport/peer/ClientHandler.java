@@ -25,6 +25,7 @@ import java.util.List;
 @ChannelHandler.Sharable
 @Component
 public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Message> {
+    private static final String channelType = "CLIENT_CHANNEL";
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
     @Autowired
@@ -37,7 +38,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
         logger.info("client read data客户端读到的数据是：{}", GsonUtils.toJson(message));
-        strategyContext.handleMsgMain(ctx, message);
+        strategyContext.handleMsgMain(ctx, message,channelType);
     }
 
     @Override

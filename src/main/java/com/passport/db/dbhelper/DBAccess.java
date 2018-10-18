@@ -167,7 +167,7 @@ public interface DBAccess {
 	 * @param address
 	 * @return
 	 */
-	boolean accountHasIp(String address) throws RocksDBException;
+	boolean accountHasOnlineIp(String address) throws RocksDBException;
 	/**
 	 * 保存自己本机的账号ip信息
 	 */
@@ -178,7 +178,9 @@ public interface DBAccess {
 	 * @param address
 	 * @param accounts
 	 */
-	void saveIpAccountInfos(String address, List<Account> accounts) throws Exception;
+	void saveIpAccountInfos(String address, List<Account> accounts,int statu) throws Exception;
+
+	void setIpAccountStatu(String ipAddr, int statu) throws RocksDBException;
 	/**
 	 * 添加一个钱包账户
 	 * @param account

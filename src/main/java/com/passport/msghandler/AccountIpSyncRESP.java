@@ -33,6 +33,11 @@ public class AccountIpSyncRESP extends Strategy {
         InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
         String clientIP = insocket.getAddress().getHostAddress();
         //保存地址ip信息
-        dbAccess.saveIpAccountInfos(clientIP,accounts);
+        int statu = 1;
+        if(this.channelType == null || "".equals(this.channelType) || "SERVER_CHANNEL".equals(this.channelType)){
+            statu = 0;
+        }
+        dbAccess.saveIpAccountInfos(clientIP,accounts,statu);
+        System.out.println("==================获取了账号ip信息,statu=="+statu);
     }
 }
