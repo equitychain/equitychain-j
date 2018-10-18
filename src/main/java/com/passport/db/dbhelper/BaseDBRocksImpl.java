@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.utils.HttpUtils;
+import com.passport.utils.NetworkTime;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ReadOptions;
@@ -75,7 +76,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         ColumnFamilyHandle handle = handleMap.get(getColName("block", "blockHeight"));
         RocksIterator heightIter;
 //        if (transaction != null) {
-            heightIter = rocksDB.newIterator(handle);
+            heightIter = transaction.getIterator(new ReadOptions(),handle);
 //        }else{
 //        heightIter = rocksDB.newIterator(handle);
 //        }
@@ -145,7 +146,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public boolean putNodeList(List<String> nodes) {
         try {
 
-            rocksDB.put(CLIENT_NODES_LIST_KEY.getBytes(), SerializeUtils.serialize(nodes));
+            transaction.put(CLIENT_NODES_LIST_KEY.getBytes(), SerializeUtils.serialize(nodes));
             return true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -157,7 +158,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public boolean put(String key, Object value) {
         try {
             KeysSet.add(key);//存储key到文件
-            rocksDB.put(key.getBytes(), SerializeUtils.serialize(value));
+            transaction.put(key.getBytes(), SerializeUtils.serialize(value));
             return true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -169,11 +170,11 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public Optional<Object> get(String key) {
         try {
             byte[] objByt = rocksDB.get(key.getBytes());
-//            if(rocksDB!=null){
-//                objByt = rocksDB.get(new ReadOptions(),key.getBytes());
-//            }else{
+            if(transaction!=null){
+                objByt = transaction.get(new ReadOptions(),key.getBytes());
+            }else{
                 objByt = rocksDB.get(key.getBytes());
-//            }
+            }
             if (objByt != null) {
                return Optional.of(SerializeUtils.unSerialize(objByt));
             }
@@ -202,7 +203,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public boolean delete(String key) {
         try {
-            rocksDB.delete(key.getBytes());
+            transaction.delete(key.getBytes());
             return true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -842,7 +843,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         BigDecimal sumMoney = BigDecimal.ZERO;
         //总手续费
         BigDecimal sumFee = BigDecimal.ZERO;
-        long timeSpli = System.currentTimeMillis() - 60*60*1000;
+        long timeSpli = NetworkTime.INSTANCE.getWebsiteDateTimeLong() - 60*60*1000;
         long count = 0l;
         long blockTimeDiff = 0l;
         Optional<Block> blockOptional = getLastBlock();

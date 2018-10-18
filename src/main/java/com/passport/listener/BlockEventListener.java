@@ -2,6 +2,7 @@ package com.passport.listener;
 
 import com.google.common.base.Optional;
 import com.passport.annotations.RocksTransaction;
+import com.passport.aop.TransactionAspect;
 import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.db.dbhelper.BaseDBAccess;
@@ -15,6 +16,7 @@ import com.passport.proto.*;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
+import com.passport.utils.NetworkTime;
 import com.passport.webhandler.BlockHandler;
 import com.passport.webhandler.TrusteeHandler;
 import io.netty.channel.group.ChannelGroup;
@@ -56,6 +58,8 @@ public class BlockEventListener {
     private BlockUtils blockUtils;
     @Autowired
     private TrusteeHandler trusteeHandler;
+    @Autowired
+    private ApplicationContextProvider provider;
 
 
     /**
@@ -76,7 +80,14 @@ public class BlockEventListener {
             }
             if (blockHeight == 0) {
                 //创建创世块
-//                dbAccess.transaction = dbAccess.rocksDB.beginTransaction(new WriteOptions());
+                System.out.println("创世快加锁(开启事务)=============!~");
+//                if(!TransactionAspect.lock.isLocked()){
+//                    TransactionAspect.lock.lock();
+//                }else{
+//                    System.out.println("创世快######");
+//                }
+                TransactionAspect.lock.lock();
+                dbAccess.transaction = dbAccess.rocksDB.beginTransaction(new WriteOptions());
                 try {
                     Block block = createGenesisBlock();
                     blockHeight = block.getBlockHeight();
@@ -85,9 +96,13 @@ public class BlockEventListener {
                     dbAccess.putBlock(block);
                     //保存区块高度到本地
                     dbAccess.putLastBlockHeight(blockHeight);
-//                    dbAccess.transaction.commit();
+                    dbAccess.transaction.commit();
+                    TransactionAspect.lock.unlock();
+                    System.out.println("创世快解锁(提交事务)=============!~");
                 } catch (Exception e) {
-//                    dbAccess.transaction.rollback();
+                    dbAccess.transaction.rollback();
+                    TransactionAspect.lock.unlock();
+                    System.out.println("创世快解锁(回滚事务)=============!~");
                 }
 
             }
@@ -195,6 +210,22 @@ public class BlockEventListener {
     @EventListener(GenerateNextBlockEvent.class)
     @RocksTransaction
     public void generateNextBlock(GenerateNextBlockEvent event) throws InterruptedException {
+        Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
+        if(!lastBlockOptional.isPresent()){
+            return;
+        }
+        Block block = lastBlockOptional.get();
+        long lastTimestamp = block.getBlockHeader().getTimeStamp();
+        long currentTimestamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
+        long timeGap = currentTimestamp - lastTimestamp;
+        if(timeGap < 9000){//间隔小于3秒，return
+//            System.out.println("未到出块时间则睡眠等待"+System.currentTimeMillis());
+            provider.publishEvent(new GenerateNextBlockEvent(0L));
+//            System.out.println("未到出块时间则睡眠等待2"+System.currentTimeMillis());
+            return;
+        }else{
+//            System.out.println("还有三秒就要出块了， 进入出块方法");
+        }
         blockHandler.produceNextBlock();
     }
 

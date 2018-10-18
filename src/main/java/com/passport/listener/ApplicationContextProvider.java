@@ -13,20 +13,37 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApplicationContextProvider implements ApplicationContextAware {
 
-    private static ApplicationContext context;
+    public static ApplicationContext context;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext)
             throws BeansException {
         context = applicationContext;
     }
-    @Async
+
+    @Async("asyncServiceExecutor")
     public void publishEvent(ApplicationEvent event) {
-        try{
-            Thread.sleep(2000);
+        try {
             context.publishEvent(event);
-        }catch (Exception e){
+//            new PublishThread(context, event).start();
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+}
+
+class PublishThread extends Thread {
+    ApplicationContext context;
+    ApplicationEvent event;
+
+    public PublishThread(ApplicationContext context, ApplicationEvent event) {
+        this.context = context;
+        this.event = event;
+    }
+
+    @Override
+    public void run() {
+//            Thread.sleep(2000);
+        context.publishEvent(event);
     }
 }

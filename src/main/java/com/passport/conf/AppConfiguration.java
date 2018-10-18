@@ -1,7 +1,6 @@
 package com.passport.conf;
 
 import com.passport.utils.StoryFileUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,4 +23,5 @@ public class AppConfiguration {
   public StoryFileUtil storyFileUtil() throws Exception {
       return StoryFileUtil.getStoryFileUtil(new File(keystoreDir));
   }
+
 }

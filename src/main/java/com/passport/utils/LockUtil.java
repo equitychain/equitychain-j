@@ -30,7 +30,7 @@ public class LockUtil {
             Credentials credentials = Credentials.create(Wallet.decrypt(password, file));
             String privateKey = credentials.getEcKeyPair().exportPrivateKey();
             if(privateKey != null && !"".equals(privateKey)) {
-                long lock = System.currentTimeMillis();
+                long lock = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
                 if (lockTime != null) {
                     lock = lock + lockTime;
                 } else {
@@ -48,7 +48,7 @@ public class LockUtil {
     public static boolean isUnlock(String address){
         Long time = addrLockMap.get(address);
         if(time == null) return false;
-        long curTime = System.currentTimeMillis();
+        long curTime = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
         return time - curTime >= 500;
     }
 }

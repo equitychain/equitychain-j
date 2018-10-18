@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Futures;
 import com.google.protobuf.ByteString;
 import com.passport.annotations.RocksTransaction;
+import com.passport.aop.TransactionAspect;
 import com.passport.constant.Constant;
 import com.passport.constant.SyncFlag;
 import com.passport.core.*;
@@ -23,7 +24,9 @@ import com.passport.transactionhandler.TransactionStrategy;
 import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
+import com.passport.utils.NetworkTime;
 import com.passport.utils.RawardUtil;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
@@ -34,10 +37,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -162,7 +162,14 @@ public class BlockHandler {
         Thread handlerThread = new Thread(new Runnable() {
             @Override
             public void run() {
-//                dbAccess.transaction =dbAccess.rocksDB.beginTransaction(new WriteOptions());;
+                System.out.println("同步区块加锁(开启事务)=============!~");
+//                if(!TransactionAspect.lock.isLocked()){
+//                    TransactionAspect.lock.lock();
+//                }else{
+//                    System.out.println("同步区块######");
+//                }
+                TransactionAspect.lock.lock();
+                dbAccess.transaction =dbAccess.rocksDB.beginTransaction(new WriteOptions());;
 
                 try{
                     //todo 校验 目前是获取相同的区块高度
@@ -202,13 +209,17 @@ public class BlockHandler {
                             break;
                         }
                     }
-//                    dbAccess.transaction.commit();
+                    dbAccess.transaction.commit();
+                    TransactionAspect.lock.unlock();
+                    System.out.println("同步区块解锁(提交事务)=============!~");
                 }catch (Exception e){
-//                    try {
-//                        dbAccess.transaction.rollback();
-//                    } catch (RocksDBException e1) {
-//                        e1.printStackTrace();
-//                    }
+                    try {
+                        dbAccess.transaction.rollback();
+                        TransactionAspect.lock.unlock();
+                        System.out.println("同步区块解锁(回滚事务)=============!~");
+                    } catch (RocksDBException e1) {
+                        e1.printStackTrace();
+                    }
                     logger.warn("synchronization block error", e);
                 }finally {
                     //更改状态
@@ -379,7 +390,7 @@ public class BlockHandler {
         if(trustees.size() == 0){
             trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
         }
-
+        waitIfNotArrived(block);
         produceBlock(newBlockHeight, trustees, blockCycle);
     }
 
@@ -390,10 +401,20 @@ public class BlockHandler {
      */
     private void waitIfNotArrived(Block block) {
         long lastTimestamp = block.getBlockHeader().getTimeStamp();
-        long currentTimestamp = System.currentTimeMillis();
+        long currentTimestamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
         long timeGap = currentTimestamp - lastTimestamp;
+
+
+        System.out.println("Super:"+DateFormatUtils.format(new Date(block.getBlockHeader().getTimeStamp()),"yyyy-MM-dd hh:mm:ss"));
+        System.out.println("Super2:"+DateFormatUtils.format(new Date(NetworkTime.INSTANCE.getWebsiteDateTimeLong()),"yyyy-MM-dd hh:mm:ss"));
+
+
+
+
+        System.err.println(Constant.BLOCK_GENERATE_TIMEGAP*1000 - timeGap+"-=-=-=-=-=-=-=-=-=-="+block.getBlockHeight());
         if(timeGap < Constant.BLOCK_GENERATE_TIMEGAP*1000){//间隔小于10秒，则睡眠等待
             try {
+                System.out.println("未到出块时间则睡眠等待"+(Constant.BLOCK_GENERATE_TIMEGAP*1000 - timeGap));
                 TimeUnit.MILLISECONDS.sleep(Constant.BLOCK_GENERATE_TIMEGAP*1000 - timeGap);
             } catch (InterruptedException e) {
                 logger.error("生产区块睡眠等待异常", e);
@@ -413,8 +434,6 @@ public class BlockHandler {
             Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
             Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
             if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
-
-                waitIfNotArrived(dbAccess.getBlock(newBlockHeight-1).get());
                 SyncFlag.setNextBlockSyncFlag(false);
                 SyncFlag.setStarCycle(blockCycle - 1);
                 Account account = accountOptional.get();
