@@ -1,6 +1,7 @@
 package com.passport.db.dbhelper;
 
 import com.google.common.base.Optional;
+import com.passport.annotations.RocksTransaction;
 import com.passport.core.*;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
@@ -171,6 +172,7 @@ public interface DBAccess {
 	/**
 	 * 保存自己本机的账号ip信息
 	 */
+
 	void saveLocalAccountIpInfo() throws Exception;
 	List<AccountIp> delAccountIpByAddr(String ip) throws Exception;
 	/**

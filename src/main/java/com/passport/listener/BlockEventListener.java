@@ -248,9 +248,9 @@ public class BlockEventListener {
             }
             //出块后重新启动不再由初始节点主导出块
             long blockHeight = CastUtils.castLong(lastBlockHeightOptional.get());
-			if(blockHeight > 1){
-				return;
-			}
+//			if(blockHeight > 1){
+//				return;
+//			}
             long newBlockHeight = blockHeight + 1;
             int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
 

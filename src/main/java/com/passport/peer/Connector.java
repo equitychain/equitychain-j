@@ -1,7 +1,10 @@
 package com.passport.peer;
 
 import com.passport.annotations.RocksTransaction;
+import com.passport.aop.TransactionAspect;
 import com.passport.constant.NodeListConstant;
+import com.passport.core.Transaction;
+import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.GenerateBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
@@ -14,6 +17,7 @@ import com.passport.timer.MonitoringIfProducerDead;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.HttpUtils;
 import com.passport.zookeeper.ServiceRegistry;
+import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -42,13 +46,24 @@ public class Connector implements InitializingBean {
     @Autowired
     private ChannelsManager channelsManager;
     @Autowired
-    private DBAccess dbAccess;
+    private BaseDBAccess dbAccess;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         //启动服务并注册到discover节点
         System.out.println("=======del all");
-        dbAccess.delAllAccountIps();
+        TransactionAspect.lock.lock();
+        dbAccess.transaction = dbAccess.rocksDB.beginTransaction(new WriteOptions());
+        try {
+            dbAccess.delAllAccountIps();
+            dbAccess.transaction.commit();
+        } catch (Exception e) {
+            dbAccess.transaction.rollback();
+            e.printStackTrace();
+        }finally {
+            TransactionAspect.lock.unlock();
+
+        }
         asyncTask.startServer();
         TimeUnit.MILLISECONDS.sleep(3000);
 
@@ -93,7 +108,18 @@ public class Connector implements InitializingBean {
         provider.publishEvent(new GenerateBlockEvent(0L));
         //节点启动，把自己账号信息保存
         try {
-            dbAccess.saveLocalAccountIpInfo();
+            TransactionAspect.lock.lock();
+            dbAccess.transaction = dbAccess.rocksDB.beginTransaction(new WriteOptions());
+            try {
+                dbAccess.saveLocalAccountIpInfo();
+                dbAccess.transaction.commit();
+            } catch (Exception e) {
+                dbAccess.transaction.rollback();
+                e.printStackTrace();
+            }finally {
+                TransactionAspect.lock.unlock();
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

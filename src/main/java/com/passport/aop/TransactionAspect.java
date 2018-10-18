@@ -40,7 +40,7 @@ public class TransactionAspect {
     public void deBefore(JoinPoint joinPoint) throws Throwable {
         beginTime = System.currentTimeMillis();
         lock.lock();
-        System.out.println(Thread.currentThread().getName()+"加锁(开启事务)=============!~"+DateFormatUtils.format(new Date(),"yyyy-MM-dd hh:mm:ss"));
+//        System.out.println(Thread.currentThread().getName()+"加锁(开启事务)=============!~"+DateFormatUtils.format(new Date(),"yyyy-MM-dd hh:mm:ss"));
         dbAccess.transaction = dbAccess.rocksDB.beginTransaction(new WriteOptions());
     }
 
@@ -52,13 +52,13 @@ public class TransactionAspect {
     public void throwingMethod(Exception e) throws RocksDBException {
         dbAccess.transaction.rollback();
         lock.unlock();
-        System.out.println("解锁(回滚)=============!~"+DateFormatUtils.format(new Date(),"yyyy-MM-dd hh:mm:ss"));
+//        System.out.println("解锁(回滚)=============!~"+DateFormatUtils.format(new Date(),"yyyy-MM-dd hh:mm:ss"));
     }
     @AfterReturning(returning = "ret", pointcut = "sig()")
     public void doAfterReturning(Object ret) throws Throwable {
         dbAccess.transaction.commit();
         lock.unlock();
-        System.err.println("解锁(提交)=============!~"+DateFormatUtils.format(new Date(),"yyyy-MM-dd hh:mm:ss")+"===耗时"+(System.currentTimeMillis()-beginTime));
+//        System.err.println("解锁(提交)=============!~"+DateFormatUtils.format(new Date(),"yyyy-MM-dd hh:mm:ss")+"===耗时"+(System.currentTimeMillis()-beginTime));
     }
 
 
