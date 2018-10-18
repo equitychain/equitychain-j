@@ -413,7 +413,6 @@ public class BlockHandler {
             Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
             Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
             if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
-
                 waitIfNotArrived(dbAccess.getBlock(newBlockHeight-1).get());
                 SyncFlag.setNextBlockSyncFlag(false);
                 SyncFlag.setStarCycle(blockCycle - 1);

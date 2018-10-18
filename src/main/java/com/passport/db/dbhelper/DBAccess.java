@@ -173,6 +173,7 @@ public interface DBAccess {
 	 */
 	void saveLocalAccountIpInfo() throws Exception;
 	List<AccountIp> delAccountIpByAddr(String ip) throws Exception;
+	int getLocalAccountIpStatu() throws Exception;
 	/**
 	 * 保存其他节点的账号ip信息
 	 * @param address

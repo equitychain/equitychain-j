@@ -326,6 +326,22 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
+    public int getLocalAccountIpStatu() throws Exception {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","ipAddr")));
+        int statu = 0;
+        String localIp = HttpUtils.getLocalHostLANAddress().getHostName();
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            String ipAddr = new String(iterator.value());
+            if(localIp.equals(ipAddr)) {
+                statu = Integer.parseInt(new String(
+                        rocksDB.get(handleMap.get(getColName("accountIp", "statu")), iterator.key())));
+                break;
+            }
+        }
+        return statu;
+    }
+
+    @Override
     public void saveIpAccountInfos(String address, List<Account> accounts, int statu) throws Exception {
         for (Account account : accounts){
             AccountIp accountIp = new AccountIp();
