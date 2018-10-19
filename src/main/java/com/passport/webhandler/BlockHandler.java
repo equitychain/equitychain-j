@@ -165,15 +165,6 @@ public class BlockHandler {
         Thread handlerThread = new Thread(new Runnable() {
             @Override
             public void run() {
-//                System.out.println("同步区块加锁(开启事务)=============!~");
-//                if(!TransactionAspect.lock.isLocked()){
-//                    TransactionAspect.lock.lock();
-//                }else{
-//                    System.out.println("同步区块######");
-//                }
-                TransactionAspect.lock.lock();
-                dbAccess.transaction =dbAccess.rocksDB.beginTransaction(new WriteOptions());;
-
                 try{
                     //todo 校验 目前是获取相同的区块高度
                     List<Block> successBlocks = getShareBlocks();
@@ -212,17 +203,7 @@ public class BlockHandler {
                             break;
                         }
                     }
-                    dbAccess.transaction.commit();
-                    TransactionAspect.lock.unlock();
-//                    System.out.println("同步区块解锁(提交事务)=============!~");
                 }catch (Exception e){
-                    try {
-                        dbAccess.transaction.rollback();
-                        TransactionAspect.lock.unlock();
-//                        System.out.println("同步区块解锁(回滚事务)=============!~");
-                    } catch (RocksDBException e1) {
-                        e1.printStackTrace();
-                    }
                     logger.warn("synchronization block error", e);
                 }finally {
                     //更改状态

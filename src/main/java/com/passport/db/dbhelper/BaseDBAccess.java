@@ -5,33 +5,25 @@ import com.passport.annotations.EntityClaz;
 import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
 import com.passport.constant.Constant;
-import com.passport.core.*;
 import com.passport.utils.ClassUtil;
-import com.passport.utils.NetworkTime;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.*;
-import org.rocksdb.Transaction;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.text.ParseException;
 import java.util.*;
-import java.util.Comparator;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public abstract class BaseDBAccess implements DBAccess {
     ThreadPoolExecutor executor = new ThreadPoolExecutor(100, 100, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1000));
-    public Transaction transaction;
-    public OptimisticTransactionDB rocksDB;
+//    public rocksDB rocksDB;
+    public RocksDB rocksDB;
     @Value("${db.dataDir}")
     private String dataDir;
 
@@ -56,7 +48,7 @@ public abstract class BaseDBAccess implements DBAccess {
                 dtoClasses.add(c);
             }
             try {
-                rocksDB = OptimisticTransactionDB.open(new Options().setCreateIfMissing(true).setWalSizeLimitMB(0).setWalTtlSeconds(0),dataDir);
+                rocksDB = rocksDB.open(new Options().setCreateIfMissing(true).setWalSizeLimitMB(0).setWalTtlSeconds(0),dataDir);
 
                 //添加默认的列族
                 handleMap.put("default", rocksDB.getDefaultColumnFamily());
@@ -101,8 +93,8 @@ public abstract class BaseDBAccess implements DBAccess {
                 }
                 //打开数据库  加载旧列族,创建新列族
                 List<ColumnFamilyHandle> handleList = new ArrayList<>();
-//                rocksDB = OptimisticTransactionDB.open(new DBOptions().setCreateIfMissing(true), dataDir, curHasColumns, handleList);
-                rocksDB = OptimisticTransactionDB.open(new DBOptions().setCreateIfMissing(true).setWalSizeLimitMB(0).setWalTtlSeconds(0), dataDir, curHasColumns, handleList);
+//                rocksDB = OptimisticrocksDBDB.open(new DBOptions().setCreateIfMissing(true), dataDir, curHasColumns, handleList);
+                rocksDB = rocksDB.open(new DBOptions().setCreateIfMissing(true).setWalSizeLimitMB(0).setWalTtlSeconds(0), dataDir, curHasColumns, handleList);
 
                 for(ColumnFamilyDescriptor descriptor : curDontHasColumns) {
                     ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
@@ -1194,7 +1186,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public boolean put(byte[] key, byte[] value) {
         boolean res = false;
         try {
-            transaction.put(key, value);
+            rocksDB.put(key, value);
             res = true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -1206,7 +1198,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public boolean putByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle, byte[] key, byte[] value) {
         boolean res = false;
         try {
-            transaction.put(columnFamilyHandle, key, value);
+            rocksDB.put(columnFamilyHandle, key, value);
             res = true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -1229,7 +1221,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public byte[] getByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         byte[] res = null;
         try {
-            res = transaction.get(columnFamilyHandle,new ReadOptions(), key);
+            res = rocksDB.get(columnFamilyHandle,new ReadOptions(), key);
         } catch (RocksDBException e) {
             e.printStackTrace();
         }
@@ -1240,7 +1232,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public boolean delete(byte[] key) {
         boolean res = false;
         try {
-            transaction.delete(key);
+            rocksDB.delete(key);
             res = true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -1252,7 +1244,7 @@ public abstract class BaseDBAccess implements DBAccess {
     public boolean deleteByColumnFamilyHandle(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         boolean res = false;
         try {
-            transaction.delete(columnFamilyHandle, key);
+            rocksDB.delete(columnFamilyHandle, key);
             res = true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -1260,38 +1252,6 @@ public abstract class BaseDBAccess implements DBAccess {
         return res;
     }
 
-    // transaction start
-    protected Snapshot snapshot;
-
-    protected Set<String> KeysSet = new HashSet<>();
-
-    public void setSnapshot(Snapshot snapshot) {
-        this.snapshot = snapshot;
-    }
-
-    public Set<String> getKeysSet() {
-        return KeysSet;
-    }
-
-    public void setKeysSet(Set<String> keysSet) {
-        KeysSet = keysSet;
-    }
-
-    public Snapshot getCurrentSnapshot() {
-        return rocksDB.getSnapshot();
-    }
-
-    public void close() {
-        //在一个事务的最后调用该方法,由切面决定调用时间(当事务注解的方法完成的时候执行)
-        //关闭DB对象实例,情况Keyset,快照
-        //todo 接下来还要加入清空实例化对象文件, 记录keySet对象的实例化对象文件之后如果事务正确执行完毕, 则清除该文件,如果执行过程中出现 问题,则在启动的时候逐一回复, 逐一回复的会后应从linkedList最后开始一次恢复
-        rocksDB.close();
-        setKeysSet(new HashSet());
-        setSnapshot(null);
-
-    }
-
-    // transaction end
     @Override
     public <T> void addIndex(T t, IndexColumnNames columnNames,byte[] indexKey) {
         try {

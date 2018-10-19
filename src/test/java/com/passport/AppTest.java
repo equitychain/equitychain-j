@@ -4,6 +4,7 @@ import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.BaseDBRocksImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.rocksdb.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -40,6 +41,10 @@ public class AppTest
 //        valK = valK/gropSize;
 //        valK = valK*gropSize;
 //        System.out.println(valK);
-        System.out.println(InetAddress.getLocalHost().getHostAddress());
+//        OptimisticTransactionDB db = OptimisticTransactionDB.open(new Options().setCreateIfMissing(true),"d:/test");
+        RocksDB rocksDB = RocksDB.open(new Options().setCreateIfMissing(true),"d:/test");
+        WriteBatch writeBatch1 = new WriteBatch();
+//        Transaction transaction = db.beginTransaction(new WriteOptions());
+        System.out.println();
     }
 }

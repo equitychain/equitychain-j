@@ -52,17 +52,10 @@ public class Connector implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         //启动服务并注册到discover节点
         System.out.println("=======del all");
-        TransactionAspect.lock.lock();
-        dbAccess.transaction = dbAccess.rocksDB.beginTransaction(new WriteOptions());
         try {
             dbAccess.delAllAccountIps();
-            dbAccess.transaction.commit();
         } catch (Exception e) {
-            dbAccess.transaction.rollback();
             e.printStackTrace();
-        }finally {
-            TransactionAspect.lock.unlock();
-
         }
         asyncTask.startServer();
         TimeUnit.MILLISECONDS.sleep(3000);
@@ -72,7 +65,7 @@ public class Connector implements InitializingBean {
         logger.info("注册后从discover节点取到的地址列表：{}", GsonUtils.toJson(set));
         String serviceAddress = HttpUtils.getLocalHostLANAddress().getHostAddress();
         for (String address : set) {
-            if(!address.equals(serviceAddress)){
+            if (!address.equals(serviceAddress)) {
                 asyncTask.startConnect(address);
             }
         }
@@ -105,18 +98,7 @@ public class Connector implements InitializingBean {
         provider.publishEvent(new GenerateBlockEvent(0L));
         //节点启动，把自己账号信息保存
         try {
-            TransactionAspect.lock.lock();
-            dbAccess.transaction = dbAccess.rocksDB.beginTransaction(new WriteOptions());
-            try {
-                dbAccess.saveLocalAccountIpInfo();
-                dbAccess.transaction.commit();
-            } catch (Exception e) {
-                dbAccess.transaction.rollback();
-                e.printStackTrace();
-            }finally {
-                TransactionAspect.lock.unlock();
-            }
-
+            dbAccess.saveLocalAccountIpInfo();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -128,7 +110,7 @@ public class Connector implements InitializingBean {
         provider.publishEvent(new GenerateBlockEvent(0L));
     }
 
-   // @EventListener(ApplicationReadyEvent.class)
+    // @EventListener(ApplicationReadyEvent.class)
     public void syncAccountList() {
 
     }
