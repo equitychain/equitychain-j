@@ -20,7 +20,7 @@ public interface Constant {
 
   //用来存储各个节点同步过来的区块
   //todo 这个队列是个有限队列，用来判断几个节点是否满了，至于多少个，需要更改
-  int BLOCK_NODE_COUNT = 2;
+  int BLOCK_NODE_COUNT =1;
   ArrayBlockingQueue<List<Block>> BLOCK_QUEUE = new ArrayBlockingQueue(BLOCK_NODE_COUNT);
 
   //初始奖励金额
@@ -32,11 +32,11 @@ public interface Constant {
   // 区块最多打包的流水数量
   int TRANS_SIZE = 100;
 
-  Integer BLOCK_HEIGHT_GAP = 30;//本地区块和广播过来的区块高度差
+  Integer BLOCK_HEIGHT_GAP = 5;//本地区块和广播过来的区块高度差
 
   Integer BLOCK_SYNC_PERTIME = 50;//一次主动同步的区块数
 
-  Integer TRUSTEES_INIT_NUM = 101;//受托人初始化的人数
+  Integer TRUSTEES_INIT_NUM = 11;//受托人初始化的人数
 
   Integer BLOCK_GENERATE_TIMEGAP = 10;//每个区块生成时间间隔
 
@@ -44,9 +44,9 @@ public interface Constant {
 
   String GENESIS_PATH = "./genesis.json";//创世文件
 
-  BigDecimal FEE_4_REGISTER_TRUSTEE = new BigDecimal(100);//注册成为受托人资金
+  BigDecimal FEE_4_REGISTER_TRUSTEE = new BigDecimal(1);//注册成为受托人资金
 
-  BigDecimal FEE_4_REGISTER_VOTER = new BigDecimal(10);//注册成为投票人资产
+  BigDecimal FEE_4_REGISTER_VOTER = new BigDecimal(1);//注册成为投票人资产
 
   Integer CHANCE_4_VOTER = 10;//投票人总投票数
 
