@@ -50,13 +50,8 @@ public class TransactionHandler {
     private HashMap<byte[], BigDecimal> eggUsedTemp = new HashMap<>();
     @Autowired
     private TransactionStrategyContext transactionStrategyContext;
-<<<<<<< HEAD
-    //流水确认奖励是否全额给受托人
-    private boolean feeTempFlag = true;
-=======
     //流水确认奖励是否全额给受托人  他的投票人数
     private List<VoteRecord> voteRecords = new ArrayList<>();
->>>>>>> d00c76a871cec5d89b36d568208ab4c61fd28395
     /**
      * 发送交易，等待其它节点确认
      * @param payAddress
@@ -300,12 +295,6 @@ public class TransactionHandler {
 
     public BigDecimal getTempEggByHash(byte[] transHash) {
         return eggUsedTemp.get(transHash);
-    }
-    public void setFeeFlag(boolean feeTempFlag){
-        feeTempFlag = feeTempFlag;
-    }
-    public boolean getFeeFlag() {
-        return feeTempFlag;
     }
     public void setVoteRecords(long blockHeight, String address){
         long time = blockUtils.getTimestamp4BlockCycle(blockHeight);
