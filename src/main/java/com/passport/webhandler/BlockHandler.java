@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Futures;
 import com.google.protobuf.ByteString;
 import com.passport.annotations.RocksTransaction;
+import com.passport.aop.TransactionAspect;
 import com.passport.constant.Constant;
 import com.passport.constant.SyncFlag;
 import com.passport.core.*;
@@ -23,7 +24,9 @@ import com.passport.transactionhandler.TransactionStrategy;
 import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
+import com.passport.utils.NetworkTime;
 import com.passport.utils.RawardUtil;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
@@ -34,10 +37,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -165,7 +165,14 @@ public class BlockHandler {
         Thread handlerThread = new Thread(new Runnable() {
             @Override
             public void run() {
-//                dbAccess.transaction =dbAccess.rocksDB.beginTransaction(new WriteOptions());;
+//                System.out.println("同步区块加锁(开启事务)=============!~");
+//                if(!TransactionAspect.lock.isLocked()){
+//                    TransactionAspect.lock.lock();
+//                }else{
+//                    System.out.println("同步区块######");
+//                }
+                TransactionAspect.lock.lock();
+                dbAccess.transaction =dbAccess.rocksDB.beginTransaction(new WriteOptions());;
 
                 try{
                     //todo 校验 目前是获取相同的区块高度
@@ -205,13 +212,17 @@ public class BlockHandler {
                             break;
                         }
                     }
-//                    dbAccess.transaction.commit();
+                    dbAccess.transaction.commit();
+                    TransactionAspect.lock.unlock();
+//                    System.out.println("同步区块解锁(提交事务)=============!~");
                 }catch (Exception e){
-//                    try {
-//                        dbAccess.transaction.rollback();
-//                    } catch (RocksDBException e1) {
-//                        e1.printStackTrace();
-//                    }
+                    try {
+                        dbAccess.transaction.rollback();
+                        TransactionAspect.lock.unlock();
+//                        System.out.println("同步区块解锁(回滚事务)=============!~");
+                    } catch (RocksDBException e1) {
+                        e1.printStackTrace();
+                    }
                     logger.warn("synchronization block error", e);
                 }finally {
                     //更改状态
@@ -367,22 +378,22 @@ public class BlockHandler {
 
     public synchronized void produceNextBlock() throws InterruptedException {
         //当前区块周期
+        long a = System.currentTimeMillis();
         Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
         if(!lastBlockOptional.isPresent()){
             return;
         }
         Block block = lastBlockOptional.get();
-
+//
         long blockHeight = CastUtils.castLong(block.getBlockHeight());
         long newBlockHeight = blockHeight + 1;
         int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
-
         //出块完成后，计算出的下一个出块人如果是自己则继续发布出块事件
         List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
         if(trustees.size() == 0){
             trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
         }
-
+        waitIfNotArrived(block);
         produceBlock(newBlockHeight, trustees, blockCycle);
     }
 
@@ -393,8 +404,12 @@ public class BlockHandler {
      */
     private void waitIfNotArrived(Block block) {
         long lastTimestamp = block.getBlockHeader().getTimeStamp();
-        long currentTimestamp = System.currentTimeMillis();
-        long timeGap = currentTimestamp - lastTimestamp;
+        long currentTimestamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
+//        long currentTimestamp = System.currentTimeMillis();
+
+       final long timeGap = currentTimestamp - lastTimestamp;
+
+//        System.err.println(Constant.BLOCK_GENERATE_TIMEGAP*1000 - timeGap+"-=-=-=-=-=-=-=-=-=-=睡几秒"+timeGap);
         if(timeGap < Constant.BLOCK_GENERATE_TIMEGAP*1000){//间隔小于10秒，则睡眠等待
             try {
                 TimeUnit.MILLISECONDS.sleep(Constant.BLOCK_GENERATE_TIMEGAP*1000 - timeGap);
@@ -411,37 +426,27 @@ public class BlockHandler {
      * @param blockCycle
      */
     public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) throws InterruptedException {
-
-//        try{
-            Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
-            Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
-            if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
-                waitIfNotArrived(dbAccess.getBlock(newBlockHeight-1).get());
-                SyncFlag.setNextBlockSyncFlag(false);
-                SyncFlag.setStarCycle(blockCycle - 1);
-                Account account = accountOptional.get();
-                if(account.getPrivateKey() != null){
-                    //打包区块
-                    minerHandler.packagingBlock(account);
-
-                    //更新101个受托人，已经出块人的状态
-                    trusteeHandler.changeStatus(trustee, blockCycle);
-
-                    logger.info("第{}个区块出块成功,出块账号:{}", newBlockHeight,account.getAddress());
-                    provider.publishEvent(new GenerateNextBlockEvent(0L));
-//                    new Thread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                                provider.publishEvent(new GenerateNextBlockEvent(0L));
-//                        }
-//                    }).start();
-                }
-            }else {
-               logger.info("下一个出块账户为："+accountOptional.get().getAddress());
+//        logger.info("区块出块成功,出块账号:");
+//        System.gc();
+//        provider.publishEvent(new GenerateNextBlockEvent(0L));
+        Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
+        Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
+        if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
+            SyncFlag.setNextBlockSyncFlag(false);
+            SyncFlag.setStarCycle(blockCycle - 1);
+            Account account = accountOptional.get();
+            if(account.getPrivateKey() != null){
+                //打包区块
+                minerHandler.packagingBlock(account);
+                //更新101个受托人，已经出块人的状态
+                trusteeHandler.changeStatus(trustee, blockCycle);
+                logger.info("第{}个区块出块成功,出块账号:{}", newBlockHeight,account.getAddress());
+                System.gc();
+                provider.publishEvent(new GenerateNextBlockEvent(0L));
             }
-//        }catch (RocksDBException e){
-//            e.printStackTrace();
-//        }
+        }else {
+            logger.info("出块账号："+accountOptional.get().getAddress());
+        }
 
     }
 

@@ -9,6 +9,7 @@ import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.utils.BlockUtils;
+import com.passport.utils.NetworkTime;
 import com.passport.webhandler.BlockHandler;
 import com.passport.webhandler.TrusteeHandler;
 import org.rocksdb.RocksDBException;
@@ -61,7 +62,7 @@ public class MonitoringIfProducerDead {
         }
         Block block = lastBlockOptional.get();
         Long timeStamp = block.getBlockHeader().getTimeStamp();
-        long currentTimeStamp = System.currentTimeMillis();
+        long currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
         if (currentTimeStamp <= timeStamp + Constant.BLOCK_GENERATE_TIMEGAP * 1000) {
             return;
         }
@@ -79,5 +80,4 @@ public class MonitoringIfProducerDead {
         //再次选出出块账户
         blockHandler.produceNextBlock();
     }
-
 }

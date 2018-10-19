@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.net.InetAddress;
+
 /**
  * Unit test for simple App.
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
+//@RunWith(SpringRunner.class)
+//@SpringBootTest
 public class AppTest 
 {
     /**
@@ -33,10 +35,11 @@ public class AppTest
         Credentials credentials = Credentials.create(keyPair.exportPrivateKey());
         System.out.println(credentials.getAddress());*/
 //1536740510951     3600000
-        long valK = 3600500;
-        long gropSize = 3600*1000;
-        valK = valK/gropSize;
-        valK = valK*gropSize;
-        System.out.println(valK);
+//        long valK = 3600500;
+//        long gropSize = 3600*1000;
+//        valK = valK/gropSize;
+//        valK = valK*gropSize;
+//        System.out.println(valK);
+        System.out.println(InetAddress.getLocalHost().getHostAddress());
     }
 }
