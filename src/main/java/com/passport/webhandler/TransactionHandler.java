@@ -17,6 +17,7 @@ import com.passport.exception.CommonException;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.transactionhandler.TransactionStrategy;
 import com.passport.transactionhandler.TransactionStrategyContext;
+import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.DataFormatUtil;
 import com.passport.utils.GsonUtils;
@@ -42,13 +43,20 @@ public class TransactionHandler {
     @Autowired
     private DBAccess dbAccess;
     @Autowired
+    private BlockUtils blockUtils;
+    @Autowired
     private ApplicationContextProvider provider;
     //todo 这是临时储存流水打包所消耗的egg，如果之后用多线程什么的这里需要进行更改储存方式
     private HashMap<byte[], BigDecimal> eggUsedTemp = new HashMap<>();
     @Autowired
     private TransactionStrategyContext transactionStrategyContext;
+<<<<<<< HEAD
     //流水确认奖励是否全额给受托人
     private boolean feeTempFlag = true;
+=======
+    //流水确认奖励是否全额给受托人  他的投票人数
+    private List<VoteRecord> voteRecords = new ArrayList<>();
+>>>>>>> d00c76a871cec5d89b36d568208ab4c61fd28395
     /**
      * 发送交易，等待其它节点确认
      * @param payAddress
@@ -296,8 +304,24 @@ public class TransactionHandler {
     public void setFeeFlag(boolean feeTempFlag){
         feeTempFlag = feeTempFlag;
     }
-    public boolean getFeeFlag(){
+    public boolean getFeeFlag() {
         return feeTempFlag;
+    }
+    public void setVoteRecords(long blockHeight, String address){
+        long time = blockUtils.getTimestamp4BlockCycle(blockHeight);
+        //获取受托人的投票记录  某个时间前的
+        List<VoteRecord> voteRecords = dbAccess.listVoteRecords(address,
+                "receiptAddress",time,2);
+        for(int i = 0; i < voteRecords.size(); i ++){
+            VoteRecord record = voteRecords.get(i);
+            if(record.getPayAddress() == null || "".equals(record.getPayAddress())) {
+                voteRecords.remove(record);
+            }
+        }
+        this.voteRecords = voteRecords;
+    }
+    public List<VoteRecord> getVoteRecords(){
+        return voteRecords;
     }
     /**
      * 已验证的区块中的流水和本地未确认流水进行匹配，如果本地未确认流水在区块中，则删除未确认流水

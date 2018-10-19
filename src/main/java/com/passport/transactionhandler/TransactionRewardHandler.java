@@ -40,7 +40,7 @@ public class TransactionRewardHandler extends TransactionStrategy {
             Optional<Account> accountOptional = dbAccess.getAccount(new String(transaction.getReceiptAddress()));
             if (accountOptional.isPresent()) {
                 BigDecimal reward = new BigDecimal(new String(transaction.getValue()));
-
+                //todo 金额的校验
                 Account account = accountOptional.get();
                 account.setBalance(account.getBalance().add(reward));
                 dbAccess.putAccount(account);

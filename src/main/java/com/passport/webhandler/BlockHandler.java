@@ -63,6 +63,7 @@ public class BlockHandler {
     public volatile boolean padding = false;
 
     /**
+<<<<<<< HEAD
      * 根据区块高度获取出块奖励，每年递减，第6年及以后奖励恒定
      * @param blockHeight
      * @return
@@ -77,6 +78,8 @@ public class BlockHandler {
 //    }
 
     /**
+=======
+>>>>>>> d00c76a871cec5d89b36d568208ab4c61fd28395
      * 校验区块是否合法
      * @param block
      * @return

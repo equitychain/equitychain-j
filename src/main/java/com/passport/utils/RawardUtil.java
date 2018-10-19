@@ -5,7 +5,11 @@ import com.passport.constant.Constant;
 import java.math.BigDecimal;
 
 public class RawardUtil {
-    //计算区块奖励算法
+    /**
+     * 根据区块高度获取出块奖励，每年递减，第6年及以后奖励恒定
+     * @param blockHeight
+     * @return
+     */
     public static BigDecimal getRewardByHeight(long height){
         Long index = height/Constant.BLOCK_DISTANCE;
         if(index > Constant.REWARD_ARRAY.length-1){
