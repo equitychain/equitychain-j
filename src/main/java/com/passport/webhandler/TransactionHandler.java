@@ -17,10 +17,7 @@ import com.passport.exception.CommonException;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.transactionhandler.TransactionStrategy;
 import com.passport.transactionhandler.TransactionStrategyContext;
-import com.passport.utils.BlockUtils;
-import com.passport.utils.CastUtils;
-import com.passport.utils.DataFormatUtil;
-import com.passport.utils.GsonUtils;
+import com.passport.utils.*;
 import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,7 +186,7 @@ public class TransactionHandler {
         transaction.setReceiptAddress(receiptAddress == null?null:receiptAddress.getBytes());
         transaction.setValue(value.getBytes());
         transaction.setExtarData(extarData.getBytes());
-        transaction.setTime(String.valueOf(System.currentTimeMillis()).getBytes());
+        transaction.setTime(String.valueOf(NetworkTime.INSTANCE.getWebsiteDateTimeLong()).getBytes());
         //生成hash和生成签名sign使用的基础数据都应该一样
         String transactionJson = GsonUtils.toJson(transaction);
         try {

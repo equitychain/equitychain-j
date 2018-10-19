@@ -378,7 +378,6 @@ public class BlockHandler {
 
     public synchronized void produceNextBlock() throws InterruptedException {
         //当前区块周期
-        long a = System.currentTimeMillis();
         Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
         if(!lastBlockOptional.isPresent()){
             return;

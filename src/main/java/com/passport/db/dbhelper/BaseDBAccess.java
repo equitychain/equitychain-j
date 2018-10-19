@@ -866,9 +866,7 @@ public abstract class BaseDBAccess implements DBAccess {
                 if (heightList == null || heightList.size() == 0) {
                     continue;
                 }
-                long t1 = System.currentTimeMillis();
                 String[] paixuHeight = longOrder(heightList, orderByFieldHandle);
-                long t2 = System.currentTimeMillis();
                 String keyFiledName = getKeyFieldByClass(tClass);
                 for (String heightByt : paixuHeight) {
                     T tObj = getObj(keyFiledName, heightByt, tClass);

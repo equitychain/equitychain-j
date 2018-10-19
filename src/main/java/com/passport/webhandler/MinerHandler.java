@@ -60,7 +60,7 @@ public class MinerHandler {
 
         //区块头，merkleTree和hash应该在获得打包交易权限时生成
         BlockHeader currentBlockHeader = new BlockHeader();
-        currentBlockHeader.setTimeStamp(System.currentTimeMillis());
+        currentBlockHeader.setTimeStamp(NetworkTime.INSTANCE.getWebsiteDateTimeLong());
         currentBlockHeader.setHashPrevBlock(prevBlock.getBlockHeader().getHash());
         //todo 这里是设置区块最多能打包多少的流水egg消耗
         currentBlockHeader.setEggMax(Long.parseLong("1000"));
@@ -73,7 +73,7 @@ public class MinerHandler {
 
         transaction.setValue(String.valueOf(RawardUtil.getRewardByHeight(CastUtils.castLong(prevBlock.getBlockHeight() + 1))).getBytes());//TODO 挖矿奖励取值优化
         transaction.setExtarData(TransactionTypeEnum.BLOCK_REWARD.toString().getBytes());
-        transaction.setTime(String.valueOf(System.currentTimeMillis()).getBytes());
+        transaction.setTime(String.valueOf(NetworkTime.INSTANCE.getWebsiteDateTimeLong()).getBytes());
         transaction.setBlockHeight(((prevBlock.getBlockHeight() + 1)+"").getBytes());
         //生成hash和生成签名sign使用的基础数据都应该一样
         String transactionJson = GsonUtils.toJson(transaction);
@@ -128,7 +128,7 @@ public class MinerHandler {
                         tempBalances.get(payAddr).subtract(curTotalPay));
                 //矿工费付给矿工  注意!无论流水是否成功被打包该矿工费是必须给的,因为已经扣了,
                 Transaction feeTrans = new Transaction();
-                feeTrans.setTime((System.currentTimeMillis() + "").getBytes());
+                feeTrans.setTime((NetworkTime.INSTANCE.getWebsiteDateTimeLong() + "").getBytes());
                 feeTrans.setPayAddress(null);
                 feeTrans.setExtarData(tran.getHash());
                 //受托人获取确认流水矿工费的一定比例的奖励  如果投票人没有则全额奖励给受托人
@@ -161,7 +161,7 @@ public class MinerHandler {
             for (int i = 0; i < transactionHandler.getVoteRecords().size(); i++) {
                 VoteRecord record = transactionHandler.getVoteRecords().get(i);
                 Transaction feeTrans = new Transaction();
-                feeTrans.setTime((System.currentTimeMillis() + "").getBytes());
+                feeTrans.setTime((NetworkTime.INSTANCE.getWebsiteDateTimeLong() + "").getBytes());
                 feeTrans.setPayAddress(null);
                 feeTrans.setExtarData(Constant.VOTER_TRANS_PROPORTION_EXTAR_DATA.getBytes());
                 feeTrans.setBlockHeight(((prevBlock.getBlockHeight() + 1) + "").getBytes());
