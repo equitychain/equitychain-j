@@ -63,6 +63,23 @@ public class BlockHandler {
     public volatile boolean padding = false;
 
     /**
+<<<<<<< HEAD
+     * 根据区块高度获取出块奖励，每年递减，第6年及以后奖励恒定
+     * @param blockHeight
+     * @return
+     */
+//    public BigDecimal getReward(Long blockHeight){
+//        Long index = blockHeight/Constant.BLOCK_DISTANCE;
+//        if(index > Constant.REWARD_ARRAY.length-1){
+//            return Constant.REWARD_ARRAY[Constant.REWARD_ARRAY.length-1];
+//        }else{
+//            return Constant.REWARD_ARRAY[index.intValue()];
+//        }
+//    }
+
+    /**
+=======
+>>>>>>> d00c76a871cec5d89b36d568208ab4c61fd28395
      * 校验区块是否合法
      * @param block
      * @return
@@ -148,7 +165,7 @@ public class BlockHandler {
         Thread handlerThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                dbAccess.transaction =dbAccess.rocksDB.beginTransaction(new WriteOptions());;
+//                dbAccess.transaction =dbAccess.rocksDB.beginTransaction(new WriteOptions());;
 
                 try{
                     //todo 校验 目前是获取相同的区块高度
@@ -160,7 +177,7 @@ public class BlockHandler {
                             Long height = (Long)optHeigth.get();
                             if(height != null) {
                                 if((blockLocal.getBlockHeight() - height) == 1) {
-                                    if(!checkBlock(blockLocal)){
+                                    if (!checkBlock(blockLocal)) {
                                         return;
                                     }
                                     dbAccess.putBlock(blockLocal);
@@ -188,13 +205,13 @@ public class BlockHandler {
                             break;
                         }
                     }
-                    dbAccess.transaction.commit();
+//                    dbAccess.transaction.commit();
                 }catch (Exception e){
-                    try {
-                        dbAccess.transaction.rollback();
-                    } catch (RocksDBException e1) {
-                        e1.printStackTrace();
-                    }
+//                    try {
+//                        dbAccess.transaction.rollback();
+//                    } catch (RocksDBException e1) {
+//                        e1.printStackTrace();
+//                    }
                     logger.warn("synchronization block error", e);
                 }finally {
                     //更改状态
@@ -366,12 +383,11 @@ public class BlockHandler {
             trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
         }
 
-        waitIfNotArrived(block);
-
         produceBlock(newBlockHeight, trustees, blockCycle);
     }
 
     /**
+     *
      * 未到出块时间则睡眠等待
      * @param block
      */
@@ -395,11 +411,14 @@ public class BlockHandler {
      * @param blockCycle
      */
     public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) throws InterruptedException {
+
 //        try{
             Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
             Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
             if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
+                waitIfNotArrived(dbAccess.getBlock(newBlockHeight-1).get());
                 SyncFlag.setNextBlockSyncFlag(false);
+                SyncFlag.setStarCycle(blockCycle - 1);
                 Account account = accountOptional.get();
                 if(account.getPrivateKey() != null){
                     //打包区块

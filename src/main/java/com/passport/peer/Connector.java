@@ -47,8 +47,9 @@ public class Connector implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         //启动服务并注册到discover节点
+        System.out.println("=======del all");
+        dbAccess.delAllAccountIps();
         asyncTask.startServer();
-
         TimeUnit.MILLISECONDS.sleep(3000);
 
         //连接discover节点
@@ -73,7 +74,6 @@ public class Connector implements InitializingBean {
         builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
         builder.setData(dataBuilder);
         channelsManager.getChannels().writeAndFlush(builder.build());
-
         try {
             TimeUnit.MILLISECONDS.sleep(3000);
         } catch (InterruptedException e) {
@@ -88,7 +88,12 @@ public class Connector implements InitializingBean {
             e.printStackTrace();
         }
         provider.publishEvent(new GenerateBlockEvent(0L));
-
+        //节点启动，把自己账号信息保存
+        try {
+            dbAccess.saveLocalAccountIpInfo();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     //生成下一个区块

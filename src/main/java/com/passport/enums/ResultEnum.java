@@ -32,9 +32,9 @@ public enum ResultEnum {
     WALLET_BACKUP_EXCEP(1012,"备份钱包文件异常"),
     WALLET_IMPORT_EXCEP(1013,"导入钱包文件异常"),
     WALLET_PWD_ERROR(1014,"钱包密码错误"),
-    WALLET_ACCOUNT_EXISTS(1015,"账户已存在");
-    //***账户***
-
+    WALLET_ACCOUNT_EXISTS(1015,"账户已存在"),
+    //***交易***
+    TRANS_UNCOMPSYN(1016,"未同步完成");
 
     private int code;
     private String message;//自定义异常描述

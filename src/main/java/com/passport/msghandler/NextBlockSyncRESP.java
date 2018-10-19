@@ -8,13 +8,16 @@ import com.passport.listener.ApplicationContextProvider;
 import com.passport.proto.BlockMessage;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.GsonUtils;
+import com.passport.utils.HttpUtils;
 import com.passport.webhandler.BlockHandler;
 import io.netty.channel.ChannelHandlerContext;
+import org.rocksdb.RocksDBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +49,12 @@ public class NextBlockSyncRESP extends Strategy {
         if(blocks==null || blocks.size() == 0){
             //同步完了，不进行广播，
             SyncFlag.setNextBlockSyncFlag(false);
+            //设置地址ip状态为1
+            try {
+                dbAccess.setIpAccountStatu(HttpUtils.getLocalHostLANAddress().getHostAddress(), 1);
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
             return;
         }
         List<Block> blockList = new ArrayList<>();

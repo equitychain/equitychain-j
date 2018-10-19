@@ -7,7 +7,13 @@ package com.passport.constant;
  **/
 public class SyncFlag {
     private static volatile boolean nextBlockSyncFlag = true;//默认处理发布主动同步区块事件，为false则处理组2接收广播区块、接收广播流水
-
+    private static volatile int starCycle = -1;
+    public static int getStarCycle(){
+        return starCycle;
+    }
+    public static void setStarCycle(int starCycle){
+        SyncFlag.starCycle = starCycle;
+    }
     public static boolean isNextBlockSyncFlag() {
         return nextBlockSyncFlag;
     }

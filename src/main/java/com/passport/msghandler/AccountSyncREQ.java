@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 服务端处理账户同步请求
@@ -28,7 +31,7 @@ public class AccountSyncREQ extends Strategy {
     private DBAccess dbAccess;
 
     @RocksTransaction
-    public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
+    public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
         logger.info("处理账户同步请求数据：{}", GsonUtils.toJson(message));
 
         AccountMessage.Account account = message.getData().getAccount();
@@ -40,6 +43,11 @@ public class AccountSyncREQ extends Strategy {
             acc.setBalance(BigDecimal.ZERO);
              if(dbAccess.putAccount(acc)){
                 logger.info("接收广播账户{}成功", acc.getAddress());
+                 InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
+                 String clientIP = insocket.getAddress().getHostAddress();
+                 List<Account> accounts = new ArrayList<>();
+                 accounts.add(acc);
+                 dbAccess.saveIpAccountInfos(clientIP,accounts,1);
              }
         }
     }

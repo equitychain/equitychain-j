@@ -10,6 +10,14 @@ import com.passport.enums.TransactionTypeEnum;
 import com.passport.exception.CipherException;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.utils.GsonUtils;
+import com.passport.utils.HttpUtils;
+import com.passport.utils.SerializeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.mockito.internal.util.StringUtil;
+import org.rocksdb.ReadOptions;
+import org.rocksdb.RocksDB;
+import org.rocksdb.RocksDBException;
+import org.rocksdb.RocksIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,14 +51,20 @@ public class AccountHandler {
     @Autowired
     private TransactionHandler transactionHandler;
 
+
     /**
      * 新增账号
      *
      * @return 账号
      */
-    public Account newAccount(String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, CipherException, IOException {
+    public Account newAccount(String password) throws Exception {
         Account account = generateAccount(password);
         if (dbAccess.putAccount(account)) {
+            try {
+                dbAccess.localAddNewAccountIp(account.getAddress());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             return account;
         }
         return null;
@@ -102,6 +116,10 @@ public class AccountHandler {
                 //创建账户
                 Account account = generateAccount("123456");
                 dbAccess.putAccount(account);
+                //重铸出块机制
+                String ip = HttpUtils.getLocalHostLANAddress().getHostAddress();
+                dbAccess.put(("heartbeat_"+ip+"_"+account.getAddress()).getBytes(),account.getAddress().getBytes());
+                //重铸出块机制
                 accounts.add(new Account(account.getAddress(),null, account.getBalance()));//不保存私钥
 
                 //创建注册为受托人交易

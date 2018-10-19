@@ -4,14 +4,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.core.*;
+import com.passport.peer.ChannelsManager;
 import com.passport.utils.HttpUtils;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.ColumnFamilyHandle;
-import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     private static final String MINERACCOUNT = "miner_account";
     @Value("${db.dataDir}")
     private String dataDir;
-
+    @Autowired
+    private ChannelsManager channelsManager;
     public BaseDBRocksImpl() {
 
     }
@@ -78,7 +80,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         ColumnFamilyHandle handle = handleMap.get(getColName("block", "blockHeight"));
         RocksIterator heightIter;
 //        if (transaction != null) {
-            heightIter = transaction.getIterator(new ReadOptions(),handle);
+            heightIter = rocksDB.newIterator(handle);
 //        }else{
 //        heightIter = rocksDB.newIterator(handle);
 //        }
@@ -148,7 +150,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public boolean putNodeList(List<String> nodes) {
         try {
 
-            transaction.put(CLIENT_NODES_LIST_KEY.getBytes(), SerializeUtils.serialize(nodes));
+            rocksDB.put(CLIENT_NODES_LIST_KEY.getBytes(), SerializeUtils.serialize(nodes));
             return true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -160,7 +162,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public boolean put(String key, Object value) {
         try {
             KeysSet.add(key);//存储key到文件
-            transaction.put(key.getBytes(), SerializeUtils.serialize(value));
+            rocksDB.put(key.getBytes(), SerializeUtils.serialize(value));
             return true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -172,11 +174,11 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public Optional<Object> get(String key) {
         try {
             byte[] objByt = rocksDB.get(key.getBytes());
-            if(transaction!=null){
-                objByt = transaction.get(new ReadOptions(),key.getBytes());
-            }else{
+//            if(rocksDB!=null){
+//                objByt = rocksDB.get(new ReadOptions(),key.getBytes());
+//            }else{
                 objByt = rocksDB.get(key.getBytes());
-            }
+//            }
             if (objByt != null) {
                return Optional.of(SerializeUtils.unSerialize(objByt));
             }
@@ -189,7 +191,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public boolean delete(String key) {
         try {
-            transaction.delete(key.getBytes());
+            rocksDB.delete(key.getBytes());
             return true;
         } catch (RocksDBException e) {
             e.printStackTrace();
@@ -219,6 +221,154 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             }
         }
         return accounts;
+    }
+
+    @Override
+    public void delAllAccountIps() throws Exception {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","id")));
+        for(iterator.seekToFirst();iterator.isValid();iterator.next()) {
+            delObj("id",new String(iterator.key()),AccountIp.class,true);
+        }
+    }
+
+    @Override
+    public List<AccountIp> listAccountIps() throws Exception {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","id")));
+        List<AccountIp> list = new ArrayList<>();
+        for(iterator.seekToFirst();iterator.isValid();iterator.next()) {
+            list.add(getObj("id",new String(iterator.key()),AccountIp.class));
+        }
+        return list;
+    }
+
+    @Override
+    public List<Account> getNodeAccountList() {
+        RocksIterator accountIter;
+//        if(transaction!=null){
+//            accountIter = transaction.getIterator(new ReadOptions(),handleMap.get(getColName("account", "address")));
+//        }else{
+        accountIter = rocksDB.newIterator(handleMap.get(getColName("account", "address")));
+//        }
+
+        ArrayList<Account> accounts = new ArrayList<>();
+        for (accountIter.seekToFirst(); accountIter.isValid(); accountIter.next()) {
+            String address = new String(accountIter.key());
+            try {
+                Account account = getObj("address", address, Account.class);
+                if (account != null &&
+                        account.getPrivateKey()!=null && !"".equals(account.getPrivateKey())
+                        && account.getPassword() != null && !"".equals(account.getPassword())) {
+                    accounts.add(account);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return accounts;
+    }
+
+    @Override
+    public boolean accountHasOnlineIp(String address) throws RocksDBException {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","address")));
+        for(iterator.seekToFirst();iterator.isValid();iterator.next()){
+            String addr = new String(iterator.value());
+            byte[] keyByt = rocksDB.get(handleMap.get(getColName("accountIp","statu")),iterator.key());
+            int statu = Integer.parseInt(new String(keyByt));
+            if(address.equals(addr) && statu == 1){
+                byte[] ipByt = rocksDB.get(handleMap.get(getColName("accountIp","ipAddr")),iterator.key());
+                if(ipByt != null && ipByt.length > 0 && !"".equals(new String(ipByt))){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    @Override
+    public void saveLocalAccountIpInfo() throws Exception {
+        List<Account> accounts = getNodeAccountList();
+        if(accounts == null){
+            accounts = new ArrayList<>();
+        }
+        //添加一个默认的,因为
+        Account defaultAcc = new Account();
+        defaultAcc.setAddress("defaultLocalAcc");
+        accounts.add(defaultAcc);
+        saveIpAccountInfos(HttpUtils.getLocalHostLANAddress().getHostAddress(),accounts,channelsManager.getChannels().size() == 0?1:0);
+    }
+
+    @Override
+    public List<AccountIp> delAccountIpByAddr(String ip) throws Exception {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","ipAddr")));
+        ArrayList<AccountIp> ips = new ArrayList<>();
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            String addr = new String(iterator.value());
+            String id = new String(iterator.key());
+            if(ip.equals(addr)){
+                ips.add(getObj("id",id,AccountIp.class));
+                delObj("id",id,AccountIp.class,true);
+            }
+        }
+        return ips;
+    }
+
+    @Override
+    public int getLocalAccountIpStatu() throws Exception {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","ipAddr")));
+        int statu = 0;
+        String localIp = HttpUtils.getLocalHostLANAddress().getHostName();
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            String ipAddr = new String(iterator.value());
+            if(localIp.equals(ipAddr)) {
+                statu = Integer.parseInt(new String(
+                        rocksDB.get(handleMap.get(getColName("accountIp", "statu")), iterator.key())));
+                break;
+            }
+        }
+        return statu;
+    }
+
+    @Override
+    public void saveIpAccountInfos(String address, List<Account> accounts, int statu) throws Exception {
+        for (Account account : accounts){
+            AccountIp accountIp = new AccountIp();
+            accountIp.setAddress(account.getAddress());
+            accountIp.setIpAddr(address);
+            accountIp.setStatu(statu);
+            accountIp.setId();
+            addObj(accountIp);
+        }
+    }
+
+    @Override
+    public void setIpAccountStatu(String ipAddr, int statu) throws RocksDBException {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","ipAddr")));
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            String addr = new String(iterator.value());
+            if(ipAddr.equals(addr)){
+                rocksDB.put(handleMap.get(getColName("accountIp","statu")),iterator.key(),(statu+"").getBytes());
+            }
+        }
+    }
+
+    @Override
+    public void localAddNewAccountIp(String address) throws Exception {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp","ipAddr")));
+        int statu = 0;
+        String localIp = HttpUtils.getLocalHostLANAddress().getHostAddress();
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            String ipAddr = new String(iterator.value());
+            if(localIp.equals(ipAddr)) {
+                statu = Integer.parseInt(new String(
+                        rocksDB.get(handleMap.get(getColName("accountIp", "statu")), iterator.key())));
+                break;
+            }
+        }
+        AccountIp ipInfo = new AccountIp();
+        ipInfo.setAddress(address);
+        ipInfo.setIpAddr(localIp);
+        ipInfo.setStatu(statu);
+        ipInfo.setId();
+        addObj(ipInfo);
     }
 
     @Override
@@ -293,8 +443,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     public List<Transaction> listUnconfirmTransactions() {
-        if (transaction.isDeadlockDetect()) {
-        }
+//        if (transaction.isDeadlockDetect()) {
+//        }
         RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("transaction", "hash")));
         List<Transaction> transactions = new ArrayList<>();
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
@@ -450,7 +600,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    public List<Trustee> getTrusteeOfRangeBeforeTime(long time) {
+    public List<Trustee> getTrusteeOfRangeBeforeTime(long time) throws RocksDBException {
         List<Trustee> voters = new ArrayList<>();
         List<Trustee> allVoters = new ArrayList<>();
         //筛选/分组/求和
@@ -458,11 +608,12 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             byte[] timeByte = getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "time")), iterator.key());
             //time的筛选
-            if (Long.parseLong(new String(timeByte)) <= time) {
+            String address = new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "receiptAddress")), iterator.key()));
+            if (Long.parseLong(new String(timeByte)) <= time && accountHasOnlineIp(address)) {
                 Trustee trustee = new Trustee();
                 trustee.setVotes(0l);
                 trustee.setStatus(1);
-                trustee.setAddress(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "receiptAddress")), iterator.key())));
+                trustee.setAddress(address);
                 int index = -1;
                 //address的分组
                 index = allVoters.indexOf(trustee);
@@ -808,6 +959,46 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             }
         }
         return count;
+    }
+
+    @Override
+    public boolean delOneBlock() throws Exception {
+        Optional<Object> optional = getLastBlockHeight();
+        //这里删除单个高度只能从最高高度开始删
+        if(optional.isPresent()) {
+            delObj(getKeyFieldByClass(Block.class),String.valueOf(optional.get()),Block.class,true);
+            //todo 还需要删除索引、确认流水等信息
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean delBlocksByHeight(long beginHeight) throws Exception {
+        Optional<Object> optional = getLastBlockHeight();
+        long maxHeight = Long.parseLong(optional.get().toString());
+        if(optional.isPresent() && beginHeight <= maxHeight) {
+
+            for (long i = maxHeight; i >= beginHeight; i --){
+                delObj(getKeyFieldByClass(Block.class),String.valueOf(i),Block.class,true);
+                //todo 还需要删除索引、确认流水等信息
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean delUnconfiTrans() throws RocksDBException {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("transaction", "hash")));
+        for (iterator.seekToFirst();iterator.isValid();iterator.next()){
+            byte[] blockHeight = rocksDB.get(handleMap.get(getColName("transaction","blockHeight")),iterator.key());
+            if(blockHeight == null || blockHeight.length == 0){
+                String hash = new String(iterator.key());
+                deleteUnconfirmTransaction(hash);
+            }
+        }
+        return true;
     }
 
 }

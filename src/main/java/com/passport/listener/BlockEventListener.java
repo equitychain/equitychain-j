@@ -72,10 +72,11 @@ public class BlockEventListener {
             Optional<Object> lastBlockHeight = dbAccess.getLastBlockHeight();
             if (lastBlockHeight.isPresent()) {
                 blockHeight = CastUtils.castLong(lastBlockHeight.get());
+
             }
             if (blockHeight == 0) {
                 //创建创世块
-                dbAccess.transaction = dbAccess.rocksDB.beginTransaction(new WriteOptions());
+//                dbAccess.transaction = dbAccess.rocksDB.beginTransaction(new WriteOptions());
                 try {
                     Block block = createGenesisBlock();
                     blockHeight = block.getBlockHeight();
@@ -84,9 +85,9 @@ public class BlockEventListener {
                     dbAccess.putBlock(block);
                     //保存区块高度到本地
                     dbAccess.putLastBlockHeight(blockHeight);
-                    dbAccess.transaction.commit();
+//                    dbAccess.transaction.commit();
                 } catch (Exception e) {
-                    dbAccess.transaction.rollback();
+//                    dbAccess.transaction.rollback();
                 }
 
             }
@@ -194,6 +195,7 @@ public class BlockEventListener {
     @EventListener(GenerateNextBlockEvent.class)
     @RocksTransaction
     public void generateNextBlock(GenerateNextBlockEvent event) throws InterruptedException {
+        System.out.println("==============GenerateNextBlockEvent 自动出下个快============");
         blockHandler.produceNextBlock();
     }
 
@@ -207,7 +209,8 @@ public class BlockEventListener {
     public void generateBlock(GenerateBlockEvent event) throws InterruptedException {
         ChannelGroup channels = channelsManager.getChannels();
         //第一个启动的节点，负责生成区块
-        if (channels.size() == 0) {
+//        if (channels.size() == 0) {
+        if (true) {
             //当前区块周期
             Optional<Object> lastBlockHeightOptional = dbAccess.getLastBlockHeight();
             if (!lastBlockHeightOptional.isPresent()) {

@@ -7,6 +7,7 @@ import com.google.common.base.Optional;
 import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.core.Account;
+import com.passport.core.AccountIp;
 import com.passport.core.Trustee;
 import com.passport.core.Voter;
 import com.passport.crypto.eth.*;
@@ -84,7 +85,6 @@ public class AccountController {
             //当挖矿账户不存在时设置为挖矿账户
             accountHandler.setMinerAccountIfNotExists(account);
             provider.publishEvent(new SyncAccountEvent(account));
-
             return new ResultDto(ResultEnum.SUCCESS.getCode(), account);
         }
         return new ResultDto(ResultEnum.SYS_ERROR);
@@ -295,6 +295,7 @@ public class AccountController {
                 }
                 return new ResultDto(ResultEnum.WALLET_IMPORT_EXCEP);
             }
+            dbAccess.localAddNewAccountIp(account.getAddress());
         } catch (CipherException e) {
             e.printStackTrace();
             return new ResultDto(ResultEnum.WALLET_PWD_ERROR);
