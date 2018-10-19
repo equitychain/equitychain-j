@@ -256,7 +256,6 @@ public class TransactionHandler {
             BigDecimal eggUsed = getEggUsedByTrans(tran);
             //只要流水的egg和区块的egg足够就能够进行打包
             if(eggUsed.compareTo(BigDecimal.ZERO)> 0 && blockMaxEgg.compareTo(eggUsed)>=0 && transactions.size() < Constant.TRANS_SIZE){
-                System.out.println("======add======="+eggUsed);
                 transactions.add(tran);
                 eggUsedTemp.put(tran.getHash(),eggUsed.multiply(new BigDecimal(new String(tran.getEggPrice()))));
                 blockMaxEgg = blockMaxEgg.subtract(eggUsed);
@@ -286,7 +285,6 @@ public class TransactionHandler {
             //消耗燃料
             //todo 有个问题，就是未确认流水的已使用egg怎么让其他节点同步
             transaction.setEggUsed(eggUsed.add(curUse).toString().getBytes());
-            System.out.println("======test=======");
             return curUse;
         } else {
             return BigDecimal.ZERO;

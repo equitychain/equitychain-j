@@ -62,8 +62,6 @@ public class Connector implements InitializingBean {
         }
     }
 
-    @Autowired
-    MonitoringIfProducerDead monitoringIfProducerDead;
     //启动的时候自动开始区块同步
     @EventListener(ApplicationReadyEvent.class)
     public void syncNextBlock() {
@@ -78,8 +76,6 @@ public class Connector implements InitializingBean {
 
         try {
             TimeUnit.MILLISECONDS.sleep(3000);
-
-            monitoringIfProducerDead.checkBlock();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

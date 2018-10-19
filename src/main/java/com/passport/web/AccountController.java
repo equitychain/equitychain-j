@@ -20,7 +20,10 @@ import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.CheckUtils;
 import com.passport.utils.StoryFileUtil;
 import com.passport.webhandler.AccountHandler;
+import com.passport.webhandler.TransactionHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +47,8 @@ import java.util.Map;
 @RequestMapping("/account")
 public class AccountController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
+
     @Value("${wallet.keystoreDir}")
     public String keystoreDir;
 
@@ -63,14 +68,6 @@ public class AccountController {
 
     @Value("${wallet.keystoreDir}")
     private String walletDir;
-
-
-    @GetMapping("/test")
-    public @ResponseBody
-    Object test() throws Exception {
-        accountHandler.test();
-        return "sdfasdf";
-    }
 
     @GetMapping("/new")
     @RocksTransaction
@@ -153,7 +150,7 @@ public class AccountController {
                     publicKey = Numeric.toHexStringNoPrefix(ecKeyPair.getPrivateKeyValue());
                 } catch (Exception e) {
                     e.printStackTrace();
-                    System.out.println("私钥解析异常："+e.getMessage());
+                    logger.error("私钥解析异常："+e.getMessage());
                 }
             }
             accountAccount.put("balance", account.getBalance());

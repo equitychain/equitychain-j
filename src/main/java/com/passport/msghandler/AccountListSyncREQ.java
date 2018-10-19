@@ -47,8 +47,6 @@ public class AccountListSyncREQ extends Strategy {
         NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
         builder.setData(dataBuilder.build());
         builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
-        System.out.println(builder.getData().getAccountsList().size());
-
         ctx.writeAndFlush(builder.build());
     }
 }

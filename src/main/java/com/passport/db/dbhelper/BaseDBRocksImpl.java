@@ -4,11 +4,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.core.*;
+import com.passport.utils.HttpUtils;
 import com.passport.utils.SerializeUtils;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +23,7 @@ import java.util.List;
 
 @Component
 public class BaseDBRocksImpl extends BaseDBAccess {
+    private static final Logger logger = LoggerFactory.getLogger(BaseDBRocksImpl.class);
     //存放节点列表
     private static final String CLIENT_NODES_LIST_KEY = "client-node-list";
     private static final String MINERACCOUNT = "miner_account";
@@ -180,22 +184,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             e.printStackTrace();
         }
         return Optional.absent();
-    }
-
-    @Override
-    public Optional<Object> get(String columnFamily, String key) {
-        byte[] objByt = new byte[100];
-        try {
-            objByt = rocksDB.get(super.handleMap.get(columnFamily), key.getBytes());
-//            if (objByt != null) {
-//                Optional.of(SerializeUtils.unSerialize(objByt));
-
-        } catch (RocksDBException e) {
-//            e.printStackTrace();
-        }
-//        return Optional.absent();
-        System.out.println(new String(objByt) + "-----------!");
-        return null;
     }
 
     @Override

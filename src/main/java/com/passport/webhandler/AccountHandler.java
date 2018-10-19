@@ -1,33 +1,25 @@
 package com.passport.webhandler;
 
 import com.google.common.base.Optional;
-import com.passport.annotations.RocksTransaction;
-import com.passport.aop.TransactionAspect;
 import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.crypto.eth.ECKeyPair;
 import com.passport.crypto.eth.WalletUtils;
 import com.passport.db.dbhelper.BaseDBAccess;
-import com.passport.db.dbhelper.DBAccess;
-import com.passport.db.transaction.RocksdbTransaction;
 import com.passport.enums.TransactionTypeEnum;
 import com.passport.exception.CipherException;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.utils.GsonUtils;
-import com.passport.utils.SerializeUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.mockito.internal.util.StringUtil;
-import org.rocksdb.ReadOptions;
-import org.rocksdb.RocksDB;
-import org.rocksdb.RocksDBException;
-import org.rocksdb.RocksIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
@@ -41,8 +33,6 @@ public class AccountHandler {
 
     @Autowired
     private BaseDBAccess dbAccess;
-    @Autowired
-    private RocksdbTransaction rocksDBTr;
     //广播event用的
     @Autowired
     private ApplicationContextProvider provider;
@@ -52,36 +42,6 @@ public class AccountHandler {
 
     @Autowired
     private TransactionHandler transactionHandler;
-
-    @RocksTransaction
-    public void test() throws RocksDBException {
-//        System.out.println(new String(dbAccess.rocksDB.get("gg0".getBytes())));
-        for (int i = 0; i < 10; i++) {
-            dbAccess.transaction.put(("gg" + i).getBytes(), (i + "_aaa").getBytes());
-
-
-//            dbAccess.transaction.put(("gg" + i).getBytes(), (i + "_g").getBytes());
-//            dbAccess.put(("gg" + i).getBytes(), (i + "_f").getBytes());
-            System.out.println("----->" + i);
-//            if (i == 9) throw new RocksDBException("shib");
-        }
-//        System.out.println(new String(dbAccess.rocksDB.get("gg0".getBytes())));
-    }
-
-    public void test2() throws RocksDBException {
-        seekB(rocksDBTr.getRocksDB());
-    }
-
-    public void seekB(RocksDB rocksDB) {
-        ReadOptions options = new ReadOptions();
-        options.setPrefixSameAsStart(true);
-        RocksIterator iterator = rocksDB.newIterator(options);
-        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-
-            System.out.println(new String(iterator.key()) + "<==>" + new String(iterator.value()));
-        }
-    }
-
 
     /**
      * 新增账号

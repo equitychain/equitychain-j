@@ -34,8 +34,4 @@ public class SHAEncrypt {
         }
         return strResult;
     }
-
-    public static void main(String[] args) {
-        System.out.println(Hex.toHexString(SHAEncrypt.SHA("hello".getBytes(), "SHA-256")));
-    }
 }

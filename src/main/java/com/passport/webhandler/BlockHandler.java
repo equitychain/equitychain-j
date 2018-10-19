@@ -348,7 +348,7 @@ public class BlockHandler {
         return blockBuilder;
     }
 
-    public void produceNextBlock() throws InterruptedException {
+    public synchronized void produceNextBlock() throws InterruptedException {
         //当前区块周期
         Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
         if(!lastBlockOptional.isPresent()){
@@ -399,8 +399,7 @@ public class BlockHandler {
             Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
             Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
             if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
-                MonitoringIfProducerDead.nextBlockFlag = false;
-//                SyncFlag.setNextBlockSyncFlag(false);
+                SyncFlag.setNextBlockSyncFlag(false);
                 Account account = accountOptional.get();
                 if(account.getPrivateKey() != null){
                     //打包区块
@@ -419,7 +418,7 @@ public class BlockHandler {
 //                    }).start();
                 }
             }else {
-                MonitoringIfProducerDead.nextBlockFlag = true;
+               logger.info("下一个出块账户为："+accountOptional.get().getAddress());
             }
 //        }catch (RocksDBException e){
 //            e.printStackTrace();

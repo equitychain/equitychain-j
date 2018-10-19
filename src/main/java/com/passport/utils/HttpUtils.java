@@ -1,5 +1,6 @@
 package com.passport.utils;
 
+import com.passport.web.AccountController;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -22,6 +23,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
@@ -40,6 +43,7 @@ import java.util.*;
  * HTTP 请求工具类
  */
 public class HttpUtils {
+    private static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
     private static PoolingHttpClientConnectionManager connMgr;
     private static RequestConfig requestConfig;
     private static final int MAX_TIMEOUT = 7000;
@@ -146,7 +150,7 @@ public class HttpUtils {
             }
             httpPost.setEntity(new UrlEncodedFormEntity(pairList, Charset.forName("UTF-8")));
             response = httpClient.execute(httpPost);
-            System.out.println(response.toString());
+            logger.info(response.toString());
             HttpEntity entity = response.getEntity();
             httpStr = EntityUtils.toString(entity, "UTF-8");
         } catch (IOException e) {
@@ -184,7 +188,7 @@ public class HttpUtils {
             httpPost.setEntity(stringEntity);
             response = httpClient.execute(httpPost);
             HttpEntity entity = response.getEntity();
-            System.out.println(response.getStatusLine().getStatusCode());
+            logger.info(response.getStatusLine().getStatusCode()+"");
             httpStr = EntityUtils.toString(entity, "UTF-8");
         } catch (IOException e) {
             e.printStackTrace();
@@ -365,6 +369,7 @@ public class HttpUtils {
         }
         return httpStr;
     }
+
     public static InetAddress getLocalHostLANAddress() throws Exception {
         try {
             InetAddress candidateAddress = null;

@@ -2,16 +2,12 @@ package com.passport.aop;
 
 
 import com.passport.db.dbhelper.BaseDBAccess;
-import com.passport.db.dbhelper.BaseDBRocksImpl;
-import com.passport.db.transaction.RocksdbTransaction;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
-import org.rocksdb.*;
+import org.rocksdb.RocksDBException;
+import org.rocksdb.WriteOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 
 /**

@@ -101,7 +101,6 @@ public abstract class BaseDBAccess implements DBAccess {
                     ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
                     String name = new String(handle.getName());
                     handleMap.put(name, handle);
-                    System.out.println("load new col=="+name);
                 }
                 for(ColumnFamilyHandle handler : handleList){
                     String name = new String(handler.getName());
@@ -915,7 +914,6 @@ public abstract class BaseDBAccess implements DBAccess {
             throw new Exception("Filter fields and values do not match.");
         }
         String keyFiledName = getKeyFieldByClass(tClass);
-        long begin = System.currentTimeMillis();
         //当页的数据区间的开始索引
         int beginItem = pageCount * (pageNumber - 1) + 1;
         //当页的数据区间的结束索引
@@ -1088,8 +1086,6 @@ public abstract class BaseDBAccess implements DBAccess {
                 break;
             }
         }
-        long end = System.currentTimeMillis();
-        System.out.println("查询耗时:" + (end - begin));
         return tList;
     }
 
