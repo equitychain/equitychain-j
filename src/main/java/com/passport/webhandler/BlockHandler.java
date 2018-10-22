@@ -357,7 +357,7 @@ public class BlockHandler {
         return blockBuilder;
     }
 
-    public synchronized void produceNextBlock() throws InterruptedException {
+    public synchronized void produceNextBlock() throws Exception {
         //当前区块周期
         Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
         if(!lastBlockOptional.isPresent()){
@@ -385,11 +385,9 @@ public class BlockHandler {
     private void waitIfNotArrived(Block block) {
         long lastTimestamp = block.getBlockHeader().getTimeStamp();
         long currentTimestamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
-//        long currentTimestamp = System.currentTimeMillis();
 
        final long timeGap = currentTimestamp - lastTimestamp;
 
-//        System.err.println(Constant.BLOCK_GENERATE_TIMEGAP*1000 - timeGap+"-=-=-=-=-=-=-=-=-=-=睡几秒"+timeGap);
         if(timeGap < Constant.BLOCK_GENERATE_TIMEGAP*1000){//间隔小于10秒，则睡眠等待
             try {
                 TimeUnit.MILLISECONDS.sleep(Constant.BLOCK_GENERATE_TIMEGAP*1000 - timeGap);
@@ -405,10 +403,7 @@ public class BlockHandler {
      * @param list
      * @param blockCycle
      */
-    public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) throws InterruptedException {
-//        logger.info("区块出块成功,出块账号:");
-//        System.gc();
-//        provider.publishEvent(new GenerateNextBlockEvent(0L));
+    public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) throws Exception {
         Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
         Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
         if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
@@ -421,7 +416,6 @@ public class BlockHandler {
                 //更新101个受托人，已经出块人的状态
                 trusteeHandler.changeStatus(trustee, blockCycle);
                 logger.info("第{}个区块出块成功,出块账号:{}", newBlockHeight,account.getAddress());
-                System.gc();
                 provider.publishEvent(new GenerateNextBlockEvent(0L));
             }
         }else {

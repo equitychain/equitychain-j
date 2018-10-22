@@ -197,24 +197,7 @@ public class BlockEventListener {
      */
     @EventListener(GenerateNextBlockEvent.class)
     @RocksTransaction
-    public void generateNextBlock(GenerateNextBlockEvent event) throws InterruptedException {
-
-        Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
-        if(!lastBlockOptional.isPresent()){
-            return;
-        }
-        Block block = lastBlockOptional.get();
-        long lastTimestamp = block.getBlockHeader().getTimeStamp();
-        long currentTimestamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
-        long timeGap = currentTimestamp - lastTimestamp;
-        if(timeGap < 9000){//间隔小于3秒，return
-//            System.out.println("未到出块时间则睡眠等待"+System.currentTimeMillis());
-            provider.publishEvent(new GenerateNextBlockEvent(0L));
-//            System.out.println("未到出块时间则睡眠等待2"+System.currentTimeMillis());
-            return;
-        }else{
-//            System.out.println("还有三秒就要出块了， 进入出块方法");
-        }
+    public void generateNextBlock(GenerateNextBlockEvent event) throws Exception {
         blockHandler.produceNextBlock();
     }
 
@@ -225,10 +208,12 @@ public class BlockEventListener {
      */
     @EventListener(GenerateBlockEvent.class)
     @RocksTransaction
-    public void generateBlock(GenerateBlockEvent event) throws InterruptedException {
+    public void generateBlock(GenerateBlockEvent event) throws Exception {
         ChannelGroup channels = channelsManager.getChannels();
         //第一个启动的节点，负责生成区块
-//        if (channels.size() == 0) {
+        if (channels.size() == 0) {
+            dbAccess.saveLocalAccountIpInfo();
+        }
         if (true) {
             //当前区块周期
             Optional<Object> lastBlockHeightOptional = dbAccess.getLastBlockHeight();

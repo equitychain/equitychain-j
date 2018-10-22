@@ -49,7 +49,7 @@ public class MonitoringIfProducerDead {
 
 //    private Lock lock = new ReentrantLock();
     @RocksTransaction
-    public void monitor() throws InterruptedException {
+    public void monitor() throws Exception {
         //已同步完成，切换到接收区块和流水广播状态
         if (SyncFlag.isNextBlockSyncFlag()) {
             return;

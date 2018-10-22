@@ -48,7 +48,7 @@ public abstract class BaseDBAccess implements DBAccess {
                 dtoClasses.add(c);
             }
             try {
-                rocksDB = rocksDB.open(new Options().setCreateIfMissing(true).setWalSizeLimitMB(0).setWalTtlSeconds(0),dataDir);
+                rocksDB = rocksDB.open(new Options().setCreateIfMissing(true).setDbLogDir("d:/dbLog"),dataDir);
 
                 //添加默认的列族
                 handleMap.put("default", rocksDB.getDefaultColumnFamily());
@@ -94,7 +94,7 @@ public abstract class BaseDBAccess implements DBAccess {
                 //打开数据库  加载旧列族,创建新列族
                 List<ColumnFamilyHandle> handleList = new ArrayList<>();
 //                rocksDB = OptimisticrocksDBDB.open(new DBOptions().setCreateIfMissing(true), dataDir, curHasColumns, handleList);
-                rocksDB = rocksDB.open(new DBOptions().setCreateIfMissing(true).setWalSizeLimitMB(0).setWalTtlSeconds(0), dataDir, curHasColumns, handleList);
+                rocksDB = rocksDB.open(new DBOptions().setCreateIfMissing(true).setDbLogDir("d:/dbLog"), dataDir, curHasColumns, handleList);
 
                 for(ColumnFamilyDescriptor descriptor : curDontHasColumns) {
                     ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);

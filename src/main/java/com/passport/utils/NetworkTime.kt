@@ -28,7 +28,8 @@ object NetworkTime {
                 uc.connect()
                 val ld = uc.date
                 val date = Date(ld)
-                return date.time
+//                return date.time
+                return System.currentTimeMillis()
             } catch (e: MalformedURLException) {
                 e.printStackTrace()
             } catch (e: IOException) {

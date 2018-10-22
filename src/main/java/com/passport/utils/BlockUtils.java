@@ -45,7 +45,6 @@ public class BlockUtils {
         if(block.isPresent()){
             Block block1 = block.get();
             BlockHeader handler = block1.getBlockHeader();
-
             return handler.getTimeStamp() + timeGapSecond;
         }
         return null;
