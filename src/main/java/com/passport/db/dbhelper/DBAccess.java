@@ -147,8 +147,9 @@ public interface DBAccess {
 	 */
 	List<Account> listAccounts();
 
-	void delAllAccountIps() throws Exception;
-	List<AccountIp> listAccountIps() throws Exception;
+//	void delAllAccountIps() throws Exception;
+//
+//	List<AccountIp> listAccountIps() throws Exception;
 	/**
 	 * 本节点的账号
 	 * @return
@@ -160,23 +161,24 @@ public interface DBAccess {
 	 * @param address
 	 * @return
 	 */
-	boolean accountHasOnlineIp(String address) throws RocksDBException;
+//	boolean accountHasOnlineIp(String address) throws RocksDBException;
 	/**
 	 * 保存自己本机的账号ip信息
 	 */
 
-	void saveLocalAccountIpInfo() throws Exception;
-	List<AccountIp> delAccountIpByAddr(String ip) throws Exception;
-	int getLocalAccountIpStatu() throws Exception;
-	/**
-	 * 保存其他节点的账号ip信息
-	 * @param address
-	 * @param accounts
-	 */
-	void saveIpAccountInfos(String address, List<Account> accounts,int statu) throws Exception;
+//	void saveLocalAccountIpInfo() throws Exception;
+//	List<AccountIp> delAccountIpByAddr(String ip) throws Exception;
+//	int getLocalAccountIpStatu() throws Exception;
+//	/**
+//	 * 保存其他节点的账号ip信息
+//	 * @param address
+//	 * @param accounts
+//	 */
+//	void saveIpAccountInfos(String address, List<Account> accounts,int statu) throws Exception;
+//
+//	void setIpAccountStatu(String ipAddr, int statu) throws RocksDBException;
 
-	void setIpAccountStatu(String ipAddr, int statu) throws RocksDBException;
-	void localAddNewAccountIp(String address) throws Exception;
+//	void localAddNewAccountIp(String address) throws Exception;
 	/**
 	 * 添加一个钱包账户
 	 * @param account

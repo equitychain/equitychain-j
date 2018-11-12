@@ -4,7 +4,6 @@ import com.google.common.base.Optional;
 import com.passport.core.Block;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
-import com.passport.listener.ChannelListener;
 import com.passport.msghandler.StrategyContext;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.BlockUtils;
@@ -28,8 +27,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     private static final String channelType = "SERVER_CHANNEL";
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
     @Autowired
-    ChannelListener listener;
-    @Autowired
     private ChannelsManager channelsManager;
     @Autowired
     private StrategyContext strategyContext;
@@ -45,7 +42,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         logger.info("server channel active服务端通道激活");
 
         logger.info("server channel id:"+ctx.channel().id().asLongText());
-        listener.channelActive(ctx);
         //保存连接的channel
         channelsManager.addChannel(ctx.channel());
     }
@@ -53,7 +49,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        listener.channelClose(ctx);
         ctx.close();
     }
 }

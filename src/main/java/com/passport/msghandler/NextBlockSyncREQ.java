@@ -54,11 +54,6 @@ public class NextBlockSyncREQ extends Strategy {
                 //设置地址ip状态为1
                 InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
                 String clientIP = insocket.getAddress().getHostAddress();
-                try {
-                    dbAccess.setIpAccountStatu(clientIP, 1);
-                } catch (RocksDBException e) {
-                    e.printStackTrace();
-                }
                 return;
             }
             count = count > (maxHeight - blockHeight+1)?(maxHeight - blockHeight+1):count;

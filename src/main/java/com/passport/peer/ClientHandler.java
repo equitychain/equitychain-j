@@ -4,7 +4,6 @@ import com.google.common.base.Optional;
 import com.passport.core.Block;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
-import com.passport.listener.ChannelListener;
 import com.passport.msghandler.StrategyContext;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.BlockUtils;
@@ -32,8 +31,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     private ChannelsManager channelsManager;
     @Autowired
     private StrategyContext strategyContext;
-    @Autowired
-    ChannelListener listener;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
@@ -46,14 +43,12 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         logger.info("client channel active客户端通道激活");
 
         logger.info("client channel id:"+ctx.channel().id().asLongText());
-        listener.channelActive(ctx);
         //保存连接的channel
         channelsManager.addChannel(ctx.channel());
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        listener.channelClose(ctx);
         //重铸机制测试
         ctx.close();
     }

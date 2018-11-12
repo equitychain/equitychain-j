@@ -60,11 +60,6 @@ public class AccountHandler {
     public Account newAccount(String password) throws Exception {
         Account account = generateAccount(password);
         if (dbAccess.putAccount(account)) {
-            try {
-                dbAccess.localAddNewAccountIp(account.getAddress());
-            }catch (Exception e){
-                e.printStackTrace();
-            }
             return account;
         }
         return null;

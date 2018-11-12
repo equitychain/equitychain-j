@@ -49,12 +49,6 @@ public class NextBlockSyncRESP extends Strategy {
         if(blocks==null || blocks.size() == 0){
             //同步完了，不进行广播，
             SyncFlag.setNextBlockSyncFlag(false);
-            //设置地址ip状态为1
-            try {
-                dbAccess.setIpAccountStatu(HttpUtils.getLocalHostLANAddress().getHostAddress(), 1);
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
             return;
         }
         List<Block> blockList = new ArrayList<>();

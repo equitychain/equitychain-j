@@ -295,7 +295,6 @@ public class AccountController {
                 }
                 return new ResultDto(ResultEnum.WALLET_IMPORT_EXCEP);
             }
-            dbAccess.localAddNewAccountIp(account.getAddress());
         } catch (CipherException e) {
             e.printStackTrace();
             return new ResultDto(ResultEnum.WALLET_PWD_ERROR);

@@ -218,32 +218,47 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         return accounts;
     }
 
-    @Override
-    public void delAllAccountIps() throws Exception {
-        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "id")));
-        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-            delObj("id", new String(iterator.key()), AccountIp.class, true);
-        }
-    }
-
-    @Override
-    public List<AccountIp> listAccountIps() throws Exception {
-        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "id")));
-        List<AccountIp> list = new ArrayList<>();
-        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-            list.add(getObj("id", new String(iterator.key()), AccountIp.class));
-        }
-        return list;
-    }
-
+//    @Override
+//    public void delAllAccountIps() throws Exception {
+//        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "id")));
+//        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+//            delObj("id", new String(iterator.key()), AccountIp.class, true);
+//        }
+//    }
+//
+//    @Override
+//    public List<AccountIp> listAccountIps() throws Exception {
+//        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "id")));
+//        List<AccountIp> list = new ArrayList<>();
+//        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+//            list.add(getObj("id", new String(iterator.key()), AccountIp.class));
+//        }
+//        return list;
+//    }
+//    @Override
+//    public void localAddNewAccountIp(String address) throws Exception {
+//        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "ipAddr")));
+//        int statu = 0;
+//        String localIp = HttpUtils.getLocalHostLANAddress().getHostAddress();
+//        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+//            String ipAddr = new String(iterator.value());
+//            if (localIp.equals(ipAddr)) {
+//                statu = Integer.parseInt(new String(
+//                        rocksDB.get(handleMap.get(getColName("accountIp", "statu")), iterator.key())));
+//                break;
+//            }
+//        }
+//        AccountIp ipInfo = new AccountIp();
+//        ipInfo.setAddress(address);
+//        ipInfo.setIpAddr(localIp);
+//        ipInfo.setStatu(statu);
+//        ipInfo.setId();
+//        addObj(ipInfo);
+//    }
     @Override
     public List<Account> getNodeAccountList() {
         RocksIterator accountIter;
-//        if(transaction!=null){
-//            accountIter = transaction.getIterator(new ReadOptions(),handleMap.get(getColName("account", "address")));
-//        }else{
         accountIter = rocksDB.newIterator(handleMap.get(getColName("account", "address")));
-//        }
 
         ArrayList<Account> accounts = new ArrayList<>();
         for (accountIter.seekToFirst(); accountIter.isValid(); accountIter.next()) {
@@ -262,110 +277,89 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         return accounts;
     }
 
-    @Override
-    public boolean accountHasOnlineIp(String address) throws RocksDBException {
-        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "address")));
-        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-            String addr = new String(iterator.value());
-            byte[] keyByt = rocksDB.get(handleMap.get(getColName("accountIp", "statu")), iterator.key());
-            int statu = Integer.parseInt(new String(keyByt));
-            if (address.equals(addr) && statu == 1) {
-                byte[] ipByt = rocksDB.get(handleMap.get(getColName("accountIp", "ipAddr")), iterator.key());
-                if (ipByt != null && ipByt.length > 0 && !"".equals(new String(ipByt))) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+//    @Override
+//    public boolean accountHasOnlineIp(String address) throws RocksDBException {
+//        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "address")));
+//        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+//            String addr = new String(iterator.value());
+//            byte[] keyByt = rocksDB.get(handleMap.get(getColName("accountIp", "statu")), iterator.key());
+//            int statu = Integer.parseInt(new String(keyByt));
+//            if (address.equals(addr) && statu == 1) {
+//                byte[] ipByt = rocksDB.get(handleMap.get(getColName("accountIp", "ipAddr")), iterator.key());
+//                if (ipByt != null && ipByt.length > 0 && !"".equals(new String(ipByt))) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
-    @Override
-    public void saveLocalAccountIpInfo() throws Exception {
-        List<Account> accounts = getNodeAccountList();
-        if (accounts == null) {
-            accounts = new ArrayList<>();
-        }
-        //添加一个默认的,因为
-        Account defaultAcc = new Account();
-        defaultAcc.setAddress("defaultLocalAcc");
-        accounts.add(defaultAcc);
-        saveIpAccountInfos(HttpUtils.getLocalHostLANAddress().getHostAddress(), accounts, channelsManager.getChannels().size() == 0 ? 1 : 0);
-    }
-
-    @Override
-    public List<AccountIp> delAccountIpByAddr(String ip) throws Exception {
-        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "ipAddr")));
-        ArrayList<AccountIp> ips = new ArrayList<>();
-        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-            String addr = new String(iterator.value());
-            String id = new String(iterator.key());
-            if (ip.equals(addr)) {
-                ips.add(getObj("id", id, AccountIp.class));
-                delObj("id", id, AccountIp.class, true);
-            }
-        }
-        return ips;
-    }
-
-    @Override
-    public int getLocalAccountIpStatu() throws Exception {
-        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "ipAddr")));
-        int statu = 0;
-        String localIp = HttpUtils.getLocalHostLANAddress().getHostName();
-        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-            String ipAddr = new String(iterator.value());
-            if (localIp.equals(ipAddr)) {
-                statu = Integer.parseInt(new String(
-                        rocksDB.get(handleMap.get(getColName("accountIp", "statu")), iterator.key())));
-                break;
-            }
-        }
-        return statu;
-    }
-
-    @Override
-    public void saveIpAccountInfos(String address, List<Account> accounts, int statu) throws Exception {
-        for (Account account : accounts) {
-            AccountIp accountIp = new AccountIp();
-            accountIp.setAddress(account.getAddress());
-            accountIp.setIpAddr(address);
-            accountIp.setStatu(statu);
-            accountIp.setId();
-            addObj(accountIp);
-        }
-    }
-
-    @Override
-    public void setIpAccountStatu(String ipAddr, int statu) throws RocksDBException {
-        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "ipAddr")));
-        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-            String addr = new String(iterator.value());
-            if (ipAddr.equals(addr)) {
-                rocksDB.put(handleMap.get(getColName("accountIp", "statu")), iterator.key(), (statu + "").getBytes());
-            }
-        }
-    }
-
-    @Override
-    public void localAddNewAccountIp(String address) throws Exception {
-        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "ipAddr")));
-        int statu = 0;
-        String localIp = HttpUtils.getLocalHostLANAddress().getHostAddress();
-        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-            String ipAddr = new String(iterator.value());
-            if (localIp.equals(ipAddr)) {
-                statu = Integer.parseInt(new String(
-                        rocksDB.get(handleMap.get(getColName("accountIp", "statu")), iterator.key())));
-                break;
-            }
-        }
-        AccountIp ipInfo = new AccountIp();
-        ipInfo.setAddress(address);
-        ipInfo.setIpAddr(localIp);
-        ipInfo.setStatu(statu);
-        ipInfo.setId();
-        addObj(ipInfo);
-    }
+//    @Override
+//    public void saveLocalAccountIpInfo() throws Exception {
+//        List<Account> accounts = getNodeAccountList();
+//        if (accounts == null) {
+//            accounts = new ArrayList<>();
+//        }
+//        //添加一个默认的,因为
+//        Account defaultAcc = new Account();
+//        defaultAcc.setAddress("defaultLocalAcc");
+//        accounts.add(defaultAcc);
+//        saveIpAccountInfos(HttpUtils.getLocalHostLANAddress().getHostAddress(), accounts, channelsManager.getChannels().size() == 0 ? 1 : 0);
+//    }
+//
+//    @Override
+//    public List<AccountIp> delAccountIpByAddr(String ip) throws Exception {
+//        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "ipAddr")));
+//        ArrayList<AccountIp> ips = new ArrayList<>();
+//        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+//            String addr = new String(iterator.value());
+//            String id = new String(iterator.key());
+//            if (ip.equals(addr)) {
+//                ips.add(getObj("id", id, AccountIp.class));
+//                delObj("id", id, AccountIp.class, true);
+//            }
+//        }
+//        return ips;
+//    }
+//
+//    @Override
+//    public int getLocalAccountIpStatu() throws Exception {
+//        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "ipAddr")));
+//        int statu = 0;
+//        String localIp = HttpUtils.getLocalHostLANAddress().getHostName();
+//        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+//            String ipAddr = new String(iterator.value());
+//            if (localIp.equals(ipAddr)) {
+//                statu = Integer.parseInt(new String(
+//                        rocksDB.get(handleMap.get(getColName("accountIp", "statu")), iterator.key())));
+//                break;
+//            }
+//        }
+//        return statu;
+//    }
+//
+//    @Override
+//    public void saveIpAccountInfos(String address, List<Account> accounts, int statu) throws Exception {
+//        for (Account account : accounts) {
+//            AccountIp accountIp = new AccountIp();
+//            accountIp.setAddress(account.getAddress());
+//            accountIp.setIpAddr(address);
+//            accountIp.setStatu(statu);
+//            accountIp.setId();
+//            addObj(accountIp);
+//        }
+//    }
+//
+//    @Override
+//    public void setIpAccountStatu(String ipAddr, int statu) throws RocksDBException {
+//        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "ipAddr")));
+//        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+//            String addr = new String(iterator.value());
+//            if (ipAddr.equals(addr)) {
+//                rocksDB.put(handleMap.get(getColName("accountIp", "statu")), iterator.key(), (statu + "").getBytes());
+//            }
+//        }
+//    }
 
     @Override
     public boolean putAccount(Account account) {
@@ -605,7 +599,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             byte[] timeByte = getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "time")), iterator.key());
             //time的筛选
             String address = new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "receiptAddress")), iterator.key()));
-            if (Long.parseLong(new String(timeByte)) <= time && accountHasOnlineIp(address)) {
+            if (Long.parseLong(new String(timeByte)) <= time) {
+//                if (Long.parseLong(new String(timeByte)) <= time && accountHasOnlineIp(address)) {
                 Trustee trustee = new Trustee();
                 trustee.setVotes(0l);
                 trustee.setStatus(1);

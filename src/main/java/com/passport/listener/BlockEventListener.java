@@ -211,9 +211,6 @@ public class BlockEventListener {
     public void generateBlock(GenerateBlockEvent event) throws Exception {
         ChannelGroup channels = channelsManager.getChannels();
         //第一个启动的节点，负责生成区块
-        if (channels.size() == 0) {
-            dbAccess.saveLocalAccountIpInfo();
-        }
         if (true) {
             //当前区块周期
             Optional<Object> lastBlockHeightOptional = dbAccess.getLastBlockHeight();

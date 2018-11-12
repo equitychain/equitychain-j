@@ -37,19 +37,3 @@ public class ApplicationContextProvider implements ApplicationContextAware {
         }
     }
 }
-
-class PublishThread extends Thread {
-    ApplicationContext context;
-    ApplicationEvent event;
-
-    public PublishThread(ApplicationContext context, ApplicationEvent event) {
-        this.context = context;
-        this.event = event;
-    }
-
-    @Override
-    public void run() {
-//            Thread.sleep(2000);
-        context.publishEvent(event);
-    }
-}

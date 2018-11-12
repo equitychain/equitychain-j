@@ -1,7 +1,5 @@
 package com.passport.peer;
 
-import com.passport.heartbeat.HeartBeatClientHandler;
-import com.passport.heartbeat.HeartBeatServerHandler;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.HttpUtils;
 import com.passport.zookeeper.ServiceRegistry;
@@ -41,10 +39,6 @@ public class ConnectAsync {
     @Autowired
     private ServerHandler serverHandler;
     @Autowired
-    private HeartBeatClientHandler heartBeatClientHandler;
-    @Autowired
-    private HeartBeatServerHandler heartBeatServerHandler;
-    @Autowired
     private ChannelsManager channelsManager;
 
     @Value("${rpc.serverPort}")
@@ -74,7 +68,6 @@ public class ConnectAsync {
                             pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
                             pipeline.addLast(new ProtobufEncoder());
                             pipeline.addLast(serverHandler);  // 处理 RPC 请求
-                            pipeline.addLast(heartBeatServerHandler);
                         }
                     })
                     //.option(ChannelOption.SO_BACKLOG, 1024);//设置tcp缓冲区
@@ -119,7 +112,6 @@ public class ConnectAsync {
                             pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
                             pipeline.addLast(new ProtobufEncoder());
                             pipeline.addLast(clientHandler);
-                            pipeline.addLast(heartBeatClientHandler);
                         }
                     });
 

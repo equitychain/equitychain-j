@@ -45,9 +45,9 @@ public class AccountSyncREQ extends Strategy {
                 logger.info("接收广播账户{}成功", acc.getAddress());
                  InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
                  String clientIP = insocket.getAddress().getHostAddress();
+                 System.out.println(clientIP);
                  List<Account> accounts = new ArrayList<>();
                  accounts.add(acc);
-                 dbAccess.saveIpAccountInfos(clientIP,accounts,1);
              }
         }
     }

@@ -63,23 +63,6 @@ public class BlockHandler {
     public volatile boolean padding = false;
 
     /**
-<<<<<<< HEAD
-     * 根据区块高度获取出块奖励，每年递减，第6年及以后奖励恒定
-     * @param blockHeight
-     * @return
-     */
-//    public BigDecimal getReward(Long blockHeight){
-//        Long index = blockHeight/Constant.BLOCK_DISTANCE;
-//        if(index > Constant.REWARD_ARRAY.length-1){
-//            return Constant.REWARD_ARRAY[Constant.REWARD_ARRAY.length-1];
-//        }else{
-//            return Constant.REWARD_ARRAY[index.intValue()];
-//        }
-//    }
-
-    /**
-=======
->>>>>>> d00c76a871cec5d89b36d568208ab4c61fd28395
      * 校验区块是否合法
      * @param block
      * @return
@@ -140,6 +123,7 @@ public class BlockHandler {
 
         return false;
     }
+
     public synchronized void addBlockQueue(List<Block> blocks) throws InterruptedException {
         if(!padding) {
             //排序，根据高度排序 排序后再添加
