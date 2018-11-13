@@ -13,6 +13,8 @@ import com.passport.webhandler.TrusteeHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +47,19 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         //保存连接的channel
         channelsManager.addChannel(ctx.channel());
     }
-
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        logger.info("已经30秒未收到客户端的消息了！"+channelsManager.getChannels().size());
+        if (evt instanceof IdleStateEvent){
+            IdleStateEvent event = (IdleStateEvent)evt;
+            if (event.state()== IdleState.READER_IDLE){
+                logger.info("关闭这个不活跃通道！");
+                exceptionCaught(ctx,new Throwable());
+            }
+        }else {
+            super.userEventTriggered(ctx,evt);
+        }
+    }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

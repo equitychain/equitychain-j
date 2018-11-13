@@ -80,19 +80,12 @@ public class BlockEventListener {
             }
             if (blockHeight == 0) {
                 //创建创世块
-                System.out.println("创世快加锁(开启事务)=============!~");
-                try {
-                    Block block = createGenesisBlock();
-                    blockHeight = block.getBlockHeight();
-                    //保存区块到本地
-                    dbAccess.putBlock(block);
-                    //保存区块高度到本地
-                    dbAccess.putLastBlockHeight(blockHeight);
-                    System.out.println("创世快解锁(提交事务)=============!~");
-                } catch (Exception e) {
-                    System.out.println("创世快解锁(回滚事务)=============!~");
-                }
-
+                Block block = createGenesisBlock();
+                blockHeight = block.getBlockHeight();
+                //保存区块到本地
+                dbAccess.putBlock(block);
+                //保存区块高度到本地
+                dbAccess.putLastBlockHeight(blockHeight);
             }
         }
         //请求最新区块

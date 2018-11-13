@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ChannelsManager {
     private static final Logger logger = LoggerFactory.getLogger(ChannelsManager.class);
+
     private static ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
     public ChannelGroup getChannels() {

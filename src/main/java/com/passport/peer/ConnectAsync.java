@@ -14,6 +14,7 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,8 @@ public class ConnectAsync {
                         @Override
                         protected void initChannel(SocketChannel sc) throws Exception {
                             ChannelPipeline pipeline = sc.pipeline();
+                            //心跳检查
+                            pipeline.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS));
                             //将字节数组转换成Person对象和将Person对象转成字节数组,一共需要四个处理器
                             pipeline.addLast(new ProtobufVarint32FrameDecoder());
                             pipeline.addLast(new ProtobufDecoder(NettyMessage.Message.getDefaultInstance()));
@@ -106,6 +109,8 @@ public class ConnectAsync {
                         @Override
                         protected void initChannel(SocketChannel sc) throws Exception {
                             ChannelPipeline pipeline = sc.pipeline();
+                            //心跳检测
+                            pipeline.addLast(new IdleStateHandler(0,30,0, TimeUnit.SECONDS));
                             //将字节数组转换成Person对象和将Person对象转成字节数组,一共需要四个处理器
                             pipeline.addLast(new ProtobufVarint32FrameDecoder());
                             pipeline.addLast(new ProtobufDecoder(NettyMessage.Message.getDefaultInstance()));
@@ -125,17 +130,17 @@ public class ConnectAsync {
             logger.info("contains:"+channelsManager.getChannels().contains(cf.channel()));
             logger.info("remove:"+channelsManager.getChannels().remove(cf.channel()));
 
-            logger.info("失败发起重连操作");
-            try {
-                TimeUnit.SECONDS.sleep(5);
-                try {
-                    startConnect(address);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            logger.info("失败发起重连操作");
+//            try {
+//                TimeUnit.SECONDS.sleep(5);
+//                try {
+//                    startConnect(address);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
         }
     }
 

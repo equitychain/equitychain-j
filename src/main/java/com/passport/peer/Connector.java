@@ -66,7 +66,7 @@ public class Connector implements InitializingBean {
     }
 
     //启动的时候自动开始区块同步
-//    @EventListener(ApplicationReadyEvent.class)
+    @EventListener(ApplicationReadyEvent.class)
     public void syncNextBlock() {
         //请求最新区块
         NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
@@ -89,18 +89,8 @@ public class Connector implements InitializingBean {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        //生成下一个区块
         provider.publishEvent(new GenerateBlockEvent(0L));
-
-    }
-
-    //生成下一个区块
-    //@EventListener(ApplicationReadyEvent.class)
-    public void generateNextBlock() {
-        provider.publishEvent(new GenerateBlockEvent(0L));
-    }
-
-    // @EventListener(ApplicationReadyEvent.class)
-    public void syncAccountList() {
 
     }
 }
