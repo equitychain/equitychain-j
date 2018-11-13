@@ -392,7 +392,6 @@ public class BlockHandler {
         Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
         if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
             SyncFlag.setNextBlockSyncFlag(false);
-            SyncFlag.setStarCycle(blockCycle - 1);
             Account account = accountOptional.get();
             if(account.getPrivateKey() != null){
                 //打包区块

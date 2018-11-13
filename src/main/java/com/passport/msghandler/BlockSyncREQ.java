@@ -115,14 +115,9 @@ public class BlockSyncREQ extends Strategy {
             if(trusteeOpt.isPresent()) {
                 trusteeHandler.changeStatus(trusteeOpt.get(),blockCycle);
             }
-            int curCycle = blockUtils.getBlockCycle(block.getBlockHeight());
-            if(SyncFlag.getStarCycle() != -1 && curCycle - SyncFlag.getStarCycle() > 0){
-                //打包流水成功后，判断下个出块人是否本节点
-                System.out.println("==============收到区块，检测下个出块人是不是我出块===========");
-                blockHandler.produceNextBlock();
-            }else if(SyncFlag.getStarCycle() == -1){
-                SyncFlag.setStarCycle(curCycle);
-            }
+            //打包流水成功后，判断下个出块人是否本节点
+            System.out.println("==============收到区块，检测下个出块人是不是我出块===========");
+            blockHandler.produceNextBlock();
         } catch (Exception e) {
             logger.error("接收区块广播异常", e);
         } finally {

@@ -3,6 +3,7 @@ package com.passport.peer;
 import com.passport.annotations.RocksTransaction;
 import com.passport.aop.TransactionAspect;
 import com.passport.constant.NodeListConstant;
+import com.passport.constant.SyncFlag;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
@@ -84,13 +85,10 @@ public class Connector implements InitializingBean {
 
         provider.publishEvent(new SyncNextBlockEvent(0L));
 
-        try {
-            TimeUnit.MILLISECONDS.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if(!SyncFlag.isNextBlockSyncFlag()){
+            //生成下一个区块
+            provider.publishEvent(new GenerateBlockEvent(0L));
         }
-        //生成下一个区块
-        provider.publishEvent(new GenerateBlockEvent(0L));
 
     }
 }

@@ -30,8 +30,6 @@ public class ApplicationContextProvider implements ApplicationContextAware {
     public void publishEvent(ApplicationEvent event) {
         try {
             context.publishEvent(event);
-//            System.out.println("1231231231231=-==-=-=-=");
-//            new PublishThread(context, event).start();
         } catch (Exception e) {
             e.printStackTrace();
         }

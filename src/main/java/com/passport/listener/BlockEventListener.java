@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.passport.annotations.RocksTransaction;
 import com.passport.aop.TransactionAspect;
 import com.passport.constant.Constant;
+import com.passport.constant.SyncFlag;
 import com.passport.core.*;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
@@ -202,7 +203,6 @@ public class BlockEventListener {
     @EventListener(GenerateBlockEvent.class)
     @RocksTransaction
     public void generateBlock(GenerateBlockEvent event) throws Exception {
-        ChannelGroup channels = channelsManager.getChannels();
         //第一个启动的节点，负责生成区块
         if (true) {
             //当前区块周期
@@ -212,9 +212,7 @@ public class BlockEventListener {
             }
             //出块后重新启动不再由初始节点主导出块
             long blockHeight = CastUtils.castLong(lastBlockHeightOptional.get());
-//			if(blockHeight > 1){
-//				return;
-//			}
+
             long newBlockHeight = blockHeight + 1;
             int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
 
@@ -223,6 +221,8 @@ public class BlockEventListener {
 
             //选择出块人
             blockHandler.produceBlock(newBlockHeight, trustees, blockCycle);
+
+
         }
     }
 
