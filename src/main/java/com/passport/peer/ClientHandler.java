@@ -61,6 +61,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     }
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        logger.error(ctx.channel().remoteAddress().toString()+"服务端关闭");
         //重铸机制测试
         ctx.close();
     }
