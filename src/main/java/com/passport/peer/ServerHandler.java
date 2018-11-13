@@ -60,17 +60,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         if (evt instanceof IdleStateEvent){
             IdleStateEvent event = (IdleStateEvent)evt;
             if (event.state()== IdleState.READER_IDLE){
-                channelsManager.concurrentHashMap.put(ctx.channel().id().toString(),channelsManager.concurrentHashMap.get(ctx.channel().id())+1);
-                if(channelsManager.concurrentHashMap.get(ctx.channel().id())>=3){
+                channelsManager.concurrentHashMap.put(ctx.channel().id().toString(),channelsManager.concurrentHashMap.get(ctx.channel().id().toString())+1);
+                if(channelsManager.concurrentHashMap.get(ctx.channel().id().toString())>=3){
                     logger.info("关闭这个不活跃通道！");
                     exceptionCaught(ctx,new Throwable());
-                }else{
-                    NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
-                    dataBuilder.setDataType(DataTypeEnum.DataType.HEART_BEAT);
-                    NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
-                    builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
-                    builder.setData(dataBuilder.build());
-                    ctx.writeAndFlush(builder.build());
                 }
             }
         }else {

@@ -1,6 +1,9 @@
 package com.passport.peer;
 
 import com.passport.msghandler.StrategyContext;
+import com.passport.proto.DataTypeEnum;
+import com.passport.proto.MessageTypeEnum;
+import com.passport.proto.NettyData;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.GsonUtils;
 import io.netty.channel.ChannelHandler;
@@ -45,8 +48,14 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         if (evt instanceof IdleStateEvent){
             IdleStateEvent event = (IdleStateEvent)evt;
             if (event.state()== IdleState.WRITER_IDLE){
-                logger.info("服务端异常，已断开");
-                exceptionCaught(ctx,new Throwable());
+//                logger.info("服务端异常，已断开");
+//                exceptionCaught(ctx,new Throwable());
+                NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
+                dataBuilder.setDataType(DataTypeEnum.DataType.HEART_BEAT);
+                NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
+                builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
+                builder.setData(dataBuilder.build());
+                ctx.writeAndFlush(builder.build());
             }
         }
     }
