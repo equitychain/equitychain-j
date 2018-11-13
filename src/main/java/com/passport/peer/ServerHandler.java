@@ -73,7 +73,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error(ctx.channel().remoteAddress().toString()+"客户端关闭");
+        logger.info(ctx.channel().remoteAddress().toString()+"客户端关闭");
         ctx.close();
     }
 }
