@@ -130,17 +130,17 @@ public class ConnectAsync {
             logger.info("contains:"+channelsManager.getChannels().contains(cf.channel()));
             logger.info("remove:"+channelsManager.getChannels().remove(cf.channel()));
 
-//            logger.info("失败发起重连操作");
-//            try {
-//                TimeUnit.SECONDS.sleep(5);
-//                try {
-//                    startConnect(address);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
+            logger.info("失败发起重连操作");
+            try {
+                TimeUnit.SECONDS.sleep(5);
+                try {
+                    startConnect(address);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
