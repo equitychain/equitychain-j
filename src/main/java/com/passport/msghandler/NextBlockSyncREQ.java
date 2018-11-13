@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.passport.annotations.RocksTransaction;
 import com.passport.core.Block;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.peer.ChannelsManager;
 import com.passport.proto.*;
 import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
@@ -34,6 +35,7 @@ public class NextBlockSyncREQ extends Strategy {
     @RocksTransaction
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块同步请求数据：{}", GsonUtils.toJson(message));
+        ChannelsManager.concurrentHashMap.put(ctx.channel().id().toString(),0);
 
         BlockMessage.Block blockInfo = message.getData().getBlock();
         //查询本地是否有此高度的区块
@@ -54,6 +56,7 @@ public class NextBlockSyncREQ extends Strategy {
                 //设置地址ip状态为1
                 InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
                 String clientIP = insocket.getAddress().getHostAddress();
+                System.out.println(clientIP);
                 return;
             }
             count = count > (maxHeight - blockHeight+1)?(maxHeight - blockHeight+1):count;

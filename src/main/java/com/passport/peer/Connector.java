@@ -84,11 +84,7 @@ public class Connector implements InitializingBean {
         }
 
         provider.publishEvent(new SyncNextBlockEvent(0L));
-
-        if(!SyncFlag.isNextBlockSyncFlag()){
-            //生成下一个区块
-            provider.publishEvent(new GenerateBlockEvent(0L));
-        }
-
+        //生成下一个区块
+        provider.publishEvent(new GenerateBlockEvent(0L));
     }
 }

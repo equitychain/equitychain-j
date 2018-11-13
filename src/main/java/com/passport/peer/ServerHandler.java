@@ -4,7 +4,12 @@ import com.google.common.base.Optional;
 import com.passport.core.Block;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
+import com.passport.event.SyncNextBlockEvent;
+import com.passport.listener.ApplicationContextProvider;
 import com.passport.msghandler.StrategyContext;
+import com.passport.proto.DataTypeEnum;
+import com.passport.proto.MessageTypeEnum;
+import com.passport.proto.NettyData;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
@@ -22,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ChannelHandler.Sharable
 @Component
@@ -32,6 +38,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     private ChannelsManager channelsManager;
     @Autowired
     private StrategyContext strategyContext;
+    @Autowired
+    private ApplicationContextProvider provider;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
@@ -42,7 +50,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         logger.info("server channel active服务端通道激活");
-
         logger.info("server channel id:"+ctx.channel().id().asLongText());
         //保存连接的channel
         channelsManager.addChannel(ctx.channel());
@@ -53,8 +60,18 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         if (evt instanceof IdleStateEvent){
             IdleStateEvent event = (IdleStateEvent)evt;
             if (event.state()== IdleState.READER_IDLE){
-                logger.info("关闭这个不活跃通道！");
-                exceptionCaught(ctx,new Throwable());
+                channelsManager.concurrentHashMap.put(ctx.channel().id().toString(),channelsManager.concurrentHashMap.get(ctx.channel().id())+1);
+                if(channelsManager.concurrentHashMap.get(ctx.channel().id())>=3){
+                    logger.info("关闭这个不活跃通道！");
+                    exceptionCaught(ctx,new Throwable());
+                }else{
+                    NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
+                    dataBuilder.setDataType(DataTypeEnum.DataType.HEART_BEAT);
+                    NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
+                    builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
+                    builder.setData(dataBuilder.build());
+                    ctx.writeAndFlush(builder.build());
+                }
             }
         }else {
             super.userEventTriggered(ctx,evt);

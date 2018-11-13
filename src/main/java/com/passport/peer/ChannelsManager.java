@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * 管理请求出去的channel或者连接进来的channel
  * @author: xujianfeng
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Component;
 public class ChannelsManager {
     private static final Logger logger = LoggerFactory.getLogger(ChannelsManager.class);
 
+    public static ConcurrentHashMap<String,Integer> concurrentHashMap = new ConcurrentHashMap();
+
     private static ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
     public ChannelGroup getChannels() {
@@ -25,6 +29,7 @@ public class ChannelsManager {
 
     public void addChannel(Channel channel){
         channels.add(channel);
+        concurrentHashMap.put(channel.id().toString(),0);
         logger.info("增加channel实例后，实例数量："+channels.size());
     }
 
