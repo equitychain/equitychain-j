@@ -69,8 +69,11 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
         String clientIP = insocket.getAddress().getHostAddress();
-        List<String> ipAddress = dbAccess.seekByKey(clientIP);
-        for(String address:ipAddress) dbAccess.rocksDB.delete((clientIP+"_"+address).getBytes());
+        List<String> clientIpToAddress = dbAccess.seekByKey(clientIP);
+        for(String address:clientIpToAddress){
+            dbAccess.rocksDB.delete((clientIP+"_"+address).getBytes());
+            dbAccess.rocksDB.delete((address+"_"+clientIP).getBytes());
+        }
         logger.info(ctx.channel().remoteAddress().toString()+"服务端关闭");
         //重铸机制测试
         ctx.close();
