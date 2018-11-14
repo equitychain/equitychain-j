@@ -8,6 +8,7 @@ import com.passport.db.dbhelper.DBAccess;
 import com.passport.proto.AccountMessage;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.GsonUtils;
+import com.passport.utils.SerializeUtils;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +47,8 @@ public class AccountSyncREQ extends Strategy {
                 logger.info("接收广播账户{}成功", acc.getAddress());
                  InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
                  String clientIP = insocket.getAddress().getHostAddress();
-                 dbAccess.rocksDB.put( (clientIP+"_"+account.getAddress()).getBytes(),account.getAddress().toByteArray());
-                 dbAccess.rocksDB.put( (account.getAddress()+"_"+clientIP).getBytes(),account.getAddress().toByteArray());
+                 dbAccess.rocksDB.put( (clientIP+"_"+account.getAddress()).getBytes(), SerializeUtils.serialize(account.getAddress()));
+                 dbAccess.rocksDB.put( (account.getAddress()+"_"+clientIP).getBytes(),SerializeUtils.serialize(account.getAddress()));
              }
         }
     }

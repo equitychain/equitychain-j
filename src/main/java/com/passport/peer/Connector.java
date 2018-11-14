@@ -17,6 +17,7 @@ import com.passport.proto.NettyMessage;
 import com.passport.timer.MonitoringIfProducerDead;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.HttpUtils;
+import com.passport.utils.SerializeUtils;
 import com.passport.utils.StoryFileUtil;
 import com.passport.zookeeper.ServiceRegistry;
 import org.rocksdb.WriteOptions;
@@ -75,8 +76,8 @@ public class Connector implements InitializingBean {
         for(String address:storyFileUtil.getAddresses()){
             try {
                 String clientIP = HttpUtils.getLocalHostLANAddress().getHostAddress();
-                dbAccess.rocksDB.put( (clientIP+"_"+address).getBytes(),address.getBytes());
-                dbAccess.rocksDB.put( (address+"_"+clientIP).getBytes(),address.getBytes());
+                dbAccess.rocksDB.put( (clientIP+"_"+address).getBytes(),SerializeUtils.serialize(address));
+                dbAccess.rocksDB.put( (address+"_"+clientIP).getBytes(), SerializeUtils.serialize(address));
             } catch (Exception e) {
                 e.printStackTrace();
             }

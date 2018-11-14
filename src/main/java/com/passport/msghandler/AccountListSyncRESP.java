@@ -9,6 +9,7 @@ import com.passport.proto.AccountMessage;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.DataFormatUtil;
 import com.passport.utils.GsonUtils;
+import com.passport.utils.SerializeUtils;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +49,8 @@ public class AccountListSyncRESP extends Strategy {
                     logger.info("同步账户列表地址{}成功", acc.getAddress());
                     InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
                     String clientIP = insocket.getAddress().getHostAddress();
-                    dbAccess.rocksDB.put( (clientIP+"_"+account.getAddress()).getBytes(),account.getAddress().toByteArray());
-                    dbAccess.rocksDB.put( (account.getAddress()+"_"+clientIP).getBytes(),account.getAddress().toByteArray());
+                    dbAccess.rocksDB.put( (clientIP+"_"+account.getAddress()).getBytes(),SerializeUtils.serialize(account.getAddress()));
+                    dbAccess.rocksDB.put( (account.getAddress()+"_"+clientIP).getBytes(),SerializeUtils.serialize(account.getAddress()));
                 }
             }
         }
