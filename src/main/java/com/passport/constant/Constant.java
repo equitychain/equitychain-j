@@ -38,7 +38,7 @@ public interface Constant {
 
   Integer TRUSTEES_INIT_NUM = 11;//受托人初始化的人数
 
-  Integer BLOCK_GENERATE_TIMEGAP = 10;//每个区块生成时间间隔
+  Integer BLOCK_GENERATE_TIMEGAP = 5;//每个区块生成时间间隔
 
   Long GENESIS_BLOCK_TIMESTAMP = DateUtils.formatStringDate("2018-09-01 00:00:00").getTime();//创世区块时间
 

@@ -305,4 +305,14 @@ public class AccountController {
         resultDto.setData(address);
         return resultDto;
     }
+
+    @GetMapping("getTest")
+    public @ResponseBody Object getTest(String clientIP){
+        List<String> list = dbAccess.seekByKey(clientIP);
+        Map<String,String> map = new HashMap<>();
+        for(String s:list){
+            map.put(clientIP+"_"+s,s);
+        }
+        return map;
+    }
 }

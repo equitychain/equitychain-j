@@ -49,8 +49,9 @@ public class AccountListSyncRESP extends Strategy {
                     logger.info("同步账户列表地址{}成功", acc.getAddress());
                     InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
                     String clientIP = insocket.getAddress().getHostAddress();
-                    dbAccess.rocksDB.put( (clientIP+"_"+account.getAddress()).getBytes(),SerializeUtils.serialize(account.getAddress()));
-                    dbAccess.rocksDB.put( (account.getAddress()+"_"+clientIP).getBytes(),SerializeUtils.serialize(account.getAddress()));
+
+                    dbAccess.rocksDB.put( (clientIP+"_"+account.getAddress()).getBytes(),SerializeUtils.serialize(new String(account.getAddress().toByteArray())));
+                    dbAccess.rocksDB.put( (account.getAddress()+"_"+clientIP).getBytes(),SerializeUtils.serialize(new String(account.getAddress().toByteArray())));
                 }
             }
         }
