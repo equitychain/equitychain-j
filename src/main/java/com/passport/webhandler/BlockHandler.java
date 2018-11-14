@@ -403,42 +403,31 @@ public class BlockHandler {
                 //更新101个受托人，已经出块人的状态
                 trusteeHandler.changeStatus(trustee, blockCycle);
                 logger.info("第{}个区块出块成功,出块账号:{}", newBlockHeight,account.getAddress());
-                SyncFlag.blockFlag = true;
+                SyncFlag.blockSyncFlag = true;
                 provider.publishEvent(new GenerateNextBlockEvent(0L));
             }
         }else {
             logger.info("出块账号："+accountOptional.get().getAddress());
-            //最后一个区块出块时间距离现在超过20秒
-            Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
-            Block block = lastBlockOptional.get();
-            Long timeStamp = block.getBlockHeader().getTimeStamp();
-            long currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
-            if (currentTimeStamp <= timeStamp + Constant.BLOCK_GENERATE_TIMEGAP * 1000) {
-                SyncFlag.blockFlag = true;
-                SyncFlag.blockSyncFlag = true;
-            }
-            if(SyncFlag.blockFlag){
                 //启动定时任务
-                Timer timer = new Timer ( );
-                timer.schedule ( new TimerTask ( ) {
-                    @Override
-                    public void run() {
+            Timer timer = new Timer ( );
+            timer.schedule ( new TimerTask ( ) {
+                @Override
+                public void run() {
+                    logger.info("进入选择出块账户线程");
+                    //接收到同步消息则停止
+                    if(SyncFlag.blockSyncFlag){
                         logger.info("重新选择出块账户");
-                        //接收到同步消息则停止
-                        if(SyncFlag.blockSyncFlag){
-                            trusteeHandler.changeStatus(trustee, blockCycle);
-                            //再次选出出块账户
-                            try {
-                                produceNextBlock();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                        trusteeHandler.changeStatus(trustee, blockCycle);
+                        //再次选出出块账户
+                        try {
+                            produceNextBlock();
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
-                }, 40*1000, 40*1000);
-            }
+                }
+            }, 40*1000, 40*1000);
         }
-
     }
 
 

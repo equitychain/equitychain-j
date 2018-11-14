@@ -13,6 +13,5 @@ public class SyncFlag {
     public static void setNextBlockSyncFlag(boolean nextBlockSyncFlag) {
         SyncFlag.nextBlockSyncFlag = nextBlockSyncFlag;
     }
-    public static volatile boolean blockFlag = false;//是否启动定时任务
-    public static volatile boolean blockSyncFlag = false;//是否在定时任务启动重选受托人
+    public static boolean blockSyncFlag = true;//是否在定时任务启动重选受托人
 }

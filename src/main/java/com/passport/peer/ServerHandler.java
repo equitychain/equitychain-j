@@ -56,7 +56,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     }
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        logger.info("已经30秒未收到客户端的消息了！"+channelsManager.getChannels().size());
+        logger.info(channelsManager.concurrentHashMap.get(ctx.channel().id().toString())+"已经30秒未收到客户端的消息了！"+channelsManager.getChannels().size());
         if (evt instanceof IdleStateEvent){
             IdleStateEvent event = (IdleStateEvent)evt;
             if (event.state()== IdleState.READER_IDLE){
