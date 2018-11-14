@@ -3,6 +3,7 @@ package com.passport.webhandler;
 import com.google.common.base.Optional;
 import com.passport.annotations.RocksTransaction;
 import com.passport.core.Trustee;
+import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.utils.BlockUtils;
 import org.rocksdb.RocksDBException;
@@ -10,8 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -19,7 +22,7 @@ public class TrusteeHandler {
     private static final Logger logger = LoggerFactory.getLogger(TrusteeHandler.class);
 
     @Autowired
-    private DBAccess dbAccess;
+    private BaseDBAccess dbAccess;
     @Autowired
     private BlockUtils blockUtils;
 
@@ -65,11 +68,18 @@ public class TrusteeHandler {
         Long timestamp = blockUtils.getTimestamp4BlockCycle(newBlockHeight);
         //查询投票记录（status==1）,时间小于等于timestamp，按投票票数从高到低排列的101个受托人，放到101个受托人列表中
         List<Trustee> trustees = new ArrayList<>();
+        List<Trustee> remoreTrus = new ArrayList<>();
         try {
             trustees = dbAccess.getTrusteeOfRangeBeforeTime(timestamp);
+            for(Trustee trustee:trustees){//周期结束下个周期用户未启动情况
+                if(CollectionUtils.isEmpty(dbAccess.seekByKey(trustee.getAddress()))){
+                    remoreTrus.add(trustee);
+                }
+            }
         } catch (RocksDBException e) {
             e.printStackTrace();
         }
+        trustees.removeAll(remoreTrus);
         dbAccess.put(String.valueOf(blockCycle), trustees);
 
         return trustees;
