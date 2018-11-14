@@ -70,7 +70,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
         String clientIP = insocket.getAddress().getHostAddress();
         List<String> ipAddress = dbAccess.seekByKey(clientIP);
-        for(String address:ipAddress) dbAccess.rocksDB.delete((clientIP+"_"+ipAddress).getBytes());
+        for(String address:ipAddress) dbAccess.rocksDB.delete((clientIP+"_"+address).getBytes());
         logger.info(ctx.channel().remoteAddress().toString()+"服务端关闭");
         //重铸机制测试
         ctx.close();
