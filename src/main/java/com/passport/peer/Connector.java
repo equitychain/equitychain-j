@@ -17,6 +17,7 @@ import com.passport.proto.NettyMessage;
 import com.passport.timer.MonitoringIfProducerDead;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.HttpUtils;
+import com.passport.utils.StoryFileUtil;
 import com.passport.zookeeper.ServiceRegistry;
 import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
@@ -48,6 +49,8 @@ public class Connector implements InitializingBean {
     private ChannelsManager channelsManager;
     @Autowired
     private BaseDBAccess dbAccess;
+    @Autowired
+    private StoryFileUtil storyFileUtil;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -69,6 +72,15 @@ public class Connector implements InitializingBean {
     //启动的时候自动开始区块同步
     @EventListener(ApplicationReadyEvent.class)
     public void syncNextBlock() {
+        for(String address:storyFileUtil.getAddresses()){
+            try {
+                String clientIP = HttpUtils.getLocalHostLANAddress().getHostAddress();
+                dbAccess.rocksDB.put( (clientIP+"_"+address).getBytes(),address.getBytes());
+                dbAccess.rocksDB.put( (address+"_"+clientIP).getBytes(),address.getBytes());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         //请求最新区块
         NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
         dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNTLIST_SYNC);

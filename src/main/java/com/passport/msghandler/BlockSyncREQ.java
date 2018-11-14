@@ -55,7 +55,8 @@ public class BlockSyncREQ extends Strategy {
     private Lock lock = new ReentrantLock();
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块广播请求数据：{}", GsonUtils.toJson(message));
-
+        //接收到消息停止定时任务中的重选
+        SyncFlag.blockSyncFlag = false;
         try {
             lock.lock();
             BlockMessage.Block block = message.getData().getBlock();

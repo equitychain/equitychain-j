@@ -39,7 +39,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     @Autowired
     private StrategyContext strategyContext;
     @Autowired
-    private ApplicationContextProvider provider;
+    private BaseDBAccess dbAccess;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
@@ -73,6 +73,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
+        String clientIP = insocket.getAddress().getHostAddress();
+        List<String> ipAddress = dbAccess.seekByKey(clientIP);
+        for(String address:ipAddress) dbAccess.rocksDB.delete((clientIP+"_"+ipAddress).getBytes());
         logger.info(ctx.channel().remoteAddress().toString()+"客户端关闭");
         ctx.close();
     }

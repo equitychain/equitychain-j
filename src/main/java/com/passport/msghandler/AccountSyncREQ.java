@@ -3,6 +3,7 @@ package com.passport.msghandler;
 import com.google.common.base.Optional;
 import com.passport.annotations.RocksTransaction;
 import com.passport.core.Account;
+import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.proto.AccountMessage;
 import com.passport.proto.NettyMessage;
@@ -28,7 +29,7 @@ public class AccountSyncREQ extends Strategy {
     private static final Logger logger = LoggerFactory.getLogger(AccountSyncREQ.class);
 
     @Autowired
-    private DBAccess dbAccess;
+    private BaseDBAccess dbAccess;
 
     @RocksTransaction
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
@@ -45,9 +46,8 @@ public class AccountSyncREQ extends Strategy {
                 logger.info("接收广播账户{}成功", acc.getAddress());
                  InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
                  String clientIP = insocket.getAddress().getHostAddress();
-                 System.out.println(clientIP);
-                 List<Account> accounts = new ArrayList<>();
-                 accounts.add(acc);
+                 dbAccess.rocksDB.put( (clientIP+"_"+account.getAddress()).getBytes(),account.getAddress().toByteArray());
+                 dbAccess.rocksDB.put( (account.getAddress()+"_"+clientIP).getBytes(),account.getAddress().toByteArray());
              }
         }
     }

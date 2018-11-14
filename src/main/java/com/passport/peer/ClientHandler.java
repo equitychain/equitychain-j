@@ -1,5 +1,6 @@
 package com.passport.peer;
 
+import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.msghandler.StrategyContext;
 import com.passport.proto.DataTypeEnum;
 import com.passport.proto.MessageTypeEnum;
@@ -16,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.net.InetSocketAddress;
+import java.util.List;
+
 @ChannelHandler.Sharable
 @Component
 public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Message> {
@@ -26,6 +30,8 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     private ChannelsManager channelsManager;
     @Autowired
     private StrategyContext strategyContext;
+    @Autowired
+    private BaseDBAccess dbAccess;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
@@ -61,6 +67,10 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     }
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
+        String clientIP = insocket.getAddress().getHostAddress();
+        List<String> ipAddress = dbAccess.seekByKey(clientIP);
+        for(String address:ipAddress) dbAccess.rocksDB.delete((clientIP+"_"+ipAddress).getBytes());
         logger.info(ctx.channel().remoteAddress().toString()+"服务端关闭");
         //重铸机制测试
         ctx.close();
