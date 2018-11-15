@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -220,7 +221,9 @@ public class BlockEventListener {
             List<Trustee> trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
 
             //选择出块人
+            if(!CollectionUtils.isEmpty(trustees))
             blockHandler.produceBlock(newBlockHeight, trustees, blockCycle);
+            else logger.info("trustees is null");
 
 
         }

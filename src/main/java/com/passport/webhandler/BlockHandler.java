@@ -361,7 +361,8 @@ public class BlockHandler {
         //查找断开节点是否存在存在则移除
 
         waitIfNotArrived(block);
-        produceBlock(newBlockHeight, trustees, blockCycle);
+        if(!CollectionUtils.isEmpty(trustees)) produceBlock(newBlockHeight, trustees, blockCycle);
+        else logger.info("trustees is null");
     }
 
     /**
@@ -438,7 +439,7 @@ public class BlockHandler {
                         }
                     }
                 }
-            }, 40*1000, 40*1000);
+            }, 1000);
         }
     }
 
