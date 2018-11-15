@@ -2,15 +2,11 @@ package com.passport.webhandler;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import com.google.common.util.concurrent.Futures;
 import com.google.protobuf.ByteString;
-import com.passport.annotations.RocksTransaction;
-import com.passport.aop.TransactionAspect;
 import com.passport.constant.Constant;
 import com.passport.constant.SyncFlag;
 import com.passport.core.*;
 import com.passport.db.dbhelper.BaseDBAccess;
-import com.passport.db.dbhelper.DBAccess;
 import com.passport.db.dbhelper.IndexColumnNames;
 import com.passport.enums.TransactionTypeEnum;
 import com.passport.event.GenerateNextBlockEvent;
@@ -19,29 +15,21 @@ import com.passport.listener.ApplicationContextProvider;
 import com.passport.proto.BlockHeaderMessage;
 import com.passport.proto.BlockMessage;
 import com.passport.proto.TransactionMessage;
-import com.passport.timer.MonitoringIfProducerDead;
 import com.passport.transactionhandler.TransactionStrategy;
 import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.NetworkTime;
 import com.passport.utils.RawardUtil;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.rocksdb.RocksDBException;
-import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 @EnableAsync
@@ -422,8 +410,8 @@ public class BlockHandler {
                     Block block = lastBlockOptional.get();
                     Long timeStamp = block.getBlockHeader().getTimeStamp();
                     long currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
-                    if (currentTimeStamp <= timeStamp + Constant.BLOCK_GENERATE_TIMEGAP * 1000) {
-                        logger.info("最后一个区块出块时间距离现在10秒以内");
+                    if (currentTimeStamp <= timeStamp + 30 * 1000) {//30s内未出块
+                        logger.info("最后一个区块出块时间距离现在30秒以内");
                         return;
                     }
                     logger.info("进入选择出块账户线程");
