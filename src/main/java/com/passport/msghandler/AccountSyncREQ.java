@@ -47,8 +47,8 @@ public class AccountSyncREQ extends Strategy {
                 logger.info("接收广播账户{}成功", acc.getAddress());
                  InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
                  String clientIP = insocket.getAddress().getHostAddress();
-                 dbAccess.rocksDB.put( (clientIP+"_"+account.getAddress()).getBytes(), SerializeUtils.serialize(new String(account.getAddress().toByteArray())));
-                 dbAccess.rocksDB.put( (account.getAddress()+"_"+clientIP).getBytes(),SerializeUtils.serialize(new String(account.getAddress().toByteArray())));
+                 dbAccess.rocksDB.put( (clientIP+"_"+new String(account.getAddress().toByteArray())).getBytes(), SerializeUtils.serialize(new String(account.getAddress().toByteArray())));
+                 dbAccess.rocksDB.put( (new String(account.getAddress().toByteArray())+"_"+clientIP).getBytes(),SerializeUtils.serialize(new String(account.getAddress().toByteArray())));
              }
         }
     }
