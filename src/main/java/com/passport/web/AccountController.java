@@ -1,17 +1,14 @@
 package com.passport.web;
 
-import ch.qos.logback.core.rolling.helper.FileStoreUtil;
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.core.Account;
-import com.passport.core.AccountIp;
 import com.passport.core.Trustee;
 import com.passport.core.Voter;
 import com.passport.crypto.eth.*;
-import com.passport.db.dbhelper.DBAccess;
+import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
 import com.passport.event.SyncAccountEvent;
@@ -19,9 +16,10 @@ import com.passport.exception.CipherException;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.CheckUtils;
+import com.passport.utils.HttpUtils;
+import com.passport.utils.SerializeUtils;
 import com.passport.utils.StoryFileUtil;
 import com.passport.webhandler.AccountHandler;
-import com.passport.webhandler.TransactionHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +61,7 @@ public class AccountController {
     @Autowired
     TransactionStrategyContext transactionStrategyContext;
     @Autowired
-    DBAccess dbAccess;
+    BaseDBAccess dbAccess;
     @Autowired
     private ApplicationContextProvider provider;
 
@@ -79,11 +77,13 @@ public class AccountController {
         if (flag) {
             return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
         }
-
+        String clientIP = HttpUtils.getLocalHostLANAddress().getHostAddress();
         Account account = accountHandler.newAccount(password);
         if (account != null) {
             //当挖矿账户不存在时设置为挖矿账户
             accountHandler.setMinerAccountIfNotExists(account);
+            dbAccess.rocksDB.put( (clientIP+"_"+new String(account.getAddress().getBytes())).getBytes(), SerializeUtils.serialize(new String(account.getAddress().getBytes())));
+            dbAccess.rocksDB.put( (new String(account.getAddress().getBytes())+"_"+clientIP).getBytes(),SerializeUtils.serialize(new String(account.getAddress().getBytes())));
             provider.publishEvent(new SyncAccountEvent(account));
             return new ResultDto(ResultEnum.SUCCESS.getCode(), account);
         }
