@@ -95,14 +95,9 @@ public class Connector implements InitializingBean {
         //发送本地账户
         NettyData.Data.Builder dataBuilder1 = NettyData.Data.newBuilder();
         dataBuilder1.setDataType(DataTypeEnum.DataType.ACCOUNTIP_SYNC);
-        for (String address : localAddress) {
-            AccountMessage.Account.Builder builder1 = AccountMessage.Account.newBuilder();
-            builder1.setAddress(ByteString.copyFrom(address.getBytes()));
-            dataBuilder1.addAccounts(builder1.build());
-        }
         NettyMessage.Message.Builder builder1 = NettyMessage.Message.newBuilder();
         builder1.setData(dataBuilder1.build());
-        builder1.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
+        builder1.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
         channelsManager.getChannels().writeAndFlush(builder1.build());
 
         try {

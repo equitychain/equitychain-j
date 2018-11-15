@@ -37,18 +37,5 @@ public class AccountIpSyncRESP extends Strategy {
             dbAccess.rocksDB.put( (clientIP+"_"+new String(account.getAddress().toByteArray())).getBytes(), SerializeUtils.serialize(new String(account.getAddress().toByteArray())));
             dbAccess.rocksDB.put( (new String(account.getAddress().toByteArray())+"_"+clientIP).getBytes(),SerializeUtils.serialize(new String(account.getAddress().toByteArray())));
         }
-        //发送本地账户
-        Set<String> localAddress = storyFileUtil.getAddresses();
-        NettyData.Data.Builder dataBuilder1 = NettyData.Data.newBuilder();
-        dataBuilder1.setDataType(DataTypeEnum.DataType.ACCOUNTIP_SYNC);
-        for (String address : localAddress) {
-            AccountMessage.Account.Builder builder1 = AccountMessage.Account.newBuilder();
-            builder1.setAddress(ByteString.copyFrom(address.getBytes()));
-            dataBuilder1.addAccounts(builder1.build());
-        }
-        NettyMessage.Message.Builder builder1 = NettyMessage.Message.newBuilder();
-        builder1.setData(dataBuilder1.build());
-        builder1.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
-        ctx.writeAndFlush(builder1.build());
     }
 }
