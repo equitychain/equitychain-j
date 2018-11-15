@@ -1,19 +1,18 @@
 package com.passport.peer;
 
+import com.google.protobuf.ByteString;
 import com.passport.annotations.RocksTransaction;
 import com.passport.aop.TransactionAspect;
 import com.passport.constant.NodeListConstant;
 import com.passport.constant.SyncFlag;
+import com.passport.core.Account;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.GenerateBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
-import com.passport.proto.DataTypeEnum;
-import com.passport.proto.MessageTypeEnum;
-import com.passport.proto.NettyData;
-import com.passport.proto.NettyMessage;
+import com.passport.proto.*;
 import com.passport.timer.MonitoringIfProducerDead;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.HttpUtils;
@@ -29,6 +28,8 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -73,7 +74,8 @@ public class Connector implements InitializingBean {
     //启动的时候自动开始区块同步
     @EventListener(ApplicationReadyEvent.class)
     public void syncNextBlock() {
-        for(String address:storyFileUtil.getAddresses()){
+        Set<String> localAddress = storyFileUtil.getAddresses();
+        for(String address:localAddress){
             try {
                 String clientIP = HttpUtils.getLocalHostLANAddress().getHostAddress();
                 dbAccess.rocksDB.put( (clientIP+"_"+address).getBytes(),SerializeUtils.serialize(address));
@@ -82,7 +84,7 @@ public class Connector implements InitializingBean {
                 e.printStackTrace();
             }
         }
-        //请求最新区块
+        //发送同步账户请求
         NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
         dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNTLIST_SYNC);
 
@@ -90,12 +92,25 @@ public class Connector implements InitializingBean {
         builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
         builder.setData(dataBuilder);
         channelsManager.getChannels().writeAndFlush(builder.build());
+        //发送本地账户
+        NettyData.Data.Builder dataBuilder1 = NettyData.Data.newBuilder();
+        dataBuilder1.setDataType(DataTypeEnum.DataType.ACCOUNTIP_SYNC);
+        for (String address : localAddress) {
+            AccountMessage.Account.Builder builder1 = AccountMessage.Account.newBuilder();
+            builder1.setAddress(ByteString.copyFrom(address.getBytes()));
+            dataBuilder1.addAccounts(builder1.build());
+        }
+        NettyMessage.Message.Builder builder1 = NettyMessage.Message.newBuilder();
+        builder1.setData(dataBuilder1.build());
+        builder1.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
+        channelsManager.getChannels().writeAndFlush(builder1.build());
+
         try {
             TimeUnit.MILLISECONDS.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
+        //请求最新区块
         provider.publishEvent(new SyncNextBlockEvent(0L));
         //生成下一个区块
         provider.publishEvent(new GenerateBlockEvent(0L));
