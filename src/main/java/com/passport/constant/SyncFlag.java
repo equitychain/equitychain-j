@@ -14,6 +14,4 @@ public class SyncFlag {
         SyncFlag.nextBlockSyncFlag = nextBlockSyncFlag;
     }
     public static boolean blockSyncFlag = true;//是否在定时任务启动重选受托人
-
-    public static boolean timerFlag = true;
 }
