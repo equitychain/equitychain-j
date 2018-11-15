@@ -1,9 +1,11 @@
 package com.passport.msghandler;
 
+import com.google.common.base.Optional;
 import com.google.protobuf.ByteString;
 import com.passport.core.Account;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.proto.*;
+import com.passport.utils.DataFormatUtil;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.SerializeUtils;
 import com.passport.utils.StoryFileUtil;
@@ -28,6 +30,14 @@ public class AccountIpSyncREQ extends Strategy {
     @Override
     void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
         logger.info("处理账户ip同步请求数据：{}", GsonUtils.toJson(message));
+        //存对方IP地址
+        InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
+        String clientIP = insocket.getAddress().getHostAddress();
+        List<AccountMessage.Account> accounts = message.getData().getAccountsList();
+        for (AccountMessage.Account account : accounts) {
+            dbAccess.rocksDB.put( (clientIP+"_"+new String(account.getAddress().toByteArray())).getBytes(),SerializeUtils.serialize(new String(account.getAddress().toByteArray())));
+            dbAccess.rocksDB.put( (new String(account.getAddress().toByteArray())+"_"+clientIP).getBytes(),SerializeUtils.serialize(new String(account.getAddress().toByteArray())));
+        }
         //发送本地账户
         Set<String> localAddress = storyFileUtil.getAddresses();
         NettyData.Data.Builder dataBuilder1 = NettyData.Data.newBuilder();
