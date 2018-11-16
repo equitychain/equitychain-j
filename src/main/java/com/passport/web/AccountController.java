@@ -92,11 +92,11 @@ public class AccountController {
         return new ResultDto(ResultEnum.SYS_ERROR);
 
     }
-    private static boolean minerFlag = true;
+
     @GetMapping("/miner")
     @RocksTransaction
     public ResultDto miner(HttpServletRequest request) throws Exception {
-        if(minerFlag){//启动时不更新受托人列表 需等下个周期在加入
+        if(SyncFlag.minerFlag){//启动时不更新受托人列表 需等下个周期在加入
             Set<String> address = storyFileUtil.getAddresses();
             List<Trustee> trustees = dbAccess.listTrustees();
             for(Trustee trustee:trustees){//更新受托人列表启动出块
@@ -111,7 +111,7 @@ public class AccountController {
             }
             //启动出块 需确认同步完成才能出块
             if(SyncFlag.blockSyncFlag){
-                minerFlag = false;
+                SyncFlag.minerFlag = false;
                 provider.publishEvent(new GenerateBlockEvent(0L));
                 //通知所有用户 本节点启动出块
                 NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();

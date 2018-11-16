@@ -351,7 +351,6 @@ public class BlockHandler {
         waitIfNotArrived(block);
         produceBlock(newBlockHeight, trustees, blockCycle);
     }
-
     /**
      *
      * 未到出块时间则睡眠等待

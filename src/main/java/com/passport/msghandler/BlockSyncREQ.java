@@ -14,6 +14,7 @@ import com.passport.proto.NettyMessage;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
+import com.passport.web.AccountController;
 import com.passport.webhandler.BlockHandler;
 import com.passport.webhandler.TransactionHandler;
 import com.passport.webhandler.TrusteeHandler;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.security.AccessController;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -118,7 +120,9 @@ public class BlockSyncREQ extends Strategy {
             }
             SyncFlag.blockSyncFlag = true;//同步完成
             System.out.println("==============收到区块，检测下个出块人===========");
-            blockHandler.produceNextBlock();
+            if(!SyncFlag.minerFlag){
+                blockHandler.produceNextBlock();
+            }
         } catch (Exception e) {
             logger.error("接收区块广播异常", e);
         } finally {

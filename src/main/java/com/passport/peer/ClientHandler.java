@@ -1,5 +1,6 @@
 package com.passport.peer;
 
+import com.google.common.base.Optional;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
@@ -8,6 +9,7 @@ import com.passport.proto.DataTypeEnum;
 import com.passport.proto.MessageTypeEnum;
 import com.passport.proto.NettyData;
 import com.passport.proto.NettyMessage;
+import com.passport.utils.BlockUtils;
 import com.passport.utils.GsonUtils;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -34,6 +36,8 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     private StrategyContext strategyContext;
     @Autowired
     private BaseDBAccess dbAccess;
+    @Autowired
+    private BlockUtils blockUtils;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
@@ -73,17 +77,28 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         String clientIP = insocket.getAddress().getHostAddress();
         List<String> clientIpToAddress = dbAccess.seekByKey(clientIP);
         List<Trustee> trustees = dbAccess.listTrustees();
+        int blockCycle = blockUtils.getBlockCycle(Long.valueOf(dbAccess.getLastBlockHeight().get().toString())+1l);
+        Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
+        List<Trustee> list = (List<Trustee>)objectOptional.get();
         for(String address:clientIpToAddress){
             dbAccess.rocksDB.delete((clientIP+"_"+address).getBytes());
             dbAccess.rocksDB.delete((address+"_"+clientIP).getBytes());
             for(Trustee trustee: trustees){
+                //更新受托人列表
                 if(trustee.getAddress().equals(address)){
                     trustee.setState(0);
                     SyncFlag.waitMiner.remove(address);
                     dbAccess.putTrustee(trustee);
                 }
+                //更新当前周期
+                for(Trustee tee : list){
+                    if(tee.getAddress().equals(address)){
+                        tee.setStatus(0);
+                    }
+                }
             }
         }
+        dbAccess.put(String.valueOf(blockCycle), list);
         logger.info(ctx.channel().remoteAddress().toString()+"服务端关闭");
         //重铸机制测试
         ctx.close();

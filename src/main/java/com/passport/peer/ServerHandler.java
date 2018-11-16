@@ -41,6 +41,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     private StrategyContext strategyContext;
     @Autowired
     private BaseDBAccess dbAccess;
+    @Autowired
+    private BlockUtils blockUtils;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
@@ -78,9 +80,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         String clientIP = insocket.getAddress().getHostAddress();
         List<String> ipAddress = dbAccess.seekByKey(clientIP);
         List<Trustee> trustees = dbAccess.listTrustees();
+        int blockCycle = blockUtils.getBlockCycle(Long.valueOf(dbAccess.getLastBlockHeight().get().toString())+1l);
+        Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
+        List<Trustee> list = (List<Trustee>)objectOptional.get();
+//        List<Trustee> list = (List<Trustee>)dbAccess.get(String.valueOf(blockCycle));
         for(String address:ipAddress){
             dbAccess.rocksDB.delete((clientIP+"_"+address).getBytes());
             dbAccess.rocksDB.delete((address+"_"+clientIP).getBytes());
+            //更新受托人列表
             for(Trustee trustee: trustees){
                 if(trustee.getAddress().equals(address)){
                     trustee.setState(0);
@@ -88,7 +95,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
                     dbAccess.putTrustee(trustee);
                 }
             }
+            //更新当前周期
+            for(Trustee tee : list){
+                if(tee.getAddress().equals(address)){
+                    tee.setStatus(0);
+                }
+            }
         }
+        dbAccess.put(String.valueOf(blockCycle), list);
         logger.info(ctx.channel().remoteAddress().toString()+"客户端关闭");
         ctx.close();
     }
