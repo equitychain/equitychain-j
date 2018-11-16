@@ -11,4 +11,5 @@ enum DataType {
     BLOCK_SYNC = 5;
     ACCOUNTIP_SYNC = 6;
     ACCOUNT_MINER = 7;
+    TRUSTEE_SYNC = 8;
 }

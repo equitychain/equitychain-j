@@ -7,6 +7,7 @@ import com.passport.constant.NodeListConstant;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Account;
 import com.passport.core.Transaction;
+import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.GenerateBlockEvent;
@@ -92,7 +93,7 @@ public class Connector implements InitializingBean {
         builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
         builder.setData(dataBuilder);
         channelsManager.getChannels().writeAndFlush(builder.build());
-        //发送本地账户
+        //发送本地账户ip绑定
         NettyData.Data.Builder dataBuilder1 = NettyData.Data.newBuilder();
         dataBuilder1.setDataType(DataTypeEnum.DataType.ACCOUNTIP_SYNC);
         for (String address : localAddress) {
@@ -104,6 +105,13 @@ public class Connector implements InitializingBean {
         builder1.setData(dataBuilder1.build());
         builder1.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
         channelsManager.getChannels().writeAndFlush(builder1.build());
+        //发送已经启动的受托人列表状态
+        NettyData.Data.Builder dataBuilder2 = NettyData.Data.newBuilder();
+        dataBuilder2.setDataType(DataTypeEnum.DataType.TRUSTEE_SYNC);
+        NettyMessage.Message.Builder builder2 = NettyMessage.Message.newBuilder();
+        builder2.setData(dataBuilder2.build());
+        builder2.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
+        channelsManager.getChannels().writeAndFlush(builder2.build());
 
         try {
             TimeUnit.MILLISECONDS.sleep(3000);

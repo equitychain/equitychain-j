@@ -3,6 +3,7 @@ import "DataType.proto";
 import "BlockMessage.proto";
 import "AccountMessage.proto";
 import "TransactionMessage.proto";
+import "TrusteeMessage.proto";
 option java_package = "com.passport.proto";
 option java_outer_classname = "NettyData";
 
@@ -13,4 +14,5 @@ message Data {
     repeated Block blocks = 4;
     Account account = 5;
     Transaction transaction = 6;
+    repeated Trustee trustee = 7;
 }

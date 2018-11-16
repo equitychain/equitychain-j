@@ -51,6 +51,10 @@ public final class DataTypeEnum {
      * <code>ACCOUNT_MINER = 7;</code>
      */
     ACCOUNT_MINER(7),
+    /**
+     * <code>TRUSTEE_SYNC = 8;</code>
+     */
+    TRUSTEE_SYNC(8),
     UNRECOGNIZED(-1),
     ;
 
@@ -86,6 +90,10 @@ public final class DataTypeEnum {
      * <code>ACCOUNT_MINER = 7;</code>
      */
     public static final int ACCOUNT_MINER_VALUE = 7;
+    /**
+     * <code>TRUSTEE_SYNC = 8;</code>
+     */
+    public static final int TRUSTEE_SYNC_VALUE = 8;
 
 
     public final int getNumber() {
@@ -114,6 +122,7 @@ public final class DataTypeEnum {
         case 5: return BLOCK_SYNC;
         case 6: return ACCOUNTIP_SYNC;
         case 7: return ACCOUNT_MINER;
+        case 8: return TRUSTEE_SYNC;
         default: return null;
       }
     }
@@ -175,12 +184,13 @@ public final class DataTypeEnum {
           descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n\016DataType.proto*\244\001\n\010DataType\022\016\n\nHEART_B" +
+            "\n\016DataType.proto*\266\001\n\010DataType\022\016\n\nHEART_B" +
                     "EAT\020\000\022\023\n\017NEXT_BLOCK_SYNC\020\001\022\024\n\020ACCOUNTLIS" +
                     "T_SYNC\020\002\022\020\n\014ACCOUNT_SYNC\020\003\022\024\n\020SEND_TRANS" +
                     "ACTION\020\004\022\016\n\nBLOCK_SYNC\020\005\022\022\n\016ACCOUNTIP_SY" +
-                    "NC\020\006\022\021\n\rACCOUNT_MINER\020\007B\"\n\022com.passport." +
-                    "protoB\014DataTypeEnumb\006proto3"
+                    "NC\020\006\022\021\n\rACCOUNT_MINER\020\007\022\020\n\014TRUSTEE_SYNC\020" +
+                    "\010B\"\n\022com.passport.protoB\014DataTypeEnumb\006p" +
+                    "roto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
             new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
