@@ -105,10 +105,13 @@ public class AccountController {
         List<Trustee> trustees = dbAccess.listTrustees();
         for(Trustee trustee:trustees){//更新受托人列表启动出块
             for(String add:address){
-                if(trustee.getAddress().equals(add)){
-                    trustee.setState(1);
-                    dbAccess.putTrustee(trustee);
-                }
+                    if(trustee.getAddress().equals(add)){
+                        if(trustee.getState() == 1){
+                            return new ResultDto(ResultEnum.SUCCESS);
+                        }
+                        trustee.setState(1);
+                        dbAccess.putTrustee(trustee);
+                    }
             }
         }
         //启动出块

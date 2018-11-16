@@ -397,47 +397,47 @@ public class BlockHandler {
         }else {
             logger.info("出块账号："+accountOptional.get().getAddress());
 
-            //最后一个区块出块时间距离现在超过10秒
-            Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
-            if (!lastBlockOptional.isPresent()) {
-                return;
-            }
-            Block block = lastBlockOptional.get();
-            Long timeStamp = block.getBlockHeader().getTimeStamp();
-            long currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
-//            if (currentTimeStamp <= timeStamp + 30 * 1000) {//30s内未出块
-//                logger.info("最后一个区块出块时间距离现在30秒以内");
+//            //最后一个区块出块时间距离现在超过10秒
+//            Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
+//            if (!lastBlockOptional.isPresent()) {
 //                return;
 //            }
-            Long time = 0l;
-            while (currentTimeStamp - timeStamp <= 30 * 1000){
-                time++;
-                logger.info("开启任务倒计时："+(currentTimeStamp - timeStamp));
-                if(!SyncFlag.blockSyncFlag){
-                    logger.info("任务倒计终止，已有出块");
-                    return;
-                }
-                currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
-            }
-            //启动定时任务
-            Timer timer = new Timer ( );
-            timer.schedule ( new TimerTask ( ) {
-                @Override
-                public void run() {
-                    logger.info("进入选择出块账户线程");
-                    //接收到同步消息则停止
-                    if(SyncFlag.blockSyncFlag){
-                        logger.info("最后一个区块出块时间距离现在超过30秒，重新选择出块账户");
-                        trusteeHandler.changeStatus(trustee, blockCycle);
-                        //再次选出出块账户
-                        try {
-                            produceNextBlock();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }, 1000);
+//            Block block = lastBlockOptional.get();
+//            Long timeStamp = block.getBlockHeader().getTimeStamp();
+//            long currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
+////            if (currentTimeStamp <= timeStamp + 30 * 1000) {//30s内未出块
+////                logger.info("最后一个区块出块时间距离现在30秒以内");
+////                return;
+////            }
+//            Long time = 0l;
+//            while (currentTimeStamp - timeStamp <= 30 * 1000){
+//                time++;
+//                logger.info("开启任务倒计时："+(currentTimeStamp - timeStamp));
+//                if(!SyncFlag.blockSyncFlag){
+//                    logger.info("任务倒计终止，已有出块");
+//                    return;
+//                }
+//                currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
+//            }
+//            //启动定时任务
+//            Timer timer = new Timer ( );
+//            timer.schedule ( new TimerTask ( ) {
+//                @Override
+//                public void run() {
+//                    logger.info("进入选择出块账户线程");
+//                    //接收到同步消息则停止
+//                    if(SyncFlag.blockSyncFlag){
+//                        logger.info("最后一个区块出块时间距离现在超过30秒，重新选择出块账户");
+//                        trusteeHandler.changeStatus(trustee, blockCycle);
+//                        //再次选出出块账户
+//                        try {
+//                            produceNextBlock();
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }, 1000);
         }
     }
 
