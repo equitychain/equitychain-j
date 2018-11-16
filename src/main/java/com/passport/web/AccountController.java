@@ -97,33 +97,33 @@ public class AccountController {
         return new ResultDto(ResultEnum.SYS_ERROR);
 
     }
-
+    private static boolean minerFlag = true;
     @GetMapping("/miner")
     @RocksTransaction
     public ResultDto miner(HttpServletRequest request) throws Exception {
-        Set<String> address = storyFileUtil.getAddresses();
-        List<Trustee> trustees = dbAccess.listTrustees();
-        for(Trustee trustee:trustees){//更新受托人列表启动出块
-            for(String add:address){
+        if(minerFlag){
+            Set<String> address = storyFileUtil.getAddresses();
+            List<Trustee> trustees = dbAccess.listTrustees();
+            for(Trustee trustee:trustees){//更新受托人列表启动出块
+                for(String add:address){
                     if(trustee.getAddress().equals(add)){
-                        if(trustee.getState() == 1){
-                            return new ResultDto(ResultEnum.SUCCESS);
-                        }
                         trustee.setState(1);
                         dbAccess.putTrustee(trustee);
                     }
+                }
             }
-        }
-        //启动出块
-        provider.publishEvent(new GenerateBlockEvent(0L));
-        //通知所有用户 本节点启动出块
-        NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
-        dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNT_MINER);
+            minerFlag = false;
+            //启动出块
+            provider.publishEvent(new GenerateBlockEvent(0L));
+            //通知所有用户 本节点启动出块
+            NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
+            dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNT_MINER);
 
-        NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
-        builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
-        builder.setData(dataBuilder.build());
-        channelsManager.getChannels().writeAndFlush(builder.build());
+            NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
+            builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
+            builder.setData(dataBuilder.build());
+            channelsManager.getChannels().writeAndFlush(builder.build());
+        }
         return new ResultDto(ResultEnum.SUCCESS);
     }
 
