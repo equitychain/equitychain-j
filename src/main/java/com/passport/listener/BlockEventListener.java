@@ -217,7 +217,10 @@ public class BlockEventListener {
             int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
 
             //取得票前101个委托人
-            List<Trustee> trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
+            List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
+            if(trustees.size() == 0){
+                trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
+            }
 
             blockHandler.produceBlock(newBlockHeight, trustees, blockCycle);
         }

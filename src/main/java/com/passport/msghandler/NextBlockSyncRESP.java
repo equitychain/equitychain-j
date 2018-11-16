@@ -50,8 +50,8 @@ public class NextBlockSyncRESP extends Strategy {
         if(blocks==null || blocks.size() == 0){
             //同步完了，不进行广播，
             SyncFlag.setNextBlockSyncFlag(false);
-            //生成下一个区块
-            provider.publishEvent(new GenerateBlockEvent(0L));
+            //生成下一个区块 需求已改需要手动启动生成下个区块
+//            provider.publishEvent(new GenerateBlockEvent(0L));
             return;
         }
         List<Block> blockList = new ArrayList<>();
