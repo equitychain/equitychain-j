@@ -4,6 +4,8 @@ import com.google.common.base.Optional;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
+import com.passport.event.GenerateBlockEvent;
+import com.passport.listener.ApplicationContextProvider;
 import com.passport.msghandler.StrategyContext;
 import com.passport.proto.DataTypeEnum;
 import com.passport.proto.MessageTypeEnum;
@@ -11,6 +13,8 @@ import com.passport.proto.NettyData;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.GsonUtils;
+import com.passport.utils.StoryFileUtil;
+import com.passport.webhandler.TrusteeHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -23,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Set;
 
 @ChannelHandler.Sharable
 @Component
@@ -38,6 +43,12 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     private BaseDBAccess dbAccess;
     @Autowired
     private BlockUtils blockUtils;
+    @Autowired
+    private StoryFileUtil storyFileUtil;
+    @Autowired
+    private ApplicationContextProvider provider;
+    @Autowired
+    private TrusteeHandler trusteeHandler;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
@@ -73,11 +84,13 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     }
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        int nextBlock = 0;
         InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
         String clientIP = insocket.getAddress().getHostAddress();
         List<String> clientIpToAddress = dbAccess.seekByKey(clientIP);
         List<Trustee> trustees = dbAccess.listTrustees();
-        int blockCycle = blockUtils.getBlockCycle(Long.valueOf(dbAccess.getLastBlockHeight().get().toString())+1l);
+        Long lastBlockHeight = Long.valueOf(dbAccess.getLastBlockHeight().get().toString());
+        int blockCycle = blockUtils.getBlockCycle(lastBlockHeight+1l);
         Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
         List<Trustee> list = (List<Trustee>)objectOptional.get();
         for(String address:clientIpToAddress){
@@ -91,10 +104,29 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
                     dbAccess.putTrustee(trustee);
                 }
                 //更新当前周期
-                for(Trustee tee : list){
-                    if(tee.getAddress().equals(address)){
-                        tee.setStatus(0);
+                for(int i= 0;i<list.size();i++){
+                    if(list.get(i).getAddress().equals(address)){
+                        list.get(i).setStatus(0);
+                        nextBlock = i+1;
                     }
+                }
+            }
+        }
+        Set<String> strings = storyFileUtil.getAddresses();
+        if(list.size()<nextBlock){//最后一个的话则算出下个周期的用户看自己存不存在
+            List<Trustee> newTrustees = trusteeHandler.findValidTrustees(blockCycle+1);
+            if(newTrustees.size() == 0){
+                newTrustees = trusteeHandler.getTrusteesBeforeTime(lastBlockHeight+1, blockCycle+1);
+                for(String s: strings){
+                    if(s.equals(newTrustees.get(0))){
+                        provider.publishEvent(new GenerateBlockEvent(0L));
+                    }
+                }
+            }
+        }else{//节点异常算出下个出块用户是不是自己是则出块
+            for(String s: strings){
+                if(s.equals(list.get(nextBlock))){
+                    provider.publishEvent(new GenerateBlockEvent(0L));
                 }
             }
         }
