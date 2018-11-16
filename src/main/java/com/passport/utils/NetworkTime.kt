@@ -23,11 +23,11 @@ object NetworkTime {
     val websiteDateTimeLong: Long
         get() {
             try {
-                val url = URL(webUrl4)
-                val uc = url.openConnection()
-                uc.connect()
-                val ld = uc.date
-                val date = Date(ld)
+//                val url = URL(webUrl4)
+//                val uc = url.openConnection()
+//                uc.connect()
+//                val ld = uc.date
+//                val date = Date(ld)
 //                return date.time
                 return System.currentTimeMillis()
             } catch (e: MalformedURLException) {

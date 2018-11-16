@@ -1,5 +1,6 @@
 package com.passport.peer;
 
+import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.msghandler.StrategyContext;
 import com.passport.proto.DataTypeEnum;
@@ -70,9 +71,16 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
         String clientIP = insocket.getAddress().getHostAddress();
         List<String> clientIpToAddress = dbAccess.seekByKey(clientIP);
+        List<Trustee> trustees = dbAccess.listTrustees();
         for(String address:clientIpToAddress){
             dbAccess.rocksDB.delete((clientIP+"_"+address).getBytes());
             dbAccess.rocksDB.delete((address+"_"+clientIP).getBytes());
+            for(Trustee trustee: trustees){
+                if(trustee.getAddress().equals(address)){
+                    trustee.setState(0);
+                    dbAccess.putTrustee(trustee);
+                }
+            }
         }
         logger.info(ctx.channel().remoteAddress().toString()+"服务端关闭");
         //重铸机制测试

@@ -76,9 +76,16 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
         String clientIP = insocket.getAddress().getHostAddress();
         List<String> ipAddress = dbAccess.seekByKey(clientIP);
+        List<Trustee> trustees = dbAccess.listTrustees();
         for(String address:ipAddress){
             dbAccess.rocksDB.delete((clientIP+"_"+address).getBytes());
             dbAccess.rocksDB.delete((address+"_"+clientIP).getBytes());
+            for(Trustee trustee: trustees){
+                if(trustee.getAddress().equals(address)){
+                    trustee.setState(0);
+                    dbAccess.putTrustee(trustee);
+                }
+            }
         }
         logger.info(ctx.channel().remoteAddress().toString()+"客户端关闭");
         ctx.close();

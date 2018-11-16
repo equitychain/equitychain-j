@@ -56,7 +56,6 @@ public class BlockSyncREQ extends Strategy {
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块广播请求数据：{}", GsonUtils.toJson(message));
         //接收到消息停止定时任务中的重选
-        SyncFlag.blockSyncFlag = false;
         try {
             lock.lock();
             BlockMessage.Block block = message.getData().getBlock();
@@ -89,6 +88,7 @@ public class BlockSyncREQ extends Strategy {
             Block blockLocal = blockHandler.convertBlockMessage2Block(block);
             //本地是否已经存在此高度区块
             if (dbAccess.getBlock(blockLocal.getBlockHeight()).isPresent()) {
+                SyncFlag.blockSyncFlag = true;//同步完成
                 return;
             }
             //验证区块合法性
@@ -116,8 +116,8 @@ public class BlockSyncREQ extends Strategy {
             if(trusteeOpt.isPresent()) {
                 trusteeHandler.changeStatus(trusteeOpt.get(),blockCycle);
             }
-            //打包流水成功后，判断下个出块人是否本节点
-            System.out.println("==============收到区块，检测下个出块人是不是我出块===========");
+            SyncFlag.blockSyncFlag = true;//同步完成
+            System.out.println("==============收到区块，检测下个出块人===========");
             blockHandler.produceNextBlock();
         } catch (Exception e) {
             logger.error("接收区块广播异常", e);

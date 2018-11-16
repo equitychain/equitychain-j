@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
+import com.passport.constant.SyncFlag;
 import com.passport.core.Account;
 import com.passport.core.Trustee;
 import com.passport.core.Voter;
@@ -112,17 +113,19 @@ public class AccountController {
                     }
                 }
             }
-            minerFlag = false;
-            //启动出块
-            provider.publishEvent(new GenerateBlockEvent(0L));
-            //通知所有用户 本节点启动出块
-            NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
-            dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNT_MINER);
+            //启动出块 需确认同步完成才能出块
+            if(SyncFlag.blockSyncFlag){
+                minerFlag = false;
+                provider.publishEvent(new GenerateBlockEvent(0L));
+                //通知所有用户 本节点启动出块
+                NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
+                dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNT_MINER);
 
-            NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
-            builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
-            builder.setData(dataBuilder.build());
-            channelsManager.getChannels().writeAndFlush(builder.build());
+                NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
+                builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
+                builder.setData(dataBuilder.build());
+                channelsManager.getChannels().writeAndFlush(builder.build());
+            }
         }
         return new ResultDto(ResultEnum.SUCCESS);
     }

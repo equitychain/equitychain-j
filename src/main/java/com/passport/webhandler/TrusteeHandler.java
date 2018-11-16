@@ -56,7 +56,7 @@ public class TrusteeHandler {
         if(objectOptional.isPresent()){
             List<Trustee> list = (List<Trustee>)objectOptional.get();
             for(Trustee tee : list){
-                if(tee.getStatus() == 1){
+                if(tee.getStatus() == 1 && tee.getState() != 0){
                     trustees.add(tee);
                 }
             }
@@ -70,11 +70,6 @@ public class TrusteeHandler {
         List<Trustee> trustees = new ArrayList<>();
         try {
             trustees = dbAccess.getTrusteeOfRangeBeforeTime(timestamp);
-            for(Trustee trustee:trustees){//周期期间节点断开
-                if(CollectionUtils.isEmpty(dbAccess.seekByKey(trustee.getAddress()))){
-                    trustee.setState(0);
-                }
-            }
         } catch (RocksDBException e) {
             e.printStackTrace();
         }

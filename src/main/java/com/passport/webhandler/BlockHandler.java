@@ -391,7 +391,6 @@ public class BlockHandler {
                 //更新101个受托人，已经出块人的状态
                 trusteeHandler.changeStatus(trustee, blockCycle);
                 logger.info("第{}个区块出块成功,出块账号:{}", newBlockHeight,account.getAddress());
-                SyncFlag.blockSyncFlag = true;
                 provider.publishEvent(new GenerateNextBlockEvent(0L));
             }
         }else {

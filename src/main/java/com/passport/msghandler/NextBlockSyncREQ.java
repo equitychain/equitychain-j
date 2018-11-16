@@ -47,16 +47,13 @@ public class NextBlockSyncREQ extends Strategy {
             long maxHeight = CastUtils.castLong(lastBlockHeight.get());
             if(maxHeight < blockHeight){
                 //todo 同步完了的
+                logger.info("同步完成");
                 NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
                 dataBuilder.setDataType(DataTypeEnum.DataType.NEXT_BLOCK_SYNC);
                 NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
                 builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
                 builder.setData(dataBuilder.build());
                 ctx.writeAndFlush(builder.build());
-                //设置地址ip状态为1
-                InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
-                String clientIP = insocket.getAddress().getHostAddress();
-                System.out.println(clientIP);
                 return;
             }
             count = count > (maxHeight - blockHeight+1)?(maxHeight - blockHeight+1):count;
