@@ -118,7 +118,7 @@ public class AccountHandler {
                 voteRecords.add(voteRecord);
 
                 //把新增的受托人放到受托人列表
-                Trustee trustee = new Trustee(account.getAddress(), 1L, 0f, new BigDecimal(0), 1,1);
+                Trustee trustee = new Trustee(account.getAddress(), 1L, 0f, new BigDecimal(0), 1,0);
                 trustees.add(trustee);
             } catch (Exception e) {
                 e.printStackTrace();
