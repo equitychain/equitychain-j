@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Optional;
 import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
+import com.passport.constant.SyncFlag;
 import com.passport.core.*;
 import com.passport.peer.ChannelsManager;
 import com.passport.utils.HttpUtils;

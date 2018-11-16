@@ -2,6 +2,7 @@ package com.passport.webhandler;
 
 import com.google.common.base.Optional;
 import com.passport.annotations.RocksTransaction;
+import com.passport.constant.SyncFlag;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
@@ -69,6 +70,16 @@ public class TrusteeHandler {
         //查询投票记录（status==1）,时间小于等于timestamp，按投票票数从高到低排列的101个受托人，放到101个受托人列表中
         List<Trustee> trustees = new ArrayList<>();
         try {
+            List<Trustee> tru = dbAccess.listTrustees();
+            SyncFlag.waitMiner.forEach((k, v) ->{
+                for(Trustee trustee:tru){
+                    if(trustee.getAddress().equals(k)){
+                        trustee.setState(v);
+                        SyncFlag.waitMiner.remove(k);
+                        dbAccess.putTrustee(trustee);
+                    }
+                }
+            });
             trustees = dbAccess.getTrusteeOfRangeBeforeTime(timestamp);
         } catch (RocksDBException e) {
             e.printStackTrace();

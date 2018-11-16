@@ -1,5 +1,8 @@
 package com.passport.constant;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 /**
  * 组1主动同步区块事件和组2接收广播区块、接收广播流水
  * @author: xujianfeng
@@ -14,4 +17,6 @@ public class SyncFlag {
         SyncFlag.nextBlockSyncFlag = nextBlockSyncFlag;
     }
     public static boolean blockSyncFlag = false;//是否在定时任务启动重选受托人
+
+    public static ConcurrentMap<String,Integer> waitMiner = new ConcurrentHashMap<>();
 }

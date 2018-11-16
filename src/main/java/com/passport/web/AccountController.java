@@ -54,14 +54,8 @@ public class AccountController {
 
     @Value("${wallet.keystoreDir}")
     public String keystoreDir;
-
     @Autowired
     AccountHandler accountHandler;
-//    @Autowired
-//    DBAccess dbAccess;
-//    @Value("${wallet.keystoreDir}")
-//    private String walletDir;
-
     @Autowired
     TransactionStrategyContext transactionStrategyContext;
     @Autowired
@@ -102,16 +96,18 @@ public class AccountController {
     @GetMapping("/miner")
     @RocksTransaction
     public ResultDto miner(HttpServletRequest request) throws Exception {
-        if(minerFlag){
+        if(minerFlag){//启动时不更新受托人列表 需等下个周期在加入
             Set<String> address = storyFileUtil.getAddresses();
             List<Trustee> trustees = dbAccess.listTrustees();
             for(Trustee trustee:trustees){//更新受托人列表启动出块
                 for(String add:address){
                     if(trustee.getAddress().equals(add)){
-                        trustee.setState(1);
-                        dbAccess.putTrustee(trustee);
+                        SyncFlag.waitMiner.put(add,1);
                     }
                 }
+            }
+            if(channelsManager.getChannels().size() == 0){
+                SyncFlag.blockSyncFlag = true;
             }
             //启动出块 需确认同步完成才能出块
             if(SyncFlag.blockSyncFlag){

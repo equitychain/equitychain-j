@@ -1,5 +1,6 @@
 package com.passport.peer;
 
+import com.passport.constant.SyncFlag;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.msghandler.StrategyContext;
@@ -78,6 +79,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
             for(Trustee trustee: trustees){
                 if(trustee.getAddress().equals(address)){
                     trustee.setState(0);
+                    SyncFlag.waitMiner.remove(address);
                     dbAccess.putTrustee(trustee);
                 }
             }

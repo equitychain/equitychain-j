@@ -1,5 +1,6 @@
 package com.passport.msghandler;
 
+import com.passport.constant.SyncFlag;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.proto.AccountMessage;
@@ -25,7 +26,7 @@ public class AccountMinerRESP extends Strategy {
     @Override
     void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
         //收到消息进行处理
-        logger.info("收到启动出块请求");
+        logger.info("收到启动出块请求放入等待。到下个周期才允许启动");
         InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
         String clientIP = insocket.getAddress().getHostAddress();
         //获取节点的账户列表
@@ -34,8 +35,7 @@ public class AccountMinerRESP extends Strategy {
         for(String address:ipAddress){
             for(Trustee trustee : trustees){
                 if(address.equals(trustee.getAddress())){
-                    trustee.setState(1);
-                    dbAccess.putTrustee(trustee);
+                    SyncFlag.waitMiner.put(address,1);
                 }
             }
         }
