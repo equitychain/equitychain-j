@@ -11,9 +11,15 @@ import com.passport.crypto.eth.*;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
+import com.passport.event.GenerateBlockEvent;
 import com.passport.event.SyncAccountEvent;
 import com.passport.exception.CipherException;
 import com.passport.listener.ApplicationContextProvider;
+import com.passport.peer.ChannelsManager;
+import com.passport.proto.DataTypeEnum;
+import com.passport.proto.MessageTypeEnum;
+import com.passport.proto.NettyData;
+import com.passport.proto.NettyMessage;
 import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.CheckUtils;
 import com.passport.utils.HttpUtils;
@@ -30,10 +36,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 账户
@@ -64,6 +67,10 @@ public class AccountController {
     BaseDBAccess dbAccess;
     @Autowired
     private ApplicationContextProvider provider;
+    @Autowired
+    private ChannelsManager channelsManager;
+    @Autowired
+    private StoryFileUtil storyFileUtil;
 
     @Value("${wallet.keystoreDir}")
     private String walletDir;
@@ -91,17 +98,30 @@ public class AccountController {
 
     }
 
-    @GetMapping("/setMinerAccount")
+    @GetMapping("/miner")
     @RocksTransaction
-    public ResultDto setMinerAccount(HttpServletRequest request) throws Exception {
-        String address = request.getParameter("address");
-        if (address != null && !"".equalsIgnoreCase(address)) {
-            Account account = accountHandler.setMinerAccount(address);
-            if (account != null) {
-                return new ResultDto(ResultEnum.SUCCESS.getCode(), account);
+    public ResultDto miner(HttpServletRequest request) throws Exception {
+        Set<String> address = storyFileUtil.getAddresses();
+        List<Trustee> trustees = dbAccess.listTrustees();
+        for(Trustee trustee:trustees){//更新受托人列表启动出块
+            for(String add:address){
+                if(trustee.getAddress().equals(add)){
+                    trustee.setState(1);
+                    dbAccess.putTrustee(trustee);
+                }
             }
         }
-        return new ResultDto(ResultEnum.SYS_ERROR);
+        //启动出块
+        provider.publishEvent(new GenerateBlockEvent(0L));
+        //通知所有用户 本节点启动出块
+        NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
+        dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNT_MINER);
+
+        NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
+        builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
+        builder.setData(dataBuilder.build());
+        channelsManager.getChannels().writeAndFlush(builder.build());
+        return new ResultDto(ResultEnum.SUCCESS);
     }
 
     @GetMapping("/generateGenesis")

@@ -68,18 +68,16 @@ public class TrusteeHandler {
         Long timestamp = blockUtils.getTimestamp4BlockCycle(newBlockHeight);
         //查询投票记录（status==1）,时间小于等于timestamp，按投票票数从高到低排列的101个受托人，放到101个受托人列表中
         List<Trustee> trustees = new ArrayList<>();
-        List<Trustee> remoreTrus = new ArrayList<>();
         try {
             trustees = dbAccess.getTrusteeOfRangeBeforeTime(timestamp);
-            for(Trustee trustee:trustees){//周期结束下个周期用户未启动情况
+            for(Trustee trustee:trustees){//周期期间节点断开
                 if(CollectionUtils.isEmpty(dbAccess.seekByKey(trustee.getAddress()))){
-                    remoreTrus.add(trustee);
+                    trustee.setState(0);
                 }
             }
         } catch (RocksDBException e) {
             e.printStackTrace();
         }
-        trustees.removeAll(remoreTrus);
         dbAccess.put(String.valueOf(blockCycle), trustees);
 
         return trustees;

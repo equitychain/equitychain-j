@@ -112,7 +112,6 @@ public class Connector implements InitializingBean {
         }
         //请求最新区块
         provider.publishEvent(new SyncNextBlockEvent(0L));
-        //生成下一个区块
-        if(channelsManager.getChannels().size() == 0) provider.publishEvent(new GenerateBlockEvent(0L));
+//        provider.publishEvent(new GenerateBlockEvent(0L));
     }
 }

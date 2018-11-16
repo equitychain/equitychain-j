@@ -25,16 +25,18 @@ public class Trustee {
     private BigDecimal income;//收入
     @FaildClaz(name = "status", type = Integer.class)
     private Integer status;//0撤消1正常
-
+    @FaildClaz(name = "state", type = Integer.class)
+    private Integer state;//未启动1启动state
     public Trustee() {
     }
 
-    public Trustee(String address, Long votes, Float generateRate, BigDecimal income, Integer status) {
+    public Trustee(String address, Long votes, Float generateRate, BigDecimal income, Integer status, Integer state) {
         this.address = address;
         this.votes = votes;
         this.generateRate = generateRate;
         this.income = income;
         this.status = status;
+        this.state = state;
     }
 
     public String getAddress() {
@@ -77,6 +79,14 @@ public class Trustee {
         this.status = status;
     }
 
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
+    }
+
     @Override
     public int hashCode() {
         return status;
@@ -95,6 +105,6 @@ public class Trustee {
         return false;
     }
     public boolean isNullContent(){
-        return votes == null && generateRate == null && income == null && status == null;
+        return votes == null && generateRate == null && income == null && status == null && state == null;
     }
 }

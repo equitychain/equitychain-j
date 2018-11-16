@@ -10,4 +10,5 @@ enum DataType {
     SEND_TRANSACTION = 4;
     BLOCK_SYNC = 5;
     ACCOUNTIP_SYNC = 6;
+    ACCOUNT_MINER = 7;
 }

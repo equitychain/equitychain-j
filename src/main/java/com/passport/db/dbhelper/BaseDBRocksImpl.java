@@ -600,22 +600,27 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             //time的筛选
             String address = new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "receiptAddress")), iterator.key()));
             if (Long.parseLong(new String(timeByte)) <= time) {
-//                if (Long.parseLong(new String(timeByte)) <= time && accountHasOnlineIp(address)) {
-                Trustee trustee = new Trustee();
-                trustee.setVotes(0l);
-                trustee.setStatus(1);
-                trustee.setAddress(address);
-                int index = -1;
-                //address的分组
-                index = allVoters.indexOf(trustee);
-                if (index != -1) {
-                    trustee = allVoters.remove(index);
+                List<Trustee> trustees = listTrustees();
+                for(Trustee trustee:trustees){
+                    if(address.equals(trustee.getAddress()) && trustee.getState() != 0){
+                        allVoters.add(trustee);
+                    }
                 }
-                //求和
-                trustee.setVotes(trustee.getVotes() + Integer.parseInt(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "voteNum")), iterator.key()))));
-                if (!trustee.isNullContent()) {
-                    allVoters.add(trustee);
-                }
+//                Trustee trustee = new Trustee();
+//                trustee.setVotes(0l);
+//                trustee.setStatus(1);
+//                trustee.setAddress(address);
+//                int index = -1;
+//                //address的分组
+//                index = allVoters.indexOf(trustee);
+//                if (index != -1) {
+//                    trustee = allVoters.remove(index);
+//                }
+//                //求和
+//                trustee.setVotes(trustee.getVotes() + Integer.parseInt(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "voteNum")), iterator.key()))));
+//                if (!trustee.isNullContent()) {
+//                    allVoters.add(trustee);
+//                }
             }
         }
         //排序

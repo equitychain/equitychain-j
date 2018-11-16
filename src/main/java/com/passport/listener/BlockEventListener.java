@@ -70,7 +70,6 @@ public class BlockEventListener {
      * @param event
      */
     @EventListener(SyncNextBlockEvent.class)
-//	@RocksTransaction
     public void syncNextBlock(SyncNextBlockEvent event) throws ParseException, RocksDBException {
         Long blockHeight = CastUtils.castLong(event.getSource());
         if (blockHeight == 0) {
@@ -220,12 +219,7 @@ public class BlockEventListener {
             //取得票前101个委托人
             List<Trustee> trustees = trusteeHandler.getTrusteesBeforeTime(newBlockHeight, blockCycle);
 
-            //选择出块人
-            if(!CollectionUtils.isEmpty(trustees))
             blockHandler.produceBlock(newBlockHeight, trustees, blockCycle);
-            else logger.info("trustees is null");
-
-
         }
     }
 

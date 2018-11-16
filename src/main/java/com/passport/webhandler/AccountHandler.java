@@ -77,18 +77,6 @@ public class AccountHandler {
         return account;
     }
 
-    //用户替换挖矿账号
-    public Account setMinerAccount(String address) {
-        Optional<Account> addAccount = dbAccess.getAccount(address);
-        if (addAccount.isPresent()) {
-            Account account = addAccount.get();
-            if (dbAccess.putMinerAccount(account)) {
-                return account;
-            }
-        }
-        return null;
-    }
-
     //用户设置默认挖矿账号（第一个创建的账户默认为挖矿账户）
     public void setMinerAccountIfNotExists(Account account) {
         Optional<Account> minerAccount = dbAccess.getMinerAccount();
@@ -111,10 +99,6 @@ public class AccountHandler {
                 //创建账户
                 Account account = generateAccount("123456");
                 dbAccess.putAccount(account);
-                //重铸出块机制
-                String ip = HttpUtils.getLocalHostLANAddress().getHostAddress();
-                dbAccess.put(("heartbeat_"+ip+"_"+account.getAddress()).getBytes(),account.getAddress().getBytes());
-                //重铸出块机制
                 accounts.add(new Account(account.getAddress(),null, account.getBalance()));//不保存私钥
 
                 //创建注册为受托人交易
@@ -134,7 +118,7 @@ public class AccountHandler {
                 voteRecords.add(voteRecord);
 
                 //把新增的受托人放到受托人列表
-                Trustee trustee = new Trustee(account.getAddress(), 1L, 0f, new BigDecimal(0), 1);
+                Trustee trustee = new Trustee(account.getAddress(), 1L, 0f, new BigDecimal(0), 1,1);
                 trustees.add(trustee);
             } catch (Exception e) {
                 e.printStackTrace();
