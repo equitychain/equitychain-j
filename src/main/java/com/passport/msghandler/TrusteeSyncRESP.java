@@ -1,6 +1,7 @@
 package com.passport.msghandler;
 
 import com.google.protobuf.ByteString;
+import com.passport.core.Account;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.proto.*;
@@ -12,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component("DATA_RESP_TRUSTEE_SYNC")
@@ -25,15 +28,21 @@ public class TrusteeSyncRESP extends Strategy {
     void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
         logger.info("处理受托人同步响应数据：{}", GsonUtils.toJson(message));
         List<TrusteeMessage.Trustee> trusteeList = message.getData().getTrusteeList();
-        List<Trustee> trustees = dbAccess.listTrustees();
+        int blockCycle = 0;
+        List<Trustee> trustees = new ArrayList<>();
         for(TrusteeMessage.Trustee trusteeMsg:trusteeList){
-            for(Trustee trustee:trustees){
-                if(trustee.getAddress().equals(new String(trusteeMsg.getAddress().toByteArray()))){
-                    trustee.setState((int) trusteeMsg.getState());
-                    dbAccess.putTrustee(trustee);
-                }
-            }
+            Trustee trustee = new Trustee();
+            trustee.setIncome(new BigDecimal(0));
+            trustee.setStatus((int) trusteeMsg.getStatus());
+            trustee.setState((int) trusteeMsg.getState());
+            trustee.setVotes(trusteeMsg.getVotes());
+            trustee.setAddress(trustee.getAddress());
+            trustee.setGenerateRate(trustee.getGenerateRate());
+            dbAccess.putTrustee(trustee);//更新状态
+            trustees.add(trustee);
+            blockCycle = (int) trusteeMsg.getBlockCycle();
         }
+        dbAccess.put(String.valueOf(blockCycle), trustees);//更新周期
         logger.info("受托人同步完成");
     }
 }

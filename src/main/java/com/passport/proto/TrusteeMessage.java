@@ -6,17 +6,17 @@ package com.passport.proto;
 public final class TrusteeMessage {
   private TrusteeMessage() {}
   public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistryLite registry) {
+          com.google.protobuf.ExtensionRegistryLite registry) {
   }
 
   public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistry registry) {
+          com.google.protobuf.ExtensionRegistry registry) {
     registerAllExtensions(
-        (com.google.protobuf.ExtensionRegistryLite) registry);
+            (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   public interface TrusteeOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:Trustee)
-      com.google.protobuf.MessageOrBuilder {
+          // @@protoc_insertion_point(interface_extends:Trustee)
+          com.google.protobuf.MessageOrBuilder {
 
     /**
      * <code>bytes address = 1;</code>
@@ -24,35 +24,59 @@ public final class TrusteeMessage {
     com.google.protobuf.ByteString getAddress();
 
     /**
-     * <code>int64 state = 2;</code>
+     * <code>int64 votes = 2;</code>
+     */
+    long getVotes();
+
+    /**
+     * <code>float generateRate = 3;</code>
+     */
+    float getGenerateRate();
+
+    /**
+     * <code>int64 status = 4;</code>
+     */
+    long getStatus();
+
+    /**
+     * <code>int64 state = 5;</code>
      */
     long getState();
+
+    /**
+     * <code>int64 blockCycle = 6;</code>
+     */
+    long getBlockCycle();
   }
   /**
    * Protobuf type {@code Trustee}
    */
   public  static final class Trustee extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:Trustee)
-      TrusteeOrBuilder {
+          com.google.protobuf.GeneratedMessageV3 implements
+          // @@protoc_insertion_point(message_implements:Trustee)
+          TrusteeOrBuilder {
     // Use Trustee.newBuilder() to construct.
     private Trustee(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
     private Trustee() {
       address_ = com.google.protobuf.ByteString.EMPTY;
+      votes_ = 0L;
+      generateRate_ = 0F;
+      status_ = 0L;
       state_ = 0L;
+      blockCycle_ = 0L;
     }
 
-    @Override
+    @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
       return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
     private Trustee(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       this();
       int mutable_bitField0_ = 0;
       try {
@@ -76,7 +100,27 @@ public final class TrusteeMessage {
             }
             case 16: {
 
+              votes_ = input.readInt64();
+              break;
+            }
+            case 29: {
+
+              generateRate_ = input.readFloat();
+              break;
+            }
+            case 32: {
+
+              status_ = input.readInt64();
+              break;
+            }
+            case 40: {
+
               state_ = input.readInt64();
+              break;
+            }
+            case 48: {
+
+              blockCycle_ = input.readInt64();
               break;
             }
           }
@@ -85,21 +129,21 @@ public final class TrusteeMessage {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
+                e).setUnfinishedMessage(this);
       } finally {
         makeExtensionsImmutable();
       }
     }
     public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return TrusteeMessage.internal_static_Trustee_descriptor;
+    getDescriptor() {
+      return com.passport.proto.TrusteeMessage.internal_static_Trustee_descriptor;
     }
 
-    protected FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return TrusteeMessage.internal_static_Trustee_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              TrusteeMessage.Trustee.class, TrusteeMessage.Trustee.Builder.class);
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+    internalGetFieldAccessorTable() {
+      return com.passport.proto.TrusteeMessage.internal_static_Trustee_fieldAccessorTable
+              .ensureFieldAccessorsInitialized(
+                      com.passport.proto.TrusteeMessage.Trustee.class, com.passport.proto.TrusteeMessage.Trustee.Builder.class);
     }
 
     public static final int ADDRESS_FIELD_NUMBER = 1;
@@ -111,13 +155,49 @@ public final class TrusteeMessage {
       return address_;
     }
 
-    public static final int STATE_FIELD_NUMBER = 2;
+    public static final int VOTES_FIELD_NUMBER = 2;
+    private long votes_;
+    /**
+     * <code>int64 votes = 2;</code>
+     */
+    public long getVotes() {
+      return votes_;
+    }
+
+    public static final int GENERATERATE_FIELD_NUMBER = 3;
+    private float generateRate_;
+    /**
+     * <code>float generateRate = 3;</code>
+     */
+    public float getGenerateRate() {
+      return generateRate_;
+    }
+
+    public static final int STATUS_FIELD_NUMBER = 4;
+    private long status_;
+    /**
+     * <code>int64 status = 4;</code>
+     */
+    public long getStatus() {
+      return status_;
+    }
+
+    public static final int STATE_FIELD_NUMBER = 5;
     private long state_;
     /**
-     * <code>int64 state = 2;</code>
+     * <code>int64 state = 5;</code>
      */
     public long getState() {
       return state_;
+    }
+
+    public static final int BLOCKCYCLE_FIELD_NUMBER = 6;
+    private long blockCycle_;
+    /**
+     * <code>int64 blockCycle = 6;</code>
+     */
+    public long getBlockCycle() {
+      return blockCycle_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -131,12 +211,24 @@ public final class TrusteeMessage {
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
+            throws java.io.IOException {
       if (!address_.isEmpty()) {
         output.writeBytes(1, address_);
       }
+      if (votes_ != 0L) {
+        output.writeInt64(2, votes_);
+      }
+      if (generateRate_ != 0F) {
+        output.writeFloat(3, generateRate_);
+      }
+      if (status_ != 0L) {
+        output.writeInt64(4, status_);
+      }
       if (state_ != 0L) {
-        output.writeInt64(2, state_);
+        output.writeInt64(5, state_);
+      }
+      if (blockCycle_ != 0L) {
+        output.writeInt64(6, blockCycle_);
       }
     }
 
@@ -147,36 +239,62 @@ public final class TrusteeMessage {
       size = 0;
       if (!address_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, address_);
+                .computeBytesSize(1, address_);
+      }
+      if (votes_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+                .computeInt64Size(2, votes_);
+      }
+      if (generateRate_ != 0F) {
+        size += com.google.protobuf.CodedOutputStream
+                .computeFloatSize(3, generateRate_);
+      }
+      if (status_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+                .computeInt64Size(4, status_);
       }
       if (state_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(2, state_);
+                .computeInt64Size(5, state_);
+      }
+      if (blockCycle_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+                .computeInt64Size(6, blockCycle_);
       }
       memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
-    @Override
-    public boolean equals(final Object obj) {
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
-       return true;
+        return true;
       }
-      if (!(obj instanceof TrusteeMessage.Trustee)) {
+      if (!(obj instanceof com.passport.proto.TrusteeMessage.Trustee)) {
         return super.equals(obj);
       }
-      TrusteeMessage.Trustee other = (TrusteeMessage.Trustee) obj;
+      com.passport.proto.TrusteeMessage.Trustee other = (com.passport.proto.TrusteeMessage.Trustee) obj;
 
       boolean result = true;
       result = result && getAddress()
-          .equals(other.getAddress());
+              .equals(other.getAddress());
+      result = result && (getVotes()
+              == other.getVotes());
+      result = result && (
+              java.lang.Float.floatToIntBits(getGenerateRate())
+                      == java.lang.Float.floatToIntBits(
+                      other.getGenerateRate()));
+      result = result && (getStatus()
+              == other.getStatus());
       result = result && (getState()
-          == other.getState());
+              == other.getState());
+      result = result && (getBlockCycle()
+              == other.getBlockCycle());
       return result;
     }
 
-    @Override
+    @java.lang.Override
     public int hashCode() {
       if (memoizedHashCode != 0) {
         return memoizedHashCode;
@@ -185,99 +303,111 @@ public final class TrusteeMessage {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + ADDRESS_FIELD_NUMBER;
       hash = (53 * hash) + getAddress().hashCode();
+      hash = (37 * hash) + VOTES_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              getVotes());
+      hash = (37 * hash) + GENERATERATE_FIELD_NUMBER;
+      hash = (53 * hash) + java.lang.Float.floatToIntBits(
+              getGenerateRate());
+      hash = (37 * hash) + STATUS_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              getStatus());
       hash = (37 * hash) + STATE_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getState());
+              getState());
+      hash = (37 * hash) + BLOCKCYCLE_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              getBlockCycle());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
     }
 
-    public static TrusteeMessage.Trustee parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.passport.proto.TrusteeMessage.Trustee parseFrom(
+            java.nio.ByteBuffer data)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static TrusteeMessage.Trustee parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.passport.proto.TrusteeMessage.Trustee parseFrom(
+            java.nio.ByteBuffer data,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static TrusteeMessage.Trustee parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.passport.proto.TrusteeMessage.Trustee parseFrom(
+            com.google.protobuf.ByteString data)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static TrusteeMessage.Trustee parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.passport.proto.TrusteeMessage.Trustee parseFrom(
+            com.google.protobuf.ByteString data,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static TrusteeMessage.Trustee parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.passport.proto.TrusteeMessage.Trustee parseFrom(byte[] data)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static TrusteeMessage.Trustee parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.passport.proto.TrusteeMessage.Trustee parseFrom(
+            byte[] data,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static TrusteeMessage.Trustee parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
+    public static com.passport.proto.TrusteeMessage.Trustee parseFrom(java.io.InputStream input)
+            throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
+              .parseWithIOException(PARSER, input);
     }
-    public static TrusteeMessage.Trustee parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+    public static com.passport.proto.TrusteeMessage.Trustee parseFrom(
+            java.io.InputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
+              .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static TrusteeMessage.Trustee parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
+    public static com.passport.proto.TrusteeMessage.Trustee parseDelimitedFrom(java.io.InputStream input)
+            throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
+              .parseDelimitedWithIOException(PARSER, input);
     }
-    public static TrusteeMessage.Trustee parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+    public static com.passport.proto.TrusteeMessage.Trustee parseDelimitedFrom(
+            java.io.InputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+              .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static TrusteeMessage.Trustee parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
+    public static com.passport.proto.TrusteeMessage.Trustee parseFrom(
+            com.google.protobuf.CodedInputStream input)
+            throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
+              .parseWithIOException(PARSER, input);
     }
-    public static TrusteeMessage.Trustee parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+    public static com.passport.proto.TrusteeMessage.Trustee parseFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
+              .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(TrusteeMessage.Trustee prototype) {
+    public static Builder newBuilder(com.passport.proto.TrusteeMessage.Trustee prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
+              ? new Builder() : new Builder().mergeFrom(this);
     }
 
-    @Override
+    @java.lang.Override
     protected Builder newBuilderForType(
-        BuilderParent parent) {
+            com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -285,19 +415,19 @@ public final class TrusteeMessage {
      * Protobuf type {@code Trustee}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:Trustee)
-        TrusteeMessage.TrusteeOrBuilder {
+            com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+            // @@protoc_insertion_point(builder_implements:Trustee)
+            com.passport.proto.TrusteeMessage.TrusteeOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return TrusteeMessage.internal_static_Trustee_descriptor;
+      getDescriptor() {
+        return com.passport.proto.TrusteeMessage.internal_static_Trustee_descriptor;
       }
 
-      protected FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return TrusteeMessage.internal_static_Trustee_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                TrusteeMessage.Trustee.class, TrusteeMessage.Trustee.Builder.class);
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+        return com.passport.proto.TrusteeMessage.internal_static_Trustee_fieldAccessorTable
+                .ensureFieldAccessorsInitialized(
+                        com.passport.proto.TrusteeMessage.Trustee.class, com.passport.proto.TrusteeMessage.Trustee.Builder.class);
       }
 
       // Construct using com.passport.proto.TrusteeMessage.Trustee.newBuilder()
@@ -306,7 +436,7 @@ public final class TrusteeMessage {
       }
 
       private Builder(
-          BuilderParent parent) {
+              com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -319,32 +449,44 @@ public final class TrusteeMessage {
         super.clear();
         address_ = com.google.protobuf.ByteString.EMPTY;
 
+        votes_ = 0L;
+
+        generateRate_ = 0F;
+
+        status_ = 0L;
+
         state_ = 0L;
+
+        blockCycle_ = 0L;
 
         return this;
       }
 
       public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return TrusteeMessage.internal_static_Trustee_descriptor;
+      getDescriptorForType() {
+        return com.passport.proto.TrusteeMessage.internal_static_Trustee_descriptor;
       }
 
-      public TrusteeMessage.Trustee getDefaultInstanceForType() {
-        return TrusteeMessage.Trustee.getDefaultInstance();
+      public com.passport.proto.TrusteeMessage.Trustee getDefaultInstanceForType() {
+        return com.passport.proto.TrusteeMessage.Trustee.getDefaultInstance();
       }
 
-      public TrusteeMessage.Trustee build() {
-        TrusteeMessage.Trustee result = buildPartial();
+      public com.passport.proto.TrusteeMessage.Trustee build() {
+        com.passport.proto.TrusteeMessage.Trustee result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public TrusteeMessage.Trustee buildPartial() {
-        TrusteeMessage.Trustee result = new TrusteeMessage.Trustee(this);
+      public com.passport.proto.TrusteeMessage.Trustee buildPartial() {
+        com.passport.proto.TrusteeMessage.Trustee result = new com.passport.proto.TrusteeMessage.Trustee(this);
         result.address_ = address_;
+        result.votes_ = votes_;
+        result.generateRate_ = generateRate_;
+        result.status_ = status_;
         result.state_ = state_;
+        result.blockCycle_ = blockCycle_;
         onBuilt();
         return result;
       }
@@ -353,44 +495,56 @@ public final class TrusteeMessage {
         return (Builder) super.clone();
       }
       public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+              com.google.protobuf.Descriptors.FieldDescriptor field,
+              Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
+              com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
       public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+              com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
       public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+              com.google.protobuf.Descriptors.FieldDescriptor field,
+              int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+              com.google.protobuf.Descriptors.FieldDescriptor field,
+              Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof TrusteeMessage.Trustee) {
-          return mergeFrom((TrusteeMessage.Trustee)other);
+        if (other instanceof com.passport.proto.TrusteeMessage.Trustee) {
+          return mergeFrom((com.passport.proto.TrusteeMessage.Trustee)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(TrusteeMessage.Trustee other) {
-        if (other == TrusteeMessage.Trustee.getDefaultInstance()) return this;
+      public Builder mergeFrom(com.passport.proto.TrusteeMessage.Trustee other) {
+        if (other == com.passport.proto.TrusteeMessage.Trustee.getDefaultInstance()) return this;
         if (other.getAddress() != com.google.protobuf.ByteString.EMPTY) {
           setAddress(other.getAddress());
         }
+        if (other.getVotes() != 0L) {
+          setVotes(other.getVotes());
+        }
+        if (other.getGenerateRate() != 0F) {
+          setGenerateRate(other.getGenerateRate());
+        }
+        if (other.getStatus() != 0L) {
+          setStatus(other.getStatus());
+        }
         if (other.getState() != 0L) {
           setState(other.getState());
+        }
+        if (other.getBlockCycle() != 0L) {
+          setBlockCycle(other.getBlockCycle());
         }
         onChanged();
         return this;
@@ -401,14 +555,14 @@ public final class TrusteeMessage {
       }
 
       public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        TrusteeMessage.Trustee parsedMessage = null;
+              com.google.protobuf.CodedInputStream input,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws java.io.IOException {
+        com.passport.proto.TrusteeMessage.Trustee parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (TrusteeMessage.Trustee) e.getUnfinishedMessage();
+          parsedMessage = (com.passport.proto.TrusteeMessage.Trustee) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -430,8 +584,8 @@ public final class TrusteeMessage {
        */
       public Builder setAddress(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         address_ = value;
         onChanged();
@@ -447,15 +601,93 @@ public final class TrusteeMessage {
         return this;
       }
 
+      private long votes_ ;
+      /**
+       * <code>int64 votes = 2;</code>
+       */
+      public long getVotes() {
+        return votes_;
+      }
+      /**
+       * <code>int64 votes = 2;</code>
+       */
+      public Builder setVotes(long value) {
+
+        votes_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 votes = 2;</code>
+       */
+      public Builder clearVotes() {
+
+        votes_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private float generateRate_ ;
+      /**
+       * <code>float generateRate = 3;</code>
+       */
+      public float getGenerateRate() {
+        return generateRate_;
+      }
+      /**
+       * <code>float generateRate = 3;</code>
+       */
+      public Builder setGenerateRate(float value) {
+
+        generateRate_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>float generateRate = 3;</code>
+       */
+      public Builder clearGenerateRate() {
+
+        generateRate_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private long status_ ;
+      /**
+       * <code>int64 status = 4;</code>
+       */
+      public long getStatus() {
+        return status_;
+      }
+      /**
+       * <code>int64 status = 4;</code>
+       */
+      public Builder setStatus(long value) {
+
+        status_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 status = 4;</code>
+       */
+      public Builder clearStatus() {
+
+        status_ = 0L;
+        onChanged();
+        return this;
+      }
+
       private long state_ ;
       /**
-       * <code>int64 state = 2;</code>
+       * <code>int64 state = 5;</code>
        */
       public long getState() {
         return state_;
       }
       /**
-       * <code>int64 state = 2;</code>
+       * <code>int64 state = 5;</code>
        */
       public Builder setState(long value) {
 
@@ -464,7 +696,7 @@ public final class TrusteeMessage {
         return this;
       }
       /**
-       * <code>int64 state = 2;</code>
+       * <code>int64 state = 5;</code>
        */
       public Builder clearState() {
 
@@ -472,13 +704,39 @@ public final class TrusteeMessage {
         onChanged();
         return this;
       }
+
+      private long blockCycle_ ;
+      /**
+       * <code>int64 blockCycle = 6;</code>
+       */
+      public long getBlockCycle() {
+        return blockCycle_;
+      }
+      /**
+       * <code>int64 blockCycle = 6;</code>
+       */
+      public Builder setBlockCycle(long value) {
+
+        blockCycle_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 blockCycle = 6;</code>
+       */
+      public Builder clearBlockCycle() {
+
+        blockCycle_ = 0L;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
+              final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
       }
 
       public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
+              final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
       }
 
@@ -487,22 +745,22 @@ public final class TrusteeMessage {
     }
 
     // @@protoc_insertion_point(class_scope:Trustee)
-    private static final TrusteeMessage.Trustee DEFAULT_INSTANCE;
+    private static final com.passport.proto.TrusteeMessage.Trustee DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new TrusteeMessage.Trustee();
+      DEFAULT_INSTANCE = new com.passport.proto.TrusteeMessage.Trustee();
     }
 
-    public static TrusteeMessage.Trustee getDefaultInstance() {
+    public static com.passport.proto.TrusteeMessage.Trustee getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
     private static final com.google.protobuf.Parser<Trustee>
-        PARSER = new com.google.protobuf.AbstractParser<Trustee>() {
+            PARSER = new com.google.protobuf.AbstractParser<Trustee>() {
       public Trustee parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Trustee(input, extensionRegistry);
+              com.google.protobuf.CodedInputStream input,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Trustee(input, extensionRegistry);
       }
     };
 
@@ -510,53 +768,55 @@ public final class TrusteeMessage {
       return PARSER;
     }
 
-    @Override
+    @java.lang.Override
     public com.google.protobuf.Parser<Trustee> getParserForType() {
       return PARSER;
     }
 
-    public TrusteeMessage.Trustee getDefaultInstanceForType() {
+    public com.passport.proto.TrusteeMessage.Trustee getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_Trustee_descriptor;
+          internal_static_Trustee_descriptor;
   private static final
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_Trustee_fieldAccessorTable;
+  com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internal_static_Trustee_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
-      getDescriptor() {
+  getDescriptor() {
     return descriptor;
   }
   private static  com.google.protobuf.Descriptors.FileDescriptor
-      descriptor;
+          descriptor;
   static {
-    String[] descriptorData = {
-      "\n\024TrusteeMessage.proto\")\n\007Trustee\022\017\n\007add" +
-      "ress\030\001 \001(\014\022\r\n\005state\030\002 \001(\003B$\n\022com.passpor" +
-      "t.protoB\016TrusteeMessageb\006proto3"
+    java.lang.String[] descriptorData = {
+            "\n\024TrusteeMessage.proto\"r\n\007Trustee\022\017\n\007add" +
+                    "ress\030\001 \001(\014\022\r\n\005votes\030\002 \001(\003\022\024\n\014generateRat" +
+                    "e\030\003 \001(\002\022\016\n\006status\030\004 \001(\003\022\r\n\005state\030\005 \001(\003\022\022" +
+                    "\n\nblockCycle\030\006 \001(\003B$\n\022com.passport.proto" +
+                    "B\016TrusteeMessageb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
+            new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+              public com.google.protobuf.ExtensionRegistry assignDescriptors(
+                      com.google.protobuf.Descriptors.FileDescriptor root) {
+                descriptor = root;
+                return null;
+              }
+            };
     com.google.protobuf.Descriptors.FileDescriptor
-      .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
-        }, assigner);
+            .internalBuildGeneratedFileFrom(descriptorData,
+                    new com.google.protobuf.Descriptors.FileDescriptor[] {
+                    }, assigner);
     internal_static_Trustee_descriptor =
-      getDescriptor().getMessageTypes().get(0);
+            getDescriptor().getMessageTypes().get(0);
     internal_static_Trustee_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_Trustee_descriptor,
-        new String[] { "Address", "State", });
+            com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+            internal_static_Trustee_descriptor,
+            new java.lang.String[] { "Address", "Votes", "GenerateRate", "Status", "State", "BlockCycle", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

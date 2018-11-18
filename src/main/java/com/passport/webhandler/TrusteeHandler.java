@@ -1,11 +1,14 @@
 package com.passport.webhandler;
 
 import com.google.common.base.Optional;
+import com.google.protobuf.ByteString;
 import com.passport.annotations.RocksTransaction;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.db.dbhelper.DBAccess;
+import com.passport.peer.ChannelsManager;
+import com.passport.proto.*;
 import com.passport.utils.BlockUtils;
 import org.rocksdb.RocksDBException;
 import org.slf4j.Logger;
@@ -26,6 +29,8 @@ public class TrusteeHandler {
     private BaseDBAccess dbAccess;
     @Autowired
     private BlockUtils blockUtils;
+    @Autowired
+    private ChannelsManager channelsManager;
 
     /**
      * 改变已经出块人的状态
@@ -52,17 +57,12 @@ public class TrusteeHandler {
      * @return
      */
     public List<Trustee> findValidTrustees(int blockCycle) {
-        List<Trustee> trustees = new ArrayList<>();
+        List<Trustee> list = new ArrayList<>();
         Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
         if(objectOptional.isPresent()){
-            List<Trustee> list = (List<Trustee>)objectOptional.get();
-            for(Trustee tee : list){
-                if(tee.getStatus() == 1 && tee.getState() != 0){
-                    trustees.add(tee);
-                }
-            }
+            list = (List<Trustee>)objectOptional.get();
         }
-        return trustees;
+        return list;
     }
 
     public List<Trustee> getTrusteesBeforeTime(long newBlockHeight, int blockCycle) {
@@ -86,7 +86,25 @@ public class TrusteeHandler {
             e.printStackTrace();
         }
         dbAccess.put(String.valueOf(blockCycle), trustees);
-
+        //没到一个周期发送一遍同步受托人列表请求
+        NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
+        dataBuilder.setDataType(DataTypeEnum.DataType.TRUSTEE_SYNC);
+        for(Trustee trustee : trustees){
+            if(trustee.getState() == 1){
+                TrusteeMessage.Trustee.Builder builder2 = TrusteeMessage.Trustee.newBuilder();
+                builder2.setAddress(ByteString.copyFrom(trustee.getAddress().getBytes()));
+                builder2.setState(trustee.getState());
+                builder2.setStatus(trustee.getStatus());
+                builder2.setVotes(trustee.getVotes());
+                builder2.setGenerateRate(trustee.getGenerateRate());
+                builder2.setBlockCycle(blockCycle);
+                dataBuilder.addTrustee(builder2);
+            }
+        }
+        NettyMessage.Message.Builder builder1 = NettyMessage.Message.newBuilder();
+        builder1.setData(dataBuilder.build());
+        builder1.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
+        channelsManager.getChannels().writeAndFlush(builder1.build());
         return trustees;
     }
 }
