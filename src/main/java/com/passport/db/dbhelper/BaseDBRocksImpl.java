@@ -603,7 +603,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             if (Long.parseLong(new String(timeByte)) <= time) {
                 List<Trustee> trustees = listTrustees();
                 for(Trustee trustee:trustees){
-                    if(address.equals(trustee.getAddress()) && trustee.getState() != 0){
+                    if(address.equals(trustee.getAddress())){
                         allVoters.add(trustee);
                     }
                 }
@@ -629,6 +629,13 @@ public class BaseDBRocksImpl extends BaseDBAccess {
             @Override
             public int compare(Trustee o1, Trustee o2) {
                 return o1.getVotes().longValue() > o2.getVotes().longValue() ? -1 : (o1.getVotes().longValue() == o2.getVotes().longValue() ? 0 : 1);
+            }
+        });
+        //排序未启动出块节点排后面
+        allVoters.sort(new Comparator<Trustee>() {
+            @Override
+            public int compare(Trustee o1, Trustee o2) {
+                return o2.getState() - o1.getState() ;
             }
         });
         //获取前101个
