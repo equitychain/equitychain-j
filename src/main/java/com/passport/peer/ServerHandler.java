@@ -91,9 +91,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         List<String> ipAddress = dbAccess.seekByKey(clientIP);
         List<Trustee> trustees = dbAccess.listTrustees();
         Long lastBlockHeight = Long.valueOf(dbAccess.getLastBlockHeight().get().toString());
-        int blockCycle = blockUtils.getBlockCycle(lastBlockHeight+1l);
-        Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
-        List<Trustee> list = (List<Trustee>)objectOptional.get();
+
+        List<Trustee> list = (List<Trustee>) dbAccess.get("blockCycle");
 //        List<Trustee> list = (List<Trustee>)dbAccess.get(String.valueOf(blockCycle));
         for(String address:ipAddress){
             dbAccess.rocksDB.delete((clientIP+"_"+address).getBytes());
@@ -114,24 +113,12 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
             }
         }
         Set<String> strings = storyFileUtil.getAddresses();
-        if(list.size()<nextBlock){//最后一个的话则算出下个周期的用户看自己存不存在
-            List<Trustee> newTrustees = trusteeHandler.findValidTrustees(blockCycle+1);
-            if(newTrustees.size() == 0){
-                newTrustees = trusteeHandler.getTrusteesBeforeTime(lastBlockHeight+1, blockCycle+1);
-                for(String s: strings){
-                    if(s.equals(newTrustees.get(0))){
-                        provider.publishEvent(new GenerateBlockEvent(0L));
-                    }
-                }
-            }
-        }else{//节点异常算出下个出块用户是不是自己是则出块
-            for(String s: strings){
-                if(s.equals(list.get(nextBlock))){
-                    provider.publishEvent(new GenerateBlockEvent(0L));
-                }
+        for(String s: strings){
+            if(s.equals(list.get(nextBlock))){
+                provider.publishEvent(new GenerateBlockEvent(0L));
             }
         }
-        dbAccess.put(String.valueOf(blockCycle), list);
+        dbAccess.put("blockCycle",list);
         logger.info(ctx.channel().remoteAddress().toString()+"客户端关闭");
         ctx.close();
     }

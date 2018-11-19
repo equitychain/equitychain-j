@@ -29,8 +29,6 @@ public class TrusteeHandler {
     private BaseDBAccess dbAccess;
     @Autowired
     private BlockUtils blockUtils;
-    @Autowired
-    private ChannelsManager channelsManager;
 
     /**
      * 改变已经出块人的状态
@@ -49,6 +47,7 @@ public class TrusteeHandler {
                 }
             }
             dbAccess.put(String.valueOf(blockCycle), list);
+            dbAccess.put("blockCycle", list);
         }
     }
 
@@ -58,12 +57,18 @@ public class TrusteeHandler {
      * @return
      */
     public List<Trustee> findValidTrustees(int blockCycle) {
-        List<Trustee> list = new ArrayList<>();
-        Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
+        List<Trustee> trustees = new ArrayList<>();
+//        Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
+        Optional<Object> objectOptional = dbAccess.get("blockCycle");
         if(objectOptional.isPresent()){
-            list = (List<Trustee>)objectOptional.get();
+            List<Trustee> list = (List<Trustee>)objectOptional.get();
+            for(Trustee tee : list){
+                if(tee.getStatus() == 1 && tee.getState() != 0){
+                    trustees.add(tee);
+                }
+            }
         }
-        return list;
+        return trustees;
     }
 
     public List<Trustee> getTrusteesBeforeTime(long newBlockHeight, int blockCycle) {
@@ -72,12 +77,23 @@ public class TrusteeHandler {
         //查询投票记录（status==1）,时间小于等于timestamp，按投票票数从高到低排列的101个受托人，放到101个受托人列表中
         List<Trustee> trustees = new ArrayList<>();
         try {
+            List<Trustee> tru = dbAccess.listTrustees();
+            SyncFlag.waitMiner.forEach((k, v) ->{//更新缓存中准备启动出块节点账号
+                for(Trustee trustee:tru){
+                    if(trustee.getAddress().equals(k)){
+                        trustee.setState(v);
+                        SyncFlag.waitMiner.remove(k);
+                        dbAccess.putTrustee(trustee);
+                    }
+                }
+            });
             trustees = dbAccess.getTrusteeOfRangeBeforeTime(timestamp);
         } catch (RocksDBException e) {
             e.printStackTrace();
         }
         //保存到数据库
         dbAccess.put(String.valueOf(blockCycle), trustees);
+        dbAccess.put("blockCycle", trustees);
         return trustees;
     }
 }
