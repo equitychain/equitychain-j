@@ -108,19 +108,21 @@ public class BlockSyncREQ extends Strategy {
             transactionHandler.matchUnConfirmTransactions(blockLocal);
             //出块完成后，计算出的下一个出块人如果是自己则继续发布出块事件
             int blockCycle = blockUtils.getBlockCycle(blockLocal.getBlockHeight());
-            //初始化受托人列表
-            List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
             //防止同步时出块导致受托人列表不一致
             int remove = -1;
-            for(int i=0;i<trustees.size();i++){
-                if(trustees.get(i).getAddress().equals(blockLocal.getProducer())){
+            List<Trustee> trusteeList = (List<Trustee>) dbAccess.get("blockCycle");
+            for(int i=0;i<trusteeList.size();i++){
+                if(trusteeList.get(i).getAddress().equals(blockLocal.getProducer())){
                     remove = i;
                 }
             }
             if(remove != -1){
-                trustees = trustees.subList(remove,trustees.size());
+                trusteeList = trusteeList.subList(remove,trusteeList.size());
+                dbAccess.put("blockCycle",trusteeList);
             }
             //end
+            //初始化受托人列表
+            List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
             if(trustees.size() == 0){
                 trusteeHandler.getTrusteesBeforeTime(blockLocal.getBlockHeight(), blockCycle);
             }
