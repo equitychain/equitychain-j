@@ -57,12 +57,17 @@ public class TrusteeHandler {
      * @return
      */
     public List<Trustee> findValidTrustees(int blockCycle) {
-        List<Trustee> list = new ArrayList<>();
+        List<Trustee> trustees = new ArrayList<>();
         Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
         if(objectOptional.isPresent()){
-            list = (List<Trustee>)objectOptional.get();
+            List<Trustee> list = (List<Trustee>)objectOptional.get();
+            for(Trustee tee : list){
+                if(tee.getStatus() == 1){
+                    trustees.add(tee);
+                }
+            }
         }
-        return list;
+        return trustees;
     }
 
     public List<Trustee> getTrusteesBeforeTime(long newBlockHeight, int blockCycle) {

@@ -58,17 +58,7 @@ public class BlockUtils {
      * @return
      */
     public Trustee randomPickBlockProducer(List<Trustee> trustees, long blockHeight){
-        List<Trustee> trus = new ArrayList<>();
-        for(Trustee tee : trustees){
-            if(tee.getStatus() == 1){
-                trus.add(tee);
-            }
-        }
-        Long index = blockHeight * (Constant.TRUSTEES_INIT_NUM-1) % trus.size();
-        Trustee trustee = trustees.get(index.intValue());
-        if(trustee.getState() == 0){
-            index = 0l;
-        }
+        Long index = blockHeight * (Constant.TRUSTEES_INIT_NUM-1) % trustees.size();
         return trustees.get(index.intValue());
     }
 }
