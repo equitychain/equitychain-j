@@ -58,9 +58,11 @@ public class TrusteeHandler {
         List<Trustee> trustees = new ArrayList<>();
 //        Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
         List<Trustee> list = SyncFlag.blockCycleList.get("blockCycle");
-        for(Trustee tee : list){
-            if(tee.getStatus() == 1 && tee.getState() != 0)
-                trustees.add(tee);
+        if(!CollectionUtils.isEmpty(list)){
+            for(Trustee tee : list){
+                if(tee.getStatus() == 1 && tee.getState() != 0)
+                    trustees.add(tee);
+            }
         }
         logger.info("受托人列表数量："+trustees.size()+"");
         return trustees;
