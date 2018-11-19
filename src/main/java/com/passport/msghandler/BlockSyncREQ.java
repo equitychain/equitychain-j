@@ -108,23 +108,21 @@ public class BlockSyncREQ extends Strategy {
             transactionHandler.matchUnConfirmTransactions(blockLocal);
             //出块完成后，计算出的下一个出块人如果是自己则继续发布出块事件
             int blockCycle = blockUtils.getBlockCycle(blockLocal.getBlockHeight());
-            //防止同步时出块导致受托人列表不一致
+            SyncFlag.blockSyncFlag = true;//同步完成
+            logger.info("收到区块，被动同步完成"+blockLocal.getProducer());
+            //标识需移除受托人列表位置
             int remove = -1;
-            List<Trustee> trusteeList = (List<Trustee>) SyncFlag.blockCycleList.get("blockCycle");
-            for(int i=0;i<trusteeList.size();i++){
+            List<Trustee> trusteeList = SyncFlag.blockCycleList.get("blockCycle");
+            for(int i = 0;i<trusteeList.size();i++){
                 if(trusteeList.get(i).getAddress().equals(blockLocal.getProducer())){
                     remove = i;
                 }
             }
             if(remove != -1){
-                if(remove+1 == trusteeList.size()){
-                    trusteeList = null;
-                }
-                trusteeList = trusteeList.subList(remove+1,trusteeList.size());
-                SyncFlag.blockCycleList.put("blockCycle", trusteeList);
+                logger.info("受托人列表对应不上需移除部分数据");
+                SyncFlag.blockCycleList.put("blockCycle",trusteeList.subList(remove,trusteeList.size()));
             }
-            //end
-            //初始化受托人列表
+            //更新受托人列表
             List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
             if(trustees.size() == 0){
                 trusteeHandler.getTrusteesBeforeTime(blockLocal.getBlockHeight(), blockCycle);
@@ -135,8 +133,6 @@ public class BlockSyncREQ extends Strategy {
             if(trusteeOpt.isPresent()) {
                 trusteeHandler.changeStatus(trusteeOpt.get(),blockCycle);
             }
-            SyncFlag.blockSyncFlag = true;//同步完成
-            logger.info("收到区块，被动同步完成");
             if(!SyncFlag.minerFlag){
                 logger.info("==============检测下个出块人===========");
                 blockHandler.produceNextBlock();
