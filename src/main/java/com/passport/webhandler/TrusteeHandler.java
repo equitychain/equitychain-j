@@ -86,25 +86,27 @@ public class TrusteeHandler {
             e.printStackTrace();
         }
         dbAccess.put(String.valueOf(blockCycle), trustees);
-        //没到一个周期发送一遍同步受托人列表请求
-        NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
-        dataBuilder.setDataType(DataTypeEnum.DataType.TRUSTEE_SYNC);
-        for(Trustee trustee : trustees){
-            if(trustee.getState() == 1){
-                TrusteeMessage.Trustee.Builder builder2 = TrusteeMessage.Trustee.newBuilder();
-                builder2.setAddress(ByteString.copyFrom(trustee.getAddress().getBytes()));
-                builder2.setState(trustee.getState());
-                builder2.setStatus(trustee.getStatus());
-                builder2.setVotes(trustee.getVotes());
-                builder2.setGenerateRate(trustee.getGenerateRate());
-                builder2.setBlockCycle(blockCycle);
-                dataBuilder.addTrustee(builder2);
+        //没到一个周期发送一遍同步受托人列表请求 未启动出块不允许发送
+        if(!SyncFlag.minerFlag){
+            NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
+            dataBuilder.setDataType(DataTypeEnum.DataType.TRUSTEE_SYNC);
+            for(Trustee trustee : trustees){
+                if(trustee.getState() == 1){
+                    TrusteeMessage.Trustee.Builder builder2 = TrusteeMessage.Trustee.newBuilder();
+                    builder2.setAddress(ByteString.copyFrom(trustee.getAddress().getBytes()));
+                    builder2.setState(trustee.getState());
+                    builder2.setStatus(trustee.getStatus());
+                    builder2.setVotes(trustee.getVotes());
+                    builder2.setGenerateRate(trustee.getGenerateRate());
+                    builder2.setBlockCycle(blockCycle);
+                    dataBuilder.addTrustee(builder2);
+                }
             }
+            NettyMessage.Message.Builder builder1 = NettyMessage.Message.newBuilder();
+            builder1.setData(dataBuilder.build());
+            builder1.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
+            channelsManager.getChannels().writeAndFlush(builder1.build());
         }
-        NettyMessage.Message.Builder builder1 = NettyMessage.Message.newBuilder();
-        builder1.setData(dataBuilder.build());
-        builder1.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
-        channelsManager.getChannels().writeAndFlush(builder1.build());
         return trustees;
     }
 }
