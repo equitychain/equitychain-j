@@ -117,7 +117,10 @@ public class BlockSyncREQ extends Strategy {
                 }
             }
             if(remove != -1){
-                trusteeList = trusteeList.subList(remove,trusteeList.size());
+                if(remove+1 == trusteeList.size()){
+                    trusteeList = null;
+                }
+                trusteeList = trusteeList.subList(remove+1,trusteeList.size());
                 SyncFlag.blockCycleList.put("blockCycle", trusteeList);
             }
             //end
