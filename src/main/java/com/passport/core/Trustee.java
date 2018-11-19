@@ -107,4 +107,11 @@ public class Trustee {
     public boolean isNullContent(){
         return votes == null && generateRate == null && income == null && status == null && state == null;
     }
+
+    @Override
+    public String toString() {
+        return "Trustee{" +
+                "address='" + address + '\'' +
+                '}';
+    }
 }

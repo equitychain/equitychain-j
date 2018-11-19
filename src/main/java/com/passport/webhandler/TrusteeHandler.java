@@ -63,11 +63,8 @@ public class TrusteeHandler {
             for(Trustee tee : list){
                 if(tee.getStatus() == 1 && tee.getState() != 0) trustees.add(tee);
             }
-            for(Trustee trustee:trustees){
-                temp.add(trustee.getAddress());
-            }
         }
-        logger.info("受托人列表数量："+trustees.size()+"------"+temp);
+        logger.info("受托人列表数量："+trustees.size()+"------"+trustees);
         return trustees;
     }
 
