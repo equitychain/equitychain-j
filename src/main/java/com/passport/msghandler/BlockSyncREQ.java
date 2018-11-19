@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.security.AccessController;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -109,6 +110,17 @@ public class BlockSyncREQ extends Strategy {
             int blockCycle = blockUtils.getBlockCycle(blockLocal.getBlockHeight());
             //初始化受托人列表
             List<Trustee> trustees = trusteeHandler.findValidTrustees(blockCycle);
+            //防止同步时出块导致受托人列表不一致
+            int remove = -1;
+            for(int i=0;i<trustees.size();i++){
+                if(trustees.get(i).getAddress().equals(blockLocal.getProducer())){
+                    remove = i;
+                }
+            }
+            if(remove != -1){
+                trustees = trustees.subList(remove,trustees.size());
+            }
+            //end
             if(trustees.size() == 0){
                 trusteeHandler.getTrusteesBeforeTime(blockLocal.getBlockHeight(), blockCycle);
             }

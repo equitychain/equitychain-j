@@ -69,7 +69,7 @@ public class TrusteeHandler {
                 }
             }
         }
-        logger.info(trustees.toString());
+        logger.info("受托人列表数量："+trustees.size()+"");
         return trustees;
     }
 
