@@ -37,7 +37,8 @@ public class TrusteeHandler {
      */
     public void changeStatus(Trustee trustee, int blockCycle) {
         //保存到数据库
-        Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
+//        Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
+        Optional<Object> objectOptional = dbAccess.get("blockCycle");
         if(objectOptional.isPresent()){
             List<Trustee> list = (List<Trustee>)objectOptional.get();
             for(Trustee tee : list){
@@ -68,6 +69,7 @@ public class TrusteeHandler {
                 }
             }
         }
+        logger.info(trustees.toString());
         return trustees;
     }
 
