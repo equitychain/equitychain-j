@@ -36,8 +36,8 @@ public class TrusteeSyncRESP extends Strategy {
             trustee.setStatus((int) trusteeMsg.getStatus());
             trustee.setState((int) trusteeMsg.getState());
             trustee.setVotes(trusteeMsg.getVotes());
-            trustee.setAddress(trustee.getAddress());
-            trustee.setGenerateRate(trustee.getGenerateRate());
+            trustee.setAddress(new String(trusteeMsg.getAddress().toByteArray()));
+            trustee.setGenerateRate(trusteeMsg.getGenerateRate());
             dbAccess.putTrustee(trustee);//更新状态
             trustees.add(trustee);
             blockCycle = (int) trusteeMsg.getBlockCycle();
