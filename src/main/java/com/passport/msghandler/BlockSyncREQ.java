@@ -113,6 +113,11 @@ public class BlockSyncREQ extends Strategy {
             //标识需移除受托人列表位置
             int remove = -1;
             List<Trustee> trusteeList = SyncFlag.blockCycleList.get("blockCycle");
+            List<String> temp = new ArrayList<>();
+            for(Trustee trustee:trusteeList){
+                temp.add(trustee.getAddress());
+            }
+            logger.info("受托人移除之前的数据：------"+temp);
             for(int i = 0;i<trusteeList.size();i++){
                 if(trusteeList.get(i).getAddress().equals(blockLocal.getProducer())){
                     remove = i;
