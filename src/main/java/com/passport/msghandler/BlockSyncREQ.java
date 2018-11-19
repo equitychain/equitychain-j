@@ -119,8 +119,9 @@ public class BlockSyncREQ extends Strategy {
                 trusteeHandler.changeStatus(trusteeOpt.get(),blockCycle);
             }
             SyncFlag.blockSyncFlag = true;//同步完成
-            System.out.println("==============收到区块，检测下个出块人===========");
+            logger.info("收到区块，被动同步完成");
             if(!SyncFlag.minerFlag){
+                logger.info("==============检测下个出块人===========");
                 blockHandler.produceNextBlock();
             }
         } catch (Exception e) {

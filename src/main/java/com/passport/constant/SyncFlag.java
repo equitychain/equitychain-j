@@ -1,5 +1,8 @@
 package com.passport.constant;
 
+import com.passport.core.Trustee;
+
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -21,4 +24,5 @@ public class SyncFlag {
     public static boolean minerFlag = true;//允许出块
 
     public static ConcurrentMap<String,Integer> waitMiner = new ConcurrentHashMap<>();
+
 }

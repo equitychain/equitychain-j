@@ -106,12 +106,12 @@ public class Connector implements InitializingBean {
         builder1.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
         channelsManager.getChannels().writeAndFlush(builder1.build());
         //发送已经启动的受托人列表状态
-        NettyData.Data.Builder dataBuilder2 = NettyData.Data.newBuilder();
-        dataBuilder2.setDataType(DataTypeEnum.DataType.TRUSTEE_SYNC);
-        NettyMessage.Message.Builder builder2 = NettyMessage.Message.newBuilder();
-        builder2.setData(dataBuilder2.build());
-        builder2.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
-        channelsManager.getChannels().writeAndFlush(builder2.build());
+//        NettyData.Data.Builder dataBuilder2 = NettyData.Data.newBuilder();
+//        dataBuilder2.setDataType(DataTypeEnum.DataType.TRUSTEE_SYNC);
+//        NettyMessage.Message.Builder builder2 = NettyMessage.Message.newBuilder();
+//        builder2.setData(dataBuilder2.build());
+//        builder2.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
+//        channelsManager.getChannels().writeAndFlush(builder2.build());
 
         try {
             TimeUnit.MILLISECONDS.sleep(3000);

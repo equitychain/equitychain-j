@@ -1,13 +1,15 @@
 package com.passport.msghandler;
 
+import com.google.protobuf.ByteString;
 import com.passport.annotations.RocksTransaction;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Block;
+import com.passport.core.Trustee;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.GenerateBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
-import com.passport.proto.BlockMessage;
-import com.passport.proto.NettyMessage;
+import com.passport.peer.ChannelsManager;
+import com.passport.proto.*;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.HttpUtils;
 import com.passport.webhandler.BlockHandler;
@@ -36,6 +38,8 @@ public class NextBlockSyncRESP extends Strategy {
     @Autowired
     private ApplicationContextProvider provider;
     @Autowired
+    private ChannelsManager channelsManager;
+    @Autowired
     private BlockHandler blockHandler;
     @Override
     @RocksTransaction
@@ -50,6 +54,15 @@ public class NextBlockSyncRESP extends Strategy {
         if(blocks==null || blocks.size() == 0){
             //同步完了，不进行广播，
             SyncFlag.setNextBlockSyncFlag(false);
+
+            //发送同步受托人列表请求
+            NettyData.Data.Builder dataBuilder2 = NettyData.Data.newBuilder();
+            dataBuilder2.setDataType(DataTypeEnum.DataType.TRUSTEE_SYNC);
+            NettyMessage.Message.Builder builder2 = NettyMessage.Message.newBuilder();
+            builder2.setData(dataBuilder2.build());
+            builder2.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
+            channelsManager.getChannels().writeAndFlush(builder2.build());
+
             //生成下一个区块 需求已改需要手动启动生成下个区块
 //            provider.publishEvent(new GenerateBlockEvent(0L));
             return;

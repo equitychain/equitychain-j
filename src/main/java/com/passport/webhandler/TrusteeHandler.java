@@ -38,6 +38,7 @@ public class TrusteeHandler {
      * @param blockCycle
      */
     public void changeStatus(Trustee trustee, int blockCycle) {
+        //保存到数据库
         Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
         if(objectOptional.isPresent()){
             List<Trustee> list = (List<Trustee>)objectOptional.get();
@@ -57,17 +58,12 @@ public class TrusteeHandler {
      * @return
      */
     public List<Trustee> findValidTrustees(int blockCycle) {
-        List<Trustee> trustees = new ArrayList<>();
+        List<Trustee> list = new ArrayList<>();
         Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
         if(objectOptional.isPresent()){
-            List<Trustee> list = (List<Trustee>)objectOptional.get();
-            for(Trustee tee : list){
-                if(tee.getStatus() == 1){
-                    trustees.add(tee);
-                }
-            }
+            list = (List<Trustee>)objectOptional.get();
         }
-        return trustees;
+        return list;
     }
 
     public List<Trustee> getTrusteesBeforeTime(long newBlockHeight, int blockCycle) {
@@ -76,42 +72,12 @@ public class TrusteeHandler {
         //查询投票记录（status==1）,时间小于等于timestamp，按投票票数从高到低排列的101个受托人，放到101个受托人列表中
         List<Trustee> trustees = new ArrayList<>();
         try {
-            List<Trustee> tru = dbAccess.listTrustees();
-            SyncFlag.waitMiner.forEach((k, v) ->{
-                for(Trustee trustee:tru){
-                    if(trustee.getAddress().equals(k)){
-                        trustee.setState(v);
-                        SyncFlag.waitMiner.remove(k);
-                        dbAccess.putTrustee(trustee);
-                    }
-                }
-            });
             trustees = dbAccess.getTrusteeOfRangeBeforeTime(timestamp);
         } catch (RocksDBException e) {
             e.printStackTrace();
         }
+        //保存到数据库
         dbAccess.put(String.valueOf(blockCycle), trustees);
-        //没到一个周期发送一遍同步受托人列表请求 未启动出块不允许发送
-        if(!SyncFlag.minerFlag){
-            NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
-            dataBuilder.setDataType(DataTypeEnum.DataType.TRUSTEE_SYNC);
-            for(Trustee trustee : trustees){
-                if(trustee.getState() == 1){
-                    TrusteeMessage.Trustee.Builder builder2 = TrusteeMessage.Trustee.newBuilder();
-                    builder2.setAddress(ByteString.copyFrom(trustee.getAddress().getBytes()));
-                    builder2.setState(trustee.getState());
-                    builder2.setStatus(trustee.getStatus());
-                    builder2.setVotes(trustee.getVotes());
-                    builder2.setGenerateRate(trustee.getGenerateRate());
-                    builder2.setBlockCycle(blockCycle);
-                    dataBuilder.addTrustee(builder2);
-                }
-            }
-            NettyMessage.Message.Builder builder1 = NettyMessage.Message.newBuilder();
-            builder1.setData(dataBuilder.build());
-            builder1.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
-            channelsManager.getChannels().writeAndFlush(builder1.build());
-        }
         return trustees;
     }
 }

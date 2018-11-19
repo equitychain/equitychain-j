@@ -1,11 +1,14 @@
 package com.passport.constant;
 
 import com.passport.core.Block;
+import com.passport.core.Trustee;
 import com.passport.utils.DateUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author Wu Created by SKINK on 2018/6/22.
