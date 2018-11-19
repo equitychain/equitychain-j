@@ -29,7 +29,6 @@ public class TrusteeSyncRESP extends Strategy {
     void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
         logger.info("处理受托人同步响应数据：{}", GsonUtils.toJson(message));
         List<TrusteeMessage.Trustee> trusteeList = message.getData().getTrusteeList();
-        int blockCycle = 0;
         List<Trustee> trustees = new ArrayList<>();
         for(TrusteeMessage.Trustee trusteeMsg:trusteeList){
             Trustee trustee = new Trustee();
@@ -41,9 +40,7 @@ public class TrusteeSyncRESP extends Strategy {
             trustee.setGenerateRate(trusteeMsg.getGenerateRate());
             dbAccess.putTrustee(trustee);//更新状态
             trustees.add(trustee);
-            blockCycle = (int) trusteeMsg.getBlockCycle();
         }
-        dbAccess.put(String.valueOf(blockCycle), trustees);
         SyncFlag.blockCycleList.put("blockCycle", trustees);//更新周期
         logger.info("受托人同步完成");
     }

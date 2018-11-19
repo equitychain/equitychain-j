@@ -1,6 +1,7 @@
 package com.passport.msghandler;
 
 import com.google.protobuf.ByteString;
+import com.passport.constant.SyncFlag;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.proto.*;
@@ -33,9 +34,7 @@ public class TrusteeSyncREQ extends Strategy {
         //发送允许出块的列表
         NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
         dataBuilder.setDataType(DataTypeEnum.DataType.TRUSTEE_SYNC);
-        List<Trustee> list = dbAccess.listTrustees();
-        Long lastBlockHeight = Long.valueOf(dbAccess.getLastBlockHeight().get().toString());
-        int blockCycle = blockUtils.getBlockCycle(lastBlockHeight+1l);
+        List<Trustee> list = SyncFlag.blockCycleList.get("blockCycle");
         for(Trustee trustee : list){
             if(trustee.getState() == 1){
                 TrusteeMessage.Trustee.Builder builder2 = TrusteeMessage.Trustee.newBuilder();
@@ -44,7 +43,6 @@ public class TrusteeSyncREQ extends Strategy {
                 builder2.setStatus(trustee.getStatus());
                 builder2.setVotes(trustee.getVotes());
                 builder2.setGenerateRate(trustee.getGenerateRate());
-                builder2.setBlockCycle(blockCycle);
                 dataBuilder.addTrustee(builder2);
             }
         }

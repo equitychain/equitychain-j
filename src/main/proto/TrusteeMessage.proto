@@ -8,5 +8,4 @@ message Trustee {
     float generateRate = 3;
     int64 status = 4;
     int64 state = 5;
-    int64 blockCycle = 6;
 }

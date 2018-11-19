@@ -42,11 +42,6 @@ public final class TrusteeMessage {
      * <code>int64 state = 5;</code>
      */
     long getState();
-
-    /**
-     * <code>int64 blockCycle = 6;</code>
-     */
-    long getBlockCycle();
   }
   /**
    * Protobuf type {@code Trustee}
@@ -65,7 +60,6 @@ public final class TrusteeMessage {
       generateRate_ = 0F;
       status_ = 0L;
       state_ = 0L;
-      blockCycle_ = 0L;
     }
 
     @java.lang.Override
@@ -116,11 +110,6 @@ public final class TrusteeMessage {
             case 40: {
 
               state_ = input.readInt64();
-              break;
-            }
-            case 48: {
-
-              blockCycle_ = input.readInt64();
               break;
             }
           }
@@ -191,15 +180,6 @@ public final class TrusteeMessage {
       return state_;
     }
 
-    public static final int BLOCKCYCLE_FIELD_NUMBER = 6;
-    private long blockCycle_;
-    /**
-     * <code>int64 blockCycle = 6;</code>
-     */
-    public long getBlockCycle() {
-      return blockCycle_;
-    }
-
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -227,9 +207,6 @@ public final class TrusteeMessage {
       if (state_ != 0L) {
         output.writeInt64(5, state_);
       }
-      if (blockCycle_ != 0L) {
-        output.writeInt64(6, blockCycle_);
-      }
     }
 
     public int getSerializedSize() {
@@ -256,10 +233,6 @@ public final class TrusteeMessage {
       if (state_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
                 .computeInt64Size(5, state_);
-      }
-      if (blockCycle_ != 0L) {
-        size += com.google.protobuf.CodedOutputStream
-                .computeInt64Size(6, blockCycle_);
       }
       memoizedSize = size;
       return size;
@@ -289,8 +262,6 @@ public final class TrusteeMessage {
               == other.getStatus());
       result = result && (getState()
               == other.getState());
-      result = result && (getBlockCycle()
-              == other.getBlockCycle());
       return result;
     }
 
@@ -315,9 +286,6 @@ public final class TrusteeMessage {
       hash = (37 * hash) + STATE_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
               getState());
-      hash = (37 * hash) + BLOCKCYCLE_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-              getBlockCycle());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -457,8 +425,6 @@ public final class TrusteeMessage {
 
         state_ = 0L;
 
-        blockCycle_ = 0L;
-
         return this;
       }
 
@@ -486,7 +452,6 @@ public final class TrusteeMessage {
         result.generateRate_ = generateRate_;
         result.status_ = status_;
         result.state_ = state_;
-        result.blockCycle_ = blockCycle_;
         onBuilt();
         return result;
       }
@@ -542,9 +507,6 @@ public final class TrusteeMessage {
         }
         if (other.getState() != 0L) {
           setState(other.getState());
-        }
-        if (other.getBlockCycle() != 0L) {
-          setBlockCycle(other.getBlockCycle());
         }
         onChanged();
         return this;
@@ -704,32 +666,6 @@ public final class TrusteeMessage {
         onChanged();
         return this;
       }
-
-      private long blockCycle_ ;
-      /**
-       * <code>int64 blockCycle = 6;</code>
-       */
-      public long getBlockCycle() {
-        return blockCycle_;
-      }
-      /**
-       * <code>int64 blockCycle = 6;</code>
-       */
-      public Builder setBlockCycle(long value) {
-
-        blockCycle_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int64 blockCycle = 6;</code>
-       */
-      public Builder clearBlockCycle() {
-
-        blockCycle_ = 0L;
-        onChanged();
-        return this;
-      }
       public final Builder setUnknownFields(
               final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -793,11 +729,11 @@ public final class TrusteeMessage {
           descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n\024TrusteeMessage.proto\"r\n\007Trustee\022\017\n\007add" +
+            "\n\024TrusteeMessage.proto\"^\n\007Trustee\022\017\n\007add" +
                     "ress\030\001 \001(\014\022\r\n\005votes\030\002 \001(\003\022\024\n\014generateRat" +
-                    "e\030\003 \001(\002\022\016\n\006status\030\004 \001(\003\022\r\n\005state\030\005 \001(\003\022\022" +
-                    "\n\nblockCycle\030\006 \001(\003B$\n\022com.passport.proto" +
-                    "B\016TrusteeMessageb\006proto3"
+                    "e\030\003 \001(\002\022\016\n\006status\030\004 \001(\003\022\r\n\005state\030\005 \001(\003B$" +
+                    "\n\022com.passport.protoB\016TrusteeMessageb\006pr" +
+                    "oto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
             new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -816,7 +752,7 @@ public final class TrusteeMessage {
     internal_static_Trustee_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
             internal_static_Trustee_descriptor,
-            new java.lang.String[] { "Address", "Votes", "GenerateRate", "Status", "State", "BlockCycle", });
+            new java.lang.String[] { "Address", "Votes", "GenerateRate", "Status", "State", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
