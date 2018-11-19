@@ -1,6 +1,7 @@
 package com.passport.msghandler;
 
 import com.google.protobuf.ByteString;
+import com.passport.constant.SyncFlag;
 import com.passport.core.Account;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
@@ -42,7 +43,8 @@ public class TrusteeSyncRESP extends Strategy {
             trustees.add(trustee);
             blockCycle = (int) trusteeMsg.getBlockCycle();
         }
-        dbAccess.put(String.valueOf(blockCycle), trustees);//更新周期
+        dbAccess.put(String.valueOf(blockCycle), trustees);
+        SyncFlag.blockCycleList.put("blockCycle", trustees);//更新周期
         logger.info("受托人同步完成");
     }
 }

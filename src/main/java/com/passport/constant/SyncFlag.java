@@ -25,4 +25,6 @@ public class SyncFlag {
 
     public static ConcurrentMap<String,Integer> waitMiner = new ConcurrentHashMap<>();
 
+    public static ConcurrentMap<String,List<Trustee>> blockCycleList = new ConcurrentHashMap<>();
+
 }

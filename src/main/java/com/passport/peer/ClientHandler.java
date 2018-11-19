@@ -89,7 +89,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         String clientIP = insocket.getAddress().getHostAddress();
         List<String> clientIpToAddress = dbAccess.seekByKey(clientIP);
         List<Trustee> trustees = dbAccess.listTrustees();
-        List<Trustee> list = (List<Trustee>)dbAccess.get("blockCycle");
+        List<Trustee> list = (List<Trustee>)SyncFlag.blockCycleList.get("blockCycle");
         for(String address:clientIpToAddress){
             dbAccess.rocksDB.delete((clientIP+"_"+address).getBytes());
             dbAccess.rocksDB.delete((address+"_"+clientIP).getBytes());
@@ -116,7 +116,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
             }
         }
 
-        dbAccess.put("blockCycle", list);
+        SyncFlag.blockCycleList.put("blockCycle", list);
         logger.info(ctx.channel().remoteAddress().toString()+"服务端关闭");
         //重铸机制测试
         ctx.close();

@@ -38,18 +38,15 @@ public class TrusteeHandler {
     public void changeStatus(Trustee trustee, int blockCycle) {
         //保存到数据库
 //        Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
-        Optional<Object> objectOptional = dbAccess.get("blockCycle");
-        if(objectOptional.isPresent()){
-            List<Trustee> list = (List<Trustee>)objectOptional.get();
-            for(Trustee tee : list){
-                if(tee.getAddress().equals(trustee.getAddress())){
-                    tee.setStatus(0);//状态设置为已出场
-                    break;
-                }
+        List<Trustee> list = SyncFlag.blockCycleList.get("blockCycle");
+        for(Trustee tee : list){
+            if(tee.getAddress().equals(trustee.getAddress())){
+                tee.setStatus(0);//状态设置为已出场
+                break;
             }
-            dbAccess.put(String.valueOf(blockCycle), list);
-            dbAccess.put("blockCycle", list);
         }
+        dbAccess.put(String.valueOf(blockCycle), list);
+        SyncFlag.blockCycleList.put("blockCycle", list);
     }
 
     /**
@@ -60,14 +57,10 @@ public class TrusteeHandler {
     public List<Trustee> findValidTrustees(int blockCycle) {
         List<Trustee> trustees = new ArrayList<>();
 //        Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
-        Optional<Object> objectOptional = dbAccess.get("blockCycle");
-        if(objectOptional.isPresent()){
-            List<Trustee> list = (List<Trustee>)objectOptional.get();
-            for(Trustee tee : list){
-                if(tee.getStatus() == 1 && tee.getState() != 0){
-                    trustees.add(tee);
-                }
-            }
+        List<Trustee> list = SyncFlag.blockCycleList.get("blockCycle");
+        for(Trustee tee : list){
+            if(tee.getStatus() == 1 && tee.getState() != 0)
+                trustees.add(tee);
         }
         logger.info("受托人列表数量："+trustees.size()+"");
         return trustees;
@@ -95,7 +88,7 @@ public class TrusteeHandler {
         }
         //保存到数据库
         dbAccess.put(String.valueOf(blockCycle), trustees);
-        dbAccess.put("blockCycle", trustees);
+        SyncFlag.blockCycleList.put("blockCycle", trustees);
         return trustees;
     }
 }

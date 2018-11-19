@@ -92,8 +92,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         List<Trustee> trustees = dbAccess.listTrustees();
         Long lastBlockHeight = Long.valueOf(dbAccess.getLastBlockHeight().get().toString());
 
-        List<Trustee> list = (List<Trustee>) dbAccess.get("blockCycle");
-//        List<Trustee> list = (List<Trustee>)dbAccess.get(String.valueOf(blockCycle));
+        List<Trustee> list = (List<Trustee>) SyncFlag.blockCycleList.get("blockCycle");
         for(String address:ipAddress){
             dbAccess.rocksDB.delete((clientIP+"_"+address).getBytes());
             dbAccess.rocksDB.delete((address+"_"+clientIP).getBytes());
@@ -118,7 +117,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
                 provider.publishEvent(new GenerateBlockEvent(0L));
             }
         }
-        dbAccess.put("blockCycle",list);
+        SyncFlag.blockCycleList.put("blockCycle", list);
         logger.info(ctx.channel().remoteAddress().toString()+"客户端关闭");
         ctx.close();
     }

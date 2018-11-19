@@ -110,7 +110,7 @@ public class BlockSyncREQ extends Strategy {
             int blockCycle = blockUtils.getBlockCycle(blockLocal.getBlockHeight());
             //防止同步时出块导致受托人列表不一致
             int remove = -1;
-            List<Trustee> trusteeList = (List<Trustee>) dbAccess.get("blockCycle");
+            List<Trustee> trusteeList = (List<Trustee>) SyncFlag.blockCycleList.get("blockCycle");
             for(int i=0;i<trusteeList.size();i++){
                 if(trusteeList.get(i).getAddress().equals(blockLocal.getProducer())){
                     remove = i;
@@ -118,7 +118,7 @@ public class BlockSyncREQ extends Strategy {
             }
             if(remove != -1){
                 trusteeList = trusteeList.subList(remove,trusteeList.size());
-                dbAccess.put("blockCycle",trusteeList);
+                SyncFlag.blockCycleList.put("blockCycle", trusteeList);
             }
             //end
             //初始化受托人列表
