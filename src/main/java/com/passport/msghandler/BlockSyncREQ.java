@@ -109,15 +109,16 @@ public class BlockSyncREQ extends Strategy {
             //标识需移除受托人列表位置
             int remove = -1;
             List<Trustee> trusteeList = SyncFlag.blockCycleList.get("blockCycle");
-            logger.debug("受托人移除之前的数据：------"+trusteeList);
+            logger.info(trusteeList.size()+"受托人移除之前的数据：------"+trusteeList);
             for(int i = 0;i<trusteeList.size();i++){
                 if(trusteeList.get(i).getAddress().equals(blockLocal.getProducer())){
                     remove = i;
                 }
             }
             if(remove != -1){
-                logger.debug("受托人列表对应不上需移除"+blockLocal.getProducer()+"数据");
+                logger.info("受托人列表对应不上需移除"+blockLocal.getProducer()+"数据");
                 SyncFlag.blockCycleList.put("blockCycle",trusteeList.subList(remove,trusteeList.size()));
+                logger.info("受托人列表移除后数量："+SyncFlag.blockCycleList.get("blockCycle"));
             }
             //改变状态
             Optional<Trustee> trusteeOpt = dbAccess.getTrustee(blockLocal.getProducer());
