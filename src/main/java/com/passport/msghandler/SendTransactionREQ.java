@@ -1,8 +1,6 @@
 package com.passport.msghandler;
 
 import com.google.common.base.Optional;
-import com.passport.annotations.RocksTransaction;
-import com.passport.constant.SyncFlag;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.exception.CommonException;
@@ -32,7 +30,6 @@ public class SendTransactionREQ extends Strategy {
     @Autowired
     private TransactionHandler transactionHandler;
 
-    @RocksTransaction
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理交易转账请求数据：{}", GsonUtils.toJson(message));
 //        if(!SyncFlag.isNextBlockSyncFlag()){

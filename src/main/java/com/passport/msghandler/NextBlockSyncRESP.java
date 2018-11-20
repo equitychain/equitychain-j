@@ -1,26 +1,19 @@
 package com.passport.msghandler;
 
-import com.google.protobuf.ByteString;
-import com.passport.annotations.RocksTransaction;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Block;
-import com.passport.core.Trustee;
 import com.passport.db.dbhelper.DBAccess;
-import com.passport.event.GenerateBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.peer.ChannelsManager;
 import com.passport.proto.*;
 import com.passport.utils.GsonUtils;
-import com.passport.utils.HttpUtils;
 import com.passport.webhandler.BlockHandler;
 import io.netty.channel.ChannelHandlerContext;
-import org.rocksdb.RocksDBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +35,6 @@ public class NextBlockSyncRESP extends Strategy {
     @Autowired
     private BlockHandler blockHandler;
     @Override
-    @RocksTransaction
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块同步响应结果：{}", GsonUtils.toJson(message));
         if(blockHandler.padding){

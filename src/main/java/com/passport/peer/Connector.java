@@ -1,26 +1,16 @@
 package com.passport.peer;
 
 import com.google.protobuf.ByteString;
-import com.passport.annotations.RocksTransaction;
-import com.passport.aop.TransactionAspect;
 import com.passport.constant.NodeListConstant;
-import com.passport.constant.SyncFlag;
-import com.passport.core.Account;
-import com.passport.core.Transaction;
-import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
-import com.passport.db.dbhelper.DBAccess;
-import com.passport.event.GenerateBlockEvent;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.proto.*;
-import com.passport.timer.MonitoringIfProducerDead;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.HttpUtils;
 import com.passport.utils.SerializeUtils;
 import com.passport.utils.StoryFileUtil;
 import com.passport.zookeeper.ServiceRegistry;
-import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -29,8 +19,6 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 

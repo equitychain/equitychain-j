@@ -1,10 +1,8 @@
 package com.passport.msghandler;
 
 import com.google.common.base.Optional;
-import com.passport.annotations.RocksTransaction;
 import com.passport.core.Account;
 import com.passport.db.dbhelper.BaseDBAccess;
-import com.passport.db.dbhelper.DBAccess;
 import com.passport.proto.AccountMessage;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.GsonUtils;
@@ -17,8 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 服务端处理账户同步请求
@@ -32,7 +28,6 @@ public class AccountSyncREQ extends Strategy {
     @Autowired
     private BaseDBAccess dbAccess;
 
-    @RocksTransaction
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
         logger.info("处理账户同步请求数据：{}", GsonUtils.toJson(message));
 

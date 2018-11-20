@@ -1,7 +1,6 @@
 package com.passport.msghandler;
 
 import com.google.common.base.Optional;
-import com.passport.annotations.RocksTransaction;
 import com.passport.core.Block;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.peer.ChannelsManager;
@@ -10,13 +9,10 @@ import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
 import com.passport.webhandler.BlockHandler;
 import io.netty.channel.ChannelHandlerContext;
-import org.rocksdb.RocksDBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.net.InetSocketAddress;
 
 /**
  * 服务端处理区块同步请求
@@ -32,7 +28,6 @@ public class NextBlockSyncREQ extends Strategy {
     @Autowired
     private BlockHandler blockHdandler;
 
-    @RocksTransaction
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块同步请求数据：{}", GsonUtils.toJson(message));
         ChannelsManager.concurrentHashMap.put(ctx.channel().id().toString(),0);

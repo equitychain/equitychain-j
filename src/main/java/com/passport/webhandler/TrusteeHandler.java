@@ -1,14 +1,8 @@
 package com.passport.webhandler;
 
-import com.google.common.base.Optional;
-import com.google.protobuf.ByteString;
-import com.passport.annotations.RocksTransaction;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
-import com.passport.db.dbhelper.DBAccess;
-import com.passport.peer.ChannelsManager;
-import com.passport.proto.*;
 import com.passport.utils.BlockUtils;
 import org.rocksdb.RocksDBException;
 import org.slf4j.Logger;
@@ -18,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -64,12 +57,12 @@ public class TrusteeHandler {
                 if(tee.getStatus() == 1 && tee.getState() != 0) trustees.add(tee);
             }
         }
-        logger.info("受托人列表数量："+trustees.size()+"------"+trustees);
+        logger.debug("受托人列表数量："+trustees.size()+"------"+trustees);
         return trustees;
     }
 
     public List<Trustee> getTrusteesBeforeTime(long newBlockHeight, int blockCycle) {
-        logger.info("重新获取受托人列表");
+        logger.debug("重新获取受托人列表");
         Long timestamp = blockUtils.getTimestamp4BlockCycle(newBlockHeight);
         //查询投票记录（status==1）,时间小于等于timestamp，按投票票数从高到低排列的101个受托人，放到101个受托人列表中
         List<Trustee> trustees = new ArrayList<>();

@@ -1,6 +1,5 @@
 package com.passport.web;
 
-import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Transaction;
@@ -38,7 +37,6 @@ public class TransactionController {
     private TransactionHandler transactionHandler;
 
     @PostMapping("/send")
-    @RocksTransaction
     public ResultDto send(HttpServletRequest request) throws Exception {
         if(SyncFlag.isNextBlockSyncFlag()){
             return new ResultDto(ResultEnum.TRANS_UNCOMPSYN);

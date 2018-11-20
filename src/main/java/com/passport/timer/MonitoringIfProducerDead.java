@@ -1,32 +1,21 @@
 package com.passport.timer;
 
 import com.google.common.base.Optional;
-import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Block;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
-import com.passport.db.dbhelper.DBAccess;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.NetworkTime;
 import com.passport.webhandler.BlockHandler;
 import com.passport.webhandler.TrusteeHandler;
-import org.rocksdb.RocksDBException;
-import org.rocksdb.Transaction;
-import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 监控出块人有没按时出块
@@ -48,7 +37,6 @@ public class MonitoringIfProducerDead {
     private BlockHandler blockHandler;
 
 //    private Lock lock = new ReentrantLock();
-    @RocksTransaction
     public void monitor() throws Exception {
         //已同步完成，切换到接收区块和流水广播状态
         if (SyncFlag.isNextBlockSyncFlag()) {

@@ -53,7 +53,7 @@ public class RocksDataSource implements MapDataSource<byte[]> {
 
   @Override
   public void specialInit(DataSourceSettings sourceSettings) {
-    logger.debug("RocksDB[{}] init",dbname);
+    logger.warn("RocksDB[{}] init",dbname);
     readWriteLock.writeLock().lock();
     try {
       if (isAlive()) return;

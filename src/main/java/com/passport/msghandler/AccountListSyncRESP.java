@@ -1,10 +1,8 @@
 package com.passport.msghandler;
 
 import com.google.common.base.Optional;
-import com.passport.annotations.RocksTransaction;
 import com.passport.core.Account;
 import com.passport.db.dbhelper.BaseDBAccess;
-import com.passport.db.dbhelper.DBAccess;
 import com.passport.proto.AccountMessage;
 import com.passport.proto.NettyMessage;
 import com.passport.utils.DataFormatUtil;
@@ -32,7 +30,6 @@ public class AccountListSyncRESP extends Strategy {
     @Autowired
     private BaseDBAccess dbAccess;
 
-    @RocksTransaction
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
         logger.info("处理账户列表同步请求数据：{}", GsonUtils.toJson(message));
         List<AccountMessage.Account> accountsList = message.getData().getAccountsList();

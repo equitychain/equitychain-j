@@ -2,7 +2,6 @@ package com.passport.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
-import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Account;
@@ -71,7 +70,6 @@ public class AccountController {
     private String walletDir;
 
     @GetMapping("/new")
-    @RocksTransaction
     public ResultDto newAccount(HttpServletRequest request) throws Exception {
         String password = request.getParameter("password");
         //非空检验
@@ -94,7 +92,6 @@ public class AccountController {
     }
 
     @GetMapping("/miner")
-    @RocksTransaction
     public ResultDto miner(HttpServletRequest request) throws Exception {
         if(SyncFlag.minerFlag){//启动时不更新受托人列表 需等下个周期在加入
             Set<String> address = storyFileUtil.getAddresses();
@@ -127,7 +124,6 @@ public class AccountController {
     }
 
     @GetMapping("/generateGenesis")
-    @RocksTransaction
     public ResultDto generateGenesis(HttpServletRequest request) throws Exception {
         accountHandler.generateTrustees();
         return new ResultDto(ResultEnum.SUCCESS);

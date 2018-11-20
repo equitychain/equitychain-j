@@ -1,13 +1,9 @@
 package com.passport.listener;
 
 import com.google.common.base.Optional;
-import com.passport.annotations.RocksTransaction;
-import com.passport.aop.TransactionAspect;
 import com.passport.constant.Constant;
-import com.passport.constant.SyncFlag;
 import com.passport.core.*;
 import com.passport.db.dbhelper.BaseDBAccess;
-import com.passport.db.dbhelper.DBAccess;
 import com.passport.event.GenerateBlockEvent;
 import com.passport.event.GenerateNextBlockEvent;
 import com.passport.event.SyncBlockEvent;
@@ -17,20 +13,15 @@ import com.passport.proto.*;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
-import com.passport.utils.NetworkTime;
 import com.passport.webhandler.BlockHandler;
 import com.passport.webhandler.TrusteeHandler;
-import io.netty.channel.group.ChannelGroup;
 import org.rocksdb.RocksDBException;
-import org.rocksdb.Transaction;
-import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -190,7 +181,6 @@ public class BlockEventListener {
      * @param event
      */
     @EventListener(GenerateNextBlockEvent.class)
-    @RocksTransaction
     public void generateNextBlock(GenerateNextBlockEvent event) throws Exception {
         blockHandler.produceNextBlock();
     }
@@ -201,7 +191,6 @@ public class BlockEventListener {
      * @param event
      */
     @EventListener(GenerateBlockEvent.class)
-    @RocksTransaction
     public void generateBlock(GenerateBlockEvent event) throws Exception {
         //第一个启动的节点，负责生成区块
         if (true) {

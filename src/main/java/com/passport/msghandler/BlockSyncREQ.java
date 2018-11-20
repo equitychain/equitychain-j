@@ -1,7 +1,6 @@
 package com.passport.msghandler;
 
 import com.google.common.base.Optional;
-import com.passport.annotations.RocksTransaction;
 import com.passport.constant.Constant;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Block;
@@ -14,7 +13,6 @@ import com.passport.proto.NettyMessage;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
 import com.passport.utils.GsonUtils;
-import com.passport.web.AccountController;
 import com.passport.webhandler.BlockHandler;
 import com.passport.webhandler.TransactionHandler;
 import com.passport.webhandler.TrusteeHandler;
@@ -25,8 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.security.AccessController;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -64,7 +60,7 @@ public class BlockSyncREQ extends Strategy {
             BlockMessage.Block block = message.getData().getBlock();
 
             if(SyncFlag.isNextBlockSyncFlag()){
-            logger.info("正在主动同步区块，暂时不处理流水广播消息");
+                logger.debug("正在主动同步区块，暂时不处理流水广播消息");
                 return;
              }
 
@@ -76,10 +72,10 @@ public class BlockSyncREQ extends Strategy {
             long lastBlockHeight = CastUtils.castLong(lastBlockHeightOptional.get());
             long blockHeight = block.getBlockHeight();
             if((lastBlockHeight + 1) != blockHeight){//最后的区块高度+1=广播过来的区块高度，表示区块按顺序处理
-                logger.info("本地区块最新高度和广播过来的区块高度相差!=1");
+                logger.debug("本地区块最新高度和广播过来的区块高度相差!=1");
                 //如果本地高度和广播过来的区块高度差
                 if(blockHeight - lastBlockHeight >= Constant.BLOCK_HEIGHT_GAP){
-                    logger.info("本地区块最新高度和广播过来的区块高度相差>=30");
+                    logger.debug("本地区块最新高度和广播过来的区块高度相差>=30");
                     //修改主动同步标记
                     SyncFlag.setNextBlockSyncFlag(true);
                     //发布主动同步事件
@@ -113,14 +109,14 @@ public class BlockSyncREQ extends Strategy {
             //标识需移除受托人列表位置
             int remove = -1;
             List<Trustee> trusteeList = SyncFlag.blockCycleList.get("blockCycle");
-            logger.info("受托人移除之前的数据：------"+trusteeList);
+            logger.debug("受托人移除之前的数据：------"+trusteeList);
             for(int i = 0;i<trusteeList.size();i++){
                 if(trusteeList.get(i).getAddress().equals(blockLocal.getProducer())){
                     remove = i;
                 }
             }
             if(remove != -1){
-                logger.info("受托人列表对应不上需移除"+blockLocal.getProducer()+"数据");
+                logger.debug("受托人列表对应不上需移除"+blockLocal.getProducer()+"数据");
                 SyncFlag.blockCycleList.put("blockCycle",trusteeList.subList(remove,trusteeList.size()));
             }
             //改变状态
