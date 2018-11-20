@@ -168,7 +168,7 @@ public class AccountController {
                     publicKey = Numeric.toHexStringNoPrefix(ecKeyPair.getPrivateKeyValue());
                 } catch (Exception e) {
                     e.printStackTrace();
-                    logger.error("私钥解析异常："+e.getMessage());
+                    logger.info("私钥解析异常："+e.getMessage());
                 }
             }
             accountAccount.put("balance", account.getBalance());

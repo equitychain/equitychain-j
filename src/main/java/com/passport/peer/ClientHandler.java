@@ -67,7 +67,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     //管道中上一个Handler触发的事件
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        logger.debug("客户端心跳监测: "+channelsManager.getChannels().size());
+        logger.info("客户端心跳监测: "+channelsManager.getChannels().size());
         if (evt instanceof IdleStateEvent){
             IdleStateEvent event = (IdleStateEvent)evt;
             if (event.state()== IdleState.WRITER_IDLE){
@@ -117,7 +117,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         }
 
         SyncFlag.blockCycleList.put("blockCycle", list);
-        logger.error(ctx.channel().remoteAddress().toString()+"服务端关闭");
+        logger.info(ctx.channel().remoteAddress().toString()+"服务端关闭");
         //重铸机制测试
         ctx.close();
     }

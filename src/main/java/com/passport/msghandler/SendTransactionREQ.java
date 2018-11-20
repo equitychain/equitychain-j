@@ -85,7 +85,7 @@ public class SendTransactionREQ extends Strategy {
                 }
             }
         } catch (Exception e) {
-            logger.error("交易流水验签失败", e);
+            logger.info("交易流水验签失败", e);
         }
     }
 }

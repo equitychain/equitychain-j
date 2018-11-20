@@ -43,7 +43,7 @@ public class RocksDataSource implements MapDataSource<byte[]> {
 
   public RocksDataSource(String dbname) {
     this.dbname = dbname;
-    logger.debug("create RocksDB[{}]",dbname);
+    logger.info("create RocksDB[{}]",dbname);
   }
 
   @Override
@@ -53,7 +53,7 @@ public class RocksDataSource implements MapDataSource<byte[]> {
 
   @Override
   public void specialInit(DataSourceSettings sourceSettings) {
-    logger.warn("RocksDB[{}] init",dbname);
+    logger.info("RocksDB[{}] init",dbname);
     readWriteLock.writeLock().lock();
     try {
       if (isAlive()) return;

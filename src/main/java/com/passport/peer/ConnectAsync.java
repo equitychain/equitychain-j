@@ -90,7 +90,7 @@ public class ConnectAsync {
 
             f.channel().closeFuture().sync();
         }catch (Exception e){
-            logger.error("与客户端连接断开", e);
+            logger.info("与客户端连接断开", e);
         }finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
@@ -124,7 +124,7 @@ public class ConnectAsync {
 
             cf.channel().closeFuture().sync();
         }catch (Exception e){
-            logger.error("与服务端连接断开", e);
+            logger.info("与服务端连接断开", e);
             e.printStackTrace();
         } finally {
             logger.info("contains:"+channelsManager.getChannels().contains(cf.channel()));

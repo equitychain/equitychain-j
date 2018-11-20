@@ -105,7 +105,7 @@ public class BlockSyncREQ extends Strategy {
             //出块完成后，计算出的下一个出块人如果是自己则继续发布出块事件
             int blockCycle = blockUtils.getBlockCycle(blockLocal.getBlockHeight());
             SyncFlag.blockSyncFlag = true;//同步完成
-            logger.info("收到区块，被动同步完成"+blockLocal.getProducer());
+            logger.info(blockLocal.getBlockHeight()+"收到区块，被动同步完成"+blockLocal.getProducer());
             //标识需移除受托人列表位置
             int remove = -1;
             List<Trustee> trusteeList = SyncFlag.blockCycleList.get("blockCycle");

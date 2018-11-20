@@ -198,7 +198,7 @@ public class TransactionHandler {
             //transaction.setPublicKey(credentials.getEcKeyPair().getPublicKey().getEncoded());
             transaction.setPublicKey(Keys.publicKeyEncode(credentials.getEcKeyPair().getPublicKey().getEncoded()).getBytes());
         } catch (Exception e) {
-            logger.error("处理私钥信息异常", e);
+            logger.info("处理私钥信息异常", e);
             throw new CommonException(ResultEnum.SYS_ERROR);
         }
         //计算交易hash

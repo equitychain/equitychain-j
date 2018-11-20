@@ -177,7 +177,7 @@ public class BlockHandler {
                         }
                     }
                 }catch (Exception e){
-                    logger.warn("synchronization block error", e);
+                    logger.info("synchronization block error", e);
                 }finally {
                     //更改状态
                     padding = false;
@@ -394,8 +394,7 @@ public class BlockHandler {
             }
         }else {
             logger.info("出块账号："+accountOptional.get().getAddress());
-
-//            //最后一个区块出块时间距离现在超过10秒
+            //最后一个区块出块时间距离现在超过10秒
 //            Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
 //            if (!lastBlockOptional.isPresent()) {
 //                return;

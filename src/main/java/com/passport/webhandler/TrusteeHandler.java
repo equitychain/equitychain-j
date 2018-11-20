@@ -40,6 +40,7 @@ public class TrusteeHandler {
         }
         dbAccess.put(String.valueOf(blockCycle), list);
         SyncFlag.blockCycleList.put("blockCycle", list);
+        logger.info("改变当前出块人的状态"+trustee.getAddress());
     }
 
     /**
@@ -57,12 +58,12 @@ public class TrusteeHandler {
                 if(tee.getStatus() == 1 && tee.getState() != 0) trustees.add(tee);
             }
         }
-        logger.debug("受托人列表数量："+trustees.size()+"------"+trustees);
+        logger.info("受托人列表数量："+trustees.size()+"------"+trustees);
         return trustees;
     }
 
     public List<Trustee> getTrusteesBeforeTime(long newBlockHeight, int blockCycle) {
-        logger.debug("重新获取受托人列表");
+        logger.info("重新获取受托人列表");
         Long timestamp = blockUtils.getTimestamp4BlockCycle(newBlockHeight);
         //查询投票记录（status==1）,时间小于等于timestamp，按投票票数从高到低排列的101个受托人，放到101个受托人列表中
         List<Trustee> trustees = new ArrayList<>();
