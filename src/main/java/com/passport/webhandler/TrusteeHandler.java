@@ -67,11 +67,13 @@ public class TrusteeHandler {
         List<Trustee> trustees = new ArrayList<>();
         try {
             List<Trustee> tru = dbAccess.listTrustees();
+            logger.info("缓存中存在已启动节点："+SyncFlag.waitMiner.size());
             SyncFlag.waitMiner.forEach((k, v) ->{//更新缓存中准备启动出块节点账号
                 for(Trustee trustee:tru){
                     if(trustee.getAddress().equals(k)){
                         trustee.setState(v);
                         SyncFlag.waitMiner.remove(k);
+                        logger.info("新周期移除缓存中节点："+SyncFlag.waitMiner.size());
                         dbAccess.putTrustee(trustee);
                     }
                 }
