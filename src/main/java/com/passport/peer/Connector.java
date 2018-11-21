@@ -63,16 +63,6 @@ public class Connector implements InitializingBean {
 //    启动的时候自动开始区块同步
     @EventListener(ApplicationReadyEvent.class)
     public void syncNextBlock() {
-        Set<String> localAddress = storyFileUtil.getAddresses();
-        for(String address:localAddress){
-            try {
-                String clientIP = HttpUtils.getLocalHostLANAddress().getHostAddress();
-                dbAccess.rocksDB.put( (clientIP+"_"+address).getBytes(),SerializeUtils.serialize(address));
-                dbAccess.rocksDB.put( (address+"_"+clientIP).getBytes(), SerializeUtils.serialize(address));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
         //发送同步账户请求
         NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
         dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNTLIST_SYNC);
@@ -81,18 +71,6 @@ public class Connector implements InitializingBean {
         builder.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
         builder.setData(dataBuilder);
         channelsManager.getChannels().writeAndFlush(builder.build());
-        //发送本地账户ip绑定
-        NettyData.Data.Builder dataBuilder1 = NettyData.Data.newBuilder();
-        dataBuilder1.setDataType(DataTypeEnum.DataType.ACCOUNTIP_SYNC);
-        for (String address : localAddress) {
-            AccountMessage.Account.Builder builder1 = AccountMessage.Account.newBuilder();
-            builder1.setAddress(ByteString.copyFrom(address.getBytes()));
-            dataBuilder1.addAccounts(builder1.build());
-        }
-        NettyMessage.Message.Builder builder1 = NettyMessage.Message.newBuilder();
-        builder1.setData(dataBuilder1.build());
-        builder1.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
-        channelsManager.getChannels().writeAndFlush(builder1.build());
 
         try {
             TimeUnit.MILLISECONDS.sleep(3000);

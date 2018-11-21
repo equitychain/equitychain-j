@@ -5,6 +5,7 @@ import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.proto.AccountMessage;
 import com.passport.proto.NettyMessage;
+import com.passport.proto.TrusteeMessage;
 import com.passport.utils.SerializeUtils;
 import com.passport.utils.StoryFileUtil;
 import io.netty.channel.ChannelHandlerContext;
@@ -27,13 +28,12 @@ public class AccountMinerRESP extends Strategy {
     void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
         //收到消息进行处理
         logger.info("收到启动出块请求放入等待。到下个周期才允许启动");
-        InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
-        String clientIP = insocket.getAddress().getHostAddress();
         //获取节点的账户列表
-        List<String> ipAddress = dbAccess.seekByKey(clientIP);
         List<Trustee> trustees = dbAccess.listTrustees();
-        for(String address:ipAddress){
-            for(Trustee trustee : trustees){
+        List<TrusteeMessage.Trustee> msgTrustees = message.getData().getTrusteeList();
+        for(Trustee trustee : trustees){
+            for(TrusteeMessage.Trustee trus:msgTrustees){
+                String address = new String(trus.getAddress().toByteArray());
                 if(address.equals(trustee.getAddress())){
                     SyncFlag.waitMiner.put(address,1);
                 }

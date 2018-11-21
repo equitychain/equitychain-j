@@ -2,6 +2,7 @@ package com.passport.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
+import com.google.protobuf.ByteString;
 import com.passport.constant.Constant;
 import com.passport.constant.SyncFlag;
 import com.passport.core.Account;
@@ -16,10 +17,7 @@ import com.passport.event.SyncAccountEvent;
 import com.passport.exception.CipherException;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.peer.ChannelsManager;
-import com.passport.proto.DataTypeEnum;
-import com.passport.proto.MessageTypeEnum;
-import com.passport.proto.NettyData;
-import com.passport.proto.NettyMessage;
+import com.passport.proto.*;
 import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.CheckUtils;
 import com.passport.utils.HttpUtils;
@@ -82,8 +80,6 @@ public class AccountController {
         if (account != null) {
             //当挖矿账户不存在时设置为挖矿账户
             accountHandler.setMinerAccountIfNotExists(account);
-            dbAccess.rocksDB.put( (clientIP+"_"+new String(account.getAddress().getBytes())).getBytes(), SerializeUtils.serialize(new String(account.getAddress().getBytes())));
-            dbAccess.rocksDB.put( (new String(account.getAddress().getBytes())+"_"+clientIP).getBytes(),SerializeUtils.serialize(new String(account.getAddress().getBytes())));
             provider.publishEvent(new SyncAccountEvent(account));
             return new ResultDto(ResultEnum.SUCCESS.getCode(), account);
         }
@@ -100,25 +96,35 @@ public class AccountController {
             //启动出块 需确认同步完成才能出块
             if(SyncFlag.blockSyncFlag){
                 SyncFlag.minerFlag = false;
-                provider.publishEvent(new GenerateBlockEvent(0L));
-                //通知所有用户 本节点启动出块
-                NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
-                dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNT_MINER);
-
-                NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
-                builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
-                builder.setData(dataBuilder.build());
-                channelsManager.getChannels().writeAndFlush(builder.build());
 
                 Set<String> address = storyFileUtil.getAddresses();
                 List<Trustee> trustees = dbAccess.listTrustees();
+                List<Trustee> localTrustees = new ArrayList<>();//添加可以出块账户
                 for(Trustee trustee:trustees){//更新受托人列表启动出块
                     for(String add:address){
                         if(trustee.getAddress().equals(add)){
                             SyncFlag.waitMiner.put(add,1);
+                            localTrustees.add(trustee);
                         }
                     }
                 }
+                provider.publishEvent(new GenerateBlockEvent(0L));
+                //通知所有用户 本节点启动出块
+                NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
+                dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNT_MINER);
+                for(Trustee s:localTrustees){
+                    TrusteeMessage.Trustee.Builder builder = TrusteeMessage.Trustee.newBuilder();
+                    builder.setAddress(ByteString.copyFrom(s.getAddress().getBytes()));
+                    builder.setVotes(s.getVotes());
+                    builder.setGenerateRate(s.getGenerateRate());
+                    builder.setStatus(s.getStatus());
+                    builder.setState(1);
+                    dataBuilder.addTrustee(builder.build());
+                }
+                NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
+                builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
+                builder.setData(dataBuilder.build());
+                channelsManager.getChannels().writeAndFlush(builder.build());
             }
         }
         return new ResultDto(ResultEnum.SUCCESS);

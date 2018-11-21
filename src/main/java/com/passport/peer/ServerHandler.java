@@ -85,39 +85,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        int nextBlock = 0;
-        InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
-        String clientIP = insocket.getAddress().getHostAddress();
-        List<String> ipAddress = dbAccess.seekByKey(clientIP);
-        List<Trustee> trustees = dbAccess.listTrustees();
-        Long lastBlockHeight = Long.valueOf(dbAccess.getLastBlockHeight().get().toString());
-
-        List<Trustee> list = (List<Trustee>) SyncFlag.blockCycleList.get("blockCycle");
-        for(String address:ipAddress){
-            dbAccess.rocksDB.delete((clientIP+"_"+address).getBytes());
-            dbAccess.rocksDB.delete((address+"_"+clientIP).getBytes());
-            //更新受托人列表
-            for(Trustee trustee: trustees){
-                if(trustee.getAddress().equals(address)){
-                    trustee.setState(0);
-                    SyncFlag.waitMiner.remove(address);
-                    dbAccess.putTrustee(trustee);
-                }
-            }
-            //更新当前周期
-            for(Trustee tee : list){
-                if(tee.getAddress().equals(address)){
-                    tee.setStatus(0);
-                }
-            }
-        }
-        Set<String> strings = storyFileUtil.getAddresses();
-        for(String s: strings){
-            if(s.equals(list.get(nextBlock))){
-                provider.publishEvent(new GenerateBlockEvent(0L));
-            }
-        }
-        SyncFlag.blockCycleList.put("blockCycle", list);
         logger.error(ctx.channel().remoteAddress().toString()+"客户端关闭");
         ctx.close();
     }

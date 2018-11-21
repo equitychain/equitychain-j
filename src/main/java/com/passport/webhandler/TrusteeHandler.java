@@ -33,7 +33,6 @@ public class TrusteeHandler {
         for(Trustee tee : list){
             if(tee.getAddress().equals(trustee.getAddress())){
                 tee.setStatus(0);//状态设置为已出场
-                break;
             }
         }
         dbAccess.put(String.valueOf(blockCycle), list);

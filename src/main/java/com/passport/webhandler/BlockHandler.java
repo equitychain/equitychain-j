@@ -379,9 +379,8 @@ public class BlockHandler {
      */
     public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) throws Exception {
         Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
-        List<String> strings = dbAccess.seekByKey(trustee.getAddress());
         Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
-        if(!CollectionUtils.isEmpty(strings) && accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
+        if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
             SyncFlag.setNextBlockSyncFlag(false);
             Account account = accountOptional.get();
             if(account.getPrivateKey() != null){
