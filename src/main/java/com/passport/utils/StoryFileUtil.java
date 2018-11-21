@@ -29,9 +29,8 @@ public class StoryFileUtil {
             storyFileUtil = new StoryFileUtil(keyStoryDir);
             storyFileUtil.reload();
         }
-        if(!keyStoryDir.exists()){
-            keyStoryDir.createNewFile();
-//            throw new Exception(keyStoryDir.getPath()+" file is not exists");
+        if(keyStoryDir.exists()){
+            throw new Exception(keyStoryDir.getPath()+" file is not exists");
         }
         if(!storyFileUtil.keyStoryDir.getPath().equals(keyStoryDir.getPath())){
             storyFileUtil.keyStoryDir = keyStoryDir;
