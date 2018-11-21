@@ -7,6 +7,7 @@ import com.passport.core.*;
 import com.passport.peer.ChannelsManager;
 import com.passport.utils.NetworkTime;
 import com.passport.utils.SerializeUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
@@ -14,13 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class BaseDBRocksImpl extends BaseDBAccess {
@@ -621,20 +621,14 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 //                }
             }
         }
-        //排序
+        //排序票数
         allVoters.sort(new Comparator<Trustee>() {
             @Override
             public int compare(Trustee o1, Trustee o2) {
                 return o1.getVotes().longValue() > o2.getVotes().longValue() ? -1 : (o1.getVotes().longValue() == o2.getVotes().longValue() ? 0 : 1);
             }
         });
-        //根据hashcode排序保证节点上的受托人列表一致
-        allVoters.sort(new Comparator<Trustee>() {
-            @Override
-            public int compare(Trustee o1, Trustee o2) {
-                return Math.abs(o1.hashCode())-Math.abs(o1.hashCode());
-            }
-        });
+
         //排序未启动出块节点排后面
         allVoters.sort(new Comparator<Trustee>() {
             @Override

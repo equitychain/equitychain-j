@@ -1,7 +1,6 @@
 package com.passport.db.dbhelper;
 
 import com.google.common.base.Optional;
-import com.passport.annotations.RocksTransaction;
 import com.passport.core.*;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;

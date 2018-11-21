@@ -60,7 +60,7 @@ public class Connector implements InitializingBean {
         }
     }
 
-    //启动的时候自动开始区块同步
+//    启动的时候自动开始区块同步
     @EventListener(ApplicationReadyEvent.class)
     public void syncNextBlock() {
         Set<String> localAddress = storyFileUtil.getAddresses();
