@@ -1,7 +1,9 @@
 package com.passport.peer;
 
+import com.google.common.base.Optional;
 import com.google.protobuf.ByteString;
 import com.passport.constant.NodeListConstant;
+import com.passport.core.Block;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
@@ -63,6 +65,16 @@ public class Connector implements InitializingBean {
 //    启动的时候自动开始区块同步
     @EventListener(ApplicationReadyEvent.class)
     public void syncNextBlock() {
+        //回退10个区块
+        Integer lashBlockHeight = Integer.valueOf(dbAccess.getLastBlockHeight().get().toString());
+        for(int i = 0;i<10;i++){
+            try {
+                dbAccess.delBlocksByHeight(new Long(lashBlockHeight-i));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
         //发送同步账户请求
         NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
         dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNTLIST_SYNC);

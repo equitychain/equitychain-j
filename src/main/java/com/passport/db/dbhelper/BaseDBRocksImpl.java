@@ -983,8 +983,13 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         if (optional.isPresent() && beginHeight <= maxHeight) {
 
             for (long i = maxHeight; i >= beginHeight; i--) {
+                //先删除流水 再删区块
+                List<Transaction> transactionList = getBlock(beginHeight).get().getTransactions();
+                for(Transaction transaction:transactionList){
+                    delObj(getKeyFieldByClass(Transaction.class),String.valueOf(transaction.getHash()),Transaction.class,true);
+                }
                 delObj(getKeyFieldByClass(Block.class), String.valueOf(i), Block.class, true);
-                //todo 还需要删除索引、确认流水等信息
+
             }
             return true;
         }
