@@ -31,14 +31,11 @@ public class TrusteeSyncRESP extends Strategy {
         logger.info("处理受托人同步响应数据：{}", GsonUtils.toJson(message));
         List<TrusteeMessage.Trustee> trusteeList = message.getData().getTrusteeList();
         List<Trustee> trustees = new ArrayList<>();
-        InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
-        String clientIP = insocket.getAddress().getHostAddress();
-        List<String> ipAddress = dbAccess.seekByKey(clientIP);
         for(TrusteeMessage.Trustee trusteeMsg:trusteeList){
             Trustee trustee = new Trustee();
             trustee.setIncome(new BigDecimal(0));
             trustee.setStatus((int) trusteeMsg.getStatus());
-            trustee.setState(1);
+            trustee.setState((int) trusteeMsg.getState());
             trustee.setVotes(trusteeMsg.getVotes());
             trustee.setAddress(new String(trusteeMsg.getAddress().toByteArray()));
             trustee.setGenerateRate(trusteeMsg.getGenerateRate());

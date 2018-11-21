@@ -31,7 +31,6 @@ public class TrusteeHandler {
     public void changeStatus(Trustee trustee, int blockCycle) {
         List<Trustee> list = SyncFlag.blockCycleList.get("blockCycle");
         list.remove(trustee);//移除出块账户
-        dbAccess.put(String.valueOf(blockCycle), list);
         SyncFlag.blockCycleList.put("blockCycle", list);
         logger.info("改变当前出块人的状态"+trustee.getAddress());
     }
@@ -77,7 +76,6 @@ public class TrusteeHandler {
         } catch (RocksDBException e) {
             e.printStackTrace();
         }
-        dbAccess.put(String.valueOf(blockCycle), trustees);
         SyncFlag.blockCycleList.put("blockCycle", trustees);
         logger.info(trustees.size()+"新周期列表为："+trustees);
         return trustees;
