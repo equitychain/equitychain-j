@@ -117,13 +117,12 @@ public class BlockSyncREQ extends Strategy {
                 }
             }
             if(remove != -1){
-                logger.info("受托人列表对应不上需移除"+blockLocal.getProducer()+"数据");
-                if(remove+1 == trusteeList.size()){
-                    SyncFlag.blockCycleList.put("blockCycle",new ArrayList<>());
-                }else{
-                    SyncFlag.blockCycleList.put("blockCycle",trusteeList.subList(remove+1,trusteeList.size()));
+                logger.info("受托人列表对应不上需更新已出部分账户"+blockLocal.getProducer()+"数据");
+                for(Trustee trustee:trusteeList.subList(0,remove)){
+                    trustee.setStatus(0);
                 }
-                logger.info("受托人列表移除后数量："+SyncFlag.blockCycleList.get("blockCycle"));
+                SyncFlag.blockCycleList.put("blockCycle",trusteeList);
+                logger.info("受托人列表更新后："+SyncFlag.blockCycleList.get("blockCycle"));
             }
             //改变状态
             Optional<Trustee> trusteeOpt = dbAccess.getTrustee(blockLocal.getProducer());

@@ -30,7 +30,13 @@ public class TrusteeHandler {
      */
     public void changeStatus(Trustee trustee, int blockCycle) {
         List<Trustee> list = SyncFlag.blockCycleList.get("blockCycle");
-        list.remove(trustee);//移除出块账户
+        for(Trustee tee : list){
+            if(tee.getAddress().equals(trustee.getAddress())){
+                tee.setStatus(0);//状态设置为已出场
+                break;
+            }
+        }
+        dbAccess.put(String.valueOf(blockCycle), list);
         SyncFlag.blockCycleList.put("blockCycle", list);
         logger.info("改变当前出块人的状态"+trustee.getAddress());
     }
@@ -45,7 +51,7 @@ public class TrusteeHandler {
         List<Trustee> list = SyncFlag.blockCycleList.get("blockCycle");
         if(!CollectionUtils.isEmpty(list)){
             for(Trustee tee : list){
-                if(tee.getState() != 0){
+                if(tee.getStatus() == 1 && tee.getState() != 0){
                     trustees.add(tee);
                 }
             }
@@ -67,7 +73,7 @@ public class TrusteeHandler {
                     if(trustee.getAddress().equals(k)){
                         trustee.setState(v);
                         SyncFlag.waitMiner.remove(k);
-                        logger.info("新周期移除缓存中节点："+SyncFlag.waitMiner.size());
+                        logger.info("新周期移除缓存："+SyncFlag.waitMiner.size());
                         dbAccess.putTrustee(trustee);
                     }
                 }
@@ -76,6 +82,7 @@ public class TrusteeHandler {
         } catch (RocksDBException e) {
             e.printStackTrace();
         }
+        dbAccess.put(String.valueOf(blockCycle), trustees);
         SyncFlag.blockCycleList.put("blockCycle", trustees);
         logger.info(trustees.size()+"新周期列表为："+trustees);
         return trustees;
