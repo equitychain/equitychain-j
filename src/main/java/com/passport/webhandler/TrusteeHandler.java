@@ -30,6 +30,7 @@ public class TrusteeHandler {
      */
     public void changeStatus(Trustee trustee, int blockCycle) {
         List<Trustee> list = SyncFlag.blockCycleList.get("blockCycle");
+        list.remove(trustee);//移除出块账户
         dbAccess.put(String.valueOf(blockCycle), list);
         SyncFlag.blockCycleList.put("blockCycle", list);
         logger.info("改变当前出块人的状态"+trustee.getAddress());
