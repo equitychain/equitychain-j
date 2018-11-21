@@ -29,8 +29,6 @@ public class TrusteeHandler {
      * @param blockCycle
      */
     public void changeStatus(Trustee trustee, int blockCycle) {
-        //保存到数据库
-//        Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
         List<Trustee> list = SyncFlag.blockCycleList.get("blockCycle");
         for(Trustee tee : list){
             if(tee.getAddress().equals(trustee.getAddress())){
@@ -50,12 +48,12 @@ public class TrusteeHandler {
      */
     public List<Trustee> findValidTrustees(int blockCycle) {
         List<Trustee> trustees = new ArrayList<>();
-        List<String> temp = new ArrayList<>();
-//        Optional<Object> objectOptional = dbAccess.get(String.valueOf(blockCycle));
         List<Trustee> list = SyncFlag.blockCycleList.get("blockCycle");
         if(!CollectionUtils.isEmpty(list)){
             for(Trustee tee : list){
-                if(tee.getStatus() == 1 && tee.getState() != 0) trustees.add(tee);
+                if(tee.getStatus() == 1 && tee.getState() != 0){
+                    trustees.add(tee);
+                }
             }
         }
         logger.info("受托人列表数量："+trustees.size()+"------"+trustees);
@@ -82,9 +80,9 @@ public class TrusteeHandler {
         } catch (RocksDBException e) {
             e.printStackTrace();
         }
-        //保存到数据库
         dbAccess.put(String.valueOf(blockCycle), trustees);
         SyncFlag.blockCycleList.put("blockCycle", trustees);
+        logger.info(trustees.size()+"新周期列表为："+trustees);
         return trustees;
     }
 }

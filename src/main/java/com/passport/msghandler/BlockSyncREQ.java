@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -117,7 +118,11 @@ public class BlockSyncREQ extends Strategy {
             }
             if(remove != -1){
                 logger.info("受托人列表对应不上需移除"+blockLocal.getProducer()+"数据");
-                SyncFlag.blockCycleList.put("blockCycle",trusteeList.subList(remove,trusteeList.size()));
+                if(remove+1 == trusteeList.size()){
+                    SyncFlag.blockCycleList.put("blockCycle",new ArrayList<>());
+                }else{
+                    SyncFlag.blockCycleList.put("blockCycle",trusteeList.subList(remove+1,trusteeList.size()));
+                }
                 logger.info("受托人列表移除后数量："+SyncFlag.blockCycleList.get("blockCycle"));
             }
             //改变状态

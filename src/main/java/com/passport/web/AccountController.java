@@ -94,15 +94,6 @@ public class AccountController {
     @GetMapping("/miner")
     public ResultDto miner(HttpServletRequest request) throws Exception {
         if(SyncFlag.minerFlag){//启动时不更新受托人列表 需等下个周期在加入
-            Set<String> address = storyFileUtil.getAddresses();
-            List<Trustee> trustees = dbAccess.listTrustees();
-            for(Trustee trustee:trustees){//更新受托人列表启动出块
-                for(String add:address){
-                    if(trustee.getAddress().equals(add)){
-                        SyncFlag.waitMiner.put(add,1);
-                    }
-                }
-            }
             if(channelsManager.getChannels().size() == 0){
                 SyncFlag.blockSyncFlag = true;
             }
@@ -118,6 +109,16 @@ public class AccountController {
                 builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
                 builder.setData(dataBuilder.build());
                 channelsManager.getChannels().writeAndFlush(builder.build());
+
+                Set<String> address = storyFileUtil.getAddresses();
+                List<Trustee> trustees = dbAccess.listTrustees();
+                for(Trustee trustee:trustees){//更新受托人列表启动出块
+                    for(String add:address){
+                        if(trustee.getAddress().equals(add)){
+                            SyncFlag.waitMiner.put(add,1);
+                        }
+                    }
+                }
             }
         }
         return new ResultDto(ResultEnum.SUCCESS);
