@@ -600,6 +600,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 List<Trustee> trustees = listTrustees();
                 for(Trustee trustee:trustees){
                     if(address.equals(trustee.getAddress())){
+                        trustee.setStatus(1);
                         allVoters.add(trustee);
                     }
                 }
