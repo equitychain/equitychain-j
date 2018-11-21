@@ -30,12 +30,6 @@ public class TrusteeHandler {
      */
     public void changeStatus(Trustee trustee, int blockCycle) {
         List<Trustee> list = SyncFlag.blockCycleList.get("blockCycle");
-        for(Trustee tee : list){
-            if(tee.getAddress().equals(trustee.getAddress())){
-                tee.setStatus(0);//状态设置为已出场
-                break;
-            }
-        }
         dbAccess.put(String.valueOf(blockCycle), list);
         SyncFlag.blockCycleList.put("blockCycle", list);
         logger.info("改变当前出块人的状态"+trustee.getAddress());
@@ -51,7 +45,7 @@ public class TrusteeHandler {
         List<Trustee> list = SyncFlag.blockCycleList.get("blockCycle");
         if(!CollectionUtils.isEmpty(list)){
             for(Trustee tee : list){
-                if(tee.getStatus() == 1 && tee.getState() != 0){
+                if(tee.getState() != 0){
                     trustees.add(tee);
                 }
             }
