@@ -91,41 +91,38 @@ public class AccountController {
     public ResultDto miner(HttpServletRequest request) throws Exception {
         if(SyncFlag.minerFlag){//启动时不更新受托人列表 需等下个周期在加入
             if(channelsManager.getChannels().size() == 0){
-                SyncFlag.blockSyncFlag = true;
+                SyncFlag.minerFlag = true;
             }
             //启动出块 需确认同步完成才能出块
-            if(SyncFlag.blockSyncFlag){
-                SyncFlag.minerFlag = false;
-
-                Set<String> address = storyFileUtil.getAddresses();
-                List<Trustee> trustees = dbAccess.listTrustees();
-                List<Trustee> localTrustees = new ArrayList<>();//添加可以出块账户
-                for(Trustee trustee:trustees){//更新受托人列表启动出块
-                    for(String add:address){
-                        if(trustee.getAddress().equals(add)){
-                            SyncFlag.waitMiner.put(add,1);
-                            localTrustees.add(trustee);
-                        }
+            Set<String> address = storyFileUtil.getAddresses();
+            List<Trustee> trustees = dbAccess.listTrustees();
+            List<Trustee> localTrustees = new ArrayList<>();//添加可以出块账户
+            for(Trustee trustee:trustees){//更新受托人列表启动出块
+                for(String add:address){
+                    if(trustee.getAddress().equals(add)){
+                        SyncFlag.waitMiner.put(add,1);
+                        localTrustees.add(trustee);
                     }
                 }
-                provider.publishEvent(new GenerateBlockEvent(0L));
-                //通知所有用户 本节点启动出块
-                NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
-                dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNT_MINER);
-                for(Trustee s:localTrustees){
-                    TrusteeMessage.Trustee.Builder builder = TrusteeMessage.Trustee.newBuilder();
-                    builder.setAddress(ByteString.copyFrom(s.getAddress().getBytes()));
-                    builder.setVotes(s.getVotes());
-                    builder.setGenerateRate(s.getGenerateRate());
-                    builder.setStatus(s.getStatus());
-                    builder.setState(1);
-                    dataBuilder.addTrustee(builder.build());
-                }
-                NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
-                builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
-                builder.setData(dataBuilder.build());
-                channelsManager.getChannels().writeAndFlush(builder.build());
             }
+            provider.publishEvent(new GenerateBlockEvent(0L));
+            SyncFlag.minerFlag = false;
+            //通知所有用户 本节点启动出块
+            NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
+            dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNT_MINER);
+            for(Trustee s:localTrustees){
+                TrusteeMessage.Trustee.Builder builder = TrusteeMessage.Trustee.newBuilder();
+                builder.setAddress(ByteString.copyFrom(s.getAddress().getBytes()));
+                builder.setVotes(s.getVotes());
+                builder.setGenerateRate(s.getGenerateRate());
+                builder.setStatus(s.getStatus());
+                builder.setState(1);
+                dataBuilder.addTrustee(builder.build());
+            }
+            NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
+            builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
+            builder.setData(dataBuilder.build());
+            channelsManager.getChannels().writeAndFlush(builder.build());
         }
         return new ResultDto(ResultEnum.SUCCESS);
     }

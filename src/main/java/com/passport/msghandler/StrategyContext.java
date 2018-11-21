@@ -1,6 +1,5 @@
 package com.passport.msghandler;
 
-import com.passport.annotations.RocksTransaction;
 import com.passport.proto.NettyMessage;
 import io.netty.channel.ChannelHandlerContext;
 import org.springframework.beans.factory.annotation.Autowired;

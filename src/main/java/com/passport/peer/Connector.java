@@ -67,13 +67,15 @@ public class Connector implements InitializingBean {
     public void syncNextBlock() {
         //回退10个区块
         Integer lashBlockHeight = Integer.valueOf(dbAccess.getLastBlockHeight().get().toString());
-        for(int i = 0;i<10;i++){
-            try {
-                dbAccess.delBlocksByHeight(new Long(lashBlockHeight-i));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if(lashBlockHeight != 1 && lashBlockHeight > 10){
+            for(int i = 0;i<10;i++){
+                try {
+                    dbAccess.delBlocksByHeight(new Long(lashBlockHeight-i));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
+            }
         }
         //发送同步账户请求
         NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
