@@ -388,52 +388,50 @@ public class BlockHandler {
                 minerHandler.packagingBlock(account);
                 //更新101个受托人，已经出块人的状态
                 trusteeHandler.changeStatus(trustee, blockCycle);
+                //启动任务
+                SyncFlag.blockTimeFlag = true;
                 logger.info("第{}个区块出块成功,出块账号:{}", newBlockHeight,account.getAddress());
                 provider.publishEvent(new GenerateNextBlockEvent(0L));
             }
         }else {
             logger.info("出块账号："+accountOptional.get().getAddress());
-            //最后一个区块出块时间距离现在超过10秒
-            Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
-            if (!lastBlockOptional.isPresent()) {
-                return;
-            }
-            Block block = lastBlockOptional.get();
-            Long timeStamp = block.getBlockHeader().getTimeStamp();
-            long currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
-            Long time = 0l;
-            while (currentTimeStamp - timeStamp <= 30 * 1000){
-                time++;
-                logger.info("开启任务倒计时："+(currentTimeStamp - timeStamp));
-                if(!SyncFlag.blockSyncFlag){
-                    logger.info("任务倒计终止，已有出块");
-                    return;
-                }
-                currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
-            }
-            if(!SyncFlag.blockSyncFlag){//已有出块不需要起定时任务
-                //启动定时任务
-                Timer timer = new Timer ( );
-                timer.schedule ( new TimerTask ( ) {
-                    @Override
-                    public void run() {
-                        logger.info("进入选择出块账户线程");
-                        //接收到同步消息则停止
-                        if(SyncFlag.blockSyncFlag){
-                            logger.info("最后一个区块出块时间距离现在超过30秒，重新选择出块账户");
-                            trusteeHandler.changeStatus(trustee, blockCycle);
-                            try {
-                                trustee.setState(0);//进入定时任务设置成未启动
-                                dbAccess.putTrustee(trustee);
-                                //再次选出出块账户
-                                produceNextBlock();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
+            //启动定时任务
+            Timer timer = new Timer ( );
+            timer.schedule ( new TimerTask ( ) {
+                @Override
+                public void run() {
+                    logger.info("进入选择出块账户线程");
+                    //最后一个区块出块时间距离现在超过10秒
+                    Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
+                    if (!lastBlockOptional.isPresent()) {
+                        return;
                     }
-                }, 1000);
-            }
+                    Block block = lastBlockOptional.get();
+                    Long timeStamp = block.getBlockHeader().getTimeStamp();
+                    long currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
+                    Long time = 0l;
+                    while (currentTimeStamp - timeStamp <= 30 * 1000){
+                        time++;
+//                          logger.info("开启任务倒计时："+(currentTimeStamp - timeStamp));
+                        if(!SyncFlag.blockTimeFlag){
+                            logger.info("任务倒计终止，已有出块");
+                            return;
+                        }
+                        currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
+                    }
+                    //接收到同步消息则停止
+                    logger.info("最后一个区块出块时间距离现在超过30秒，重新选择出块账户");
+                    trusteeHandler.changeStatus(trustee, blockCycle);
+                    try {
+                        trustee.setState(0);//进入定时任务设置成未启动
+                        dbAccess.putTrustee(trustee);
+                        //再次选出出块账户
+                        produceNextBlock();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, 1000);
         }
     }
 

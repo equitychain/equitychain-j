@@ -56,6 +56,7 @@ public class BlockSyncREQ extends Strategy {
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块广播请求数据：{}", GsonUtils.toJson(message));
         //接收到消息停止定时任务中的重选
+        SyncFlag.blockTimeFlag = false;
         try {
             lock.lock();
             BlockMessage.Block block = message.getData().getBlock();
@@ -76,7 +77,7 @@ public class BlockSyncREQ extends Strategy {
                 logger.debug("本地区块最新高度和广播过来的区块高度相差!=1");
                 //如果本地高度和广播过来的区块高度差
                 if(blockHeight - lastBlockHeight >= Constant.BLOCK_HEIGHT_GAP){
-                    logger.debug("本地区块最新高度和广播过来的区块高度相差>=30");
+                    logger.debug("本地区块最新高度和广播过来的区块高度相差>=5");
                     //修改主动同步标记
                     SyncFlag.setNextBlockSyncFlag(true);
                     //发布主动同步事件
@@ -88,7 +89,6 @@ public class BlockSyncREQ extends Strategy {
             Block blockLocal = blockHandler.convertBlockMessage2Block(block);
             //本地是否已经存在此高度区块
             if (dbAccess.getBlock(blockLocal.getBlockHeight()).isPresent()) {
-                SyncFlag.blockSyncFlag = true;//同步完成
                 return;
             }
             //验证区块合法性
@@ -105,7 +105,6 @@ public class BlockSyncREQ extends Strategy {
             transactionHandler.matchUnConfirmTransactions(blockLocal);
             //出块完成后，计算出的下一个出块人如果是自己则继续发布出块事件
             int blockCycle = blockUtils.getBlockCycle(blockLocal.getBlockHeight());
-            SyncFlag.blockSyncFlag = true;//同步完成
             logger.info(blockLocal.getBlockHeight()+"收到区块，被动同步完成"+blockLocal.getProducer());
             //标识需移除受托人列表位置
             int remove = -1;

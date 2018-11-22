@@ -46,6 +46,7 @@ public class NextBlockSyncRESP extends Strategy {
         if(blocks==null || blocks.size() == 0){
             //同步完了，不进行广播，
             SyncFlag.setNextBlockSyncFlag(false);
+            SyncFlag.blockTimeFlag = true;
             //发送同步受托人列表请求
             NettyData.Data.Builder dataBuilder2 = NettyData.Data.newBuilder();
             dataBuilder2.setDataType(DataTypeEnum.DataType.TRUSTEE_SYNC);
@@ -65,6 +66,7 @@ public class NextBlockSyncRESP extends Strategy {
 
             //本地是否已经存在此高度区块
             if (dbAccess.getBlock(blockLocal.getBlockHeight()).isPresent()) {
+                SyncFlag.blockTimeFlag = true;
                 return;
             }
             //验证区块合法性

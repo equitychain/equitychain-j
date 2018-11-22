@@ -19,7 +19,7 @@ public class SyncFlag {
     public static void setNextBlockSyncFlag(boolean nextBlockSyncFlag) {
         SyncFlag.nextBlockSyncFlag = nextBlockSyncFlag;
     }
-    public static boolean blockSyncFlag = false;//是否能启动出块 只允许一次
+    public static boolean blockTimeFlag = false;//是否能启动出块 只允许一次
 
     public static boolean minerFlag = true;//允许出块
 
