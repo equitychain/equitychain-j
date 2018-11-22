@@ -604,21 +604,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                         allVoters.add(trustee);
                     }
                 }
-//                Trustee trustee = new Trustee();
-//                trustee.setVotes(0l);
-//                trustee.setStatus(1);
-//                trustee.setAddress(address);
-//                int index = -1;
-//                //address的分组
-//                index = allVoters.indexOf(trustee);
-//                if (index != -1) {
-//                    trustee = allVoters.remove(index);
-//                }
-//                //求和
-//                trustee.setVotes(trustee.getVotes() + Integer.parseInt(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "voteNum")), iterator.key()))));
-//                if (!trustee.isNullContent()) {
-//                    allVoters.add(trustee);
-//                }
             }
         }
         //排序票数
@@ -636,6 +621,10 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 return o2.getState() - o1.getState() ;
             }
         });
+        //去重
+        HashSet h = new HashSet(allVoters);
+        allVoters.clear();
+        allVoters.addAll(h);
         //获取前101个
         voters.addAll(allVoters.size() >= Constant.TRUSTEES_INIT_NUM ? allVoters.subList(0, Constant.TRUSTEES_INIT_NUM) : allVoters);
         return voters;

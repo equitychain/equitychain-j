@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.protobuf.ByteString;
 import com.passport.constant.NodeListConstant;
 import com.passport.core.Block;
+import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.event.SyncNextBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
@@ -21,6 +22,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -76,6 +78,12 @@ public class Connector implements InitializingBean {
                 }
 
             }
+        }
+        //将本地受托人列表状态所有改成0
+        List<Trustee> trustees = dbAccess.listTrustees();
+        for(Trustee trustee:trustees){
+            trustee.setState(0);
+            dbAccess.putTrustee(trustee);
         }
         //发送同步账户请求
         NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
