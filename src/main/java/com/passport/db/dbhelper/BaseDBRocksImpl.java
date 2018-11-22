@@ -592,18 +592,32 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         List<Trustee> allVoters = new ArrayList<>();
         //筛选/分组/求和
         RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("voteRecord", "id")));
-        List<Trustee> trustees = listTrustees();
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             byte[] timeByte = getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "time")), iterator.key());
             //time的筛选
             String address = new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "receiptAddress")), iterator.key()));
             if (Long.parseLong(new String(timeByte)) <= time) {
-                for(Trustee trustee:trustees){
-                    if(address.equals(trustee.getAddress())){
-                        trustee.setStatus(1);
-                        allVoters.add(trustee);
-                    }
+                Optional<Trustee> trusteeOptional = getTrustee(address);
+                if (trusteeOptional.isPresent()) {
+                    Trustee trustee = trusteeOptional.get();
+                    trustee.setStatus(1);
+                    allVoters.add(trustee);
                 }
+//                Trustee trustee = new Trustee();
+//                trustee.setVotes(0l);
+//                trustee.setStatus(1);
+//                trustee.setAddress(address);
+//                int index = -1;
+//                //address的分组
+//                index = allVoters.indexOf(trustee);
+//                if (index != -1) {
+//                    trustee = allVoters.remove(index);
+//                }
+//                //求和
+//                trustee.setVotes(trustee.getVotes() + Integer.parseInt(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "voteNum")), iterator.key()))));
+//                if (!trustee.isNullContent()) {
+//                    allVoters.add(trustee);
+//                }
             }
         }
         //排序票数
@@ -837,7 +851,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 screenHanles.add(handleMap.get(getColName("transaction", screens.get(i))));
             }
         }
-        if (screenVals == null) {
+        if (screenVals == null) {/**/
             screenVals = new ArrayList<>();
         }
         if (screens == null) {
