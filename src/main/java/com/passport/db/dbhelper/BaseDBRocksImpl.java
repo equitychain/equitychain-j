@@ -592,12 +592,12 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         List<Trustee> allVoters = new ArrayList<>();
         //筛选/分组/求和
         RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("voteRecord", "id")));
+        List<Trustee> trustees = listTrustees();
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             byte[] timeByte = getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "time")), iterator.key());
             //time的筛选
             String address = new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "receiptAddress")), iterator.key()));
             if (Long.parseLong(new String(timeByte)) <= time) {
-                List<Trustee> trustees = listTrustees();
                 for(Trustee trustee:trustees){
                     if(address.equals(trustee.getAddress())){
                         trustee.setStatus(1);
@@ -621,10 +621,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 return o2.getState() - o1.getState() ;
             }
         });
-        //去重
-        HashSet h = new HashSet(allVoters);
-        allVoters.clear();
-        allVoters.addAll(h);
+
         //获取前101个
         voters.addAll(allVoters.size() >= Constant.TRUSTEES_INIT_NUM ? allVoters.subList(0, Constant.TRUSTEES_INIT_NUM) : allVoters);
         return voters;

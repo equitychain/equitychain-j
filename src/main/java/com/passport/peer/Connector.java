@@ -81,6 +81,7 @@ public class Connector implements InitializingBean {
         }
         //将本地受托人列表状态所有改成0
         List<Trustee> trustees = dbAccess.listTrustees();
+        logger.info("初始启动受托人列表数为："+trustees.size());
         for(Trustee trustee:trustees){
             trustee.setState(0);
             dbAccess.putTrustee(trustee);
