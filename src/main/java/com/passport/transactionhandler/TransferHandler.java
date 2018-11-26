@@ -24,8 +24,6 @@ public class TransferHandler extends TransactionStrategy {
 
     @Autowired
     private DBAccess dbAccess;
-    @Autowired
-    private TransactionHandler transactionHandler;
 
     @Override
     protected void handle(Transaction transaction) {
