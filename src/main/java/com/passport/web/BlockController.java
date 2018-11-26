@@ -212,12 +212,13 @@ public class BlockController {
     }
     @GetMapping("getCensesData")
     @ResponseBody
-    public String getCensesData(){
+    public ResultDto getCensesData(){
         try {
-            return dbAccess.censesData();
+            return new ResultDto(ResultEnum.SUCCESS.getCode(), dbAccess.censesData());
         } catch (RocksDBException e) {
             e.printStackTrace();
-            return "";
+            return new ResultDto(ResultEnum.SYS_ERROR);
         }
+
     }
 }

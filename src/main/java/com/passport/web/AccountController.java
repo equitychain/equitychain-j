@@ -159,8 +159,7 @@ public class AccountController {
      * @return
      */
     @GetMapping("getAccountByAddress")
-    public ResultDto getAccountByAddress(@RequestParam("address") String address) {
-        String token = Constant.MAIN_COIN;
+    public ResultDto getAccountByAddress(@RequestParam("address") String address,@RequestParam("token") String token) {
         Map accountAccount = new HashMap();
         Optional<Account> blockOptional = dbAccess.getAccount(address+"_"+token);
         if (blockOptional.isPresent()) {
@@ -203,11 +202,12 @@ public class AccountController {
         BigDecimal sumBalance = BigDecimal.ZERO;
         for (Account account : accountList) {
             if (!StringUtils.isEmpty(account.getPrivateKey())) {
+                String[] addressToken = account.getAddress_token().split("_");
                 Map accountMap = new HashMap();
                 accountMap.put("address_token", account.getAddress_token());
                 accountMap.put("balance", account.getBalance());
-                accountMap.put("token",account.getToken());
-                accountMap.put("address",account.getAddress());
+                accountMap.put("token",addressToken[1]);
+                accountMap.put("address",addressToken[0]);
                 accounts.add(accountMap);
                 sumBalance = sumBalance.add(account.getBalance());
             }

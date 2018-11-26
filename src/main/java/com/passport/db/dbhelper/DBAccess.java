@@ -7,6 +7,7 @@ import org.rocksdb.RocksDBException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -412,7 +413,7 @@ public interface DBAccess {
 	 * 统计数据方法
 	 * @return
 	 */
-	String censesData() throws RocksDBException;
+	Map<String,Object> censesData() throws RocksDBException;
 
 	/**
 	 * 投票列表

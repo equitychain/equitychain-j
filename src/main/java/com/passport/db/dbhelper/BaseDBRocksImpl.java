@@ -834,7 +834,8 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     }
 
     @Override
-    public String censesData() throws RocksDBException {
+    public Map<String,Object> censesData() throws RocksDBException {
+        Map<String,Object> map = new HashMap<>();
         //获取当前最新高度，根据最新高度进行统计
         Optional lastHeightOpt = getLastBlockHeight();
         //总金额
@@ -885,12 +886,11 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 }
             }
         }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("avgMoney", lastHeightOpt.isPresent() ? sumMoney.divide(new BigDecimal(lastHeightOpt.get().toString()), 3, BigDecimal.ROUND_DOWN) : sumMoney);
-        jsonObject.put("avgFee", lastHeightOpt.isPresent() ? sumFee.divide(new BigDecimal(lastHeightOpt.get().toString()), 3, BigDecimal.ROUND_DOWN) : sumFee);
-        jsonObject.put("countTrans", count);
-        jsonObject.put("blockTimeDiff", blockTimeDiff);
-        return jsonObject.toJSONString();
+        map.put("avgMoney", lastHeightOpt.isPresent() ? sumMoney.divide(new BigDecimal(lastHeightOpt.get().toString()), 3, BigDecimal.ROUND_DOWN) : sumMoney);
+        map.put("avgFee", lastHeightOpt.isPresent() ? sumFee.divide(new BigDecimal(lastHeightOpt.get().toString()), 3, BigDecimal.ROUND_DOWN) : sumFee);
+        map.put("countTrans", count);
+        map.put("blockTimeDiff", blockTimeDiff);
+        return map;
     }
 
     @Override
