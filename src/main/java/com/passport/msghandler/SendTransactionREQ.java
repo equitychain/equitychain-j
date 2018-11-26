@@ -44,11 +44,11 @@ public class SendTransactionREQ extends Strategy {
         trans.setValue(transaction.getValue().toByteArray());
         trans.setExtarData(transaction.getExtarData().toByteArray());
         trans.setTime(transaction.getTimeStamp().toByteArray());
-        trans.setToken(transaction.getToken().toByteArray());
+        trans.setToken(transaction.getToken().getBytes());
         //使用公钥验签
         //String transactionJson = GsonUtils.toJson(trans);
         try {
-           // PublicKey publicKey = Sign.publicKeyFromByte(transaction.getPublicKey().toByteArray());
+            //PublicKey publicKey = Sign.publicKeyFromByte(transaction.getPublicKey().toByteArray());
             //boolean flag = ECDSAUtil.verifyECDSASig(publicKey, transactionJson, transaction.getSignature().toByteArray());
             boolean flag = CheckUtils.checkTransaction(trans);
             if (flag) {

@@ -6,17 +6,17 @@ package com.passport.proto;
 public final class TransactionMessage {
   private TransactionMessage() {}
   public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistryLite registry) {
+          com.google.protobuf.ExtensionRegistryLite registry) {
   }
 
   public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistry registry) {
+          com.google.protobuf.ExtensionRegistry registry) {
     registerAllExtensions(
-        (com.google.protobuf.ExtensionRegistryLite) registry);
+            (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   public interface TransactionOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:Transaction)
-      com.google.protobuf.MessageOrBuilder {
+          // @@protoc_insertion_point(interface_extends:Transaction)
+          com.google.protobuf.MessageOrBuilder {
 
     /**
      * <code>bytes hash = 1;</code>
@@ -94,17 +94,22 @@ public final class TransactionMessage {
     com.google.protobuf.ByteString getStatus();
 
     /**
-     * <code>bytes token = 16;</code>
+     * <code>string token = 16;</code>
      */
-    com.google.protobuf.ByteString getToken();
+    java.lang.String getToken();
+    /**
+     * <code>string token = 16;</code>
+     */
+    com.google.protobuf.ByteString
+    getTokenBytes();
   }
   /**
    * Protobuf type {@code Transaction}
    */
   public  static final class Transaction extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:Transaction)
-      TransactionOrBuilder {
+          com.google.protobuf.GeneratedMessageV3 implements
+          // @@protoc_insertion_point(message_implements:Transaction)
+          TransactionOrBuilder {
     // Use Transaction.newBuilder() to construct.
     private Transaction(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -125,18 +130,18 @@ public final class TransactionMessage {
       eggUsed_ = com.google.protobuf.ByteString.EMPTY;
       nonce_ = com.google.protobuf.ByteString.EMPTY;
       status_ = com.google.protobuf.ByteString.EMPTY;
-      token_ = com.google.protobuf.ByteString.EMPTY;
+      token_ = "";
     }
 
-    @Override
+    @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
       return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
     private Transaction(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       this();
       int mutable_bitField0_ = 0;
       try {
@@ -229,8 +234,9 @@ public final class TransactionMessage {
               break;
             }
             case 130: {
+              java.lang.String s = input.readStringRequireUtf8();
 
-              token_ = input.readBytes();
+              token_ = s;
               break;
             }
           }
@@ -239,21 +245,21 @@ public final class TransactionMessage {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
+                e).setUnfinishedMessage(this);
       } finally {
         makeExtensionsImmutable();
       }
     }
     public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return TransactionMessage.internal_static_Transaction_descriptor;
+    getDescriptor() {
+      return com.passport.proto.TransactionMessage.internal_static_Transaction_descriptor;
     }
 
-    protected FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return TransactionMessage.internal_static_Transaction_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              TransactionMessage.Transaction.class, TransactionMessage.Transaction.Builder.class);
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+    internalGetFieldAccessorTable() {
+      return com.passport.proto.TransactionMessage.internal_static_Transaction_fieldAccessorTable
+              .ensureFieldAccessorsInitialized(
+                      com.passport.proto.TransactionMessage.Transaction.class, com.passport.proto.TransactionMessage.Transaction.Builder.class);
     }
 
     public static final int HASH_FIELD_NUMBER = 1;
@@ -392,12 +398,37 @@ public final class TransactionMessage {
     }
 
     public static final int TOKEN_FIELD_NUMBER = 16;
-    private com.google.protobuf.ByteString token_;
+    private volatile java.lang.Object token_;
     /**
-     * <code>bytes token = 16;</code>
+     * <code>string token = 16;</code>
      */
-    public com.google.protobuf.ByteString getToken() {
-      return token_;
+    public java.lang.String getToken() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs =
+                (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        token_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string token = 16;</code>
+     */
+    public com.google.protobuf.ByteString
+    getTokenBytes() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b =
+                com.google.protobuf.ByteString.copyFromUtf8(
+                        (java.lang.String) ref);
+        token_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     private byte memoizedIsInitialized = -1;
@@ -411,7 +442,7 @@ public final class TransactionMessage {
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
+            throws java.io.IOException {
       if (!hash_.isEmpty()) {
         output.writeBytes(1, hash_);
       }
@@ -457,8 +488,8 @@ public final class TransactionMessage {
       if (!status_.isEmpty()) {
         output.writeBytes(15, status_);
       }
-      if (!token_.isEmpty()) {
-        output.writeBytes(16, token_);
+      if (!getTokenBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 16, token_);
       }
     }
 
@@ -469,120 +500,119 @@ public final class TransactionMessage {
       size = 0;
       if (!hash_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, hash_);
+                .computeBytesSize(1, hash_);
       }
       if (!signature_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, signature_);
+                .computeBytesSize(2, signature_);
       }
       if (!value_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, value_);
+                .computeBytesSize(3, value_);
       }
       if (!payAddress_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, payAddress_);
+                .computeBytesSize(4, payAddress_);
       }
       if (!receiptAddress_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(5, receiptAddress_);
+                .computeBytesSize(5, receiptAddress_);
       }
       if (!eggPrice_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(6, eggPrice_);
+                .computeBytesSize(6, eggPrice_);
       }
       if (!eggMax_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(7, eggMax_);
+                .computeBytesSize(7, eggMax_);
       }
       if (!timeStamp_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(8, timeStamp_);
+                .computeBytesSize(8, timeStamp_);
       }
       if (!extarData_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(9, extarData_);
+                .computeBytesSize(9, extarData_);
       }
       if (!publicKey_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(10, publicKey_);
+                .computeBytesSize(10, publicKey_);
       }
       if (!tradeType_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(11, tradeType_);
+                .computeBytesSize(11, tradeType_);
       }
       if (!blockHeight_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(12, blockHeight_);
+                .computeBytesSize(12, blockHeight_);
       }
       if (!eggUsed_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(13, eggUsed_);
+                .computeBytesSize(13, eggUsed_);
       }
       if (!nonce_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(14, nonce_);
+                .computeBytesSize(14, nonce_);
       }
       if (!status_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(15, status_);
+                .computeBytesSize(15, status_);
       }
-      if (!token_.isEmpty()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(16, token_);
+      if (!getTokenBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(16, token_);
       }
       memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
-    @Override
-    public boolean equals(final Object obj) {
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
-       return true;
+        return true;
       }
-      if (!(obj instanceof TransactionMessage.Transaction)) {
+      if (!(obj instanceof com.passport.proto.TransactionMessage.Transaction)) {
         return super.equals(obj);
       }
-      TransactionMessage.Transaction other = (TransactionMessage.Transaction) obj;
+      com.passport.proto.TransactionMessage.Transaction other = (com.passport.proto.TransactionMessage.Transaction) obj;
 
       boolean result = true;
       result = result && getHash()
-          .equals(other.getHash());
+              .equals(other.getHash());
       result = result && getSignature()
-          .equals(other.getSignature());
+              .equals(other.getSignature());
       result = result && getValue()
-          .equals(other.getValue());
+              .equals(other.getValue());
       result = result && getPayAddress()
-          .equals(other.getPayAddress());
+              .equals(other.getPayAddress());
       result = result && getReceiptAddress()
-          .equals(other.getReceiptAddress());
+              .equals(other.getReceiptAddress());
       result = result && getEggPrice()
-          .equals(other.getEggPrice());
+              .equals(other.getEggPrice());
       result = result && getEggMax()
-          .equals(other.getEggMax());
+              .equals(other.getEggMax());
       result = result && getTimeStamp()
-          .equals(other.getTimeStamp());
+              .equals(other.getTimeStamp());
       result = result && getExtarData()
-          .equals(other.getExtarData());
+              .equals(other.getExtarData());
       result = result && getPublicKey()
-          .equals(other.getPublicKey());
+              .equals(other.getPublicKey());
       result = result && getTradeType()
-          .equals(other.getTradeType());
+              .equals(other.getTradeType());
       result = result && getBlockHeight()
-          .equals(other.getBlockHeight());
+              .equals(other.getBlockHeight());
       result = result && getEggUsed()
-          .equals(other.getEggUsed());
+              .equals(other.getEggUsed());
       result = result && getNonce()
-          .equals(other.getNonce());
+              .equals(other.getNonce());
       result = result && getStatus()
-          .equals(other.getStatus());
+              .equals(other.getStatus());
       result = result && getToken()
-          .equals(other.getToken());
+              .equals(other.getToken());
       return result;
     }
 
-    @Override
+    @java.lang.Override
     public int hashCode() {
       if (memoizedHashCode != 0) {
         return memoizedHashCode;
@@ -626,91 +656,91 @@ public final class TransactionMessage {
       return hash;
     }
 
-    public static TransactionMessage.Transaction parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.passport.proto.TransactionMessage.Transaction parseFrom(
+            java.nio.ByteBuffer data)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static TransactionMessage.Transaction parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.passport.proto.TransactionMessage.Transaction parseFrom(
+            java.nio.ByteBuffer data,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static TransactionMessage.Transaction parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.passport.proto.TransactionMessage.Transaction parseFrom(
+            com.google.protobuf.ByteString data)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static TransactionMessage.Transaction parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.passport.proto.TransactionMessage.Transaction parseFrom(
+            com.google.protobuf.ByteString data,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static TransactionMessage.Transaction parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.passport.proto.TransactionMessage.Transaction parseFrom(byte[] data)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static TransactionMessage.Transaction parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+    public static com.passport.proto.TransactionMessage.Transaction parseFrom(
+            byte[] data,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static TransactionMessage.Transaction parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
+    public static com.passport.proto.TransactionMessage.Transaction parseFrom(java.io.InputStream input)
+            throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
+              .parseWithIOException(PARSER, input);
     }
-    public static TransactionMessage.Transaction parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+    public static com.passport.proto.TransactionMessage.Transaction parseFrom(
+            java.io.InputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
+              .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static TransactionMessage.Transaction parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
+    public static com.passport.proto.TransactionMessage.Transaction parseDelimitedFrom(java.io.InputStream input)
+            throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
+              .parseDelimitedWithIOException(PARSER, input);
     }
-    public static TransactionMessage.Transaction parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+    public static com.passport.proto.TransactionMessage.Transaction parseDelimitedFrom(
+            java.io.InputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+              .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static TransactionMessage.Transaction parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
+    public static com.passport.proto.TransactionMessage.Transaction parseFrom(
+            com.google.protobuf.CodedInputStream input)
+            throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
+              .parseWithIOException(PARSER, input);
     }
-    public static TransactionMessage.Transaction parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+    public static com.passport.proto.TransactionMessage.Transaction parseFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
+              .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(TransactionMessage.Transaction prototype) {
+    public static Builder newBuilder(com.passport.proto.TransactionMessage.Transaction prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
+              ? new Builder() : new Builder().mergeFrom(this);
     }
 
-    @Override
+    @java.lang.Override
     protected Builder newBuilderForType(
-        BuilderParent parent) {
+            com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -718,19 +748,19 @@ public final class TransactionMessage {
      * Protobuf type {@code Transaction}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:Transaction)
-        TransactionMessage.TransactionOrBuilder {
+            com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+            // @@protoc_insertion_point(builder_implements:Transaction)
+            com.passport.proto.TransactionMessage.TransactionOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return TransactionMessage.internal_static_Transaction_descriptor;
+      getDescriptor() {
+        return com.passport.proto.TransactionMessage.internal_static_Transaction_descriptor;
       }
 
-      protected FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return TransactionMessage.internal_static_Transaction_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                TransactionMessage.Transaction.class, TransactionMessage.Transaction.Builder.class);
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+        return com.passport.proto.TransactionMessage.internal_static_Transaction_fieldAccessorTable
+                .ensureFieldAccessorsInitialized(
+                        com.passport.proto.TransactionMessage.Transaction.class, com.passport.proto.TransactionMessage.Transaction.Builder.class);
       }
 
       // Construct using com.passport.proto.TransactionMessage.Transaction.newBuilder()
@@ -739,7 +769,7 @@ public final class TransactionMessage {
       }
 
       private Builder(
-          BuilderParent parent) {
+              com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -780,30 +810,30 @@ public final class TransactionMessage {
 
         status_ = com.google.protobuf.ByteString.EMPTY;
 
-        token_ = com.google.protobuf.ByteString.EMPTY;
+        token_ = "";
 
         return this;
       }
 
       public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return TransactionMessage.internal_static_Transaction_descriptor;
+      getDescriptorForType() {
+        return com.passport.proto.TransactionMessage.internal_static_Transaction_descriptor;
       }
 
-      public TransactionMessage.Transaction getDefaultInstanceForType() {
-        return TransactionMessage.Transaction.getDefaultInstance();
+      public com.passport.proto.TransactionMessage.Transaction getDefaultInstanceForType() {
+        return com.passport.proto.TransactionMessage.Transaction.getDefaultInstance();
       }
 
-      public TransactionMessage.Transaction build() {
-        TransactionMessage.Transaction result = buildPartial();
+      public com.passport.proto.TransactionMessage.Transaction build() {
+        com.passport.proto.TransactionMessage.Transaction result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public TransactionMessage.Transaction buildPartial() {
-        TransactionMessage.Transaction result = new TransactionMessage.Transaction(this);
+      public com.passport.proto.TransactionMessage.Transaction buildPartial() {
+        com.passport.proto.TransactionMessage.Transaction result = new com.passport.proto.TransactionMessage.Transaction(this);
         result.hash_ = hash_;
         result.signature_ = signature_;
         result.value_ = value_;
@@ -828,39 +858,39 @@ public final class TransactionMessage {
         return (Builder) super.clone();
       }
       public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+              com.google.protobuf.Descriptors.FieldDescriptor field,
+              Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
+              com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
       public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+              com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
       public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+              com.google.protobuf.Descriptors.FieldDescriptor field,
+              int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+              com.google.protobuf.Descriptors.FieldDescriptor field,
+              Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof TransactionMessage.Transaction) {
-          return mergeFrom((TransactionMessage.Transaction)other);
+        if (other instanceof com.passport.proto.TransactionMessage.Transaction) {
+          return mergeFrom((com.passport.proto.TransactionMessage.Transaction)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(TransactionMessage.Transaction other) {
-        if (other == TransactionMessage.Transaction.getDefaultInstance()) return this;
+      public Builder mergeFrom(com.passport.proto.TransactionMessage.Transaction other) {
+        if (other == com.passport.proto.TransactionMessage.Transaction.getDefaultInstance()) return this;
         if (other.getHash() != com.google.protobuf.ByteString.EMPTY) {
           setHash(other.getHash());
         }
@@ -906,8 +936,9 @@ public final class TransactionMessage {
         if (other.getStatus() != com.google.protobuf.ByteString.EMPTY) {
           setStatus(other.getStatus());
         }
-        if (other.getToken() != com.google.protobuf.ByteString.EMPTY) {
-          setToken(other.getToken());
+        if (!other.getToken().isEmpty()) {
+          token_ = other.token_;
+          onChanged();
         }
         onChanged();
         return this;
@@ -918,14 +949,14 @@ public final class TransactionMessage {
       }
 
       public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        TransactionMessage.Transaction parsedMessage = null;
+              com.google.protobuf.CodedInputStream input,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws java.io.IOException {
+        com.passport.proto.TransactionMessage.Transaction parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (TransactionMessage.Transaction) e.getUnfinishedMessage();
+          parsedMessage = (com.passport.proto.TransactionMessage.Transaction) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -947,8 +978,8 @@ public final class TransactionMessage {
        */
       public Builder setHash(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         hash_ = value;
         onChanged();
@@ -976,8 +1007,8 @@ public final class TransactionMessage {
        */
       public Builder setSignature(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         signature_ = value;
         onChanged();
@@ -1005,8 +1036,8 @@ public final class TransactionMessage {
        */
       public Builder setValue(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         value_ = value;
         onChanged();
@@ -1034,8 +1065,8 @@ public final class TransactionMessage {
        */
       public Builder setPayAddress(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         payAddress_ = value;
         onChanged();
@@ -1063,8 +1094,8 @@ public final class TransactionMessage {
        */
       public Builder setReceiptAddress(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         receiptAddress_ = value;
         onChanged();
@@ -1092,8 +1123,8 @@ public final class TransactionMessage {
        */
       public Builder setEggPrice(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         eggPrice_ = value;
         onChanged();
@@ -1121,8 +1152,8 @@ public final class TransactionMessage {
        */
       public Builder setEggMax(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         eggMax_ = value;
         onChanged();
@@ -1150,8 +1181,8 @@ public final class TransactionMessage {
        */
       public Builder setTimeStamp(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         timeStamp_ = value;
         onChanged();
@@ -1179,8 +1210,8 @@ public final class TransactionMessage {
        */
       public Builder setExtarData(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         extarData_ = value;
         onChanged();
@@ -1208,8 +1239,8 @@ public final class TransactionMessage {
        */
       public Builder setPublicKey(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         publicKey_ = value;
         onChanged();
@@ -1237,8 +1268,8 @@ public final class TransactionMessage {
        */
       public Builder setTradeType(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         tradeType_ = value;
         onChanged();
@@ -1266,8 +1297,8 @@ public final class TransactionMessage {
        */
       public Builder setBlockHeight(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         blockHeight_ = value;
         onChanged();
@@ -1295,8 +1326,8 @@ public final class TransactionMessage {
        */
       public Builder setEggUsed(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         eggUsed_ = value;
         onChanged();
@@ -1324,8 +1355,8 @@ public final class TransactionMessage {
        */
       public Builder setNonce(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         nonce_ = value;
         onChanged();
@@ -1353,8 +1384,8 @@ public final class TransactionMessage {
        */
       public Builder setStatus(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         status_ = value;
         onChanged();
@@ -1370,27 +1401,53 @@ public final class TransactionMessage {
         return this;
       }
 
-      private com.google.protobuf.ByteString token_ = com.google.protobuf.ByteString.EMPTY;
+      private java.lang.Object token_ = "";
       /**
-       * <code>bytes token = 16;</code>
+       * <code>string token = 16;</code>
        */
-      public com.google.protobuf.ByteString getToken() {
-        return token_;
+      public java.lang.String getToken() {
+        java.lang.Object ref = token_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+                  (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          token_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
       }
       /**
-       * <code>bytes token = 16;</code>
+       * <code>string token = 16;</code>
        */
-      public Builder setToken(com.google.protobuf.ByteString value) {
+      public com.google.protobuf.ByteString
+      getTokenBytes() {
+        java.lang.Object ref = token_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b =
+                  com.google.protobuf.ByteString.copyFromUtf8(
+                          (java.lang.String) ref);
+          token_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string token = 16;</code>
+       */
+      public Builder setToken(
+              java.lang.String value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
+          throw new NullPointerException();
+        }
 
         token_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>bytes token = 16;</code>
+       * <code>string token = 16;</code>
        */
       public Builder clearToken() {
 
@@ -1398,13 +1455,27 @@ public final class TransactionMessage {
         onChanged();
         return this;
       }
+      /**
+       * <code>string token = 16;</code>
+       */
+      public Builder setTokenBytes(
+              com.google.protobuf.ByteString value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        checkByteStringIsUtf8(value);
+
+        token_ = value;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
+              final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
       }
 
       public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
+              final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
       }
 
@@ -1413,22 +1484,22 @@ public final class TransactionMessage {
     }
 
     // @@protoc_insertion_point(class_scope:Transaction)
-    private static final TransactionMessage.Transaction DEFAULT_INSTANCE;
+    private static final com.passport.proto.TransactionMessage.Transaction DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new TransactionMessage.Transaction();
+      DEFAULT_INSTANCE = new com.passport.proto.TransactionMessage.Transaction();
     }
 
-    public static TransactionMessage.Transaction getDefaultInstance() {
+    public static com.passport.proto.TransactionMessage.Transaction getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
     private static final com.google.protobuf.Parser<Transaction>
-        PARSER = new com.google.protobuf.AbstractParser<Transaction>() {
+            PARSER = new com.google.protobuf.AbstractParser<Transaction>() {
       public Transaction parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Transaction(input, extensionRegistry);
+              com.google.protobuf.CodedInputStream input,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Transaction(input, extensionRegistry);
       }
     };
 
@@ -1436,60 +1507,60 @@ public final class TransactionMessage {
       return PARSER;
     }
 
-    @Override
+    @java.lang.Override
     public com.google.protobuf.Parser<Transaction> getParserForType() {
       return PARSER;
     }
 
-    public TransactionMessage.Transaction getDefaultInstanceForType() {
+    public com.passport.proto.TransactionMessage.Transaction getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_Transaction_descriptor;
+          internal_static_Transaction_descriptor;
   private static final
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_Transaction_fieldAccessorTable;
+  com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internal_static_Transaction_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
-      getDescriptor() {
+  getDescriptor() {
     return descriptor;
   }
   private static  com.google.protobuf.Descriptors.FileDescriptor
-      descriptor;
+          descriptor;
   static {
-    String[] descriptorData = {
-      "\n\030TransactionMessage.proto\"\253\002\n\013Transacti" +
-      "on\022\014\n\004hash\030\001 \001(\014\022\021\n\tsignature\030\002 \001(\014\022\r\n\005v" +
-      "alue\030\003 \001(\014\022\022\n\npayAddress\030\004 \001(\014\022\026\n\016receip" +
-      "tAddress\030\005 \001(\014\022\020\n\010eggPrice\030\006 \001(\014\022\016\n\006eggM" +
-      "ax\030\007 \001(\014\022\021\n\ttimeStamp\030\010 \001(\014\022\021\n\textarData" +
-      "\030\t \001(\014\022\021\n\tpublicKey\030\n \001(\014\022\021\n\ttradeType\030\013" +
-      " \001(\014\022\023\n\013blockHeight\030\014 \001(\014\022\017\n\007eggUsed\030\r \001" +
-      "(\014\022\r\n\005nonce\030\016 \001(\014\022\016\n\006status\030\017 \001(\014\022\r\n\005tok" +
-      "en\030\020 \001(\014B(\n\022com.passport.protoB\022Transact" +
-      "ionMessageb\006proto3"
+    java.lang.String[] descriptorData = {
+            "\n\030TransactionMessage.proto\"\253\002\n\013Transacti" +
+                    "on\022\014\n\004hash\030\001 \001(\014\022\021\n\tsignature\030\002 \001(\014\022\r\n\005v" +
+                    "alue\030\003 \001(\014\022\022\n\npayAddress\030\004 \001(\014\022\026\n\016receip" +
+                    "tAddress\030\005 \001(\014\022\020\n\010eggPrice\030\006 \001(\014\022\016\n\006eggM" +
+                    "ax\030\007 \001(\014\022\021\n\ttimeStamp\030\010 \001(\014\022\021\n\textarData" +
+                    "\030\t \001(\014\022\021\n\tpublicKey\030\n \001(\014\022\021\n\ttradeType\030\013" +
+                    " \001(\014\022\023\n\013blockHeight\030\014 \001(\014\022\017\n\007eggUsed\030\r \001" +
+                    "(\014\022\r\n\005nonce\030\016 \001(\014\022\016\n\006status\030\017 \001(\014\022\r\n\005tok" +
+                    "en\030\020 \001(\tB(\n\022com.passport.protoB\022Transact" +
+                    "ionMessageb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
+            new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+              public com.google.protobuf.ExtensionRegistry assignDescriptors(
+                      com.google.protobuf.Descriptors.FileDescriptor root) {
+                descriptor = root;
+                return null;
+              }
+            };
     com.google.protobuf.Descriptors.FileDescriptor
-      .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
-        }, assigner);
+            .internalBuildGeneratedFileFrom(descriptorData,
+                    new com.google.protobuf.Descriptors.FileDescriptor[] {
+                    }, assigner);
     internal_static_Transaction_descriptor =
-      getDescriptor().getMessageTypes().get(0);
+            getDescriptor().getMessageTypes().get(0);
     internal_static_Transaction_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_Transaction_descriptor,
-        new String[] { "Hash", "Signature", "Value", "PayAddress", "ReceiptAddress", "EggPrice", "EggMax", "TimeStamp", "ExtarData", "PublicKey", "TradeType", "BlockHeight", "EggUsed", "Nonce", "Status", "Token", });
+            com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+            internal_static_Transaction_descriptor,
+            new java.lang.String[] { "Hash", "Signature", "Value", "PayAddress", "ReceiptAddress", "EggPrice", "EggMax", "TimeStamp", "ExtarData", "PublicKey", "TradeType", "BlockHeight", "EggUsed", "Nonce", "Status", "Token", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
