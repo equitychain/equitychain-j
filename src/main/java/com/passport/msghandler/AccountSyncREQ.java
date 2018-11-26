@@ -32,7 +32,7 @@ public class AccountSyncREQ extends Strategy {
         logger.info("处理账户同步请求数据：{}", GsonUtils.toJson(message));
 
         AccountMessage.Account account = message.getData().getAccount();
-        Optional<Account> accountOptional = dbAccess.getAccount(String.valueOf(account.getAddress()));
+        Optional<Account> accountOptional = dbAccess.getAccount(String.valueOf(account.getAddress())+"_"+String.valueOf(account.getToken()));
         if(!accountOptional.isPresent()){
 //            Account acc = accountOptional.get();
             Account acc = new Account();

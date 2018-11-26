@@ -34,7 +34,7 @@ public class AccountListSyncRESP extends Strategy {
         logger.info("处理账户列表同步请求数据：{}", GsonUtils.toJson(message));
         List<AccountMessage.Account> accountsList = message.getData().getAccountsList();
         for (AccountMessage.Account account : accountsList) {
-            Optional<Account> accountOptional = dbAccess.getAccount(DataFormatUtil.byteStringToString(account.getAddress()));
+            Optional<Account> accountOptional = dbAccess.getAccount(DataFormatUtil.byteStringToString(account.getAddress())+"_"+DataFormatUtil.byteStringToString(account.getToken()));
             if(!accountOptional.isPresent()){//同步不存在本地数据库的账户
                 Account acc = new Account();
                 acc.setAddress_token(new String(account.getAddress().toByteArray())+"_"+new String(account.getToken().toByteArray()));

@@ -58,7 +58,7 @@ public class TransactionHandler {
      * @param tradeType 交易类型
      * @return
      */
-    public Transaction sendTransaction(String payAddress, String receiptAddress, String value, String extarData, String password, String tradeType) throws CommonException {
+    public Transaction sendTransaction(String payAddress, String receiptAddress, String value, String extarData, String password, String tradeType,String token) throws CommonException {
         //判断是否解锁
         //if(LockUtil.isUnlock(payAddress)) {
         if(true) {
@@ -74,7 +74,7 @@ public class TransactionHandler {
             }
 
             //2.支付地址、接收地址是否已经创建、支付方交易密码是否正确
-            Optional<Account> accountPayOptional = dbAccess.getAccount(payAddress);
+            Optional<Account> accountPayOptional = dbAccess.getAccount(payAddress+"_"+token);
             if (!accountPayOptional.isPresent()) {
                 throw new CommonException(ResultEnum.ACCOUNT_NOT_EXISTS);
             }
@@ -89,7 +89,7 @@ public class TransactionHandler {
             }
 
             //4.使用支付方的私钥加密数据 TODO 构造签名数据
-            Transaction transaction = generateTransaction(payAddress, receiptAddress, value, extarData, accountPay);
+            Transaction transaction = generateTransaction(payAddress, receiptAddress, value, extarData, accountPay,token);
             transaction.setTradeType(TransactionTypeEnum.statusOf(tradeType).toString().getBytes());
             transaction.setEggMax(Constant.TRANS_EGG_MAXDEFALT.toString().getBytes());
             transaction.setEggPrice(Constant.TRANS_EGG_PRICEDEFALT.toString().getBytes());
@@ -180,13 +180,14 @@ public class TransactionHandler {
      * @param accountPay
      * @return
      */
-    public Transaction generateTransaction(String payAddress, String receiptAddress, String value, String extarData, Account accountPay) {
+    public Transaction generateTransaction(String payAddress, String receiptAddress, String value, String extarData, Account accountPay,String token) {
         Transaction transaction = new Transaction();
         transaction.setPayAddress(payAddress.getBytes());
         transaction.setReceiptAddress(receiptAddress == null?null:receiptAddress.getBytes());
         transaction.setValue(value.getBytes());
         transaction.setExtarData(extarData.getBytes());
         transaction.setTime(String.valueOf(NetworkTime.INSTANCE.getWebsiteDateTimeLong()).getBytes());
+        transaction.setToken(token.getBytes());
         //生成hash和生成签名sign使用的基础数据都应该一样
         String transactionJson = GsonUtils.toJson(transaction);
         try {

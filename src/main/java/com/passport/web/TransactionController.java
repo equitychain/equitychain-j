@@ -62,7 +62,7 @@ public class TransactionController {
             return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
         }
 
-        Transaction transaction = transactionHandler.sendTransaction(payAddress, receiptAddress, value, extarData, password, tradeType);
+        Transaction transaction = transactionHandler.sendTransaction(payAddress, receiptAddress, value, extarData, password, tradeType,token);
         com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
         BeanUtils.copyProperties(transaction, transactionDto);
         return new ResultDto(ResultEnum.SUCCESS.getCode(), transactionDto);

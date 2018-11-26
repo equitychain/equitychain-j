@@ -103,7 +103,7 @@ public class AccountHandler {
 
                 String[] addressToken = account.getAddress_token().split("_");
                 //创建注册为受托人交易
-                Transaction transaction = transactionHandler.generateTransaction(addressToken[0], null, "0", "", account);
+                Transaction transaction = transactionHandler.generateTransaction(addressToken[0], null, "0", "", account,addressToken[1]);
                 transaction.setTradeType(TransactionTypeEnum.TRUSTEE_REGISTER.toString().getBytes());
                 transaction.setBlockHeight("1".getBytes());
                 transactions.add(transaction);
