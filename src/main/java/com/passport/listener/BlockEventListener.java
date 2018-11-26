@@ -132,7 +132,7 @@ public class BlockEventListener {
 
         List<Account> accounts = genesisBlockInfo.getAccounts();
         accounts.forEach(account -> {
-            if (!dbAccess.getAccount(account.getAddress()).isPresent()) {
+            if (!dbAccess.getAccount(account.getAddress_token()).isPresent()) {
                 dbAccess.putAccount(account);
             }
         });

@@ -31,13 +31,14 @@ public class TransferHandler extends TransactionStrategy {
     protected void handle(Transaction transaction) {
         String payAddress = new String(transaction.getPayAddress());
         String receiptAddress = new String(transaction.getReceiptAddress());
+        String token = new String(transaction.getToken());
 
-        Optional<Account> payAddressOptional = dbAccess.getAccount(payAddress);
+        Optional<Account> payAddressOptional = dbAccess.getAccount(payAddress+"_"+token);
         if(!payAddressOptional.isPresent()){
             return;
         }
 
-        Optional<Account> receiptAddressOptional = dbAccess.getAccount(receiptAddress);
+        Optional<Account> receiptAddressOptional = dbAccess.getAccount(receiptAddress+"_"+token);
         if(!receiptAddressOptional.isPresent()){
             return;
         }

@@ -47,7 +47,7 @@ public class TransactionController {
         String extarData = request.getParameter("extarData");
         String password = request.getParameter("password");
         String tradeType = request.getParameter("tradeType");
-
+        String token = request.getParameter("token");
         boolean flag = false;
         //若流水类型为 委托人注册 或 投票人注册的时候 不校验receiptAddress
         if (TransactionTypeEnum.TRUSTEE_REGISTER.toString().equals(tradeType)

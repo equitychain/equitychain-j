@@ -33,7 +33,7 @@ public class TrusteeCannelHandler extends TransactionStrategy {
         String payAddress = new String(transaction.getPayAddress());
         Optional<Trustee> trusteeOptional = dbAccess.getTrustee(payAddress);
         if (trusteeOptional.isPresent() && trusteeOptional.get().getStatus() == 1) {//只有受托人才能发起取消注册
-            Optional<Account> accountOptional = dbAccess.getAccount(payAddress);
+            Optional<Account> accountOptional = dbAccess.getAccount(payAddress+"_"+Constant.MAIN_COIN);
             if (accountOptional.isPresent()) {
                 Account account = accountOptional.get();
                 BigDecimal balance = account.getBalance();

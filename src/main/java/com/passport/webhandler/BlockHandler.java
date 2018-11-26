@@ -379,7 +379,7 @@ public class BlockHandler {
      */
     public void produceBlock(long newBlockHeight, List<Trustee> list, int blockCycle) throws Exception {
         Trustee trustee = blockUtils.randomPickBlockProducer(list, newBlockHeight);
-        Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress());
+        Optional<Account> accountOptional = dbAccess.getAccount(trustee.getAddress()+"_"+Constant.MAIN_COIN);
         if(accountOptional.isPresent() && accountOptional.get().getPrivateKey() != null && !"".equals(accountOptional.get().getPrivateKey())){//出块人属于本节点
             SyncFlag.setNextBlockSyncFlag(false);
             Account account = accountOptional.get();
@@ -390,11 +390,11 @@ public class BlockHandler {
                 trusteeHandler.changeStatus(trustee, blockCycle);
                 //启动任务
                 SyncFlag.blockTimeFlag = true;
-                logger.info("第{}个区块出块成功,出块账号:{}", newBlockHeight,account.getAddress());
+                logger.info("第{}个区块出块成功,出块账号:{}", newBlockHeight,account.getAddress_token());
                 provider.publishEvent(new GenerateNextBlockEvent(0L));
             }
         }else {
-            logger.info("出块账号："+accountOptional.get().getAddress());
+            logger.info("出块账号："+accountOptional.get().getAddress_token());
             //启动定时任务
             Timer timer = new Timer ( );
             timer.schedule ( new TimerTask ( ) {

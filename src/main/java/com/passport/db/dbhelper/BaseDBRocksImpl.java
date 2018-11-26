@@ -197,14 +197,14 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 //        if(transaction!=null){
 //            accountIter = transaction.getIterator(new ReadOptions(),handleMap.get(getColName("account", "address")));
 //        }else{
-        accountIter = rocksDB.newIterator(handleMap.get(getColName("account", "address")));
+        accountIter = rocksDB.newIterator(handleMap.get(getColName("account", "address_token")));
 //        }
 
         ArrayList<Account> accounts = new ArrayList<>();
         for (accountIter.seekToFirst(); accountIter.isValid(); accountIter.next()) {
             String address = new String(accountIter.key());
             try {
-                Account account = getObj("address", address, Account.class);
+                Account account = getObj("address_token", address, Account.class);
                 if (account != null) {
                     accounts.add(account);
                 }
@@ -215,53 +215,16 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         return accounts;
     }
 
-//    @Override
-//    public void delAllAccountIps() throws Exception {
-//        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "id")));
-//        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-//            delObj("id", new String(iterator.key()), AccountIp.class, true);
-//        }
-//    }
-//
-//    @Override
-//    public List<AccountIp> listAccountIps() throws Exception {
-//        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "id")));
-//        List<AccountIp> list = new ArrayList<>();
-//        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-//            list.add(getObj("id", new String(iterator.key()), AccountIp.class));
-//        }
-//        return list;
-//    }
-//    @Override
-//    public void localAddNewAccountIp(String address) throws Exception {
-//        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("accountIp", "ipAddr")));
-//        int statu = 0;
-//        String localIp = HttpUtils.getLocalHostLANAddress().getHostAddress();
-//        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-//            String ipAddr = new String(iterator.value());
-//            if (localIp.equals(ipAddr)) {
-//                statu = Integer.parseInt(new String(
-//                        rocksDB.get(handleMap.get(getColName("accountIp", "statu")), iterator.key())));
-//                break;
-//            }
-//        }
-//        AccountIp ipInfo = new AccountIp();
-//        ipInfo.setAddress(address);
-//        ipInfo.setIpAddr(localIp);
-//        ipInfo.setStatu(statu);
-//        ipInfo.setId();
-//        addObj(ipInfo);
-//    }
     @Override
     public List<Account> getNodeAccountList() {
         RocksIterator accountIter;
-        accountIter = rocksDB.newIterator(handleMap.get(getColName("account", "address")));
+        accountIter = rocksDB.newIterator(handleMap.get(getColName("account", "address_token")));
 
         ArrayList<Account> accounts = new ArrayList<>();
         for (accountIter.seekToFirst(); accountIter.isValid(); accountIter.next()) {
             String address = new String(accountIter.key());
             try {
-                Account account = getObj("address", address, Account.class);
+                Account account = getObj("address_token", address, Account.class);
                 if (account != null &&
                         account.getPrivateKey() != null && !"".equals(account.getPrivateKey())
                         && account.getPassword() != null && !"".equals(account.getPassword())) {
@@ -373,7 +336,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     @Override
     public Optional<Account> getAccount(String address) {
         try {
-            Account account = getObj("address", address, Account.class);
+            Account account = getObj("address_token", address, Account.class);
             if (account.isNullContent()) {
                 return Optional.absent();
             }

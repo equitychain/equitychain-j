@@ -31,7 +31,7 @@ public class TrusteeRegisterHandler extends TransactionStrategy {
         Optional<Trustee> trusteeOptional = dbAccess.getTrustee(payAddress);
         if (!trusteeOptional.isPresent() || trusteeOptional.get().getStatus() == 0) {//已是委托人则不能重复注册
             //判断受托人资产是否足够
-            Optional<Account> accountOptional = dbAccess.getAccount(payAddress);
+            Optional<Account> accountOptional = dbAccess.getAccount(payAddress+"_"+Constant.MAIN_COIN);
             if (accountOptional.isPresent()) {
                 Account account = accountOptional.get();
                 BigDecimal balance = account.getBalance();

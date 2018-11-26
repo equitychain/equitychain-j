@@ -30,10 +30,10 @@ public class AccountEventListener {
 	@EventListener(SyncAccountEvent.class)
 	public void syncAccount(SyncAccountEvent event) {
 		Account account = (Account) event.getSource();
-
+		String[] addressToken = account.getAddress_token().split("_");
 		//把新增账户广播到其它节点
 		AccountMessage.Account.Builder accountBuilder = AccountMessage.Account.newBuilder();
-		accountBuilder.setAddress(ByteString.copyFrom(account.getAddress().getBytes()));
+		accountBuilder.setAddress(ByteString.copyFrom(addressToken[0].getBytes()));
 		//accountBuilder.setPrivateKey(ByteString.copyFrom(account.getPrivateKey().getBytes()));
 		//accountBuilder.setBalance(ByteString.copyFrom(String.valueOf(account.getBalance()).getBytes()));
 		accountBuilder.setBalance(ByteString.copyFrom(String.valueOf(BigDecimal.ZERO).getBytes()));

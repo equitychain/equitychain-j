@@ -1,6 +1,7 @@
 package com.passport.transactionhandler;
 
 import com.google.common.base.Optional;
+import com.passport.constant.Constant;
 import com.passport.core.Account;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
@@ -34,7 +35,7 @@ public class BlockRewardHandler extends TransactionStrategy {
         byte[] payAddressByte = transaction.getPayAddress();
         //挖矿奖励 TODO 出块同时奖励投票人
         if (payAddressByte == null || payAddressByte.length == 0) {
-            Optional<Account> accountOptional = dbAccess.getAccount(new String(transaction.getReceiptAddress()));
+            Optional<Account> accountOptional = dbAccess.getAccount(new String(transaction.getReceiptAddress())+"_"+ Constant.MAIN_COIN);
             if (accountOptional.isPresent()) {
                 String blockHeight = new String(transaction.getBlockHeight());
                 BigDecimal reward = RawardUtil.getRewardByHeight(CastUtils.castLong(blockHeight));

@@ -14,8 +14,8 @@ import java.math.BigDecimal;
 @EntityClaz(name = "account")
 public class Account{
     @KeyField
-    @FaildClaz(name = "address",type = String.class)
-    private String address;//地址
+    @FaildClaz(name = "address_token",type = String.class)
+    private String address_token;//地址
     @FaildClaz(name = "privateKey",type = String.class)
     private String privateKey;//私钥
     @FaildClaz(name = "balance",type = BigDecimal.class)
@@ -27,23 +27,23 @@ public class Account{
 
     }
 
-    public Account(String address, BigDecimal balance) {
-        this.address = address;
+    public Account(String address_token, BigDecimal balance) {
+        this.address_token = address_token;
         this.balance = balance;
     }
 
-    public Account(String address, String privateKey, BigDecimal balance) {
-        this.address = address;
+    public Account(String address_token, String privateKey, BigDecimal balance) {
+        this.address_token = address_token;
         this.privateKey = privateKey;
         this.balance = balance;
     }
 
-    public String getAddress() {
-        return address;
+    public String getAddress_token() {
+        return address_token;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setAddress_token(String address_token) {
+        this.address_token = address_token;
     }
 
     public String getPrivateKey() {
@@ -73,7 +73,7 @@ public class Account{
     @Override
     public String toString() {
         return "Account{" +
-                "address='" + address + '\'' +
+                "address_token='" + address_token + '\'' +
                 ", privateKey='" + privateKey + '\'' +
                 ", balance=" + balance +
                 ", password='" + password + '\'' +

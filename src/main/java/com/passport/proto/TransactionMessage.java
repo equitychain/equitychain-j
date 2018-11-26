@@ -92,6 +92,11 @@ public final class TransactionMessage {
      * <code>bytes status = 15;</code>
      */
     com.google.protobuf.ByteString getStatus();
+
+    /**
+     * <code>bytes token = 16;</code>
+     */
+    com.google.protobuf.ByteString getToken();
   }
   /**
    * Protobuf type {@code Transaction}
@@ -120,6 +125,7 @@ public final class TransactionMessage {
       eggUsed_ = com.google.protobuf.ByteString.EMPTY;
       nonce_ = com.google.protobuf.ByteString.EMPTY;
       status_ = com.google.protobuf.ByteString.EMPTY;
+      token_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @Override
@@ -220,6 +226,11 @@ public final class TransactionMessage {
             case 122: {
 
               status_ = input.readBytes();
+              break;
+            }
+            case 130: {
+
+              token_ = input.readBytes();
               break;
             }
           }
@@ -380,6 +391,15 @@ public final class TransactionMessage {
       return status_;
     }
 
+    public static final int TOKEN_FIELD_NUMBER = 16;
+    private com.google.protobuf.ByteString token_;
+    /**
+     * <code>bytes token = 16;</code>
+     */
+    public com.google.protobuf.ByteString getToken() {
+      return token_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -436,6 +456,9 @@ public final class TransactionMessage {
       }
       if (!status_.isEmpty()) {
         output.writeBytes(15, status_);
+      }
+      if (!token_.isEmpty()) {
+        output.writeBytes(16, token_);
       }
     }
 
@@ -504,6 +527,10 @@ public final class TransactionMessage {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(15, status_);
       }
+      if (!token_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(16, token_);
+      }
       memoizedSize = size;
       return size;
     }
@@ -550,6 +577,8 @@ public final class TransactionMessage {
           .equals(other.getNonce());
       result = result && getStatus()
           .equals(other.getStatus());
+      result = result && getToken()
+          .equals(other.getToken());
       return result;
     }
 
@@ -590,6 +619,8 @@ public final class TransactionMessage {
       hash = (53 * hash) + getNonce().hashCode();
       hash = (37 * hash) + STATUS_FIELD_NUMBER;
       hash = (53 * hash) + getStatus().hashCode();
+      hash = (37 * hash) + TOKEN_FIELD_NUMBER;
+      hash = (53 * hash) + getToken().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -749,6 +780,8 @@ public final class TransactionMessage {
 
         status_ = com.google.protobuf.ByteString.EMPTY;
 
+        token_ = com.google.protobuf.ByteString.EMPTY;
+
         return this;
       }
 
@@ -786,6 +819,7 @@ public final class TransactionMessage {
         result.eggUsed_ = eggUsed_;
         result.nonce_ = nonce_;
         result.status_ = status_;
+        result.token_ = token_;
         onBuilt();
         return result;
       }
@@ -871,6 +905,9 @@ public final class TransactionMessage {
         }
         if (other.getStatus() != com.google.protobuf.ByteString.EMPTY) {
           setStatus(other.getStatus());
+        }
+        if (other.getToken() != com.google.protobuf.ByteString.EMPTY) {
+          setToken(other.getToken());
         }
         onChanged();
         return this;
@@ -1332,6 +1369,35 @@ public final class TransactionMessage {
         onChanged();
         return this;
       }
+
+      private com.google.protobuf.ByteString token_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes token = 16;</code>
+       */
+      public com.google.protobuf.ByteString getToken() {
+        return token_;
+      }
+      /**
+       * <code>bytes token = 16;</code>
+       */
+      public Builder setToken(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+
+        token_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes token = 16;</code>
+       */
+      public Builder clearToken() {
+
+        token_ = getDefaultInstance().getToken();
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -1395,16 +1461,16 @@ public final class TransactionMessage {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\030TransactionMessage.proto\"\234\002\n\013Transacti" +
+      "\n\030TransactionMessage.proto\"\253\002\n\013Transacti" +
       "on\022\014\n\004hash\030\001 \001(\014\022\021\n\tsignature\030\002 \001(\014\022\r\n\005v" +
       "alue\030\003 \001(\014\022\022\n\npayAddress\030\004 \001(\014\022\026\n\016receip" +
       "tAddress\030\005 \001(\014\022\020\n\010eggPrice\030\006 \001(\014\022\016\n\006eggM" +
       "ax\030\007 \001(\014\022\021\n\ttimeStamp\030\010 \001(\014\022\021\n\textarData" +
       "\030\t \001(\014\022\021\n\tpublicKey\030\n \001(\014\022\021\n\ttradeType\030\013" +
       " \001(\014\022\023\n\013blockHeight\030\014 \001(\014\022\017\n\007eggUsed\030\r \001" +
-      "(\014\022\r\n\005nonce\030\016 \001(\014\022\016\n\006status\030\017 \001(\014B(\n\022com" +
-      ".passport.protoB\022TransactionMessageb\006pro" +
-      "to3"
+      "(\014\022\r\n\005nonce\030\016 \001(\014\022\016\n\006status\030\017 \001(\014\022\r\n\005tok" +
+      "en\030\020 \001(\014B(\n\022com.passport.protoB\022Transact" +
+      "ionMessageb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1423,7 +1489,7 @@ public final class TransactionMessage {
     internal_static_Transaction_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Transaction_descriptor,
-        new String[] { "Hash", "Signature", "Value", "PayAddress", "ReceiptAddress", "EggPrice", "EggMax", "TimeStamp", "ExtarData", "PublicKey", "TradeType", "BlockHeight", "EggUsed", "Nonce", "Status", });
+        new String[] { "Hash", "Signature", "Value", "PayAddress", "ReceiptAddress", "EggPrice", "EggMax", "TimeStamp", "ExtarData", "PublicKey", "TradeType", "BlockHeight", "EggUsed", "Nonce", "Status", "Token", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -32,6 +32,11 @@ public final class AccountMessage {
      * <code>bytes balance = 3;</code>
      */
     com.google.protobuf.ByteString getBalance();
+
+    /**
+     * <code>bytes token = 4;</code>
+     */
+    com.google.protobuf.ByteString getToken();
   }
   /**
    * Protobuf type {@code Account}
@@ -48,6 +53,7 @@ public final class AccountMessage {
       address_ = com.google.protobuf.ByteString.EMPTY;
       privateKey_ = com.google.protobuf.ByteString.EMPTY;
       balance_ = com.google.protobuf.ByteString.EMPTY;
+      token_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @Override
@@ -88,6 +94,11 @@ public final class AccountMessage {
             case 26: {
 
               balance_ = input.readBytes();
+              break;
+            }
+            case 34: {
+
+              token_ = input.readBytes();
               break;
             }
           }
@@ -140,6 +151,15 @@ public final class AccountMessage {
       return balance_;
     }
 
+    public static final int TOKEN_FIELD_NUMBER = 4;
+    private com.google.protobuf.ByteString token_;
+    /**
+     * <code>bytes token = 4;</code>
+     */
+    public com.google.protobuf.ByteString getToken() {
+      return token_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -161,6 +181,9 @@ public final class AccountMessage {
       if (!balance_.isEmpty()) {
         output.writeBytes(3, balance_);
       }
+      if (!token_.isEmpty()) {
+        output.writeBytes(4, token_);
+      }
     }
 
     public int getSerializedSize() {
@@ -179,6 +202,10 @@ public final class AccountMessage {
       if (!balance_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(3, balance_);
+      }
+      if (!token_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(4, token_);
       }
       memoizedSize = size;
       return size;
@@ -202,6 +229,8 @@ public final class AccountMessage {
           .equals(other.getPrivateKey());
       result = result && getBalance()
           .equals(other.getBalance());
+      result = result && getToken()
+          .equals(other.getToken());
       return result;
     }
 
@@ -218,6 +247,8 @@ public final class AccountMessage {
       hash = (53 * hash) + getPrivateKey().hashCode();
       hash = (37 * hash) + BALANCE_FIELD_NUMBER;
       hash = (53 * hash) + getBalance().hashCode();
+      hash = (37 * hash) + TOKEN_FIELD_NUMBER;
+      hash = (53 * hash) + getToken().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -353,6 +384,8 @@ public final class AccountMessage {
 
         balance_ = com.google.protobuf.ByteString.EMPTY;
 
+        token_ = com.google.protobuf.ByteString.EMPTY;
+
         return this;
       }
 
@@ -378,6 +411,7 @@ public final class AccountMessage {
         result.address_ = address_;
         result.privateKey_ = privateKey_;
         result.balance_ = balance_;
+        result.token_ = token_;
         onBuilt();
         return result;
       }
@@ -427,6 +461,9 @@ public final class AccountMessage {
         }
         if (other.getBalance() != com.google.protobuf.ByteString.EMPTY) {
           setBalance(other.getBalance());
+        }
+        if (other.getToken() != com.google.protobuf.ByteString.EMPTY) {
+          setToken(other.getToken());
         }
         onChanged();
         return this;
@@ -540,6 +577,35 @@ public final class AccountMessage {
         onChanged();
         return this;
       }
+
+      private com.google.protobuf.ByteString token_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes token = 4;</code>
+       */
+      public com.google.protobuf.ByteString getToken() {
+        return token_;
+      }
+      /**
+       * <code>bytes token = 4;</code>
+       */
+      public Builder setToken(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+
+        token_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes token = 4;</code>
+       */
+      public Builder clearToken() {
+
+        token_ = getDefaultInstance().getToken();
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -603,10 +669,10 @@ public final class AccountMessage {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\024AccountMessage.proto\"?\n\007Account\022\017\n\007add" +
+      "\n\024AccountMessage.proto\"N\n\007Account\022\017\n\007add" +
       "ress\030\001 \001(\014\022\022\n\nprivateKey\030\002 \001(\014\022\017\n\007balanc" +
-      "e\030\003 \001(\014B$\n\022com.passport.protoB\016AccountMe" +
-      "ssageb\006proto3"
+      "e\030\003 \001(\014\022\r\n\005token\030\004 \001(\014B$\n\022com.passport.p" +
+      "rotoB\016AccountMessageb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -625,7 +691,7 @@ public final class AccountMessage {
     internal_static_Account_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Account_descriptor,
-        new String[] { "Address", "PrivateKey", "Balance", });
+        new String[] { "Address", "PrivateKey", "Balance", "Token", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

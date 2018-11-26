@@ -32,7 +32,7 @@ public class VoteHandler extends TransactionStrategy {
         if(!voterOptional.isPresent() || voterOptional.get().getStatus() == 0){
             return;
         }
-        Optional<Account> accountOptional = dbAccess.getAccount(payAddress);
+        Optional<Account> accountOptional = dbAccess.getAccount(payAddress+"_"+Constant.MAIN_COIN);
         if(!accountOptional.isPresent()){
             return;
         }

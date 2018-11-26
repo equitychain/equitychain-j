@@ -36,15 +36,11 @@ public class AccountSyncREQ extends Strategy {
         if(!accountOptional.isPresent()){
 //            Account acc = accountOptional.get();
             Account acc = new Account();
-            acc.setAddress(new String(account.getAddress().toByteArray()));
+            acc.setAddress_token(new String(account.getAddress().toByteArray())+"_"+new String(account.getToken().toByteArray()));
             acc.setBalance(BigDecimal.ZERO);
              if(dbAccess.putAccount(acc)){
-                logger.info("接收广播账户{}成功", acc.getAddress());
-                 InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
-                 String clientIP = insocket.getAddress().getHostAddress();
-                 dbAccess.rocksDB.put( (clientIP+"_"+new String(account.getAddress().toByteArray())).getBytes(), SerializeUtils.serialize(new String(account.getAddress().toByteArray())));
-                 dbAccess.rocksDB.put( (new String(account.getAddress().toByteArray())+"_"+clientIP).getBytes(),SerializeUtils.serialize(new String(account.getAddress().toByteArray())));
-             }
+                logger.info("接收广播账户{}成功", acc.getAddress_token());
+            }
         }
     }
 }

@@ -72,7 +72,7 @@ public class AccountHandler {
 
         //创建公私钥并生成keystore文件
         ECKeyPair keyPair = WalletUtils.generateNewWalletFile(password, new File(walletDir), true);
-        Account account = new Account(keyPair.getAddress(), keyPair.exportPrivateKey(), BigDecimal.ZERO);
+        Account account = new Account(keyPair.getAddress()+"_"+Constant.MAIN_COIN, keyPair.exportPrivateKey(), BigDecimal.ZERO);
         account.setPassword(password);
         return account;
     }
@@ -99,10 +99,11 @@ public class AccountHandler {
                 //创建账户
                 Account account = generateAccount("123456");
                 dbAccess.putAccount(account);
-                accounts.add(new Account(account.getAddress(),null, account.getBalance()));//不保存私钥
+                accounts.add(new Account(account.getAddress_token(),null, account.getBalance()));//不保存私钥
 
+                String[] addressToken = account.getAddress_token().split("_");
                 //创建注册为受托人交易
-                Transaction transaction = transactionHandler.generateTransaction(account.getAddress(), null, "0", "", account);
+                Transaction transaction = transactionHandler.generateTransaction(addressToken[0], null, "0", "", account);
                 transaction.setTradeType(TransactionTypeEnum.TRUSTEE_REGISTER.toString().getBytes());
                 transaction.setBlockHeight("1".getBytes());
                 transactions.add(transaction);
@@ -110,7 +111,7 @@ public class AccountHandler {
                 //增加投票记录
                 VoteRecord voteRecord = new VoteRecord();
                 voteRecord.setPayAddress("");
-                voteRecord.setReceiptAddress(account.getAddress());
+                voteRecord.setReceiptAddress(addressToken[0]);
                 voteRecord.setTime(Constant.GENESIS_BLOCK_TIMESTAMP);
                 voteRecord.setStatus(1);
                 voteRecord.setVoteNum(1);
@@ -118,7 +119,7 @@ public class AccountHandler {
                 voteRecords.add(voteRecord);
 
                 //把新增的受托人放到受托人列表
-                Trustee trustee = new Trustee(account.getAddress(), 1L, 0f, new BigDecimal(0), 1,0);
+                Trustee trustee = new Trustee(addressToken[0], 1L, 0f, new BigDecimal(0), 1,0);
                 trustees.add(trustee);
             } catch (Exception e) {
                 e.printStackTrace();

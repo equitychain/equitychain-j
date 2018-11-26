@@ -30,7 +30,7 @@ public class VoterCannelHandler extends TransactionStrategy {
         Optional<Voter> voterOptional = dbAccess.getVoter(payAddress);
         if (voterOptional.isPresent() && voterOptional.get().getStatus() == 1) {//只有投票人才能发起取消注册
             //判断投票人资产是否足够
-            Optional<Account> accountOptional = dbAccess.getAccount(payAddress);
+            Optional<Account> accountOptional = dbAccess.getAccount(payAddress+"_"+Constant.MAIN_COIN);
             if (accountOptional.isPresent()) {
                 Account account = accountOptional.get();
                 BigDecimal balance = account.getBalance();

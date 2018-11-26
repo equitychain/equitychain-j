@@ -36,7 +36,9 @@ public class AccountListSyncREQ extends Strategy {
         dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNTLIST_SYNC);
         for (Account account : accounts) {
             AccountMessage.Account.Builder builder = AccountMessage.Account.newBuilder();
-            builder.setAddress(ByteString.copyFrom(account.getAddress().getBytes()));
+            String[] addressToken = account.getAddress_token().split("_");
+            builder.setAddress(ByteString.copyFrom(addressToken[0].getBytes()));
+            builder.setToken(ByteString.copyFrom(addressToken[1].getBytes()));
             builder.setBalance(ByteString.copyFrom(String.valueOf(BigDecimal.ZERO).getBytes()));
             dataBuilder.addAccounts(builder.build());
         }

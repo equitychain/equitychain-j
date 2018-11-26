@@ -6,4 +6,5 @@ message Account {
     bytes address = 1;
     bytes privateKey = 2;
     bytes balance = 3;
+    bytes token = 4;
 }

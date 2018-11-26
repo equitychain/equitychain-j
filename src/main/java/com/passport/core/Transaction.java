@@ -63,6 +63,9 @@ public class Transaction {
   @FaildClaz(name = "status",type = Integer.class)
   private Integer status;
 
+  @FaildClaz(name = "token",type = byte[].class)
+  private byte[] token;
+
   public Integer getNonce() {
     return nonce;
   }
@@ -183,8 +186,16 @@ public class Transaction {
     this.blockHeight = blockHeight;
   }
 
-  public Transaction(Integer nonce, byte[] hash, byte[] signature, byte[] value, byte[] payAddress,
-                     byte[] receiptAddress, byte[] eggPrice, byte[] eggMax, byte[] time, byte[] extarData) {
+    public byte[] getToken() {
+        return token;
+    }
+
+    public void setToken(byte[] token) {
+        this.token = token;
+    }
+
+    public Transaction(Integer nonce, byte[] hash, byte[] signature, byte[] value, byte[] payAddress,
+                       byte[] receiptAddress, byte[] eggPrice, byte[] eggMax, byte[] time, byte[] extarData, byte[] token) {
     this.nonce = nonce;
     this.hash = hash;
     this.signature = signature;
@@ -195,6 +206,7 @@ public class Transaction {
     this.eggMax = eggMax;
     this.time = time;
     this.extarData = extarData;
+    this.token = token;
   }
 
   public Transaction() {

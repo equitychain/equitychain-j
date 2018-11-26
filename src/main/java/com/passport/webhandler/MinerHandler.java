@@ -51,6 +51,8 @@ public class MinerHandler {
         }
         Block prevBlock = lastBlock.get();//上个区块
 
+        String[] minerAddressToken =  minerAccount.getAddress_token().split("_");
+
         //区块头，merkleTree和hash应该在获得打包交易权限时生成
         BlockHeader currentBlockHeader = new BlockHeader();
         currentBlockHeader.setTimeStamp(NetworkTime.INSTANCE.getWebsiteDateTimeLong());
@@ -61,13 +63,14 @@ public class MinerHandler {
         //创建挖矿奖励交易
         Transaction transaction = new Transaction();
         transaction.setPayAddress(null);
-        transaction.setReceiptAddress(minerAccount.getAddress().getBytes());//奖励接收者是挖矿账号
+        transaction.setReceiptAddress(minerAddressToken[0].getBytes());//奖励接收者是挖矿账号
 
 
         transaction.setValue(String.valueOf(RawardUtil.getRewardByHeight(CastUtils.castLong(prevBlock.getBlockHeight() + 1))).getBytes());//TODO 挖矿奖励取值优化
         transaction.setExtarData(TransactionTypeEnum.BLOCK_REWARD.toString().getBytes());
         transaction.setTime(String.valueOf(NetworkTime.INSTANCE.getWebsiteDateTimeLong()).getBytes());
         transaction.setBlockHeight(((prevBlock.getBlockHeight() + 1)+"").getBytes());
+        transaction.setToken(minerAddressToken[1].getBytes());
         //生成hash和生成签名sign使用的基础数据都应该一样
         String transactionJson = GsonUtils.toJson(transaction);
         //计算交易hash
@@ -83,14 +86,14 @@ public class MinerHandler {
         currentBlock.setBlockHeight(prevBlock.getBlockHeight() + 1);
         currentBlock.setTransactions(list);
         currentBlock.setTransactionCount(list.size());
-        currentBlock.setProducer(minerAccount.getAddress());
+        currentBlock.setProducer(minerAddressToken[0]);
 
         //完成共识，打包交易流水
         List<Transaction> transactions = dbAccess.listUnconfirmTransactions();
         List<Transaction> blockTrans = transactionHandler.getBlockTrans(transactions,new BigDecimal(currentBlockHeader.getEggMax()));
         BigDecimal sumTransMoney = BigDecimal.ZERO;
 
-        transactionHandler.setVoteRecords(prevBlock.getBlockHeight() + 1,minerAccount.getAddress());
+        transactionHandler.setVoteRecords(prevBlock.getBlockHeight() + 1,minerAddressToken[0]);
         Map<String, BigDecimal> tempBalances = new HashMap<>();
         for(Transaction tran : blockTrans){
             //矿工费
@@ -98,7 +101,7 @@ public class MinerHandler {
             valueDec = valueDec == null?BigDecimal.ZERO:valueDec;
             String payAddr = new String(tran.getPayAddress());
             if(!tempBalances.containsKey(payAddr)) {
-                Optional<Account> account = dbAccess.getAccount(payAddr);
+                Optional<Account> account = dbAccess.getAccount(payAddr+"_"+Constant.MAIN_COIN);
                 if (!account.isPresent()) {
                     continue;
                 }
@@ -129,7 +132,8 @@ public class MinerHandler {
                 feeTrans.setValue(String.valueOf(transactionHandler.getVoteRecords().size() == 0?valueDec:valueDec.multiply(BigDecimal.ONE.subtract(Constant.CONFIRM_TRANS_PROPORTION))).getBytes());
 
                 feeTrans.setBlockHeight(((prevBlock.getBlockHeight() + 1) + "").getBytes());
-                feeTrans.setReceiptAddress(minerAccount.getAddress().getBytes());
+                feeTrans.setReceiptAddress(minerAddressToken[0].getBytes());
+                feeTrans.setToken(minerAddressToken[1].getBytes());
 
                 //生成hash和生成签名sign使用的基础数据都应该一样
                 String tranJson = GsonUtils.toJson(feeTrans);
@@ -164,6 +168,7 @@ public class MinerHandler {
                     feeTrans.setValue(String.valueOf(voterReward.add(diffReward)).getBytes());
                 }
                 feeTrans.setReceiptAddress(record.getPayAddress().getBytes());
+                feeTrans.setToken(minerAddressToken[1].getBytes());
                 String tranJson = GsonUtils.toJson(feeTrans);
                 feeTrans.setHash(ECDSAUtil.applySha256(tranJson).getBytes());
                 feeTrans.setTradeType(TransactionTypeEnum.CONFIRM_REWARD.toString().getBytes());

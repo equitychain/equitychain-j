@@ -102,6 +102,7 @@ public class CheckUtils {
 		trans.setValue(transaction.getValue());
 		trans.setExtarData(transaction.getExtarData());
 		trans.setTime(transaction.getTime());
+		trans.setToken(transaction.getToken());
 		//生成hash和生成签名sign使用的基础数据都应该一样 TODO 使用多语言开发时应使用同样的序列化算法
 		String transactionJson = GsonUtils.toJson(trans);
 		try {

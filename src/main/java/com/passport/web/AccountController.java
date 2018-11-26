@@ -160,8 +160,9 @@ public class AccountController {
      */
     @GetMapping("getAccountByAddress")
     public ResultDto getAccountByAddress(@RequestParam("address") String address) {
+        String token = Constant.MAIN_COIN;
         Map accountAccount = new HashMap();
-        Optional<Account> blockOptional = dbAccess.getAccount(address);
+        Optional<Account> blockOptional = dbAccess.getAccount(address+"_"+token);
         if (blockOptional.isPresent()) {
             Account account = blockOptional.get();
             String publicKey = "";
@@ -176,7 +177,7 @@ public class AccountController {
                 }
             }
             accountAccount.put("balance", account.getBalance());
-            accountAccount.put("address", account.getAddress());
+            accountAccount.put("address", account.getAddress_token());
             accountAccount.put("publicKey", publicKey);
         }else {
             return new ResultDto(ResultEnum.ACCOUNT_NOT_EXISTS);
@@ -200,7 +201,7 @@ public class AccountController {
         for (Account account : accountList) {
             if (!StringUtils.isEmpty(account.getPrivateKey())) {
                 Map accountMap = new HashMap();
-                accountMap.put("address", account.getAddress());
+                accountMap.put("address", account.getAddress_token());
                 accountMap.put("balance", account.getBalance());
                 accounts.add(accountMap);
                 sumBalance = sumBalance.add(account.getBalance());
@@ -224,7 +225,7 @@ public class AccountController {
         ResultDto resultDto = new ResultDto();
         Map resultMap = new HashMap();
         Account account = null;
-        Optional<Account> accountOptional = dbAccess.getAccount(address);
+        Optional<Account> accountOptional = dbAccess.getAccount(address+"_"+Constant.MAIN_COIN);
         if (accountOptional.isPresent()) {
             account = accountOptional.get();
         }

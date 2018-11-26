@@ -37,19 +37,14 @@ public class AccountListSyncRESP extends Strategy {
             Optional<Account> accountOptional = dbAccess.getAccount(DataFormatUtil.byteStringToString(account.getAddress()));
             if(!accountOptional.isPresent()){//同步不存在本地数据库的账户
                 Account acc = new Account();
-                acc.setAddress(new String(account.getAddress().toByteArray()));
+                acc.setAddress_token(new String(account.getAddress().toByteArray())+"_"+new String(account.getToken().toByteArray()));
                 acc.setPrivateKey(new String(account.getPrivateKey().toByteArray()));
                 byte[] balanceByte = account.getBalance().toByteArray();
                 acc.setBalance((balanceByte==null||balanceByte.length==0)?BigDecimal.ZERO:new BigDecimal(new String(balanceByte)));
                 boolean flag = dbAccess.putAccount(acc);
                 if(flag){
-                    logger.info("同步账户列表地址{}成功", acc.getAddress());
-                    InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
-                    String clientIP = insocket.getAddress().getHostAddress();
-
-                    dbAccess.rocksDB.put( (clientIP+"_"+new String(account.getAddress().toByteArray())).getBytes(),SerializeUtils.serialize(new String(account.getAddress().toByteArray())));
-                    dbAccess.rocksDB.put( (new String(account.getAddress().toByteArray())+"_"+clientIP).getBytes(),SerializeUtils.serialize(new String(account.getAddress().toByteArray())));
-                }
+                    logger.info("同步账户列表地址{}成功", acc.getAddress_token());
+               }
             }
         }
     }

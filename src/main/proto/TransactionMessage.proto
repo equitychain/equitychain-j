@@ -18,4 +18,5 @@ message Transaction {
     bytes eggUsed = 13;
     bytes nonce = 14;
     bytes status = 15;
+    bytes token = 16;
 }

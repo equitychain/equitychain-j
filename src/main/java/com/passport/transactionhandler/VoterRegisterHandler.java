@@ -31,7 +31,7 @@ public class VoterRegisterHandler extends TransactionStrategy {
         Optional<Voter> voterOptional = dbAccess.getVoter(payAddress);
         if (!voterOptional.isPresent() || voterOptional.get().getStatus() == 0) {//已是投票人则不能重复注册
             //判断投票人资产是否足够
-            Optional<Account> accountOptional = dbAccess.getAccount(payAddress);
+            Optional<Account> accountOptional = dbAccess.getAccount(payAddress+"_"+new String(transaction.getToken()));
             if (accountOptional.isPresent()) {
                 Account account = accountOptional.get();
                 BigDecimal balance = account.getBalance();
