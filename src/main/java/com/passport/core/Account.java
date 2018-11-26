@@ -3,6 +3,8 @@ package com.passport.core;
 import com.passport.annotations.EntityClaz;
 import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
+import com.passport.constant.Constant;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 
@@ -23,6 +25,10 @@ public class Account{
     @FaildClaz(name = "password",type = String.class)
     private String password;//交易密码
 
+    private String address;
+
+    private String token;
+
     public Account() {
 
     }
@@ -32,10 +38,12 @@ public class Account{
         this.balance = balance;
     }
 
-    public Account(String address_token, String privateKey, BigDecimal balance) {
+    public Account(String address_token, String privateKey, BigDecimal balance,String address,String token) {
         this.address_token = address_token;
         this.privateKey = privateKey;
         this.balance = balance;
+        this.address = address;
+        this.token = token;
     }
 
     public String getAddress_token() {
@@ -68,6 +76,22 @@ public class Account{
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     @Override

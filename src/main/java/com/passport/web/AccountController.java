@@ -176,9 +176,12 @@ public class AccountController {
                     logger.info("私钥解析异常："+e.getMessage());
                 }
             }
+            String[] addressToken = account.getAddress_token().split("_");
             accountAccount.put("balance", account.getBalance());
-            accountAccount.put("address", account.getAddress_token());
+            accountAccount.put("address_token", account.getAddress_token());
             accountAccount.put("publicKey", publicKey);
+            accountAccount.put("token", addressToken[1]);
+            accountAccount.put("address", addressToken[0]);
         }else {
             return new ResultDto(ResultEnum.ACCOUNT_NOT_EXISTS);
         }
@@ -201,8 +204,10 @@ public class AccountController {
         for (Account account : accountList) {
             if (!StringUtils.isEmpty(account.getPrivateKey())) {
                 Map accountMap = new HashMap();
-                accountMap.put("address", account.getAddress_token());
+                accountMap.put("address_token", account.getAddress_token());
                 accountMap.put("balance", account.getBalance());
+                accountMap.put("token",account.getToken());
+                accountMap.put("address",account.getAddress());
                 accounts.add(accountMap);
                 sumBalance = sumBalance.add(account.getBalance());
             }
@@ -240,6 +245,7 @@ public class AccountController {
             voter = voterOptional.get();
         }
         resultMap.put("address", address);
+        resultMap.put("token", account.getToken());
         resultMap.put("balance", account == null ? BigDecimal.ZERO : account.getBalance());
         resultMap.put("isTrustee", trustee == null ? false : true);//是否为委托人
         resultMap.put("trusteeDeposit", Constant.FEE_4_REGISTER_TRUSTEE);//委托人押金
@@ -309,7 +315,7 @@ public class AccountController {
             ECKeyPair ecKeyPair = Wallet.decrypt(pwd, walletFile);
             address = ecKeyPair.getAddress();
             String fileName = WalletUtils.generateWalletFile(pwd, ecKeyPair, new File(keystoreDir), true);
-            Account account = new Account(ecKeyPair.getAddress(), ecKeyPair.exportPrivateKey(), BigDecimal.ZERO);
+            Account account = new Account(ecKeyPair.getAddress()+"_"+Constant.MAIN_COIN, ecKeyPair.exportPrivateKey(), BigDecimal.ZERO,ecKeyPair.getAddress(),Constant.MAIN_COIN);
             boolean res = dbAccess.putAccount(account);
             if (!res) {
                 File walletfile = new File(walletPath + File.separator + fileName);

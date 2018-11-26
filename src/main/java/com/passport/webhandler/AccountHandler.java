@@ -72,7 +72,7 @@ public class AccountHandler {
 
         //创建公私钥并生成keystore文件
         ECKeyPair keyPair = WalletUtils.generateNewWalletFile(password, new File(walletDir), true);
-        Account account = new Account(keyPair.getAddress()+"_"+Constant.MAIN_COIN, keyPair.exportPrivateKey(), BigDecimal.ZERO);
+        Account account = new Account(keyPair.getAddress()+"_"+Constant.MAIN_COIN, keyPair.exportPrivateKey(), BigDecimal.ZERO,keyPair.getAddress(),Constant.MAIN_COIN);
         account.setPassword(password);
         return account;
     }
@@ -99,9 +99,10 @@ public class AccountHandler {
                 //创建账户
                 Account account = generateAccount("123456");
                 dbAccess.putAccount(account);
-                accounts.add(new Account(account.getAddress_token(),null, account.getBalance()));//不保存私钥
-
                 String[] addressToken = account.getAddress_token().split("_");
+
+                accounts.add(new Account(account.getAddress_token(),null, account.getBalance(),addressToken[0],addressToken[1]));//不保存私钥
+
                 //创建注册为受托人交易
                 Transaction transaction = transactionHandler.generateTransaction(addressToken[0], null, "0", "", account,addressToken[1]);
                 transaction.setTradeType(TransactionTypeEnum.TRUSTEE_REGISTER.toString().getBytes());
