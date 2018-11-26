@@ -94,14 +94,9 @@ public final class TransactionMessage {
     com.google.protobuf.ByteString getStatus();
 
     /**
-     * <code>string token = 16;</code>
+     * <code>bytes token = 16;</code>
      */
-    java.lang.String getToken();
-    /**
-     * <code>string token = 16;</code>
-     */
-    com.google.protobuf.ByteString
-    getTokenBytes();
+    com.google.protobuf.ByteString getToken();
   }
   /**
    * Protobuf type {@code Transaction}
@@ -130,7 +125,7 @@ public final class TransactionMessage {
       eggUsed_ = com.google.protobuf.ByteString.EMPTY;
       nonce_ = com.google.protobuf.ByteString.EMPTY;
       status_ = com.google.protobuf.ByteString.EMPTY;
-      token_ = "";
+      token_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @java.lang.Override
@@ -234,9 +229,8 @@ public final class TransactionMessage {
               break;
             }
             case 130: {
-              java.lang.String s = input.readStringRequireUtf8();
 
-              token_ = s;
+              token_ = input.readBytes();
               break;
             }
           }
@@ -398,37 +392,12 @@ public final class TransactionMessage {
     }
 
     public static final int TOKEN_FIELD_NUMBER = 16;
-    private volatile java.lang.Object token_;
+    private com.google.protobuf.ByteString token_;
     /**
-     * <code>string token = 16;</code>
+     * <code>bytes token = 16;</code>
      */
-    public java.lang.String getToken() {
-      java.lang.Object ref = token_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs =
-                (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        token_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string token = 16;</code>
-     */
-    public com.google.protobuf.ByteString
-    getTokenBytes() {
-      java.lang.Object ref = token_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b =
-                com.google.protobuf.ByteString.copyFromUtf8(
-                        (java.lang.String) ref);
-        token_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public com.google.protobuf.ByteString getToken() {
+      return token_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -488,8 +457,8 @@ public final class TransactionMessage {
       if (!status_.isEmpty()) {
         output.writeBytes(15, status_);
       }
-      if (!getTokenBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 16, token_);
+      if (!token_.isEmpty()) {
+        output.writeBytes(16, token_);
       }
     }
 
@@ -558,8 +527,9 @@ public final class TransactionMessage {
         size += com.google.protobuf.CodedOutputStream
                 .computeBytesSize(15, status_);
       }
-      if (!getTokenBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(16, token_);
+      if (!token_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+                .computeBytesSize(16, token_);
       }
       memoizedSize = size;
       return size;
@@ -810,7 +780,7 @@ public final class TransactionMessage {
 
         status_ = com.google.protobuf.ByteString.EMPTY;
 
-        token_ = "";
+        token_ = com.google.protobuf.ByteString.EMPTY;
 
         return this;
       }
@@ -936,9 +906,8 @@ public final class TransactionMessage {
         if (other.getStatus() != com.google.protobuf.ByteString.EMPTY) {
           setStatus(other.getStatus());
         }
-        if (!other.getToken().isEmpty()) {
-          token_ = other.token_;
-          onChanged();
+        if (other.getToken() != com.google.protobuf.ByteString.EMPTY) {
+          setToken(other.getToken());
         }
         onChanged();
         return this;
@@ -1401,43 +1370,17 @@ public final class TransactionMessage {
         return this;
       }
 
-      private java.lang.Object token_ = "";
+      private com.google.protobuf.ByteString token_ = com.google.protobuf.ByteString.EMPTY;
       /**
-       * <code>string token = 16;</code>
+       * <code>bytes token = 16;</code>
        */
-      public java.lang.String getToken() {
-        java.lang.Object ref = token_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-                  (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          token_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public com.google.protobuf.ByteString getToken() {
+        return token_;
       }
       /**
-       * <code>string token = 16;</code>
+       * <code>bytes token = 16;</code>
        */
-      public com.google.protobuf.ByteString
-      getTokenBytes() {
-        java.lang.Object ref = token_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b =
-                  com.google.protobuf.ByteString.copyFromUtf8(
-                          (java.lang.String) ref);
-          token_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string token = 16;</code>
-       */
-      public Builder setToken(
-              java.lang.String value) {
+      public Builder setToken(com.google.protobuf.ByteString value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -1447,25 +1390,11 @@ public final class TransactionMessage {
         return this;
       }
       /**
-       * <code>string token = 16;</code>
+       * <code>bytes token = 16;</code>
        */
       public Builder clearToken() {
 
         token_ = getDefaultInstance().getToken();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string token = 16;</code>
-       */
-      public Builder setTokenBytes(
-              com.google.protobuf.ByteString value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        checkByteStringIsUtf8(value);
-
-        token_ = value;
         onChanged();
         return this;
       }
@@ -1540,7 +1469,7 @@ public final class TransactionMessage {
                     "\030\t \001(\014\022\021\n\tpublicKey\030\n \001(\014\022\021\n\ttradeType\030\013" +
                     " \001(\014\022\023\n\013blockHeight\030\014 \001(\014\022\017\n\007eggUsed\030\r \001" +
                     "(\014\022\r\n\005nonce\030\016 \001(\014\022\016\n\006status\030\017 \001(\014\022\r\n\005tok" +
-                    "en\030\020 \001(\tB(\n\022com.passport.protoB\022Transact" +
+                    "en\030\020 \001(\014B(\n\022com.passport.protoB\022Transact" +
                     "ionMessageb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =

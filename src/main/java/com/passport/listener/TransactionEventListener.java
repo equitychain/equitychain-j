@@ -49,7 +49,7 @@ public class TransactionEventListener {
         transactionBuilder.setEggPrice(ByteString.copyFrom(transaction.getEggPrice() == null ? BigInteger.ZERO.toString().getBytes() : transaction.getEggPrice()));
         transactionBuilder.setBlockHeight(ByteString.copyFrom(transaction.getBlockHeight() == null ? BigInteger.ZERO.toString().getBytes() : transaction.getBlockHeight()));
         transactionBuilder.setTradeType(ByteString.copyFrom(transaction.getTradeType() == null ? BigInteger.ZERO.toString().getBytes() : transaction.getTradeType()));
-        transactionBuilder.setToken(new String(transaction.getToken()));
+        transactionBuilder.setToken(ByteString.copyFrom(transaction.getToken() == null ? "".getBytes() : transaction.getToken()));
         NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
         dataBuilder.setDataType(DataTypeEnum.DataType.SEND_TRANSACTION);
         dataBuilder.setTransaction(transactionBuilder.build());

@@ -93,7 +93,7 @@ public class BlockController {
                 totalValue = totalValue.add(fee);
                 transaction.setConfirms(lastBlockHeight - blockHeight);
                 transaction.setFee(fee);
-                transaction.setTokenName(Constant.MAIN_COIN);
+                transaction.setToken(Constant.MAIN_COIN);
             }
             newBlock.setTotalValue(totalValue);
             newBlock.setTotalFee(totalFee);

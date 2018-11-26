@@ -21,14 +21,14 @@ public class Transaction {
   private Integer status;
   private Object confirms;
   private Object fee;
-  private Object tokenName;
+  private Object token;
 
-  public Object getTokenName() {
-    return tokenName;
+  public Object getToken() {
+    return token;
   }
 
-  public void setTokenName(Object tokenName) {
-    this.tokenName = tokenName;
+  public void setToken(Object token) {
+    this.token = token;
   }
 
   public Object getFee() {

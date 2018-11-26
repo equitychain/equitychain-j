@@ -97,7 +97,7 @@ public class TransactionController {
             BigDecimal eggPrice = transactionDto.getEggPrice()==null||transactionDto.getEggPrice().equals("")  ? BigDecimal.ZERO : new BigDecimal(transactionDto.getEggPrice().toString());
             BigDecimal fee = eggPrice.multiply(eggUsed).setScale(8, BigDecimal.ROUND_HALF_UP);
             transactionDto.setFee(fee);
-            transactionDto.setTokenName(Constant.MAIN_COIN);
+            transactionDto.setToken(Constant.MAIN_COIN);
             transactionsDto.add(transactionDto);
         }
         Map resultMap = new HashMap();
@@ -131,7 +131,7 @@ public class TransactionController {
             BigDecimal eggPrice = transactionDto.getEggPrice()==null||transactionDto.getEggPrice().equals("")  ? BigDecimal.ZERO : new BigDecimal(transactionDto.getEggPrice().toString());
             BigDecimal fee = eggPrice.multiply(eggUsed).setScale(8, BigDecimal.ROUND_HALF_UP);
             transactionDto.setFee(fee);
-            transactionDto.setTokenName(Constant.MAIN_COIN);
+            transactionDto.setToken(Constant.MAIN_COIN);
             transactionsDto.add(transactionDto);
         }
         Map resultMap = new HashMap();

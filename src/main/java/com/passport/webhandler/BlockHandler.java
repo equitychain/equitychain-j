@@ -275,7 +275,7 @@ public class BlockHandler {
             transaction.setTradeType(trans.getTradeType().toByteArray());
             transaction.setBlockHeight(trans.getBlockHeight().toByteArray());
             transaction.setEggUsed(trans.getEggUsed().toByteArray());
-            transaction.setToken(trans.getToken().getBytes());
+            transaction.setToken(trans.getToken().toByteArray());
             if(trans.getNonce().toByteArray() != null && trans.getNonce().toByteArray().length != 0 )transaction.setNonce(Integer.parseInt(new String(trans.getNonce().toByteArray())));
             transaction.setPublicKey(trans.getPublicKey().toByteArray());
             if(trans.getStatus().toByteArray() != null && trans.getStatus().toByteArray().length != 0) transaction.setStatus(Integer.parseInt(new String(trans.getStatus().toByteArray())));
@@ -325,7 +325,7 @@ public class BlockHandler {
             if (trans.getNonce()!=null) transactionBuilder.setNonce(ByteString.copyFrom(trans.getNonce().toString().getBytes()));
             if(trans.getPublicKey()!=null)transactionBuilder.setPublicKey(ByteString.copyFrom(trans.getPublicKey()));
             if(trans.getStatus()!=null)transactionBuilder.setStatus(ByteString.copyFrom(trans.getStatus().toString().getBytes()));
-            if(trans.getToken()!=null)transactionBuilder.setToken(trans.getToken().toString());
+            if(trans.getToken()!=null)transactionBuilder.setToken(ByteString.copyFrom(trans.getToken()));
 
             blockBuilder.addTransactions(transactionBuilder.build());
         });
