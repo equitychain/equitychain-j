@@ -36,6 +36,7 @@ public class AccountEventListener {
 		accountBuilder.setAddress(ByteString.copyFrom(addressToken[0].getBytes()));
 		//accountBuilder.setPrivateKey(ByteString.copyFrom(account.getPrivateKey().getBytes()));
 		//accountBuilder.setBalance(ByteString.copyFrom(String.valueOf(account.getBalance()).getBytes()));
+		accountBuilder.setToken(ByteString.copyFrom(addressToken[1].getBytes()));
 		accountBuilder.setBalance(ByteString.copyFrom(String.valueOf(BigDecimal.ZERO).getBytes()));
 
 		NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();

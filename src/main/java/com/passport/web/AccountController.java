@@ -245,7 +245,6 @@ public class AccountController {
             voter = voterOptional.get();
         }
         resultMap.put("address", address);
-        resultMap.put("token", account.getToken());
         resultMap.put("balance", account == null ? BigDecimal.ZERO : account.getBalance());
         resultMap.put("isTrustee", trustee == null ? false : true);//是否为委托人
         resultMap.put("trusteeDeposit", Constant.FEE_4_REGISTER_TRUSTEE);//委托人押金
