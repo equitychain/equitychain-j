@@ -1,12 +1,16 @@
 package com.passport.web;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
+import com.passport.constant.SyncFlag;
 import com.passport.core.Block;
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
+import com.passport.msghandler.BlockSyncREQ;
+import com.passport.utils.DateUtils;
 import com.passport.webhandler.MinerHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -16,10 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 区块
@@ -219,6 +220,47 @@ public class BlockController {
             e.printStackTrace();
             return new ResultDto(ResultEnum.SYS_ERROR);
         }
+    }
+    @GetMapping("getSyncBlockSchedule")
+    @ResponseBody
+    public ResultDto getSyncBlockSchedule(){
+        Map<String,Object> map = new HashMap<>();
+        map.put("BlockSync",SyncFlag.isNextBlockSyncFlag());
 
+
+
+        return new ResultDto(ResultEnum.SUCCESS.getCode(),map);
+    }
+    @GetMapping("getKChart")
+    @ResponseBody
+    public ResultDto getKChart(){
+        List<com.passport.dto.coreobject.Transaction> transactions = new ArrayList<>();
+        Long t1 = System.currentTimeMillis();
+        List<Transaction> transactionList = dbAccess.listTransactions();
+        Long t2 = System.currentTimeMillis();
+        System.out.println(t2-t1);
+        for(Transaction transaction:transactionList){
+            com.passport.dto.coreobject.Transaction tranObj = new com.passport.dto.coreobject.Transaction();
+            BeanUtils.copyProperties(transaction, tranObj);
+            transactions.add(tranObj);
+        }
+        Long one = new Long(transactions.get(0).getTime().toString());
+        Map<String,Integer> sum = new TreeMap<>();
+        int i = 0;
+        for(com.passport.dto.coreobject.Transaction transaction:transactions){
+            if(one<= new Long(transaction.getTime().toString()) && new Long(transaction.getTime().toString()) <= one + 60*60*1000 ){//测试每小时统计
+                i++;
+            }else{
+                sum.put(DateUtils.stampToDate(transaction.getTime().toString())+"_"+DateUtils.stampToDate( (new Long(transaction.getTime().toString())+60*60*1000)+"" ), i);
+                one = new Long(transaction.getTime().toString());
+                i = 0;
+            }
+        }
+        List<Integer> list = new ArrayList<>();
+        for(String s:sum.keySet()){
+            list.add(sum.get(s));
+        }
+        System.out.println(JSONObject.toJSONString(sum));
+        return new ResultDto(ResultEnum.SUCCESS.getCode(),list.toArray());
     }
 }

@@ -65,7 +65,7 @@ public class TrusteeController {
     }
 
     /**
-     * 委托人列表
+     * 委托人地址获取投票记录
      *
      * @param pageCount
      * @param pageNumber
@@ -94,6 +94,7 @@ public class TrusteeController {
             trusteeMap.put("status",trustee.getStatus());
             trusteeList.add(trusteeMap);
         }
+//        List<VoteRecord> voteRecords = dbAccess.listVoteRecords(address, "payAddress");
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
         resultDto.setData(trusteeList);
         return resultDto;

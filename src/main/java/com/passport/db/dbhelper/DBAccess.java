@@ -147,39 +147,12 @@ public interface DBAccess {
 	 * @return
 	 */
 	List<Account> listAccounts();
-
-//	void delAllAccountIps() throws Exception;
-//
-//	List<AccountIp> listAccountIps() throws Exception;
 	/**
 	 * 本节点的账号
 	 * @return
 	 */
 	List<Account> getNodeAccountList();
 
-	/**
-	 * 判断账号是否有ip在线
-	 * @param address
-	 * @return
-	 */
-//	boolean accountHasOnlineIp(String address) throws RocksDBException;
-	/**
-	 * 保存自己本机的账号ip信息
-	 */
-
-//	void saveLocalAccountIpInfo() throws Exception;
-//	List<AccountIp> delAccountIpByAddr(String ip) throws Exception;
-//	int getLocalAccountIpStatu() throws Exception;
-//	/**
-//	 * 保存其他节点的账号ip信息
-//	 * @param address
-//	 * @param accounts
-//	 */
-//	void saveIpAccountInfos(String address, List<Account> accounts,int statu) throws Exception;
-//
-//	void setIpAccountStatu(String ipAddr, int statu) throws RocksDBException;
-
-//	void localAddNewAccountIp(String address) throws Exception;
 	/**
 	 * 添加一个钱包账户
 	 * @param account
@@ -314,7 +287,7 @@ public interface DBAccess {
 	 */
     List<VoteRecord> listVoteRecords(String address, String type,long time, int screenType);
 
-    List<VoteRecord> listVoteRecords(String address, String typee);
+    List<VoteRecord> listVoteRecords(String address, String type);
 	/**
 	 * 区块分页查询
 	 * @param pageCount：每页记录数
@@ -435,4 +408,7 @@ public interface DBAccess {
 	boolean delBlocksByHeight(long beginHeight) throws Exception;
 
 	boolean delUnconfiTrans() throws RocksDBException;
+
+	//k线图使用
+	List<Transaction> listTransactions();
 }

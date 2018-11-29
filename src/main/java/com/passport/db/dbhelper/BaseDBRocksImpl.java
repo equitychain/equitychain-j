@@ -1,13 +1,12 @@
 package com.passport.db.dbhelper;
 
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.peer.ChannelsManager;
 import com.passport.utils.NetworkTime;
 import com.passport.utils.SerializeUtils;
-import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
@@ -15,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -566,21 +564,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                     trustee.setStatus(1);
                     allVoters.add(trustee);
                 }
-//                Trustee trustee = new Trustee();
-//                trustee.setVotes(0l);
-//                trustee.setStatus(1);
-//                trustee.setAddress(address);
-//                int index = -1;
-//                //address的分组
-//                index = allVoters.indexOf(trustee);
-//                if (index != -1) {
-//                    trustee = allVoters.remove(index);
-//                }
-//                //求和
-//                trustee.setVotes(trustee.getVotes() + Integer.parseInt(new String(getByColumnFamilyHandle(handleMap.get(getColName("voteRecord", "voteNum")), iterator.key()))));
-//                if (!trustee.isNullContent()) {
-//                    allVoters.add(trustee);
-//                }
             }
         }
         //排序票数
@@ -746,6 +729,28 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         } catch (Exception e) {
             return new ArrayList<>();
         }
+    }
+    @Override
+    public List<Transaction> listTransactions(){
+        List<Transaction> transactionList = new ArrayList<>();
+        try {
+            RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("transaction", "hash")));
+            for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+                byte[] hashKey = iterator.key();
+    //            byte[] transHeight = rocksDB.get(handleMap.get(getColName("transaction", "blockHeight")), hashKey);
+                    Transaction transaction = getObj("transaction_blockHeight",hashKey,Transaction.class);
+                    transactionList.add(transaction);
+            }
+            transactionList.sort(new Comparator<Transaction>() {
+                @Override
+                public int compare(Transaction o1, Transaction o2) {
+                   return (int) (new Long(new String(o1.getTime()))-new Long(new String(o2.getTime())));
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return transactionList;
     }
 
     @Override

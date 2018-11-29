@@ -7,6 +7,7 @@ import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
 import com.passport.enums.TransactionTypeEnum;
+import com.passport.exception.CommonException;
 import com.passport.utils.CheckUtils;
 import com.passport.webhandler.TransactionHandler;
 import org.rocksdb.RocksDBException;
@@ -37,35 +38,41 @@ public class TransactionController {
     private TransactionHandler transactionHandler;
 
     @PostMapping("/send")
-    public ResultDto send(HttpServletRequest request) throws Exception {
-        if(SyncFlag.isNextBlockSyncFlag()){
-            return new ResultDto(ResultEnum.TRANS_UNCOMPSYN);
-        }
-        String payAddress = request.getParameter("payAddress");
-        String receiptAddress = request.getParameter("receiptAddress");
-        String value = request.getParameter("value");
-        String extarData = request.getParameter("extarData");
-        String password = request.getParameter("password");
-        String tradeType = request.getParameter("tradeType");
-        String token = request.getParameter("token");
-        boolean flag = false;
-        //若流水类型为 委托人注册 或 投票人注册的时候 不校验receiptAddress
-        if (TransactionTypeEnum.TRUSTEE_REGISTER.toString().equals(tradeType)
-                || TransactionTypeEnum.VOTER_REGISTER.toString().equals(tradeType)) {
-            flag = CheckUtils.checkParamIfEmpty(payAddress, value, extarData);
-        } else {
-            //非空检验
-            flag = CheckUtils.checkParamIfEmpty(payAddress, receiptAddress, value, extarData);
+    public ResultDto send(HttpServletRequest request) {
+        try {
+            if(SyncFlag.isNextBlockSyncFlag()){
+                return new ResultDto(ResultEnum.TRANS_UNCOMPSYN);
+            }
+            String payAddress = request.getParameter("payAddress");
+            String receiptAddress = request.getParameter("receiptAddress");
+            String value = request.getParameter("value");
+            String extarData = request.getParameter("extarData");
+            String password = request.getParameter("password");
+            String tradeType = request.getParameter("tradeType");
+            String token = request.getParameter("token");
+            boolean flag = false;
+            //若流水类型为 委托人注册 或 投票人注册的时候 不校验receiptAddress
+            if (TransactionTypeEnum.TRUSTEE_REGISTER.toString().equals(tradeType)
+                    || TransactionTypeEnum.VOTER_REGISTER.toString().equals(tradeType)) {
+                flag = CheckUtils.checkParamIfEmpty(payAddress, value, extarData);
+            } else {
+                //非空检验
+                flag = CheckUtils.checkParamIfEmpty(payAddress, receiptAddress, value, extarData);
+            }
+
+            if (flag) {
+                return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
+            }
+
+            Transaction transaction = transactionHandler.sendTransaction(payAddress, receiptAddress, value, extarData, password, tradeType,token);
+            com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
+            BeanUtils.copyProperties(transaction, transactionDto);
+            return new ResultDto(ResultEnum.SUCCESS.getCode(), transactionDto);
+        }catch (CommonException e){
+            e.printStackTrace();
+            return new ResultDto(e.getResultEnum().getCode(),e.getMessage());
         }
 
-        if (flag) {
-            return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
-        }
-
-        Transaction transaction = transactionHandler.sendTransaction(payAddress, receiptAddress, value, extarData, password, tradeType,token);
-        com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
-        BeanUtils.copyProperties(transaction, transactionDto);
-        return new ResultDto(ResultEnum.SUCCESS.getCode(), transactionDto);
     }
 
     /**
@@ -77,35 +84,47 @@ public class TransactionController {
      * @return
      */
     @GetMapping("getTransactionByAddress")
-    public ResultDto getTransactionByAddress(@RequestParam("pageCount") int pageCount, @RequestParam("pageNumber") int pageNumber, @RequestParam("address") String address) throws RocksDBException {
-        List<String> screens = new ArrayList<>();
-        List<byte[][]> screenVals = new ArrayList<>();
-        Integer lashBlockHeight = Integer.valueOf(dbAccess.getLastBlockHeight().get().toString());
-        screens.add("payAddress");
-        screens.add("receiptAddress");
-        byte[][] bytes1 = new byte[1][];
-        bytes1[0] = address.getBytes();
-        screenVals.add(bytes1);
-        screenVals.add(bytes1);
-        List<Transaction> transactions = dbAccess.transactionPagination(pageCount, pageNumber, 0, screens, screenVals, 1);
-        List<com.passport.dto.coreobject.Transaction> transactionsDto = new ArrayList<>();
-        for (Transaction transaction : transactions) {
-            com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
-            BeanUtils.copyProperties(transaction, transactionDto);
-            transactionDto.setConfirms(lashBlockHeight-Integer.valueOf(transactionDto.getBlockHeight().toString()));
-            BigDecimal eggUsed = transactionDto.getEggUsed()==null||transactionDto.getEggUsed().equals("") ? BigDecimal.ZERO : new BigDecimal(transactionDto.getEggUsed().toString());
-            BigDecimal eggPrice = transactionDto.getEggPrice()==null||transactionDto.getEggPrice().equals("")  ? BigDecimal.ZERO : new BigDecimal(transactionDto.getEggPrice().toString());
-            BigDecimal fee = eggPrice.multiply(eggUsed).setScale(8, BigDecimal.ROUND_HALF_UP);
-            transactionDto.setFee(fee);
-            transactionDto.setToken(Constant.MAIN_COIN);
-            transactionsDto.add(transactionDto);
+    public ResultDto getTransactionByAddress(@RequestParam("pageCount") int pageCount,
+                                             @RequestParam("pageNumber") int pageNumber, @RequestParam("address") String address) {
+        try {
+            Long t1 = System.currentTimeMillis();
+            List<String> screens = new ArrayList<>();
+            List<byte[][]> screenVals = new ArrayList<>();
+            Integer lashBlockHeight = Integer.valueOf(dbAccess.getLastBlockHeight().get().toString());
+            screens.add("payAddress");
+            screens.add("receiptAddress");
+            byte[][] bytes1 = new byte[1][];
+            bytes1[0] = address.getBytes();
+            screenVals.add(bytes1);
+            screenVals.add(bytes1);
+            List<Transaction> transactions = dbAccess.transactionPagination(pageCount, pageNumber, 0, screens, screenVals, 1);
+            Long t2 = System.currentTimeMillis();
+            System.out.println(t2-t1);
+            List<com.passport.dto.coreobject.Transaction> transactionsDto = new ArrayList<>();
+            for (Transaction transaction : transactions) {
+                com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
+                BeanUtils.copyProperties(transaction, transactionDto);
+                transactionDto.setConfirms(lashBlockHeight-Integer.valueOf(transactionDto.getBlockHeight().toString()));
+                BigDecimal eggUsed = transactionDto.getEggUsed()==null||transactionDto.getEggUsed().equals("") ? BigDecimal.ZERO : new BigDecimal(transactionDto.getEggUsed().toString());
+                BigDecimal eggPrice = transactionDto.getEggPrice()==null||transactionDto.getEggPrice().equals("")  ? BigDecimal.ZERO : new BigDecimal(transactionDto.getEggPrice().toString());
+                BigDecimal fee = eggPrice.multiply(eggUsed).setScale(8, BigDecimal.ROUND_HALF_UP);
+                transactionDto.setFee(fee);
+                transactionDto.setToken(Constant.MAIN_COIN);
+                transactionsDto.add(transactionDto);
+            }
+            Map resultMap = new HashMap();
+            resultMap.put("transactionList", transactionsDto);
+//            resultMap.put("count", dbAccess.getTransCountByAddress(address));//TODO:待解决
+            resultMap.put("count",transactionsDto.size());
+            ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
+            resultDto.setData(resultMap);
+            return resultDto;
+        }catch (CommonException e){
+            e.printStackTrace();
+            return new ResultDto(e.getResultEnum().getCode(),e.getMessage());
+        }catch (Exception e){
+            return new ResultDto(ResultEnum.SYS_ERROR.getCode(),e.getMessage());
         }
-        Map resultMap = new HashMap();
-        resultMap.put("transactionList", transactionsDto);
-        resultMap.put("count", dbAccess.getTransCountByAddress(address));//TODO:待解决
-        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
-        resultDto.setData(resultMap);
-        return resultDto;
     }
 
     /**
