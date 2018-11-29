@@ -15,4 +15,5 @@ message Data {
     Account account = 5;
     Transaction transaction = 6;
     repeated Trustee trustee = 7;
+    int64 blockHeight = 8;
 }

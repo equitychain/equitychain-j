@@ -75,6 +75,7 @@ public class NextBlockSyncRESP extends Strategy {
 //            }
             blockList.add(blockLocal);
         }
+        SyncFlag.blockHeight = message.getData().getBlockHeight();
         try {
             blockHandler.addBlockQueue(blockList);
         } catch (InterruptedException e) {

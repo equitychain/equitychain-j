@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentMap;
  **/
 public class SyncFlag {
     private static volatile boolean nextBlockSyncFlag = true;//默认处理发布主动同步区块事件，为false则处理组2接收广播区块、接收广播流水
-    public static int blockHeight = 0;
+    public static Long blockHeight = 0L;
     public static boolean isNextBlockSyncFlag() {
         return nextBlockSyncFlag;
     }

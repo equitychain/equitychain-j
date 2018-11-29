@@ -137,6 +137,11 @@ public final class NettyData {
      */
     com.passport.proto.TrusteeMessage.TrusteeOrBuilder getTrusteeOrBuilder(
             int index);
+
+    /**
+     * <code>int64 blockHeight = 8;</code>
+     */
+    long getBlockHeight();
   }
   /**
    * Protobuf type {@code Data}
@@ -154,6 +159,7 @@ public final class NettyData {
       accounts_ = java.util.Collections.emptyList();
       blocks_ = java.util.Collections.emptyList();
       trustee_ = java.util.Collections.emptyList();
+      blockHeight_ = 0L;
     }
 
     @java.lang.Override
@@ -251,6 +257,11 @@ public final class NettyData {
               }
               trustee_.add(
                       input.readMessage(com.passport.proto.TrusteeMessage.Trustee.parser(), extensionRegistry));
+              break;
+            }
+            case 64: {
+
+              blockHeight_ = input.readInt64();
               break;
             }
           }
@@ -470,6 +481,15 @@ public final class NettyData {
       return trustee_.get(index);
     }
 
+    public static final int BLOCKHEIGHT_FIELD_NUMBER = 8;
+    private long blockHeight_;
+    /**
+     * <code>int64 blockHeight = 8;</code>
+     */
+    public long getBlockHeight() {
+      return blockHeight_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -502,6 +522,9 @@ public final class NettyData {
       }
       for (int i = 0; i < trustee_.size(); i++) {
         output.writeMessage(7, trustee_.get(i));
+      }
+      if (blockHeight_ != 0L) {
+        output.writeInt64(8, blockHeight_);
       }
     }
 
@@ -537,6 +560,10 @@ public final class NettyData {
       for (int i = 0; i < trustee_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
                 .computeMessageSize(7, trustee_.get(i));
+      }
+      if (blockHeight_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+                .computeInt64Size(8, blockHeight_);
       }
       memoizedSize = size;
       return size;
@@ -576,6 +603,8 @@ public final class NettyData {
       }
       result = result && getTrusteeList()
               .equals(other.getTrusteeList());
+      result = result && (getBlockHeight()
+              == other.getBlockHeight());
       return result;
     }
 
@@ -612,6 +641,9 @@ public final class NettyData {
         hash = (37 * hash) + TRUSTEE_FIELD_NUMBER;
         hash = (53 * hash) + getTrusteeList().hashCode();
       }
+      hash = (37 * hash) + BLOCKHEIGHT_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              getBlockHeight());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -782,6 +814,8 @@ public final class NettyData {
         } else {
           trusteeBuilder_.clear();
         }
+        blockHeight_ = 0L;
+
         return this;
       }
 
@@ -849,6 +883,7 @@ public final class NettyData {
         } else {
           result.trustee_ = trusteeBuilder_.build();
         }
+        result.blockHeight_ = blockHeight_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -980,6 +1015,9 @@ public final class NettyData {
               trusteeBuilder_.addAllMessages(other.trustee_);
             }
           }
+        }
+        if (other.getBlockHeight() != 0L) {
+          setBlockHeight(other.getBlockHeight());
         }
         onChanged();
         return this;
@@ -2122,6 +2160,32 @@ public final class NettyData {
         }
         return trusteeBuilder_;
       }
+
+      private long blockHeight_ ;
+      /**
+       * <code>int64 blockHeight = 8;</code>
+       */
+      public long getBlockHeight() {
+        return blockHeight_;
+      }
+      /**
+       * <code>int64 blockHeight = 8;</code>
+       */
+      public Builder setBlockHeight(long value) {
+
+        blockHeight_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 blockHeight = 8;</code>
+       */
+      public Builder clearBlockHeight() {
+
+        blockHeight_ = 0L;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
               final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -2188,13 +2252,13 @@ public final class NettyData {
             "\n\017NettyData.proto\032\016DataType.proto\032\022Block" +
                     "Message.proto\032\024AccountMessage.proto\032\030Tra" +
                     "nsactionMessage.proto\032\024TrusteeMessage.pr" +
-                    "oto\"\307\001\n\004Data\022\033\n\010dataType\030\001 \001(\0162\t.DataTyp" +
+                    "oto\"\334\001\n\004Data\022\033\n\010dataType\030\001 \001(\0162\t.DataTyp" +
                     "e\022\025\n\005block\030\002 \001(\0132\006.Block\022\032\n\010accounts\030\003 \003" +
                     "(\0132\010.Account\022\026\n\006blocks\030\004 \003(\0132\006.Block\022\031\n\007" +
                     "account\030\005 \001(\0132\010.Account\022!\n\013transaction\030\006" +
                     " \001(\0132\014.Transaction\022\031\n\007trustee\030\007 \003(\0132\010.Tr" +
-                    "usteeB\037\n\022com.passport.protoB\tNettyDatab\006" +
-                    "proto3"
+                    "ustee\022\023\n\013blockHeight\030\010 \001(\003B\037\n\022com.passpo" +
+                    "rt.protoB\tNettyDatab\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
             new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2218,7 +2282,7 @@ public final class NettyData {
     internal_static_Data_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
             internal_static_Data_descriptor,
-            new java.lang.String[] { "DataType", "Block", "Accounts", "Blocks", "Account", "Transaction", "Trustee", });
+            new java.lang.String[] { "DataType", "Block", "Accounts", "Blocks", "Account", "Transaction", "Trustee", "BlockHeight", });
     com.passport.proto.DataTypeEnum.getDescriptor();
     com.passport.proto.BlockMessage.getDescriptor();
     com.passport.proto.AccountMessage.getDescriptor();

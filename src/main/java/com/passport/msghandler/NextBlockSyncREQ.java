@@ -68,6 +68,7 @@ public class NextBlockSyncREQ extends Strategy {
             }
             count --;
         }
+        dataBuilder.setBlockHeight(CastUtils.castLong(lastBlockHeight.get()));//同步时带上高度
         NettyMessage.Message.Builder builder = NettyMessage.Message.newBuilder();
         builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
         builder.setData(dataBuilder.build());
