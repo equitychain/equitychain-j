@@ -226,7 +226,9 @@ public class BlockController {
     public ResultDto getSyncBlockSchedule(){
         Map<String,Object> map = new HashMap<>();
         map.put("BlockSync",SyncFlag.isNextBlockSyncFlag());
-        map.put("blockSchedule",Integer.valueOf(dbAccess.getLastBlockHeight().get().toString())/SyncFlag.blockHeight);
+        Long localHeight = Long.parseLong(dbAccess.getLastBlockHeight().get().toString());
+        BigDecimal blockSchedule = new BigDecimal((double) localHeight / SyncFlag.blockHeight);
+        map.put("blockSchedule",blockSchedule.setScale(2,BigDecimal.ROUND_HALF_UP));
         return new ResultDto(ResultEnum.SUCCESS.getCode(),map);
     }
     @GetMapping("getKChart")
