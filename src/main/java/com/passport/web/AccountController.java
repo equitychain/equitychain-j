@@ -127,6 +127,7 @@ public class AccountController {
         return new ResultDto(ResultEnum.SUCCESS);
     }
 
+
     @GetMapping("/generateGenesis")
     public ResultDto generateGenesis(HttpServletRequest request) throws Exception {
         accountHandler.generateTrustees();

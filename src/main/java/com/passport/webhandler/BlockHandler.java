@@ -393,6 +393,8 @@ public class BlockHandler {
                 trusteeHandler.changeStatus(trustee, blockCycle);
                 //启动任务
                 SyncFlag.blockTimeFlag = true;
+                //更新高度
+                SyncFlag.blockHeight = newBlockHeight;
                 logger.info("第{}个区块出块成功,出块账号:{}", newBlockHeight,account.getAddress_token());
                 provider.publishEvent(new GenerateNextBlockEvent(0L));
             }

@@ -245,22 +245,44 @@ public class BlockController {
             transactions.add(tranObj);
         }
         Long one = new Long(transactions.get(0).getTime().toString());
-        Map<String,Integer> sum = new TreeMap<>();
+        List<K> list = new ArrayList<>();
         int i = 0;
         for(com.passport.dto.coreobject.Transaction transaction:transactions){
             if(one<= new Long(transaction.getTime().toString()) && new Long(transaction.getTime().toString()) <= one + 60*60*1000 ){//测试每小时统计
                 i++;
             }else{
-                sum.put(DateUtils.stampToDate(transaction.getTime().toString())+"_"+DateUtils.stampToDate( (new Long(transaction.getTime().toString())+60*60*1000)+"" ), i);
+//                sum.put(DateUtils.stampToDate(transaction.getTime().toString())+"_"+DateUtils.stampToDate( (new Long(transaction.getTime().toString())+60*60*1000)+"" ), i);
+                list.add(new K(DateUtils.stampToDate(transaction.getTime().toString()),i));
                 one = new Long(transaction.getTime().toString());
                 i = 0;
             }
         }
-        List<Integer> list = new ArrayList<>();
-        for(String s:sum.keySet()){
-            list.add(sum.get(s));
-        }
-        System.out.println(JSONObject.toJSONString(sum));
-        return new ResultDto(ResultEnum.SUCCESS.getCode(),list.toArray());
+        System.out.println(JSONObject.toJSONString(list));
+        return new ResultDto(ResultEnum.SUCCESS.getCode(),list);
+    }
+}
+class K{
+    private String date;
+    private int sum;
+
+    public K(String date, int sum) {
+        this.date = date;
+        this.sum = sum;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public int getSum() {
+        return sum;
+    }
+
+    public void setSum(int sum) {
+        this.sum = sum;
     }
 }
