@@ -561,8 +561,10 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                 Optional<Trustee> trusteeOptional = getTrustee(address);
                 if (trusteeOptional.isPresent()) {
                     Trustee trustee = trusteeOptional.get();
-                    trustee.setStatus(1);
-                    allVoters.add(trustee);
+                    if(Collections.frequency(allVoters,trustee)<1){//不存在才新增
+                        allVoters.add(trustee);
+                        trustee.setStatus(1);
+                    }
                 }
             }
         }

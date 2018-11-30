@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -48,11 +49,28 @@ public class VoteController {
         }
         return resultDto;
     }
+//    @GetMapping("votingRecord")
+//    public ResultDto votingRecord(@RequestParam("address") String address,@RequestParam("pageCount") int pageCount, @RequestParam("pageNumber") int pageNumber){
+//        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
+//        List<VoteRecord> voters = dbAccess.votingRecord(address, pageCount,pageNumber);
+//        resultDto.setData(voters);
+//        return resultDto;
+//    }
     @GetMapping("votingRecord")
     public ResultDto votingRecord(@RequestParam("address") String address,@RequestParam("pageCount") int pageCount, @RequestParam("pageNumber") int pageNumber){
+        List<VoteRecord> voteRecords = dbAccess.listVoteRecords(address, "payAddress");
+        voteRecords.sort(new Comparator<VoteRecord>() {
+            @Override
+            public int compare(VoteRecord o1, VoteRecord o2) {
+                return (int) (o1.getTime()-o2.getTime());
+            }
+        });
+        //当页的数据区间的开始索引
+        int beginItem = pageCount * (pageNumber - 1);
+        //当页的数据区间的结束索引
+        int endItem = pageCount * pageNumber;
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
-        List<VoteRecord> voters = dbAccess.votingRecord(address, pageCount,pageNumber);
-        resultDto.setData(voters);
+        resultDto.setData(voteRecords.subList(beginItem<=voteRecords.size()-1 ? beginItem:voteRecords.size(),endItem<=voteRecords.size()-1 ? endItem:voteRecords.size()));
         return resultDto;
     }
 }

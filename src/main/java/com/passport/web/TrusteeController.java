@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 委托人
@@ -65,7 +62,7 @@ public class TrusteeController {
     }
 
     /**
-     * 委托人地址获取投票记录
+     * 委托人地址获取投票记录 别人投给他的记录
      *
      * @param pageCount
      * @param pageNumber
@@ -73,30 +70,19 @@ public class TrusteeController {
      */
     @GetMapping("getTrusteeListAsAddress")
     public ResultDto getTrusteeListAsAddress(@RequestParam("pageCount") int pageCount, @RequestParam("pageNumber") int pageNumber, @RequestParam("address") String address) {
-        List<Map> trusteeList = new ArrayList<>();
-        List<Trustee> trustees = dbAccess.trusteePagination(pageCount, pageNumber, 0, null, null);
-        for (Trustee trustee : trustees) {
-            boolean isAlreadyVote = false;
-            List<VoteRecord> voteRecords = dbAccess.listVoteRecords(address, "payAddress");
-            if (voteRecords.size() != 0) {
-                for (VoteRecord voteRecord : voteRecords) {
-                    if (voteRecord.getReceiptAddress().equals(trustee.getAddress())) {
-                        isAlreadyVote = true;
-                    }
-                }
+        List<VoteRecord> voteRecords = dbAccess.listVoteRecords(address, "receiptAddress");
+        voteRecords.sort(new Comparator<VoteRecord>() {
+            @Override
+            public int compare(VoteRecord o1, VoteRecord o2) {
+                return (int) (o1.getTime()-o2.getTime());
             }
-            Map trusteeMap = new HashMap();
-            trusteeMap.put("address", trustee.getAddress());
-            trusteeMap.put("voteNum", trustee.getVotes());
-            trusteeMap.put("isAlreadyVote",isAlreadyVote );
-            trusteeMap.put("generateRate",trustee.getGenerateRate() );
-            trusteeMap.put("income",trustee.getIncome() );
-            trusteeMap.put("status",trustee.getStatus());
-            trusteeList.add(trusteeMap);
-        }
-//        List<VoteRecord> voteRecords = dbAccess.listVoteRecords(address, "payAddress");
+        });
+        //当页的数据区间的开始索引
+        int beginItem = pageCount * (pageNumber - 1);
+        //当页的数据区间的结束索引
+        int endItem = pageCount * pageNumber;
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
-        resultDto.setData(trusteeList);
+        resultDto.setData(voteRecords.subList(beginItem<=voteRecords.size()-1 ? beginItem:voteRecords.size(),endItem<=voteRecords.size()-1 ? endItem:voteRecords.size()));
         return resultDto;
     }
 }
