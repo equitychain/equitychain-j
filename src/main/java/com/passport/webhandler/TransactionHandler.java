@@ -186,7 +186,7 @@ public class TransactionHandler {
         transaction.setReceiptAddress(receiptAddress == null?null:receiptAddress.getBytes());
         transaction.setValue(value.getBytes());
         transaction.setExtarData(extarData.getBytes());
-        transaction.setTime(String.valueOf(NetworkTime.INSTANCE.getWebsiteDateTimeLong()).getBytes());
+        transaction.setTime(String.valueOf(System.currentTimeMillis()).getBytes());
         transaction.setToken(token.getBytes());
         //生成hash和生成签名sign使用的基础数据都应该一样
         String transactionJson = GsonUtils.toJson(transaction);

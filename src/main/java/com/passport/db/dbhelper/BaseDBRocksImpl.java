@@ -4,9 +4,7 @@ import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.core.*;
 import com.passport.peer.ChannelsManager;
-import com.passport.utils.NetworkTime;
 import com.passport.utils.SerializeUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
@@ -849,7 +847,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         BigDecimal sumMoney = BigDecimal.ZERO;
         //总手续费
         BigDecimal sumFee = BigDecimal.ZERO;
-        long timeSpli = NetworkTime.INSTANCE.getWebsiteDateTimeLong() - 60 * 60 * 1000;
+        long timeSpli = System.currentTimeMillis() - 60 * 60 * 1000;
         long count = 0l;
         long blockTimeDiff = 0l;
         Optional<Block> blockOptional = getLastBlock();

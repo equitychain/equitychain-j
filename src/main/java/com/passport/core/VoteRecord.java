@@ -3,7 +3,6 @@ package com.passport.core;
 import com.passport.annotations.EntityClaz;
 import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
-import com.passport.utils.NetworkTime;
 
 /**
  * 投票记录
@@ -33,7 +32,7 @@ public class VoteRecord {
         this.receiptAddress = receiptAddress;
         this.voteNum = voteNum;
         this.status = status;
-        this.time = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
+        this.time = System.currentTimeMillis();;
     }
 
     public String getPayAddress() {

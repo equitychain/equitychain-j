@@ -19,14 +19,12 @@ import com.passport.transactionhandler.TransactionStrategy;
 import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.BlockUtils;
 import com.passport.utils.CastUtils;
-import com.passport.utils.NetworkTime;
 import com.passport.utils.RawardUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -361,7 +359,7 @@ public class BlockHandler {
      */
     private void waitIfNotArrived(Block block) {
         long lastTimestamp = block.getBlockHeader().getTimeStamp();
-        long currentTimestamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
+        long currentTimestamp = System.currentTimeMillis();;
 
        final long timeGap = currentTimestamp - lastTimestamp;
 
@@ -413,7 +411,7 @@ public class BlockHandler {
                     }
                     Block block = lastBlockOptional.get();
                     Long timeStamp = block.getBlockHeader().getTimeStamp();
-                    long currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
+                    long currentTimeStamp = System.currentTimeMillis();
                     Long time = 0l;
                     while (currentTimeStamp - timeStamp <= 30 * 1000){
                         time++;
@@ -422,7 +420,7 @@ public class BlockHandler {
                             logger.info("任务倒计终止，已有出块");
                             return;
                         }
-                        currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
+                        currentTimeStamp = System.currentTimeMillis();;
                     }
                     //接收到同步消息则停止
                     logger.info("最后一个区块出块时间距离现在超过30秒，重新选择出块账户");

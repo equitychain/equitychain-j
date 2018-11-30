@@ -7,7 +7,6 @@ import com.passport.core.Block;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.utils.BlockUtils;
-import com.passport.utils.NetworkTime;
 import com.passport.webhandler.BlockHandler;
 import com.passport.webhandler.TrusteeHandler;
 import org.slf4j.Logger;
@@ -50,7 +49,8 @@ public class MonitoringIfProducerDead {
         }
         Block block = lastBlockOptional.get();
         Long timeStamp = block.getBlockHeader().getTimeStamp();
-        long currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
+//        long currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
+        long currentTimeStamp = System.currentTimeMillis();
         if (currentTimeStamp <= timeStamp + Constant.BLOCK_GENERATE_TIMEGAP * 1000) {
             return;
         }
