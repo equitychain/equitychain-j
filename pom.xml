@@ -32,6 +32,17 @@
       <name>spring-plugins</name>
       <url>http://repo.spring.io/plugins-release</url>
     </repository>
+    <repository>
+      <id>hq-repository</id>
+      <name>HQ Repository</name>
+      <url>http://47.92.64.158:7876/nexus/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
   </repositories>
 
   <dependencies>
@@ -46,10 +57,15 @@
       <artifactId>gson</artifactId>
     </dependency>
 
+    <!--<dependency>-->
+      <!--<groupId>org.rocksdb</groupId>-->
+      <!--<artifactId>rocksdbjni</artifactId>-->
+      <!--<version>5.14.2</version>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>org.rocksdb</groupId>
-      <artifactId>rocksdbjni</artifactId>
-      <version>5.14.2</version>
+      <artifactId>rocksdbjni-repair</artifactId>
+      <version>5.13.4</version>
     </dependency>
 
     <dependency>
@@ -57,7 +73,11 @@
       <artifactId>snappy-java</artifactId>
       <version>1.1.7.2</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>0.9.10</version>
+    </dependency>
 
     <!--<dependency>
       <groupId>org.ethereum</groupId>
@@ -312,4 +332,33 @@
       <!--</plugin>-->
     </plugins>
   </build>
+
+  <distributionManagement>
+    <repository>
+      <id>deploy-releases</id>
+      <name>Porject Release</name>
+      <url>http://47.92.64.158:7876/nexus/content/repositories/releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>deploy-snapshots</id>
+      <name>Porject Snapshot</name>
+      <url>http://47.92.64.158:7876/nexus/content/repositories/snapshots/</url>
+      <uniqueVersion>true</uniqueVersion>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>hq-repository</id>
+      <name>HQ Repository</name>
+      <url>http://47.92.64.158:7876/nexus/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+
 </project>

@@ -1,18 +1,13 @@
 package com.passport.utils;
 
 import com.passport.annotations.EntityClaz;
+import org.reflections.Reflections;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.Set;
 
 public class ClassUtil {
 
@@ -23,34 +18,17 @@ public class ClassUtil {
     public static List<Class<?>> getClasses(String packageName) {
 
         // 第一个class类的集合
-        List<Class<?>> classes = new ArrayList<Class<?>>();
-        // 是否循环迭代
-        boolean recursive = true;
-        // 获取包的名字 并进行替换
-        String packageDirName = packageName.replace('.', '/');
-        // 定义一个枚举的集合 并进行循环来处理这个目录下的things
-        Enumeration<URL> dirs;
-        try {
-            dirs = Thread.currentThread().getContextClassLoader().getResources(packageDirName);
-            // 循环迭代下去
-            while (dirs.hasMoreElements()) {
-                // 获取下一个元素
-                URL url = dirs.nextElement();
-                // 得到协议的名称
-                String protocol = url.getProtocol();
-                // 如果是以文件的形式保存在服务器上
-                if ("file".equals(protocol)) {
-                    // 获取包的物理路径
-                    String filePath = URLDecoder.decode(url.getFile(), "UTF-8");
-                    // 以文件的方式扫描整个包下的文件 并添加到集合中
-                    findAndAddClassesInPackageByFile(packageName, filePath, recursive, classes);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        List<Class<?>> c = new ArrayList<Class<?>>();
+        //反射工具包，指明扫描路径
+        Reflections reflections = new Reflections(packageName);
+        //获取带Handler注解的类
+        Set<Class<?>> classList = reflections.getTypesAnnotatedWith(EntityClaz.class);
+        for (Class classes : classList) {
+            EntityClaz t = (EntityClaz) classes.getAnnotation(EntityClaz.class);
+            c.add(classes);
         }
-
-        return classes;
+        System.out.println(c.size());
+        return c;
     }
 
     /**
@@ -66,6 +44,7 @@ public class ClassUtil {
         File dir = new File(packagePath);
         // 如果不存在或者 也不是目录就直接返回
         if (!dir.exists() || !dir.isDirectory()) {
+            System.out.println("列族文件不存在");
             return;
         }
         // 如果存在 就获取包下的所有文件 包括目录
@@ -76,6 +55,7 @@ public class ClassUtil {
             }
         });
         // 循环所有文件
+        System.out.println("dirfiles:"+dirfiles);
         for (File file : dirfiles) {
             // 如果是目录 则继续扫描
             if (file.isDirectory()) {

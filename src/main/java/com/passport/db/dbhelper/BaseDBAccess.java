@@ -41,7 +41,7 @@ public abstract class BaseDBAccess implements DBAccess {
             }
             List<String> fields = new ArrayList<>();
             IndexColumnNames[] indexColumnNames = IndexColumnNames.values();
-            //添加字节码,加载dto属性
+            //TODO: 添加字节码,加载dto属性--cannot not read.
             List<Class<?>> classes = ClassUtil.getClasses("com.passport.core");
             for(Class c : classes){
                 fields.addAll(getClassCols(c));
@@ -94,7 +94,7 @@ public abstract class BaseDBAccess implements DBAccess {
                 //打开数据库  加载旧列族,创建新列族
                 List<ColumnFamilyHandle> handleList = new ArrayList<>();
 //                rocksDB = OptimisticrocksDBDB.open(new DBOptions().setCreateIfMissing(true), dataDir, curHasColumns, handleList);
-                rocksDB = rocksDB.open(new DBOptions().setCreateIfMissing(true).setDbLogDir("d:/dbLog"), dataDir, curHasColumns, handleList);
+                rocksDB = rocksDB.open(new DBOptions().setCreateIfMissing(true), dataDir, curHasColumns, handleList);
 
                 for(ColumnFamilyDescriptor descriptor : curDontHasColumns) {
                     ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
@@ -106,6 +106,7 @@ public abstract class BaseDBAccess implements DBAccess {
                     handleMap.put(name, handler);
                 }
             }
+            System.out.println("init:"+handleMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -316,6 +317,8 @@ public abstract class BaseDBAccess implements DBAccess {
                                 if (!hasKey) break;
                             }
                         }
+
+                        System.out.println("handleMap:"+handleMap);
                         putByColumnFamilyHandle(handleMap.get(getColName(className, fieldName)), key, SerializeUtils.serialize(value));
 //                        writeBatch.put(handleMap.get(getColName(className, fieldName)), key, SerializeUtils.serialize(value));
 //                        bachCount ++;
