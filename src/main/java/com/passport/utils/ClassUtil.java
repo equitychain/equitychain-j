@@ -27,7 +27,6 @@ public class ClassUtil {
             EntityClaz t = (EntityClaz) classes.getAnnotation(EntityClaz.class);
             c.add(classes);
         }
-        System.out.println(c.size());
         return c;
     }
 

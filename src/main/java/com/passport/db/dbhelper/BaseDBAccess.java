@@ -106,7 +106,6 @@ public abstract class BaseDBAccess implements DBAccess {
                     handleMap.put(name, handler);
                 }
             }
-            System.out.println("init:"+handleMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -317,8 +316,6 @@ public abstract class BaseDBAccess implements DBAccess {
                                 if (!hasKey) break;
                             }
                         }
-
-                        System.out.println("handleMap:"+handleMap);
                         putByColumnFamilyHandle(handleMap.get(getColName(className, fieldName)), key, SerializeUtils.serialize(value));
 //                        writeBatch.put(handleMap.get(getColName(className, fieldName)), key, SerializeUtils.serialize(value));
 //                        bachCount ++;
