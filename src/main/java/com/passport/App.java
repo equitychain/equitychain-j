@@ -27,19 +27,6 @@ import java.util.Enumeration;
 @SpringBootApplication(scanBasePackages = {"com.passport"})
 public class App {
    public static void main(String[] args) {
-//    ApplicationContext abstractApplicationContext = SpringApplication.run(App.class, args);
     SpringApplication.run(App.class, args);
-
-//       try {
-//           Enumeration<URL> ss =  abstractApplicationContext.getClassLoader().getResources("com.passport.core");
-//           while (ss.hasMoreElements()) {
-//               // 获取下一个元素
-//               URL url = ss.nextElement();
-//               System.out.println("APP:"+url);
-//           }
-//       } catch (IOException e) {
-//           e.printStackTrace();
-//       }
-
    }
 }
