@@ -9,6 +9,7 @@ import com.passport.enums.TransactionTypeEnum;
 import com.passport.event.SyncBlockEvent;
 import com.passport.listener.ApplicationContextProvider;
 import com.passport.utils.CastUtils;
+import com.passport.utils.DateUtils;
 import com.passport.utils.GsonUtils;
 import com.passport.utils.RawardUtil;
 import org.slf4j.Logger;
@@ -54,7 +55,7 @@ public class MinerHandler {
 
         //区块头，merkleTree和hash应该在获得打包交易权限时生成
         BlockHeader currentBlockHeader = new BlockHeader();
-        currentBlockHeader.setTimeStamp(System.currentTimeMillis());
+        currentBlockHeader.setTimeStamp(DateUtils.getWebTime());
         currentBlockHeader.setHashPrevBlock(prevBlock.getBlockHeader().getHash());
         //todo 这里是设置区块最多能打包多少的流水egg消耗
         currentBlockHeader.setEggMax(Long.parseLong("1000"));
@@ -122,7 +123,7 @@ public class MinerHandler {
                         tempBalances.get(payAddr).subtract(curTotalPay));
                 //矿工费付给矿工  注意!无论流水是否成功被打包该矿工费是必须给的,因为已经扣了,
                 Transaction feeTrans = new Transaction();
-                feeTrans.setTime((System.currentTimeMillis() + "").getBytes());
+                feeTrans.setTime((DateUtils.getWebTime() + "").getBytes());
                 feeTrans.setPayAddress(null);
                 feeTrans.setExtarData(tran.getHash());
                 //受托人获取确认流水矿工费的一定比例的奖励  如果投票人没有则全额奖励给受托人

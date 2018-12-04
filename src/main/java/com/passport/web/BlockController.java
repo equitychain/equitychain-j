@@ -235,10 +235,7 @@ public class BlockController {
     @ResponseBody
     public ResultDto getKChart(){
         List<com.passport.dto.coreobject.Transaction> transactions = new ArrayList<>();
-        Long t1 = System.currentTimeMillis();
         List<Transaction> transactionList = dbAccess.listTransactions();
-        Long t2 = System.currentTimeMillis();
-        System.out.println(t2-t1);
         for(Transaction transaction:transactionList){
             com.passport.dto.coreobject.Transaction tranObj = new com.passport.dto.coreobject.Transaction();
             BeanUtils.copyProperties(transaction, tranObj);

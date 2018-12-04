@@ -186,7 +186,7 @@ public class TransactionHandler {
         transaction.setReceiptAddress(receiptAddress == null?null:receiptAddress.getBytes());
         transaction.setValue(value.getBytes());
         transaction.setExtarData(extarData.getBytes());
-        transaction.setTime(String.valueOf(System.currentTimeMillis()).getBytes());
+        transaction.setTime(String.valueOf(DateUtils.getWebTime()).getBytes());
         transaction.setToken(token.getBytes());
         //生成hash和生成签名sign使用的基础数据都应该一样
         String transactionJson = GsonUtils.toJson(transaction);
@@ -262,16 +262,9 @@ public class TransactionHandler {
     public BigDecimal getEggUsedByTrans(Transaction transaction) {
         //TODO 这里的egg要那些参数计算，怎么计算
         //计算损耗egg，更新流水的eggUsed  注意，要确保流水的limit要大于或等于used
-        long begin = System.currentTimeMillis();
-        try {
-            Thread.sleep(3);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        long end = System.currentTimeMillis();
         BigDecimal eggUsed = DataFormatUtil.byteAsBigDecimal(transaction.getEggUsed());
         BigDecimal eggMax =DataFormatUtil.byteAsBigDecimal(transaction.getEggMax());
-        BigDecimal curUse = new BigDecimal(end - begin);
+        BigDecimal curUse = new BigDecimal(3);
         if (eggMax.compareTo(eggUsed.add(curUse)) >= 0) {
             //消耗燃料
             //todo 有个问题，就是未确认流水的已使用egg怎么让其他节点同步

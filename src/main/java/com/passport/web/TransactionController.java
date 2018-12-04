@@ -88,7 +88,6 @@ public class TransactionController {
     public ResultDto getTransactionByAddress(@RequestParam("pageCount") int pageCount,
                                              @RequestParam("pageNumber") int pageNumber, @RequestParam("address") String address) {
         try {
-            Long t1 = System.currentTimeMillis();
             List<String> screens = new ArrayList<>();
             List<byte[][]> screenVals = new ArrayList<>();
             Integer lashBlockHeight = Integer.valueOf(dbAccess.getLastBlockHeight().get().toString());
@@ -99,8 +98,6 @@ public class TransactionController {
             screenVals.add(bytes1);
             screenVals.add(bytes1);
             List<Transaction> transactions = dbAccess.transactionPagination(pageCount, pageNumber, 0, screens, screenVals, 1);
-            Long t2 = System.currentTimeMillis();
-            System.out.println(t2-t1);
             List<com.passport.dto.coreobject.Transaction> transactionsDto = new ArrayList<>();
             for (Transaction transaction : transactions) {
                 com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
@@ -183,10 +180,7 @@ public class TransactionController {
     @GetMapping("getTransactionList")
     public ResultDto getTransactionList(){
         List<com.passport.dto.coreobject.Transaction> transactions = new ArrayList<>();
-        Long t1 = System.currentTimeMillis();
         List<Transaction> transactionList = dbAccess.listTransactions();
-        Long t2 = System.currentTimeMillis();
-        System.out.println(t2-t1);
         for(Transaction transaction:transactionList){
             com.passport.dto.coreobject.Transaction tranObj = new com.passport.dto.coreobject.Transaction();
             BeanUtils.copyProperties(transaction, tranObj);

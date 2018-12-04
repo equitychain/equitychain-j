@@ -30,7 +30,7 @@ public class LockUtil {
             Credentials credentials = Credentials.create(Wallet.decrypt(password, file));
             String privateKey = credentials.getEcKeyPair().exportPrivateKey();
             if(privateKey != null && !"".equals(privateKey)) {
-                long lock = System.currentTimeMillis();;
+                long lock = DateUtils.getWebTime();
                 if (lockTime != null) {
                     lock = lock + lockTime;
                 } else {

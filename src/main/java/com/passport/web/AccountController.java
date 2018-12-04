@@ -75,7 +75,6 @@ public class AccountController {
         if (flag) {
             return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
         }
-        String clientIP = HttpUtils.getLocalHostLANAddress().getHostAddress();
         Account account = accountHandler.newAccount(password);
         if (account != null) {
             //当挖矿账户不存在时设置为挖矿账户
@@ -89,18 +88,32 @@ public class AccountController {
 
     @GetMapping("/miner")
     public ResultDto miner(HttpServletRequest request) throws Exception {
+        String minerAddress = request.getParameter("address");
+        //非空检验
+        boolean flag = CheckUtils.checkParamIfEmpty(minerAddress);
+        if (flag) {
+            return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
+        }
         if(SyncFlag.minerFlag){//启动时不更新受托人列表 需等下个周期在加入
-            if(channelsManager.getChannels().size() == 0){
-                SyncFlag.minerFlag = true;
-            }
-            //启动出块 需确认同步完成才能出块
-            Set<String> address = storyFileUtil.getAddresses();
             List<Trustee> trustees = dbAccess.listTrustees();
             List<Trustee> localTrustees = new ArrayList<>();//添加可以出块账户
-            for(Trustee trustee:trustees){//更新受托人列表启动出块
-                for(String add:address){
-                    if(trustee.getAddress().equals(add)){
-                        SyncFlag.waitMiner.put(add,1);
+            if(channelsManager.getChannels().size() == 0){//服务器启动直接所有受托人启动
+                SyncFlag.minerFlag = true;
+                Set<String> address = storyFileUtil.getAddresses();
+                //启动出块 需确认同步完成才能出块
+                for(Trustee trustee:trustees){//更新受托人列表启动出块
+                    for(String add:address){
+                        if(trustee.getAddress().equals(add)){
+                            SyncFlag.waitMiner.put(add,1);
+                            localTrustees.add(trustee);
+                        }
+                    }
+                }
+            }else{
+                //启动出块 需确认同步完成才能出块
+                for(Trustee trustee:trustees){//更新受托人列表启动出块
+                    if(trustee.getAddress().equals(minerAddress)){
+                        SyncFlag.waitMiner.put(minerAddress,1);
                         localTrustees.add(trustee);
                     }
                 }
