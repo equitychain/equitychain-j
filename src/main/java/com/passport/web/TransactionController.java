@@ -9,6 +9,7 @@ import com.passport.enums.ResultEnum;
 import com.passport.enums.TransactionTypeEnum;
 import com.passport.exception.CommonException;
 import com.passport.utils.CheckUtils;
+import com.passport.utils.DateUtils;
 import com.passport.webhandler.TransactionHandler;
 import org.rocksdb.RocksDBException;
 import org.springframework.beans.BeanUtils;
@@ -178,5 +179,20 @@ public class TransactionController {
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
         resultDto.setData(transactionsDto);
         return resultDto;
+    }
+    @GetMapping("getTransactionList")
+    public ResultDto getTransactionList(){
+        List<com.passport.dto.coreobject.Transaction> transactions = new ArrayList<>();
+        Long t1 = System.currentTimeMillis();
+        List<Transaction> transactionList = dbAccess.listTransactions();
+        Long t2 = System.currentTimeMillis();
+        System.out.println(t2-t1);
+        for(Transaction transaction:transactionList){
+            com.passport.dto.coreobject.Transaction tranObj = new com.passport.dto.coreobject.Transaction();
+            BeanUtils.copyProperties(transaction, tranObj);
+            tranObj.setTime(DateUtils.stampToDate(tranObj.getTime()+""));
+            transactions.add(tranObj);
+        }
+        return new ResultDto(ResultEnum.SUCCESS.getCode(),transactions);
     }
 }

@@ -260,29 +260,29 @@ public class BlockController {
         System.out.println(JSONObject.toJSONString(list));
         return new ResultDto(ResultEnum.SUCCESS.getCode(),list);
     }
-}
-class K{
-    private String date;
-    private int sum;
+    class K{
+        private String date;
+        private int sum;
 
-    public K(String date, int sum) {
-        this.date = date;
-        this.sum = sum;
-    }
+        public K(String date, int sum) {
+            this.date = date;
+            this.sum = sum;
+        }
 
-    public String getDate() {
-        return date;
-    }
+        public String getDate() {
+            return date;
+        }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
+        public void setDate(String date) {
+            this.date = date;
+        }
 
-    public int getSum() {
-        return sum;
-    }
+        public int getSum() {
+            return sum;
+        }
 
-    public void setSum(int sum) {
-        this.sum = sum;
+        public void setSum(int sum) {
+            this.sum = sum;
+        }
     }
 }

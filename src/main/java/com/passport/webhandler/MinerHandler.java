@@ -114,9 +114,8 @@ public class MinerHandler {
             String tradeType = new String(tran.getTradeType());
             //投票流水和撤销投票人流水不需要扣除balance的value，只需要扣除fee
             boolean canSubVal = "VOTE".equals(tradeType)||"VOTER_CANNEL".equals(tradeType);
-            if(curTotalPay.compareTo(tempBalances.get(payAddr)) <=  0 ||
-                    (tran.getTradeType() != null && canSubVal
-                            && valueDec.compareTo(tempBalances.get(payAddr)) <=0)) {
+            if(curTotalPay.compareTo(tempBalances.get(payAddr)) <=  0
+                || (tran.getTradeType() != null && canSubVal && valueDec.compareTo(tempBalances.get(payAddr)) <=0)) {
                 //累计扣除相关金额进行暂时缓存用于判断资金够不够
                 tempBalances.put(payAddr,canSubVal?
                         tempBalances.get(payAddr).subtract(valueDec):
