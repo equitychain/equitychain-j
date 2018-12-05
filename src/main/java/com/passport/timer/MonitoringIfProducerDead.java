@@ -89,7 +89,7 @@ public class MonitoringIfProducerDead {
             String extarData = "测试";
             String password ="123456";
             String tradeType = "TRANSFER";
-            String token = "BCP";
+            String token = "EQU";
             boolean flag = false;
             //若流水类型为 委托人注册 或 投票人注册的时候 不校验receiptAddress
             if (TransactionTypeEnum.TRUSTEE_REGISTER.toString().equals(tradeType)

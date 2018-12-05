@@ -92,7 +92,7 @@ public class AccountController {
         //非空检验
         boolean flag = CheckUtils.checkParamIfEmpty(minerAddress);
         if (flag) {
-            return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
+            return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY.getCode(),!SyncFlag.minerFlag);
         }
         if(SyncFlag.minerFlag){//启动时不更新受托人列表 需等下个周期在加入
             List<Trustee> trustees = dbAccess.listTrustees();
@@ -137,7 +137,7 @@ public class AccountController {
             builder.setData(dataBuilder.build());
             channelsManager.getChannels().writeAndFlush(builder.build());
         }
-        return new ResultDto(ResultEnum.SUCCESS);
+        return new ResultDto(ResultEnum.SUCCESS.getCode(),!SyncFlag.minerFlag);
     }
 
 
@@ -321,10 +321,16 @@ public class AccountController {
         try {
             File file = new File(walletPath);
             WalletFile walletFile = new ObjectMapper().readValue(file, WalletFile.class);
-            Optional<Account> accountOptional = dbAccess.getAccount(Numeric.HEX_PREFIX + walletFile.getAddress());
-            if (accountOptional.isPresent()) {
-                return new ResultDto(ResultEnum.WALLET_ACCOUNT_EXISTS);
-            }
+//            Optional<Account> accountOptional = dbAccess.getAccount(walletFile.getAddress());
+//            if (accountOptional.isPresent() || StringUtils.isNotBlank(accountOptional.get().getPrivateKey())) {
+//                return new ResultDto(ResultEnum.WALLET_ACCOUNT_EXISTS);
+//            }
+            Set<String> set = storyFileUtil.getAddresses();
+            for(String s:set){
+                if(s.equals(walletFile.getAddress())){
+                    return new ResultDto(ResultEnum.WALLET_ACCOUNT_EXISTS);
+                }
+            };
             ECKeyPair ecKeyPair = Wallet.decrypt(pwd, walletFile);
             address = ecKeyPair.getAddress();
             String fileName = WalletUtils.generateWalletFile(pwd, ecKeyPair, new File(keystoreDir), true);
@@ -346,15 +352,5 @@ public class AccountController {
         }
         resultDto.setData(address);
         return resultDto;
-    }
-
-    @GetMapping("getTest")
-    public @ResponseBody Object getTest(String clientIP){
-        List<String> list = dbAccess.seekByKey(clientIP);
-        Map<String,String> map = new HashMap<>();
-        for(String s:list){
-            map.put(clientIP+"_"+s,s);
-        }
-        return map;
     }
 }

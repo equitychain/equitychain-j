@@ -211,6 +211,7 @@ public class BlockController {
         }
         return list;
     }
+    //统计
     @GetMapping("getCensesData")
     @ResponseBody
     public ResultDto getCensesData(){
