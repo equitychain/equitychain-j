@@ -282,7 +282,12 @@ public class AccountController {
         WalletFile walletFile = null;
         String fileName = "";
         try {
-            walletFile = StoryFileUtil.getStoryFileUtil(new File(keystoreDir)).getAddressInfo(address);
+            Set<String> set = storyFileUtil.getAddresses();
+            for(String s:set){
+                if(s.contains(address)){
+                    walletFile = StoryFileUtil.getStoryFileUtil(new File(keystoreDir)).getAddressInfo(s);
+                }
+            }
             ECKeyPair ecKeyPair = Wallet.decrypt(pwd, walletFile);
             fileName = WalletUtils.generateWalletFile(pwd, ecKeyPair, new File(targePath), true);
         } catch (Exception e) {

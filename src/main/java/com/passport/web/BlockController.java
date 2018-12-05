@@ -255,6 +255,10 @@ public class BlockController {
                 i = 0;
             }
         }
+        //刚启动只有一小时内
+        if(list.size() == 0){
+            list.add(new K(DateUtils.stampToDate(one.toString()),i));
+        }
         System.out.println(JSONObject.toJSONString(list));
         return new ResultDto(ResultEnum.SUCCESS.getCode(),list);
     }
