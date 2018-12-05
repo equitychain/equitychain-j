@@ -103,6 +103,39 @@ public class BlockController {
         resultDto.setData(newBlock);
         return resultDto;
     }
+    /**
+     * 根据区块高度 流水页数 获取单条流水
+     *
+     * @param blockHeight:区块高度
+     * @return
+     */
+    @GetMapping("getBlockByHeightTransaction")
+    public ResultDto getBlockByHeightTransaction(@RequestParam("blockHeight") int blockHeight,@RequestParam(value = "pageNum") int pageNum) {
+        long lastBlockHeight = 0;
+        Optional<Object> objectOptional = dbAccess.getLastBlockHeight();
+        if (objectOptional.isPresent()) {
+            lastBlockHeight = Long.valueOf(objectOptional.get().toString());
+        }
+        com.passport.dto.coreobject.Block newBlock = new com.passport.dto.coreobject.Block();
+        Optional<Block> blockOptional = dbAccess.getBlock(blockHeight);
+        BigDecimal totalValue = BigDecimal.ZERO;
+        BigDecimal totalFee = BigDecimal.ZERO;
+        if (blockOptional.isPresent()) {
+            newBlock = getBlockObject(blockOptional.get());
+            com.passport.dto.coreobject.Transaction transaction = newBlock.getTransactions().get(pageNum-1);
+            totalValue = totalValue.add(transaction.getValue() == null ? BigDecimal.ZERO : new BigDecimal(transaction.getValue().toString()));
+            BigDecimal eggUsed = transaction.getEggUsed()==null||transaction.getEggUsed().equals("") ? BigDecimal.ZERO : new BigDecimal(transaction.getEggUsed().toString());
+            BigDecimal eggPrice = transaction.getEggPrice()==null||transaction.getEggPrice().equals("")  ? BigDecimal.ZERO : new BigDecimal(transaction.getEggPrice().toString());
+            BigDecimal fee = eggPrice.multiply(eggUsed).setScale(8, BigDecimal.ROUND_HALF_UP);
+            totalValue = totalValue.add(fee);
+            transaction.setConfirms(lastBlockHeight - blockHeight);
+            transaction.setFee(fee);
+            transaction.setToken(Constant.MAIN_COIN);
+            return new ResultDto(ResultEnum.SUCCESS.getCode(),transaction);
+        }else{
+            return new ResultDto(ResultEnum.SYS_ERROR);
+        }
+    }
 
 
     /**
