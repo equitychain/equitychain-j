@@ -848,7 +848,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         BigDecimal sumMoney = BigDecimal.ZERO;
         //总手续费
         BigDecimal sumFee = BigDecimal.ZERO;
-        long timeSpli = DateUtils.getWebTime() - 60 * 60 * 1000;
         long count = 0l;
         long blockTimeDiff = 0l;
         Optional<Block> blockOptional = getLastBlock();
@@ -881,20 +880,22 @@ public class BaseDBRocksImpl extends BaseDBAccess {
                         }
                     }
 
-                    byte[] timeByt = rocksDB.get(handleMap.get(getColName("transaction", "time")), hashKey);
-                    if (timeByt != null && timeByt.length != 0) {
-                        long time = Long.parseLong(new String(timeByt));
-                        if (time >= timeSpli) {
-                            //一小时内的交易流水   进行统计
-                            count++;
-                        }
-                    }
+//                    byte[] timeByt = rocksDB.get(handleMap.get(getColName("transaction", "time")), hashKey);
+//                    if (timeByt != null && timeByt.length != 0) {
+//                        long time = Long.parseLong(new String(timeByt));
+//                        if (time >= timeSpli) {
+//                            //一小时内的交易流水   进行统计
+//                            count++;
+//                        }
+//                    }
+                    count++;
                 }
             }
         }
         map.put("avgMoney", lastHeightOpt.isPresent() ? sumMoney.divide(new BigDecimal(lastHeightOpt.get().toString()), 3, BigDecimal.ROUND_DOWN) : sumMoney);
         map.put("avgFee", lastHeightOpt.isPresent() ? sumFee.divide(new BigDecimal(lastHeightOpt.get().toString()), 3, BigDecimal.ROUND_DOWN) : sumFee);
-        map.put("countTrans", count);
+        Long s = DateUtils.getWebTime()-Constant.GENESIS_BLOCK_TIMESTAMP;
+        map.put("countTrans", new BigDecimal(count/(s/(1000*60*60))).setScale(3,BigDecimal.ROUND_DOWN));
         map.put("blockTimeDiff", blockTimeDiff);
         return map;
     }
@@ -977,5 +978,4 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         }
         return true;
     }
-
 }
