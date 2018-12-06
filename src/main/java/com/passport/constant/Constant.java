@@ -70,4 +70,6 @@ public interface Constant {
   BigDecimal CONFIRM_TRANS_PROPORTION = new BigDecimal("0.2");
   //投票人奖励精度
   int PROPORTION_ACCURACY = 8;
+  //主节点资产
+  BigDecimal masterBalance = new BigDecimal(6.18*10000*10000);
 }

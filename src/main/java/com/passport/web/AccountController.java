@@ -359,4 +359,9 @@ public class AccountController {
         resultDto.setData(address);
         return resultDto;
     }
+    @GetMapping("checkChannel")
+    public ResultDto checkChannel() {
+        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS.getCode(),channelsManager.getChannels().size());//TODO:待实现
+        return resultDto;
+    }
 }

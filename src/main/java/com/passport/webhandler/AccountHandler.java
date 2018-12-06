@@ -94,10 +94,20 @@ public class AccountHandler {
         List<Transaction> transactions = new ArrayList<>();
         List<Trustee> trustees = new ArrayList<>();
         List<VoteRecord> voteRecords = new ArrayList<>();
+        int voteNum = 1;
         for (int i = 0; i < Constant.TRUSTEES_INIT_NUM; i++) {
             try {
+//                //TODO: 前30个节点各有10000票
+//                if(i<=30){
+//                    voteNum = 10000;
+//                }else{
+//                    voteNum = 1;
+//                }
                 //创建账户
                 Account account = generateAccount("123456");
+//                if(i == 0){
+//                    account.setBalance(Constant.masterBalance);
+//                }
                 dbAccess.putAccount(account);
                 String[] addressToken = account.getAddress_token().split("_");
 
@@ -115,7 +125,7 @@ public class AccountHandler {
                 voteRecord.setReceiptAddress(addressToken[0]);
                 voteRecord.setTime(Constant.GENESIS_BLOCK_TIMESTAMP);
                 voteRecord.setStatus(1);
-                voteRecord.setVoteNum(1);
+                voteRecord.setVoteNum(voteNum);
                 voteRecord.setId();
                 voteRecords.add(voteRecord);
 
