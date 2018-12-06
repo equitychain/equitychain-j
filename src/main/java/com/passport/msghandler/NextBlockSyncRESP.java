@@ -34,7 +34,6 @@ public class NextBlockSyncRESP extends Strategy {
     private ChannelsManager channelsManager;
     @Autowired
     private BlockHandler blockHandler;
-    private static int trustee = 0;
     @Override
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块同步响应结果：{}", GsonUtils.toJson(message));
@@ -48,17 +47,13 @@ public class NextBlockSyncRESP extends Strategy {
             //同步完了，不进行广播，
             SyncFlag.setNextBlockSyncFlag(false);
             SyncFlag.blockTimeFlag = true;
-            //同步受托人只同步一次
-            if(trustee == 0){
-                //发送同步受托人列表请求
-                NettyData.Data.Builder dataBuilder2 = NettyData.Data.newBuilder();
-                dataBuilder2.setDataType(DataTypeEnum.DataType.TRUSTEE_SYNC);
-                NettyMessage.Message.Builder builder2 = NettyMessage.Message.newBuilder();
-                builder2.setData(dataBuilder2.build());
-                builder2.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
-                channelsManager.getChannels().writeAndFlush(builder2.build());
-                trustee = 1;
-            }
+            //发送同步受托人列表请求
+            NettyData.Data.Builder dataBuilder2 = NettyData.Data.newBuilder();
+            dataBuilder2.setDataType(DataTypeEnum.DataType.TRUSTEE_SYNC);
+            NettyMessage.Message.Builder builder2 = NettyMessage.Message.newBuilder();
+            builder2.setData(dataBuilder2.build());
+            builder2.setMessageType(MessageTypeEnum.MessageType.DATA_REQ);
+            channelsManager.getChannels().writeAndFlush(builder2.build());
 
             //生成下一个区块 需求已改需要手动启动生成下个区块
 //            provider.publishEvent(new GenerateBlockEvent(0L));

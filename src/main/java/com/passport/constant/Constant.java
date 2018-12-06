@@ -37,7 +37,7 @@ public interface Constant {
 
   Integer BLOCK_HEIGHT_GAP = 5;//本地区块和广播过来的区块高度差
 
-  Integer BLOCK_SYNC_PERTIME = 50;//一次主动同步的区块数
+  Integer BLOCK_SYNC_PERTIME = 2000;//一次主动同步的区块数
 
   Integer TRUSTEES_INIT_NUM = 11;//受托人初始化的人数
 
