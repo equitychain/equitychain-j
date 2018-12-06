@@ -106,6 +106,7 @@ public class AccountController {
                         if(trustee.getAddress().equals(add)){
                             SyncFlag.waitMiner.put(add,1);
                             localTrustees.add(trustee);
+                            SyncFlag.minerFlag = false;
                         }
                     }
                 }
@@ -115,11 +116,11 @@ public class AccountController {
                     if(trustee.getAddress().equals(minerAddress)){
                         SyncFlag.waitMiner.put(minerAddress,1);
                         localTrustees.add(trustee);
+                        SyncFlag.minerFlag = false;
                     }
                 }
             }
             provider.publishEvent(new GenerateBlockEvent(0L));
-            SyncFlag.minerFlag = false;
             //通知所有用户 本节点启动出块
             NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
             dataBuilder.setDataType(DataTypeEnum.DataType.ACCOUNT_MINER);
