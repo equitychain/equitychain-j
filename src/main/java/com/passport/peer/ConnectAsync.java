@@ -63,8 +63,8 @@ public class ConnectAsync {
                         @Override
                         protected void initChannel(SocketChannel sc) throws Exception {
                             ChannelPipeline pipeline = sc.pipeline();
-                            //心跳检查
-                            pipeline.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS));
+                            //心跳检查 默认30s 现改成60s
+                            pipeline.addLast(new IdleStateHandler(60, 0, 0, TimeUnit.SECONDS));
                             //将字节数组转换成Person对象和将Person对象转成字节数组,一共需要四个处理器
                             pipeline.addLast(new ProtobufVarint32FrameDecoder());
                             pipeline.addLast(new ProtobufDecoder(NettyMessage.Message.getDefaultInstance()));
@@ -109,8 +109,8 @@ public class ConnectAsync {
                         @Override
                         protected void initChannel(SocketChannel sc) throws Exception {
                             ChannelPipeline pipeline = sc.pipeline();
-                            //心跳检测
-                            pipeline.addLast(new IdleStateHandler(0,30,0, TimeUnit.SECONDS));
+                            //心跳检测 默认30s 现改成60s
+                            pipeline.addLast(new IdleStateHandler(0,60,0, TimeUnit.SECONDS));
                             //将字节数组转换成Person对象和将Person对象转成字节数组,一共需要四个处理器
                             pipeline.addLast(new ProtobufVarint32FrameDecoder());
                             pipeline.addLast(new ProtobufDecoder(NettyMessage.Message.getDefaultInstance()));
