@@ -29,7 +29,7 @@ public class ChannelsManager {
 
     public void addChannel(Channel channel){
         channels.add(channel);
-        concurrentHashMap.put(channel.id().toString(),0);
+        concurrentHashMap.put(channel.remoteAddress().toString(),0);
         logger.info("增加channel实例后，实例数量："+channels.size());
     }
 

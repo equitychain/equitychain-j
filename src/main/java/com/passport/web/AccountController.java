@@ -1,5 +1,6 @@
 package com.passport.web;
 
+import afu.org.checkerframework.checker.oigj.qual.O;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.protobuf.ByteString;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.math.BigDecimal;
+import java.nio.channels.Channel;
 import java.util.*;
 
 /**
@@ -361,7 +363,11 @@ public class AccountController {
     }
     @GetMapping("checkChannel")
     public ResultDto checkChannel() {
-        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS.getCode(),channelsManager.getChannels().size());//TODO:待实现
+        Map<String, Object> map = new HashMap<>();
+        channelsManager.getChannels().forEach(v->{
+            map.put(v.remoteAddress().toString(),v.remoteAddress().toString());
+        });
+        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS.getCode(),map);//TODO:待实现
         return resultDto;
     }
 }
