@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.net.InetSocketAddress;
+
 /**
  * 服务端处理区块同步请求
  * @author: xujianfeng
@@ -30,7 +32,8 @@ public class NextBlockSyncREQ extends Strategy {
 
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块同步请求数据：{}", GsonUtils.toJson(message));
-        ChannelsManager.concurrentHashMap.put(ctx.channel().remoteAddress().toString(),0);
+        InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
+        ChannelsManager.concurrentHashMap.put(inetSocketAddress.getAddress().getHostAddress(),0);
 
         BlockMessage.Block blockInfo = message.getData().getBlock();
         //查询本地是否有此高度的区块

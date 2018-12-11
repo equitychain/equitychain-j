@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -29,7 +30,8 @@ public class ChannelsManager {
 
     public void addChannel(Channel channel){
         channels.add(channel);
-        concurrentHashMap.put(channel.remoteAddress().toString(),0);
+        InetSocketAddress inetSocketAddress = (InetSocketAddress) channel.remoteAddress();
+        concurrentHashMap.put(inetSocketAddress.getAddress().getHostAddress(),0);
         logger.info("增加channel实例后，实例数量："+channels.size());
     }
 
