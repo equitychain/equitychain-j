@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 
 /**
- * 普通用户投票
+ * 普通用户投票 目前投票不需要扣除手续费 只需要矿工费
  * @author: xujianfeng
  * @create: 2018-09-10 17:46
  **/

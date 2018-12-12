@@ -13,19 +13,24 @@ import java.util.concurrent.ConcurrentMap;
  **/
 public class SyncFlag {
     private static volatile boolean nextBlockSyncFlag = true;//默认处理发布主动同步区块事件，为false则处理组2接收广播区块、接收广播流水
-    public static Long blockHeight = 0L;
+
     public static boolean isNextBlockSyncFlag() {
         return nextBlockSyncFlag;
     }
+
     public static void setNextBlockSyncFlag(boolean nextBlockSyncFlag) {
         SyncFlag.nextBlockSyncFlag = nextBlockSyncFlag;
     }
-    public static boolean blockTimeFlag = false;//是否能启动出块 只允许一次
+    public static Long blockHeight = 1L;//进度条使用轮训初始高度
+
+    public static boolean blockTimeFlag = false;//是否启动定时任务
 
     public static boolean minerFlag = true;//允许出块
 
-    public static ConcurrentMap<String,Integer> waitMiner = new ConcurrentHashMap<>();
+    public static ConcurrentMap<String,Integer> waitMiner = new ConcurrentHashMap<>();//启动挖矿账户缓存
 
-    public static ConcurrentMap<String,List<Trustee>> blockCycleList = new ConcurrentHashMap<>();
+    public static ConcurrentMap<String,List<Trustee>> blockCycleList = new ConcurrentHashMap<>();//周期
+
+    public static ConcurrentMap<String,Boolean> keystoreAddressStatus = new ConcurrentHashMap<>();//keystore里账户是否启动了挖矿状态
 
 }

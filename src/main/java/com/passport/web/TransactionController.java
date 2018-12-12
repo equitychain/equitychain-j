@@ -60,7 +60,6 @@ public class TransactionController {
                 //非空检验
                 flag = CheckUtils.checkParamIfEmpty(payAddress, receiptAddress, value, extarData);
             }
-
             if (flag) {
                 return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
             }
@@ -73,7 +72,6 @@ public class TransactionController {
             e.printStackTrace();
             return new ResultDto(e.getResultEnum().getCode(),e.getMessage());
         }
-
     }
 
     /**

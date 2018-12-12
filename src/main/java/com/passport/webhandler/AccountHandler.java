@@ -3,6 +3,7 @@ package com.passport.webhandler;
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.core.*;
+import com.passport.crypto.eth.Bip39Wallet;
 import com.passport.crypto.eth.ECKeyPair;
 import com.passport.crypto.eth.WalletUtils;
 import com.passport.db.dbhelper.BaseDBAccess;
@@ -64,7 +65,7 @@ public class AccountHandler {
         }
         return null;
     }
-    private Account generateAccount(String password) throws CipherException, IOException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+    private Account generateAccount(String password) throws Exception {
         File file = new File(walletDir);
         if (!file.exists()) {
             file.mkdir();
@@ -72,6 +73,9 @@ public class AccountHandler {
 
         //创建公私钥并生成keystore文件
         ECKeyPair keyPair = WalletUtils.generateNewWalletFile(password, new File(walletDir), true);
+
+//        Bip39Wallet bip39Wallet = WalletUtils.generateBip39Wallet(password, new File(walletDir));
+//        ECKeyPair keyPair = bip39Wallet.getKeyPair();
         Account account = new Account(keyPair.getAddress()+"_"+Constant.MAIN_COIN, keyPair.exportPrivateKey(), BigDecimal.ZERO,keyPair.getAddress(),Constant.MAIN_COIN);
         account.setPassword(password);
         return account;

@@ -96,7 +96,7 @@ public class AccountController {
         if (flag) {
             return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY.getCode(),!SyncFlag.minerFlag);
         }
-        if(SyncFlag.minerFlag){//启动时不更新受托人列表 需等下个周期在加入
+        if(SyncFlag.minerFlag){//启动时不更新受托人列表 需等下个周期在加入 只要有一个账户启动则所有启动
             List<Trustee> trustees = dbAccess.listTrustees();
             List<Trustee> localTrustees = new ArrayList<>();//添加可以出块账户
             if(channelsManager.getChannels().size() == 0){//服务器启动直接所有受托人启动
@@ -109,6 +109,7 @@ public class AccountController {
                             SyncFlag.waitMiner.put(add,1);
                             localTrustees.add(trustee);
                             SyncFlag.minerFlag = false;
+                            SyncFlag.keystoreAddressStatus.put(trustee.getAddress(),true);
                         }
                     }
                 }
@@ -119,6 +120,7 @@ public class AccountController {
                         SyncFlag.waitMiner.put(minerAddress,1);
                         localTrustees.add(trustee);
                         SyncFlag.minerFlag = false;
+                        SyncFlag.keystoreAddressStatus.put(trustee.getAddress(),true);
                     }
                 }
             }
@@ -225,6 +227,7 @@ public class AccountController {
                 accountMap.put("balance", account.getBalance());
                 accountMap.put("token",addressToken[1]);
                 accountMap.put("address",addressToken[0]);
+                accountMap.put("miner",SyncFlag.keystoreAddressStatus.get(addressToken[0]) == null ? false:SyncFlag.keystoreAddressStatus.get(addressToken[0]));//true 开启挖矿 false 未开启
                 accounts.add(accountMap);
                 sumBalance = sumBalance.add(account.getBalance());
             }
@@ -361,6 +364,11 @@ public class AccountController {
         resultDto.setData(address);
         return resultDto;
     }
+
+    /**
+     * 测试使用查看网络连接情况
+     * @return
+     */
     @GetMapping("checkChannel")
     public ResultDto checkChannel() {
         Map<String, Object> map = new HashMap<>();

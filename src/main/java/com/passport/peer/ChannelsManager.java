@@ -18,9 +18,10 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Component
 public class ChannelsManager {
+
     private static final Logger logger = LoggerFactory.getLogger(ChannelsManager.class);
 
-    public static ConcurrentHashMap<String,Integer> concurrentHashMap = new ConcurrentHashMap();
+    public static ConcurrentHashMap<String,Integer> concurrentHashMap = new ConcurrentHashMap();//心跳使用 key ip value 次数
 
     private static ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 

@@ -255,16 +255,30 @@ public class BlockController {
             return new ResultDto(ResultEnum.SYS_ERROR);
         }
     }
+
+    /**
+     * 启动时候的轮训
+     * @return
+     */
     @GetMapping("getSyncBlockSchedule")
     @ResponseBody
     public ResultDto getSyncBlockSchedule(){
         Map<String,Object> map = new HashMap<>();
         map.put("BlockSync",SyncFlag.isNextBlockSyncFlag());
-        Long localHeight = Long.parseLong(dbAccess.getLastBlockHeight().get().toString());
-        BigDecimal blockSchedule = new BigDecimal((double) localHeight / SyncFlag.blockHeight);
+        Optional<Object> objectOptional = dbAccess.getLastBlockHeight();
+        Long lastBlockHeight = 0l;
+        if (objectOptional.isPresent()) {
+            lastBlockHeight = Long.valueOf(objectOptional.get().toString());
+        }
+        BigDecimal blockSchedule = new BigDecimal((double) lastBlockHeight / SyncFlag.blockHeight);
         map.put("blockSchedule",blockSchedule.setScale(2,BigDecimal.ROUND_HALF_UP));
         return new ResultDto(ResultEnum.SUCCESS.getCode(),map);
     }
+
+    /**
+     * K线图
+     * @return
+     */
     @GetMapping("getKChart")
     @ResponseBody
     public ResultDto getKChart(){
