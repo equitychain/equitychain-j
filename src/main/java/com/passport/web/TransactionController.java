@@ -56,6 +56,7 @@ public class TransactionController {
             if (TransactionTypeEnum.TRUSTEE_REGISTER.toString().equals(tradeType)
                     || TransactionTypeEnum.VOTER_REGISTER.toString().equals(tradeType)) {
                 flag = CheckUtils.checkParamIfEmpty(payAddress, value, extarData);
+                receiptAddress = dbAccess.getMasterAccount();
             } else {
                 //非空检验
                 flag = CheckUtils.checkParamIfEmpty(payAddress, receiptAddress, value, extarData);

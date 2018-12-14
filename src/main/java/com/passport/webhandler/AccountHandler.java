@@ -59,13 +59,13 @@ public class AccountHandler {
      * @return 账号
      */
     public Account newAccount(String password) throws Exception {
-        Account account = generateAccount(password);
+        Account account = generateAccount(password,"guest");
         if (dbAccess.putAccount(account)) {
             return account;
         }
         return null;
     }
-    private Account generateAccount(String password) throws Exception {
+    private Account generateAccount(String password,String identity) throws Exception {
         File file = new File(walletDir);
         if (!file.exists()) {
             file.mkdir();
@@ -76,7 +76,7 @@ public class AccountHandler {
 
 //        Bip39Wallet bip39Wallet = WalletUtils.generateBip39Wallet(password, new File(walletDir));
 //        ECKeyPair keyPair = bip39Wallet.getKeyPair();
-        Account account = new Account(keyPair.getAddress()+"_"+Constant.MAIN_COIN, keyPair.exportPrivateKey(), BigDecimal.ZERO,keyPair.getAddress(),Constant.MAIN_COIN);
+        Account account = new Account(keyPair.getAddress()+"_"+Constant.MAIN_COIN, keyPair.exportPrivateKey(), BigDecimal.ZERO,keyPair.getAddress(),Constant.MAIN_COIN,identity);
         account.setPassword(password);
         return account;
     }
@@ -94,56 +94,64 @@ public class AccountHandler {
      */
     public void generateTrustees() {
         GenesisBlockInfo genesisBlockInfo = new GenesisBlockInfo();
+        try {
         List<Account> accounts = new ArrayList<>();
         List<Transaction> transactions = new ArrayList<>();
         List<Trustee> trustees = new ArrayList<>();
         List<VoteRecord> voteRecords = new ArrayList<>();
         int voteNum = 1;
         for (int i = 0; i < Constant.TRUSTEES_INIT_NUM; i++) {
-            try {
-//                //TODO: 前30个节点各有10000票
-//                if(i<=30){
-//                    voteNum = 10000;
-//                }else{
-//                    voteNum = 1;
-//                }
-                //创建账户
-                Account account = generateAccount("123456");
-//                if(i == 0){
-//                    account.setBalance(Constant.masterBalance);
-//                }
-                dbAccess.putAccount(account);
-                String[] addressToken = account.getAddress_token().split("_");
 
-                accounts.add(new Account(account.getAddress_token(),null, account.getBalance(),addressToken[0],addressToken[1]));//不保存私钥
+//          //TODO: 前30个节点各有10000票
+//          if(i<=30){
+//             voteNum = 10000;
+//          }else{
+//             voteNum = 1;
+//          }
+            //创建账户
+            Account account = generateAccount("123456","guest");
+//          if(i == 0){
+//             account.setBalance(Constant.masterBalance);
+//          }
+            dbAccess.putAccount(account);
+            String[] addressToken = account.getAddress_token().split("_");
 
-                //创建注册为受托人交易
-                Transaction transaction = transactionHandler.generateTransaction(addressToken[0], null, "0", "", account,addressToken[1]);
-                transaction.setTradeType(TransactionTypeEnum.TRUSTEE_REGISTER.toString().getBytes());
-                transaction.setBlockHeight("1".getBytes());
-                transactions.add(transaction);
+            accounts.add(new Account(account.getAddress_token(),null, account.getBalance(),addressToken[0],addressToken[1],account.getIdentity()));//不保存私钥
 
-                //增加投票记录
-                VoteRecord voteRecord = new VoteRecord();
-                voteRecord.setPayAddress("");
-                voteRecord.setReceiptAddress(addressToken[0]);
-                voteRecord.setTime(Constant.GENESIS_BLOCK_TIMESTAMP);
-                voteRecord.setStatus(1);
-                voteRecord.setVoteNum(voteNum);
-                voteRecord.setId();
-                voteRecords.add(voteRecord);
+            //创建注册为受托人交易
+            Transaction transaction = transactionHandler.generateTransaction(addressToken[0], null, "0", "", account,addressToken[1]);
+            transaction.setTradeType(TransactionTypeEnum.TRUSTEE_REGISTER.toString().getBytes());
+            transaction.setBlockHeight("1".getBytes());
+            transactions.add(transaction);
 
-                //把新增的受托人放到受托人列表
-                Trustee trustee = new Trustee(addressToken[0], 1L, 0f, new BigDecimal(0), 1,0);
-                trustees.add(trustee);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            //增加投票记录
+            VoteRecord voteRecord = new VoteRecord();
+            voteRecord.setPayAddress("");
+            voteRecord.setReceiptAddress(addressToken[0]);
+            voteRecord.setTime(Constant.GENESIS_BLOCK_TIMESTAMP);
+            voteRecord.setStatus(1);
+            voteRecord.setVoteNum(voteNum);
+            voteRecord.setId();
+            voteRecords.add(voteRecord);
+
+            //把新增的受托人放到受托人列表
+            Trustee trustee = new Trustee(addressToken[0], 1L, 0f, new BigDecimal(0), 1,0);
+            trustees.add(trustee);
         }
+        //创建账户 官方中间账户 start
+        Account account = generateAccount("123456","master");
+        dbAccess.putAccount(account);
+        String[] addressToken = account.getAddress_token().split("_");
+        accounts.add(new Account(account.getAddress_token(),null, account.getBalance(),addressToken[0],addressToken[1],account.getIdentity()));
+        //end
+
         genesisBlockInfo.setAccounts(accounts);
         genesisBlockInfo.setTransactions(transactions);
         genesisBlockInfo.setTrustees(trustees);
         genesisBlockInfo.setVoteRecords(voteRecords);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //在项目下生成json文件
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(Constant.GENESIS_PATH))) {
             writer.write(GsonUtils.toJson(genesisBlockInfo));

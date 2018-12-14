@@ -278,6 +278,7 @@ public class TransactionHandler {
     public BigDecimal getTempEggByHash(byte[] transHash) {
         return eggUsedTemp.get(transHash);
     }
+
     public void setVoteRecords(long blockHeight, String address){
         long time = blockUtils.getTimestamp4BlockCycle(blockHeight);
         //获取受托人的投票记录  某个时间前的

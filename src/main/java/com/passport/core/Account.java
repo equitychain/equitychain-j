@@ -24,6 +24,8 @@ public class Account{
     private BigDecimal balance;//余额
     @FaildClaz(name = "password",type = String.class)
     private String password;//交易密码
+    @FaildClaz(name = "identity",type = String.class)
+    private String identity;//交易密码
 
     private String address;
 
@@ -38,12 +40,13 @@ public class Account{
         this.balance = balance;
     }
 
-    public Account(String address_token, String privateKey, BigDecimal balance,String address,String token) {
+    public Account(String address_token, String privateKey, BigDecimal balance,String address,String token,String identity) {
         this.address_token = address_token;
         this.privateKey = privateKey;
         this.balance = balance;
         this.address = address;
         this.token = token;
+        this.identity = identity;
     }
 
     public String getAddress_token() {
@@ -94,6 +97,14 @@ public class Account{
         this.token = token;
     }
 
+    public String getIdentity() {
+        return identity;
+    }
+
+    public void setIdentity(String identity) {
+        this.identity = identity;
+    }
+
     @Override
     public String toString() {
         return "Account{" +
@@ -101,6 +112,7 @@ public class Account{
                 ", privateKey='" + privateKey + '\'' +
                 ", balance=" + balance +
                 ", password='" + password + '\'' +
+                ", identity='" + identity + '\'' +
                 '}';
     }
 

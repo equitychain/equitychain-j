@@ -98,6 +98,7 @@ public class MinerHandler {
         for(Transaction tran : blockTrans){
             //矿工费
             BigDecimal valueDec = transactionHandler.getTempEggByHash(tran.getHash());
+            logger.info("矿工费为："+valueDec);
             valueDec = valueDec == null?BigDecimal.ZERO:valueDec;
             String payAddr = new String(tran.getPayAddress());
             if(!tempBalances.containsKey(payAddr)) {
@@ -127,8 +128,9 @@ public class MinerHandler {
                 feeTrans.setPayAddress(null);
                 feeTrans.setExtarData(tran.getHash());
                 //受托人获取确认流水矿工费的一定比例的奖励  如果投票人没有则全额奖励给受托人
-
-                feeTrans.setValue(String.valueOf(transactionHandler.getVoteRecords().size() == 0?valueDec:valueDec.multiply(BigDecimal.ONE.subtract(Constant.CONFIRM_TRANS_PROPORTION))).getBytes());
+                feeTrans.setValue(String.valueOf(
+                        transactionHandler.getVoteRecords().size() == 0?
+                                valueDec:valueDec.multiply(BigDecimal.ONE.subtract(Constant.CONFIRM_TRANS_PROPORTION))).getBytes());
 
                 feeTrans.setBlockHeight(((prevBlock.getBlockHeight() + 1) + "").getBytes());
                 feeTrans.setReceiptAddress(minerAddressToken[0].getBytes());

@@ -317,7 +317,21 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 //            }
 //        }
 //    }
-
+    @Override
+    public String getMasterAccount() {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("account", "identity")));
+        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+            if("master".equals(new String(iterator.value()))){
+                Optional<Account> accountOptional = getAccount(new String(iterator.key()));
+                if (accountOptional.isPresent()) {
+                    Account account = accountOptional.get();
+                    String[] address_token = account.getAddress_token().split("_");
+                    return address_token[0];
+                }
+            }
+        }
+        return "";
+    }
     @Override
     public boolean putAccount(Account account) {
         try {
@@ -390,8 +404,6 @@ public class BaseDBRocksImpl extends BaseDBAccess {
 
     @Override
     public List<Transaction> listUnconfirmTransactions() {
-//        if (transaction.isDeadlockDetect()) {
-//        }
         RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("transaction", "hash")));
         List<Transaction> transactions = new ArrayList<>();
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {

@@ -228,6 +228,12 @@ public class AccountController {
                 accountMap.put("token",addressToken[1]);
                 accountMap.put("address",addressToken[0]);
                 accountMap.put("miner",SyncFlag.keystoreAddressStatus.get(addressToken[0]) == null ? false:SyncFlag.keystoreAddressStatus.get(addressToken[0]));//true 开启挖矿 false 未开启
+                Trustee trustee = null;
+                Optional<Trustee> trusteeOptional = dbAccess.getTrustee(addressToken[0]);
+                if (trusteeOptional.isPresent()) {
+                    trustee = trusteeOptional.get();
+                }
+                accountMap.put("isTrustee", trustee == null ? false : true);//是否为委托人
                 accounts.add(accountMap);
                 sumBalance = sumBalance.add(account.getBalance());
             }
@@ -345,7 +351,8 @@ public class AccountController {
             ECKeyPair ecKeyPair = Wallet.decrypt(pwd, walletFile);
             address = ecKeyPair.getAddress();
             String fileName = WalletUtils.generateWalletFile(pwd, ecKeyPair, new File(keystoreDir), true);
-            Account account = new Account(ecKeyPair.getAddress()+"_"+Constant.MAIN_COIN, ecKeyPair.exportPrivateKey(), BigDecimal.ZERO,ecKeyPair.getAddress(),Constant.MAIN_COIN);
+            Account account = new Account(ecKeyPair.getAddress()+"_"+Constant.MAIN_COIN, ecKeyPair.exportPrivateKey(),
+                    BigDecimal.ZERO,ecKeyPair.getAddress(),Constant.MAIN_COIN,"guest");
             boolean res = dbAccess.putAccount(account);
             if (!res) {
                 File walletfile = new File(walletPath + File.separator + fileName);

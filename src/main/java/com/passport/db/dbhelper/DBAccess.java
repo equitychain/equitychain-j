@@ -153,6 +153,8 @@ public interface DBAccess {
 	 */
 	List<Account> getNodeAccountList();
 
+	String getMasterAccount();
+
 	/**
 	 * 添加一个钱包账户
 	 * @param account
