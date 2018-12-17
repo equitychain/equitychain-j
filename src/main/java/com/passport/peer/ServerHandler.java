@@ -72,7 +72,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         logger.info(channelsManager.concurrentHashMap.get(ctx.channel().id().asShortText())+"已经30秒未收到客户端的消息了！剩余channel数"+channelsManager.getChannels().size());
         if (evt instanceof IdleStateEvent){
             IdleStateEvent event = (IdleStateEvent)evt;
-            if (event.state()== IdleState.READER_IDLE){
+            if (event.state()== IdleState.ALL_IDLE){
                 channelsManager.concurrentHashMap.put(ctx.channel().id().asShortText(),channelsManager.concurrentHashMap.get(ctx.channel().id().asShortText())+1);
                 logger.info(ctx+"通道心跳数"+channelsManager.concurrentHashMap.get(ctx.channel().id().asShortText()));
                 if(channelsManager.concurrentHashMap.get(ctx.channel().id().asShortText())>=3){

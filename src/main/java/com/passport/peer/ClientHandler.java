@@ -70,7 +70,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
         logger.info("客户端心跳监测: "+channelsManager.getChannels().size());
         if (evt instanceof IdleStateEvent){
             IdleStateEvent event = (IdleStateEvent)evt;
-            if (event.state()== IdleState.WRITER_IDLE){
+            if (event.state()== IdleState.ALL_IDLE){
 //                logger.info("服务端异常，已断开");
 //                exceptionCaught(ctx,new Throwable());
                 NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
