@@ -79,6 +79,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
                 builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
                 builder.setData(dataBuilder.build());
                 ctx.writeAndFlush(builder.build());
+                System.out.println("client发送心跳消息");
             }
         }
     }

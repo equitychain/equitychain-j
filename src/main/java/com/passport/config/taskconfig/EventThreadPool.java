@@ -19,7 +19,7 @@ public class EventThreadPool {
 
     @Bean
     public Executor asyncServiceExecutor() {
-        logger.debug("start asyncServiceExecutor");
+        logger.info("start asyncServiceExecutor");
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         //配置核心线程数
         executor.setCorePoolSize(5);

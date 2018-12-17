@@ -60,7 +60,7 @@ public class BlockSyncREQ extends Strategy {
             BlockMessage.Block block = message.getData().getBlock();
 
             if(SyncFlag.isNextBlockSyncFlag()){
-                logger.debug("正在主动同步区块，暂时不处理流水广播消息");
+                logger.info("正在主动同步区块，暂时不处理流水广播消息");
                 return;
              }
 
@@ -72,10 +72,10 @@ public class BlockSyncREQ extends Strategy {
             long lastBlockHeight = CastUtils.castLong(lastBlockHeightOptional.get());
             long blockHeight = block.getBlockHeight();
             if((lastBlockHeight + 1) != blockHeight){//最后的区块高度+1=广播过来的区块高度，表示区块按顺序处理
-                logger.debug("本地区块最新高度和广播过来的区块高度相差!=1");
+                logger.info("本地区块最新高度和广播过来的区块高度相差!=1");
                 //如果本地高度和广播过来的区块高度差
                 if(blockHeight - lastBlockHeight >= Constant.BLOCK_HEIGHT_GAP){
-                    logger.debug("本地区块最新高度和广播过来的区块高度相差>=5");
+                    logger.info("本地区块最新高度和广播过来的区块高度相差>=5");
                     //修改主动同步标记
                     SyncFlag.setNextBlockSyncFlag(true);
                     //发布主动同步事件

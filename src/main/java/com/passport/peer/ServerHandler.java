@@ -69,13 +69,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<NettyMessage.Mess
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
-        logger.warn(channelsManager.concurrentHashMap.get(inetSocketAddress.getAddress().getHostAddress())+"已经30秒未收到客户端的消息了！"+channelsManager.getChannels().size());
+        logger.info(channelsManager.concurrentHashMap.get(inetSocketAddress.getAddress().getHostAddress())+"已经30秒未收到客户端的消息了！"+channelsManager.getChannels().size());
         if (evt instanceof IdleStateEvent){
             IdleStateEvent event = (IdleStateEvent)evt;
             if (event.state()== IdleState.READER_IDLE){
                 channelsManager.concurrentHashMap.put(inetSocketAddress.getAddress().getHostAddress(),channelsManager.concurrentHashMap.get(inetSocketAddress.getAddress().getHostAddress())+1);
+                logger.info(inetSocketAddress.getAddress().getHostAddress()+"通道心跳数"+channelsManager.concurrentHashMap.get(inetSocketAddress.getAddress().getHostAddress()));
                 if(channelsManager.concurrentHashMap.get(inetSocketAddress.getAddress().getHostAddress())>=3){
-                    logger.error("关闭这个不活跃通道！");
+                    logger.info("关闭这个不活跃通道！");
                     exceptionCaught(ctx,new Throwable());
                 }
             }

@@ -25,7 +25,7 @@ public class HeartBeatRESP extends Strategy {
     private ApplicationContextProvider provider;
     @Override
     void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {
-        logger.debug("处理心跳响应结果：{}", GsonUtils.toJson(message));
+        logger.info("处理心跳响应结果：{}", GsonUtils.toJson(message));
         InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
         ChannelsManager.concurrentHashMap.put(inetSocketAddress.getAddress().getHostAddress(),0);
     }

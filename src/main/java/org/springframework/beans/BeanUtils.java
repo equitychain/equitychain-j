@@ -475,7 +475,7 @@ public abstract class BeanUtils {
 			catch (Throwable ex) {
 				// e.g. AccessControlException on Google App Engine
 				if (logger.isDebugEnabled()) {
-					logger.debug("Could not access system ClassLoader: " + ex);
+					logger.info("Could not access system ClassLoader: " + ex);
 				}
 				return null;
 			}
@@ -485,7 +485,7 @@ public abstract class BeanUtils {
 			Class<?> editorClass = cl.loadClass(editorName);
 			if (!PropertyEditor.class.isAssignableFrom(editorClass)) {
 				if (logger.isWarnEnabled()) {
-					logger.warn("Editor class [" + editorName +
+					logger.info("Editor class [" + editorName +
 							"] does not implement [java.beans.PropertyEditor] interface");
 				}
 				unknownEditorTypes.add(targetType);
@@ -495,7 +495,7 @@ public abstract class BeanUtils {
 		}
 		catch (ClassNotFoundException ex) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("No property editor [" + editorName + "] found for type " +
+				logger.info("No property editor [" + editorName + "] found for type " +
 						targetType.getName() + " according to 'Editor' suffix convention");
 			}
 			unknownEditorTypes.add(targetType);
