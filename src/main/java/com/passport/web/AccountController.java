@@ -378,14 +378,18 @@ public class AccountController {
      */
     @GetMapping("checkChannel")
     public ResultDto checkChannel() {
-        Map<String, Object> map = new HashMap<>();
-//        channelsManager.getChannels().forEach(v->{
-//            map.put(v.remoteAddress().toString(),v.remoteAddress().toString());
-//        });
-        ChannelsManager.concurrentHashMap.forEach((k,v)->{
-            map.put(k,v);
+        List<Map> list = new ArrayList<>();
+        Map<String, Object> map1 = new HashMap<>();
+        channelsManager.getChannels().forEach(v->{
+            map1.put(v.id().asShortText(),v.remoteAddress().toString());
         });
-        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS.getCode(),map);//TODO:待实现
+        Map<String, Object> map2 = new HashMap<>();
+        ChannelsManager.concurrentHashMap.forEach((k,v)->{
+            map2.put(k,v);
+        });
+        list.add(map1);
+        list.add(map2);
+        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS.getCode(),list);//TODO:待实现
         return resultDto;
     }
 }

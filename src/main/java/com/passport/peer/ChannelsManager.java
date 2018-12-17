@@ -21,7 +21,8 @@ public class ChannelsManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ChannelsManager.class);
 
-    public static ConcurrentHashMap<String,Integer> concurrentHashMap = new ConcurrentHashMap();//心跳使用 key ip value 次数
+    //TODO: 不会被清除 导致map容量越来越大 损耗资源
+    public static ConcurrentHashMap<String,Integer> concurrentHashMap = new ConcurrentHashMap();//心跳使用 key ip的id value 次数
 
     private static ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
@@ -32,7 +33,7 @@ public class ChannelsManager {
     public void addChannel(Channel channel){
         channels.add(channel);
         InetSocketAddress inetSocketAddress = (InetSocketAddress) channel.remoteAddress();
-        concurrentHashMap.put(inetSocketAddress.getAddress().getHostAddress(),0);
+        concurrentHashMap.put(channel.id().asShortText(),0);
         logger.info("增加channel实例后，实例数量："+channels.size());
     }
 

@@ -33,7 +33,7 @@ public class NextBlockSyncREQ extends Strategy {
     public void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
         logger.info("处理区块同步请求数据：{}", GsonUtils.toJson(message));
         InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
-        ChannelsManager.concurrentHashMap.put(inetSocketAddress.getAddress().getHostAddress(),0);
+        ChannelsManager.concurrentHashMap.put(ctx.channel().id().asShortText(),0);
 
         BlockMessage.Block blockInfo = message.getData().getBlock();
         //查询本地是否有此高度的区块
