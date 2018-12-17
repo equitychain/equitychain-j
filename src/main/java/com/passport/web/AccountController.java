@@ -79,8 +79,6 @@ public class AccountController {
         }
         Account account = accountHandler.newAccount(password);
         if (account != null) {
-            //当挖矿账户不存在时设置为挖矿账户
-            accountHandler.setMinerAccountIfNotExists(account);
             provider.publishEvent(new SyncAccountEvent(account));
             return new ResultDto(ResultEnum.SUCCESS.getCode(), account);
         }
@@ -319,7 +317,23 @@ public class AccountController {
      */
     @PostMapping("importWallet")
     public ResultDto importWallet(@RequestParam("pwd") String pwd, @RequestParam("mnemonic") String mnemonic) {
-        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);//TODO:待实现
+        ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
+        Bip39Wallet bip39Wallet = null;
+        try {
+            bip39Wallet = WalletUtils.generateBip39Wallet(pwd, mnemonic);
+            Account account = new Account(bip39Wallet.getKeyPair().getAddress()+"_"+Constant.MAIN_COIN, bip39Wallet.getKeyPair().exportPrivateKey(),
+                    BigDecimal.ZERO,bip39Wallet.getKeyPair().getAddress(),Constant.MAIN_COIN,"guest");
+            Set<String> set = storyFileUtil.getAddresses();
+            for(String s:set){
+                if(s.equals(account.getAddress())){
+                    return new ResultDto(ResultEnum.WALLET_ACCOUNT_EXISTS);
+                }
+            };
+            dbAccess.putAccount(account);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResultDto(ResultEnum.SYS_ERROR);
+        }
         return resultDto;
     }
 
@@ -338,10 +352,6 @@ public class AccountController {
         try {
             File file = new File(walletPath);
             WalletFile walletFile = new ObjectMapper().readValue(file, WalletFile.class);
-//            Optional<Account> accountOptional = dbAccess.getAccount(walletFile.getAddress());
-//            if (accountOptional.isPresent() || StringUtils.isNotBlank(accountOptional.get().getPrivateKey())) {
-//                return new ResultDto(ResultEnum.WALLET_ACCOUNT_EXISTS);
-//            }
             Set<String> set = storyFileUtil.getAddresses();
             for(String s:set){
                 if(s.equals(walletFile.getAddress())){

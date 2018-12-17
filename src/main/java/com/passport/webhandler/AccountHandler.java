@@ -72,21 +72,14 @@ public class AccountHandler {
         }
 
         //创建公私钥并生成keystore文件
-        ECKeyPair keyPair = WalletUtils.generateNewWalletFile(password, new File(walletDir), true);
+//        ECKeyPair keyPair = WalletUtils.generateNewWalletFile(password, new File(walletDir), true);
 
-//        Bip39Wallet bip39Wallet = WalletUtils.generateBip39Wallet(password, new File(walletDir));
-//        ECKeyPair keyPair = bip39Wallet.getKeyPair();
+        Bip39Wallet bip39Wallet = WalletUtils.generateBip39Wallet(password, new File(walletDir));
+        ECKeyPair keyPair = bip39Wallet.getKeyPair();
         Account account = new Account(keyPair.getAddress()+"_"+Constant.MAIN_COIN, keyPair.exportPrivateKey(), BigDecimal.ZERO,keyPair.getAddress(),Constant.MAIN_COIN,identity);
         account.setPassword(password);
+        account.setMnemonic(bip39Wallet.getMnemonic());
         return account;
-    }
-
-    //用户设置默认挖矿账号（第一个创建的账户默认为挖矿账户）
-    public void setMinerAccountIfNotExists(Account account) {
-        Optional<Account> minerAccount = dbAccess.getMinerAccount();
-        if (!minerAccount.isPresent()) {
-            dbAccess.putMinerAccount(account);
-        }
     }
 
     /**
