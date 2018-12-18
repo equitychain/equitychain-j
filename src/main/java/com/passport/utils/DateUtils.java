@@ -395,11 +395,14 @@ public class DateUtils {
             uc.connect ( );
             time = uc.getDate ( );
         } catch (MalformedURLException e) {
-            e.printStackTrace ( );
+//            e.printStackTrace ( );
+            time = System.currentTimeMillis();
         } catch (IOException e) {
-            e.printStackTrace ( );
+//            e.printStackTrace ( );
+            time = System.currentTimeMillis();
+        }finally {
+            return time > Constant.GENESIS_BLOCK_TIMESTAMP ? time : Constant.GENESIS_BLOCK_TIMESTAMP;
         }
-        return time > Constant.GENESIS_BLOCK_TIMESTAMP ? time : Constant.GENESIS_BLOCK_TIMESTAMP;
     }
 
     public static void main(String[] args) {

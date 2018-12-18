@@ -64,9 +64,9 @@ public class MinerHandler {
         Transaction transaction = new Transaction();
         transaction.setPayAddress(null);
         transaction.setReceiptAddress(minerAddressToken[0].getBytes());//奖励接收者是挖矿账号
-
-
-        transaction.setValue(String.valueOf(RawardUtil.getRewardByHeight(CastUtils.castLong(prevBlock.getBlockHeight() + 1))).getBytes());//TODO 挖矿奖励取值优化
+        //TODO 挖矿奖励取值优化
+        BigDecimal block_reward = RawardUtil.getRewardByHeight(CastUtils.castLong(prevBlock.getBlockHeight() + 1));
+        transaction.setValue(String.valueOf(block_reward).getBytes());
         transaction.setExtarData(TransactionTypeEnum.BLOCK_REWARD.toString().getBytes());
         transaction.setTime(String.valueOf(System.currentTimeMillis()).getBytes());
         transaction.setBlockHeight(((prevBlock.getBlockHeight() + 1)+"").getBytes());
@@ -95,7 +95,7 @@ public class MinerHandler {
 
         transactionHandler.setVoteRecords(prevBlock.getBlockHeight() + 1,minerAddressToken[0]);
         Map<String, BigDecimal> tempBalances = new HashMap<>();
-        for(Transaction tran : blockTrans){
+        for(Transaction tran : blockTrans){//有未确认流水才有旷工费
             //矿工费
             BigDecimal valueDec = transactionHandler.getTempEggByHash(tran.getHash());
             logger.info("矿工费为："+valueDec);
@@ -116,6 +116,7 @@ public class MinerHandler {
             String tradeType = new String(tran.getTradeType());
             //投票流水和撤销投票人流水不需要扣除balance的value，只需要扣除fee
             boolean canSubVal = "VOTE".equals(tradeType)||"VOTER_CANNEL".equals(tradeType);
+
             if(curTotalPay.compareTo(tempBalances.get(payAddr)) <=  0
                 || (tran.getTradeType() != null && canSubVal && valueDec.compareTo(tempBalances.get(payAddr)) <=0)) {
                 //累计扣除相关金额进行暂时缓存用于判断资金够不够
@@ -152,7 +153,10 @@ public class MinerHandler {
             }
         }
         if(transactionHandler.getVoteRecords().size() != 0){
-            //计算每个投票人应该获得多少奖励
+            //计算分发的流水奖励金额的比例 基数0.2
+            if(sumTransMoney.compareTo(BigDecimal.ZERO) == 0){
+                sumTransMoney = block_reward.multiply(Constant.CONFIRM_TRANS_PROPORTION);
+            }
             BigDecimal voterReward = sumTransMoney.divide(new BigDecimal(transactionHandler.getVoteRecords().size()), Constant.PROPORTION_ACCURACY, BigDecimal.ROUND_DOWN);
             //差值计算
             BigDecimal diffReward = sumTransMoney.subtract(voterReward.multiply(new BigDecimal(transactionHandler.getVoteRecords().size())));
