@@ -132,7 +132,7 @@ public class MinerHandler {
                 feeTrans.setValue(String.valueOf(
                         transactionHandler.getVoteRecords().size() == 0?
                                 valueDec:valueDec.multiply(BigDecimal.ONE.subtract(Constant.CONFIRM_TRANS_PROPORTION))).getBytes());
-
+                //TODO 第一次获得奖励需测试好像为6/投票人个数 往后的都是1/投票人个数
                 feeTrans.setBlockHeight(((prevBlock.getBlockHeight() + 1) + "").getBytes());
                 feeTrans.setReceiptAddress(minerAddressToken[0].getBytes());
                 feeTrans.setToken(minerAddressToken[1].getBytes());

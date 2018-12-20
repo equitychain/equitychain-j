@@ -397,6 +397,8 @@ public class AccountController {
         ChannelsManager.concurrentHashMap.forEach((k,v)->{
             map2.put(k,v);
         });
+        map1.put("master",dbAccess.getMasterAccount());
+        map1.put("centre",dbAccess.getCentreAccount());
         list.add(map1);
         list.add(map2);
         ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS.getCode(),list);//TODO:待实现

@@ -43,7 +43,7 @@ public class TrusteeController {
                 return new ResultDto(ResultEnum.TRANS_UNCOMPSYN);
             }
             String payAddress = request.getParameter("payAddress");
-            String receiptAddress = dbAccess.getMasterAccount();
+            String receiptAddress = dbAccess.getCentreAccount();
             String value = Constant.FEE_4_REGISTER_TRUSTEE.toString();
             String extarData = request.getParameter("extarData");
             String password = request.getParameter("password");

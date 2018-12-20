@@ -264,7 +264,13 @@ public class TransactionHandler {
         //计算损耗egg，更新流水的eggUsed  注意，要确保流水的limit要大于或等于used
         BigDecimal eggUsed = DataFormatUtil.byteAsBigDecimal(transaction.getEggUsed());
         BigDecimal eggMax =DataFormatUtil.byteAsBigDecimal(transaction.getEggMax());
-        BigDecimal curUse = new BigDecimal(3);
+        BigDecimal curUse = null;
+        //投票不需要矿工费
+        if(new String(transaction.getTradeType()).equals(TransactionTypeEnum.VOTE.name())){
+            curUse = new BigDecimal(0);
+        }else{
+            curUse = new BigDecimal(3);
+        }
         if (eggMax.compareTo(eggUsed.add(curUse)) >= 0) {
             //消耗燃料
             //todo 有个问题，就是未确认流水的已使用egg怎么让其他节点同步

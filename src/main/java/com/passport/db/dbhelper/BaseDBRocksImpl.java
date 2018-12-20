@@ -333,6 +333,21 @@ public class BaseDBRocksImpl extends BaseDBAccess {
         return "";
     }
     @Override
+    public String getCentreAccount() {
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName("account", "identity")));
+        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+            if("centre".equals(new String(iterator.value()))){
+                Optional<Account> accountOptional = getAccount(new String(iterator.key()));
+                if (accountOptional.isPresent()) {
+                    Account account = accountOptional.get();
+                    String[] address_token = account.getAddress_token().split("_");
+                    return address_token[0];
+                }
+            }
+        }
+        return "";
+    }
+    @Override
     public boolean putAccount(Account account) {
         try {
             addObj(account);

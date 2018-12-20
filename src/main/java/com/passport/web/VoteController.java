@@ -50,7 +50,7 @@ public class VoteController {
                 return new ResultDto(ResultEnum.TRANS_UNCOMPSYN);
             }
             String payAddress = request.getParameter("payAddress");
-            String receiptAddress = dbAccess.getMasterAccount();
+            String receiptAddress = dbAccess.getCentreAccount();
             String value = Constant.FEE_4_REGISTER_VOTER.toString();
             String extarData = request.getParameter("extarData");
             String password = request.getParameter("password");

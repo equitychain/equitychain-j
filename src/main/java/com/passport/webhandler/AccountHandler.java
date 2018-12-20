@@ -132,10 +132,21 @@ public class AccountHandler {
             trustees.add(trustee);
         }
         //创建账户 官方中间账户 start
-        Account account = generateAccount("123456","master");
+        Account account = generateAccount("123456","centre");
         dbAccess.putAccount(account);
         String[] addressToken = account.getAddress_token().split("_");
         accounts.add(new Account(account.getAddress_token(),null, account.getBalance(),addressToken[0],addressToken[1],account.getIdentity()));
+        //end
+        //创建账户 官方账户 start
+        Account accountMaster = generateAccount("123456","master");
+        accountMaster.setBalance(Constant.masterBalance);
+        dbAccess.putAccount(accountMaster);
+        String[] addressMasterToken = accountMaster.getAddress_token().split("_");
+        accounts.add(new Account(accountMaster.getAddress_token(),null, accountMaster.getBalance(),addressMasterToken[0],addressMasterToken[1],accountMaster.getIdentity()));
+        Transaction transaction = transactionHandler.generateTransaction("", addressMasterToken[0], Constant.masterBalance.toString(), "", accountMaster,addressToken[1]);
+        transaction.setTradeType(TransactionTypeEnum.BLOCK_REWARD.toString().getBytes());
+        transaction.setBlockHeight("1".getBytes());
+        transactions.add(transaction);
         //end
 
         genesisBlockInfo.setAccounts(accounts);

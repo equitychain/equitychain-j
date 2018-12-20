@@ -155,6 +155,8 @@ public interface DBAccess {
 
 	String getMasterAccount();
 
+	String getCentreAccount();
+
 	/**
 	 * 添加一个钱包账户
 	 * @param account
