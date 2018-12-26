@@ -7,6 +7,7 @@ import com.passport.annotations.KeyField;
 import com.passport.constant.Constant;
 import com.passport.utils.ClassUtil;
 import com.passport.utils.SerializeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.rocksdb.*;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -1265,16 +1266,18 @@ public abstract class BaseDBAccess implements DBAccess {
         }
     }
     @Override
-    public <T> List<T> seekByKey(String keyPrefix) {
+    public <T> List<T> seekByKey(String keyPrefix,String columnKey,Class<T> clazz) throws Exception {
         ArrayList<T> ts = new ArrayList<>();
         ReadOptions options = new ReadOptions();
         options.setPrefixSameAsStart(true);
-        RocksIterator iterator = rocksDB.newIterator(options);
+        RocksIterator iterator = rocksDB.newIterator(handleMap.get(getColName(clazz.getSimpleName().toLowerCase(), columnKey)));
         byte[] key = keyPrefix.getBytes();
-        for (iterator.seek(key); iterator.isValid(); iterator.next()) {
-            if (!new String(iterator.key()).startsWith(keyPrefix)) continue;
-            ts.add((T) SerializeUtils.unSerialize(iterator.value()));
+        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+            if (new String(iterator.value()).equals(keyPrefix)) {
+                ts.add((T) getObj(getKeyFieldByClass(clazz), iterator.key(), clazz));
+            }
         }
         return ts;
     }
 }
+

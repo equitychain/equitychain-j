@@ -74,7 +74,6 @@ public class TransactionController {
             return new ResultDto(e.getResultEnum().getCode(),e.getMessage());
         }
     }
-
     /**
      * 根据地址查流水
      *
@@ -123,7 +122,92 @@ public class TransactionController {
             return new ResultDto(ResultEnum.SYS_ERROR.getCode(),e.getMessage());
         }
     }
-
+    /**
+     * 根据接收地址查流水
+     *
+     * @param pageCount
+     * @param pageNumber
+     * @param address
+     * @return
+     */
+    @GetMapping("getReceiptTransactionByAddress")
+    public ResultDto getReceiptTransactionByAddress(@RequestParam("pageCount") int pageCount,
+                                             @RequestParam("pageNumber") int pageNumber , @RequestParam("address") String address) {
+        try {
+            List<Transaction> receiptAddressList = dbAccess.seekByKey(address,"receiptAddress",Transaction.class);
+            Integer lashBlockHeight = Integer.valueOf(dbAccess.getLastBlockHeight().get().toString());
+            Integer start = (pageNumber-1)*pageCount;
+            Integer end = start+pageCount;
+            List<Transaction> receiptList = receiptAddressList.subList(start<=receiptAddressList.size()-1?start:receiptAddressList.size()
+                    ,end<=receiptAddressList.size()-1?end:receiptAddressList.size());
+            List<com.passport.dto.coreobject.Transaction> transactionsDto = new ArrayList<>();
+            for (Transaction transaction : receiptList) {
+                com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
+                BeanUtils.copyProperties(transaction, transactionDto);
+                transactionDto.setConfirms(lashBlockHeight-Integer.valueOf(transactionDto.getBlockHeight().toString()));
+                BigDecimal eggUsed = transactionDto.getEggUsed()==null||transactionDto.getEggUsed().equals("") ? BigDecimal.ZERO : new BigDecimal(transactionDto.getEggUsed().toString());
+                BigDecimal eggPrice = transactionDto.getEggPrice()==null||transactionDto.getEggPrice().equals("")  ? BigDecimal.ZERO : new BigDecimal(transactionDto.getEggPrice().toString());
+                BigDecimal fee = eggPrice.multiply(eggUsed).setScale(8, BigDecimal.ROUND_HALF_UP);
+                transactionDto.setFee(fee);
+                transactionDto.setToken(Constant.MAIN_COIN);
+                transactionsDto.add(transactionDto);
+            }
+            Map resultMap = new HashMap();
+            resultMap.put("transactionList", transactionsDto);
+            resultMap.put("count",receiptAddressList.size());
+            ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
+            resultDto.setData(resultMap);
+            return resultDto;
+        }catch (CommonException e){
+            e.printStackTrace();
+            return new ResultDto(e.getResultEnum().getCode(),e.getMessage());
+        }catch (Exception e){
+            return new ResultDto(ResultEnum.SYS_ERROR.getCode(),e.getMessage());
+        }
+    }
+    /**
+     * 根据发送地址查流水
+     *
+     * @param pageCount
+     * @param pageNumber
+     * @param address
+     * @return
+     */
+    @GetMapping("getPayTransactionByAddress")
+    public ResultDto getPayTransactionByAddress(@RequestParam("pageCount") int pageCount,
+                                             @RequestParam("pageNumber") int pageNumber , @RequestParam("address") String address) {
+        try {
+            List<Transaction> payAddressList = dbAccess.seekByKey(address,"payAddress",Transaction.class);
+            Integer lashBlockHeight = Integer.valueOf(dbAccess.getLastBlockHeight().get().toString());
+            Integer start = (pageNumber-1)*pageCount;
+            Integer end = start+pageCount;
+            List<Transaction> payList = payAddressList.subList(start<=payAddressList.size()-1?start:payAddressList.size()
+                    ,end<=payAddressList.size()-1?end:payAddressList.size());
+            List<com.passport.dto.coreobject.Transaction> transactionsDto = new ArrayList<>();
+            for (Transaction transaction : payList) {
+                com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
+                BeanUtils.copyProperties(transaction, transactionDto);
+                transactionDto.setConfirms(lashBlockHeight-Integer.valueOf(transactionDto.getBlockHeight().toString()));
+                BigDecimal eggUsed = transactionDto.getEggUsed()==null||transactionDto.getEggUsed().equals("") ? BigDecimal.ZERO : new BigDecimal(transactionDto.getEggUsed().toString());
+                BigDecimal eggPrice = transactionDto.getEggPrice()==null||transactionDto.getEggPrice().equals("")  ? BigDecimal.ZERO : new BigDecimal(transactionDto.getEggPrice().toString());
+                BigDecimal fee = eggPrice.multiply(eggUsed).setScale(8, BigDecimal.ROUND_HALF_UP);
+                transactionDto.setFee(fee);
+                transactionDto.setToken(Constant.MAIN_COIN);
+                transactionsDto.add(transactionDto);
+            }
+            Map resultMap = new HashMap();
+            resultMap.put("transactionList", transactionsDto);
+            resultMap.put("count",payAddressList.size());
+            ResultDto resultDto = new ResultDto(ResultEnum.SUCCESS);
+            resultDto.setData(resultMap);
+            return resultDto;
+        }catch (CommonException e){
+            e.printStackTrace();
+            return new ResultDto(e.getResultEnum().getCode(),e.getMessage());
+        }catch (Exception e){
+            return new ResultDto(ResultEnum.SYS_ERROR.getCode(),e.getMessage());
+        }
+    }
     /**
      * 查询前n个区块的流水
      *

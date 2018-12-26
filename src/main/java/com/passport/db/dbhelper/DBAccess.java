@@ -140,7 +140,7 @@ public interface DBAccess {
 	 * @param keyPrefix
 	 * @return
 	 */
-	<T> List<T> seekByKey(String keyPrefix);
+	<T> List<T> seekByKey(String keyPrefix,String columnKey,Class<T> clazz) throws Exception ;
 
 	/**
 	 * 获取账户列表
