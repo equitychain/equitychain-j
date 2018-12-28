@@ -131,11 +131,11 @@ public class BlockHandler {
 
     public void synHandlerBlock(){
         //TODO 需不需要额外开线程，需要的话可以写个线程工具类
-        try{
             ThreadPoolUtils blockThread = new ThreadPoolUtils(ThreadPoolUtils.CachedThread,1);
             blockThread.execute(new Runnable() {
                 @Override
                 public void run() {
+                    try{
                         //todo 校验 目前是获取相同的区块高度
                         List<Block> successBlocks = getShareBlocks();
                         //存储区块到本地
@@ -152,8 +152,7 @@ public class BlockHandler {
                                         dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
 
                                         //另开线程执行流水
-                                        ThreadPoolUtils transactionThread = new ThreadPoolUtils(ThreadPoolUtils.CachedThread,1);
-                                        transactionThread.execute(new Runnable() {
+                                        blockThread.execute(new Runnable() {
                                             @Override
                                             public void run() {
                                                 //同时保存区块中的流水到已确认流水列表中
@@ -172,7 +171,6 @@ public class BlockHandler {
                                                 });
                                             }
                                         });
-                                        transactionThread.shutDown();
                                     }
                                 }else{
                                     break;
@@ -181,20 +179,19 @@ public class BlockHandler {
                                 break;
                             }
                         }
-                }
-            });
-            blockThread.shutDown();
-        }catch (Exception e){
-            logger.info("synchronization block error", e);
-        }finally {
-            //更改状态
-            padding = false;
-            //清空队列
-            Constant.BLOCK_QUEUE.clear();
+                }catch (Exception e){
+                    logger.info("synchronization block error", e);
+                }finally {
+                    //更改状态
+                    padding = false;
+                    //清空队列
+                    Constant.BLOCK_QUEUE.clear();
 
-            //继续同步下组区块
-            provider.publishEvent(new SyncNextBlockEvent(0L));
-        }
+                    //继续同步下组区块
+                    provider.publishEvent(new SyncNextBlockEvent(0L));
+                }
+            }
+        });
     }
     //检查各节点区块，取出共用的区块高度 并是连续的
     protected List<Block> getShareBlocks(){
