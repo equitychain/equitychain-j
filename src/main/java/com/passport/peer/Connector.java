@@ -3,6 +3,7 @@ package com.passport.peer;
 import com.google.common.base.Optional;
 import com.google.protobuf.ByteString;
 import com.passport.constant.NodeListConstant;
+import com.passport.constant.SyncFlag;
 import com.passport.core.Block;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
@@ -67,6 +68,7 @@ public class Connector implements InitializingBean {
 //    启动的时候自动开始区块同步
     @EventListener(ApplicationReadyEvent.class)
     public void syncNextBlock() {
+        SyncFlag.start = System.currentTimeMillis();
         //回退10个区块
         Integer lashBlockHeight = Integer.valueOf(dbAccess.getLastBlockHeight().get().toString());
         if(lashBlockHeight != 1 && lashBlockHeight > 10){

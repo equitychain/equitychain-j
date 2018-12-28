@@ -47,6 +47,8 @@ public class NextBlockSyncRESP extends Strategy {
             //同步完了，不进行广播，
             SyncFlag.setNextBlockSyncFlag(false);
             SyncFlag.blockTimeFlag = true;
+            SyncFlag.end = System.currentTimeMillis();
+            logger.info("启动同步完成耗时："+(SyncFlag.end-SyncFlag.start));
             //发送同步受托人列表请求
             NettyData.Data.Builder dataBuilder2 = NettyData.Data.newBuilder();
             dataBuilder2.setDataType(DataTypeEnum.DataType.TRUSTEE_SYNC);

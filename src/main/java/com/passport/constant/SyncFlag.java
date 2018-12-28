@@ -33,4 +33,8 @@ public class SyncFlag {
 
     public static ConcurrentMap<String,Boolean> keystoreAddressStatus = new ConcurrentHashMap<>();//keystore里账户是否启动了挖矿状态
 
+    public static Long start = 0L;
+
+    public static Long end = 0L;
+
 }

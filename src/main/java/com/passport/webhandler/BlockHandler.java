@@ -17,10 +17,7 @@ import com.passport.proto.BlockMessage;
 import com.passport.proto.TransactionMessage;
 import com.passport.transactionhandler.TransactionStrategy;
 import com.passport.transactionhandler.TransactionStrategyContext;
-import com.passport.utils.BlockUtils;
-import com.passport.utils.CastUtils;
-import com.passport.utils.DateUtils;
-import com.passport.utils.RawardUtil;
+import com.passport.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,61 +131,70 @@ public class BlockHandler {
 
     public void synHandlerBlock(){
         //TODO 需不需要额外开线程，需要的话可以写个线程工具类
-        Thread handlerThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try{
-                    //todo 校验 目前是获取相同的区块高度
-                    List<Block> successBlocks = getShareBlocks();
-                    //存储区块到本地
-                    for(Block blockLocal : successBlocks) {
-                        Optional<Object> optHeigth = dbAccess.getLastBlockHeightT();
-                        if(optHeigth.isPresent()) {
-                            Long height = (Long)optHeigth.get();
-                            if(height != null) {
-                                if((blockLocal.getBlockHeight() - height) == 1) {
-                                    if (!checkBlock(blockLocal)) {
-                                        return;
-                                    }
-                                    dbAccess.putBlock(blockLocal);
-                                    dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
-
-                                    //同时保存区块中的流水到已确认流水列表中
-                                    blockLocal.getTransactions().forEach(transaction -> {
-                                        TransactionStrategy transactionStrategy = transactionStrategyContext.getTransactionStrategy(new String(transaction.getTradeType()));
-                                        if(transactionStrategy != null){
-                                            transactionStrategy.handleTransaction(transaction);
-                                            try {
-                                                dbAccess.addIndex(transaction, IndexColumnNames.TRANSTIMEINDEX,transaction.getTime());
-                                                dbAccess.addIndex(transaction,IndexColumnNames.TRANSBLOCKHEIGHTINDEX,transaction.getBlockHeight());
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                            }
-                                            dbAccess.putConfirmTransaction(transaction);
+        try{
+            ThreadPoolUtils blockThread = new ThreadPoolUtils(ThreadPoolUtils.CachedThread,1);
+            blockThread.execute(new Runnable() {
+                @Override
+                public void run() {
+                        //todo 校验 目前是获取相同的区块高度
+                        List<Block> successBlocks = getShareBlocks();
+                        //存储区块到本地
+                        for(Block blockLocal : successBlocks) {
+                            Optional<Object> optHeigth = dbAccess.getLastBlockHeightT();
+                            if(optHeigth.isPresent()) {
+                                Long height = (Long)optHeigth.get();
+                                if(height != null) {
+                                    if((blockLocal.getBlockHeight() - height) == 1) {
+                                        if (!checkBlock(blockLocal)) {
+                                            return;
                                         }
-                                    });
+                                        dbAccess.putBlock(blockLocal);
+                                        dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
+
+                                        //另开线程执行流水
+                                        ThreadPoolUtils transactionThread = new ThreadPoolUtils(ThreadPoolUtils.CachedThread,1);
+                                        transactionThread.execute(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                //同时保存区块中的流水到已确认流水列表中
+                                                blockLocal.getTransactions().forEach(transaction -> {
+                                                    TransactionStrategy transactionStrategy = transactionStrategyContext.getTransactionStrategy(new String(transaction.getTradeType()));
+                                                    if(transactionStrategy != null){
+                                                        transactionStrategy.handleTransaction(transaction);
+                                                        try {
+                                                            dbAccess.addIndex(transaction, IndexColumnNames.TRANSTIMEINDEX,transaction.getTime());
+                                                            dbAccess.addIndex(transaction,IndexColumnNames.TRANSBLOCKHEIGHTINDEX,transaction.getBlockHeight());
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                        dbAccess.putConfirmTransaction(transaction);
+                                                    }
+                                                });
+                                            }
+                                        });
+                                        transactionThread.shutDown();
+                                    }
+                                }else{
+                                    break;
                                 }
                             }else{
                                 break;
                             }
-                        }else{
-                            break;
                         }
-                    }
-                }catch (Exception e){
-                    logger.info("synchronization block error", e);
-                }finally {
-                    //更改状态
-                    padding = false;
-                    //清空队列
-                    Constant.BLOCK_QUEUE.clear();
-
-                    //继续同步下组区块
-                    provider.publishEvent(new SyncNextBlockEvent(0L));
                 }
-            }
-        });
-        handlerThread.start();
+            });
+            blockThread.shutDown();
+        }catch (Exception e){
+            logger.info("synchronization block error", e);
+        }finally {
+            //更改状态
+            padding = false;
+            //清空队列
+            Constant.BLOCK_QUEUE.clear();
+
+            //继续同步下组区块
+            provider.publishEvent(new SyncNextBlockEvent(0L));
+        }
     }
     //检查各节点区块，取出共用的区块高度 并是连续的
     protected List<Block> getShareBlocks(){
