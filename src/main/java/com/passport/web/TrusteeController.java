@@ -12,6 +12,8 @@ import com.passport.exception.CommonException;
 import com.passport.utils.CheckUtils;
 import com.passport.webhandler.TransactionHandler;
 import org.apache.commons.collections4.list.TreeList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +37,7 @@ public class TrusteeController {
     @Autowired
     private TransactionHandler transactionHandler;
 
+    private static final Logger logger = LoggerFactory.getLogger(TrusteeController.class);
 
     @PostMapping("/register")
     public ResultDto register(HttpServletRequest request) {
@@ -56,6 +59,7 @@ public class TrusteeController {
             Transaction transaction = transactionHandler.sendTransaction(payAddress, receiptAddress, value, extarData, password, tradeType,token);
             com.passport.dto.coreobject.Transaction transactionDto = new com.passport.dto.coreobject.Transaction();
             BeanUtils.copyProperties(transaction, transactionDto);
+            logger.info("发送注册受托人请求");
             return new ResultDto(ResultEnum.SUCCESS.getCode(), transactionDto);
         }catch (CommonException e){
             e.printStackTrace();
