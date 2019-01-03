@@ -166,6 +166,7 @@ public class TransactionHandler {
             if(!trusteeOptional.isPresent() || trusteeOptional.get().getStatus() == 0){
                 return new CommonException(ResultEnum.TRUSTEE_NOTEXISTS);
             }
+            //TODO 重复投票暂时未作处理
         }
 
         return null;
