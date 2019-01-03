@@ -395,20 +395,11 @@ public class DateUtils {
             uc.connect ( );
             time = uc.getDate ( );
         } catch (MalformedURLException e) {
-//            e.printStackTrace ( );
             time = System.currentTimeMillis();
         } catch (IOException e) {
-//            e.printStackTrace ( );
             time = System.currentTimeMillis();
         }finally {
             return time > Constant.GENESIS_BLOCK_TIMESTAMP ? time : Constant.GENESIS_BLOCK_TIMESTAMP;
         }
-    }
-
-    public static void main(String[] args) {
-        String s = getWebTime()+"";
-        System.out.println(s);
-        System.out.println(stampToDate(s));
-
     }
 }
