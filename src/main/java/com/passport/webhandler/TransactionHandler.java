@@ -253,6 +253,8 @@ public class TransactionHandler {
                 if(blockMaxEgg.compareTo(BigDecimal.ZERO) == 0){
                     break;
                 }
+            }else if(new String(tran.getTradeType()).equals(TransactionTypeEnum.VOTE.name())){
+                transactions.add(tran);
             }
         }
         return transactions;
