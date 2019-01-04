@@ -25,7 +25,7 @@ public class SyncFlag {
 
     public static boolean blockTimeFlag = false;//是否启动定时任务
 
-    public static boolean minerFlag = true;//允许出块
+    public static boolean minerFlag = true;//允许出块 是否可以执行可出块资格
 
     public static ConcurrentMap<String,Integer> waitMiner = new ConcurrentHashMap<>();//启动挖矿账户缓存
 

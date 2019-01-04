@@ -94,34 +94,32 @@ public class AccountController {
         if (flag) {
             return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY.getCode(),!SyncFlag.minerFlag);
         }
-        if(SyncFlag.minerFlag){//启动时不更新受托人列表 需等下个周期在加入 只要有一个账户启动则所有启动
-            List<Trustee> trustees = dbAccess.listTrustees();
-            List<Trustee> localTrustees = new ArrayList<>();//添加可以出块账户
-            if(channelsManager.getChannels().size() == 0){//服务器启动直接所有受托人启动
-                SyncFlag.minerFlag = true;
-                Set<String> address = storyFileUtil.getAddresses();
-                //启动出块 需确认同步完成才能出块
-                for(Trustee trustee:trustees){//更新受托人列表启动出块
-                    for(String add:address){
-                        if(trustee.getAddress().equals(add)){
-                            SyncFlag.waitMiner.put(add,1);
-                            localTrustees.add(trustee);
-                            SyncFlag.minerFlag = false;
-                            SyncFlag.keystoreAddressStatus.put(trustee.getAddress(),true);
-                        }
-                    }
-                }
-            }else{
-                //启动出块 需确认同步完成才能出块
-                for(Trustee trustee:trustees){//更新受托人列表启动出块
-                    if(trustee.getAddress().equals(minerAddress)){
-                        SyncFlag.waitMiner.put(minerAddress,1);
+        List<Trustee> trustees = dbAccess.listTrustees();
+        List<Trustee> localTrustees = new ArrayList<>();//添加可以出块账户
+        if(channelsManager.getChannels().size() == 0){//服务器启动直接所有受托人启动
+            Set<String> address = storyFileUtil.getAddresses();
+            //启动出块 需确认同步完成才能出块
+            for(Trustee trustee:trustees){//更新受托人列表启动出块
+                for(String add:address){
+                    if(trustee.getAddress().equals(add)){
+                        SyncFlag.waitMiner.put(add,1);
                         localTrustees.add(trustee);
                         SyncFlag.minerFlag = false;
                         SyncFlag.keystoreAddressStatus.put(trustee.getAddress(),true);
                     }
                 }
             }
+        }else{
+            //启动出块 需确认同步完成才能出块
+            for(Trustee trustee:trustees){//更新受托人列表启动出块
+                if(trustee.getAddress().equals(minerAddress)){
+                    SyncFlag.waitMiner.put(minerAddress,1);
+                    localTrustees.add(trustee);
+                    SyncFlag.keystoreAddressStatus.put(trustee.getAddress(),true);
+                }
+            }
+        }
+        if(SyncFlag.waitMiner.get(minerAddress) != null){
             provider.publishEvent(new GenerateBlockEvent(0L));
             //通知所有用户 本节点启动出块
             NettyData.Data.Builder dataBuilder = NettyData.Data.newBuilder();
@@ -139,8 +137,11 @@ public class AccountController {
             builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
             builder.setData(dataBuilder.build());
             channelsManager.getChannels().writeAndFlush(builder.build());
+            SyncFlag.minerFlag = true;//启动出块
+            return new ResultDto(ResultEnum.SUCCESS.getCode(),!SyncFlag.minerFlag);
+        }else{
+            return new ResultDto(ResultEnum.SYS_ERROR);
         }
-        return new ResultDto(ResultEnum.SUCCESS.getCode(),!SyncFlag.minerFlag);
     }
 
 

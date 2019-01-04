@@ -403,42 +403,41 @@ public class BlockHandler {
             }
         }else {
             logger.info("出块账号："+accountOptional.get().getAddress_token());
-            //启动定时任务
-            Timer timer = new Timer ( );
-            timer.schedule ( new TimerTask ( ) {
-                @Override
-                public void run() {
-                    logger.info("进入选择出块账户线程");
-                    //最后一个区块出块时间距离现在超过10秒
-                    Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
-                    if (!lastBlockOptional.isPresent()) {
-                        return;
-                    }
-                    Block block = lastBlockOptional.get();
-                    Long timeStamp = block.getBlockHeader().getTimeStamp();
-                    Date date = new Date(DateUtils.getWebTime());
-                    Long time = 0l;
-                    while (date.getTime() - timeStamp <= 30 * 1000){
-                        time++;
-                        if(!SyncFlag.blockTimeFlag){
-                            logger.info("任务倒计终止，已有出块");
-                            return;
-                        }
-                        date = org.apache.commons.lang3.time.DateUtils.addSeconds(date,1);
-                    }
-                    //接收到同步消息则停止
-                    logger.info("最后一个区块出块时间距离现在超过30秒，重新选择出块账户");
-                    trusteeHandler.changeStatus(trustee, blockCycle);
-                    try {
-                        trustee.setState(0);//进入定时任务设置成未启动
-                        dbAccess.putTrustee(trustee);
-                        //再次选出出块账户
-                        produceNextBlock();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }, 1000);
+            // TODO 启动定时任务 测试环境注销定时任务
+//            Timer timer = new Timer ( );
+//            timer.schedule ( new TimerTask ( ) {
+//                @Override
+//                public void run() {
+//                    logger.info("进入选择出块账户线程");
+//                    //最后一个区块出块时间距离现在超过10秒
+//                    Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
+//                    if (!lastBlockOptional.isPresent()) {
+//                        return;
+//                    }
+//                    Block block = lastBlockOptional.get();
+//                    Long timeStamp = block.getBlockHeader().getTimeStamp();
+//                    Date date = new Date(DateUtils.getWebTime());
+//                    while (date.getTime() - timeStamp <= 30 * 1000){
+//
+//                        if(!SyncFlag.blockTimeFlag){
+//                            logger.info("任务倒计终止，已有出块");
+//                            return;
+//                        }
+//                        date = org.apache.commons.lang3.time.DateUtils.addSeconds(date,1);
+//                    }
+//                    //接收到同步消息则停止
+//                    logger.info("最后一个区块出块时间距离现在超过30秒，重新选择出块账户");
+//                    trusteeHandler.changeStatus(trustee, blockCycle);
+//                    try {
+//                        trustee.setState(0);//进入定时任务设置成未启动
+//                        dbAccess.putTrustee(trustee);
+//                        //再次选出出块账户
+//                        produceNextBlock();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }, 1000);
         }
     }
 
