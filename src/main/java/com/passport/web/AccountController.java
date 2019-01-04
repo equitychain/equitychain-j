@@ -109,6 +109,7 @@ public class AccountController {
                     }
                 }
             }
+            provider.publishEvent(new GenerateBlockEvent(0L));
         }else{
             //启动出块 需确认同步完成才能出块
             for(Trustee trustee:trustees){//更新受托人列表启动出块
