@@ -6,7 +6,7 @@
 
     <!--输出sql语句-->
     <logger name="com.passport" level="debug"/>
-    <property name="path" value="D:/log"></property>
+    <property name="path" value="./log"></property>
     <property name="maxHistory" value="30"/>
     <property name="maxFileSize" value="50MB"/>
 

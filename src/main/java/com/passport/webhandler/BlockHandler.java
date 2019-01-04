@@ -18,6 +18,7 @@ import com.passport.proto.TransactionMessage;
 import com.passport.transactionhandler.TransactionStrategy;
 import com.passport.transactionhandler.TransactionStrategyContext;
 import com.passport.utils.*;
+import org.apache.commons.lang3.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -415,16 +416,15 @@ public class BlockHandler {
                     }
                     Block block = lastBlockOptional.get();
                     Long timeStamp = block.getBlockHeader().getTimeStamp();
-                    long currentTimeStamp = DateUtils.getWebTime();
+                    Date date = new Date(DateUtils.getWebTime());
                     Long time = 0l;
-                    while (currentTimeStamp - timeStamp <= 30 * 1000){
+                    while (date.getTime() - timeStamp <= 30 * 1000){
                         time++;
-//                          logger.info("开启任务倒计时："+(currentTimeStamp - timeStamp));
                         if(!SyncFlag.blockTimeFlag){
                             logger.info("任务倒计终止，已有出块");
                             return;
                         }
-                        currentTimeStamp = DateUtils.getWebTime();
+                        date = org.apache.commons.lang3.time.DateUtils.addSeconds(date,1);
                     }
                     //接收到同步消息则停止
                     logger.info("最后一个区块出块时间距离现在超过30秒，重新选择出块账户");
