@@ -37,6 +37,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.nio.channels.Channel;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 账户
@@ -109,6 +110,7 @@ public class AccountController {
                     }
                 }
             }
+            TimeUnit.MILLISECONDS.sleep(1000);
             provider.publishEvent(new GenerateBlockEvent(0L));
         }else{
             //启动出块 需确认同步完成才能出块
@@ -116,6 +118,7 @@ public class AccountController {
                 if(trustee.getAddress().equals(minerAddress)){
                     SyncFlag.waitMiner.put(minerAddress,1);
                     localTrustees.add(trustee);
+                    SyncFlag.minerFlag = false;
                     SyncFlag.keystoreAddressStatus.put(trustee.getAddress(),true);
                 }
             }
@@ -138,8 +141,7 @@ public class AccountController {
             builder.setMessageType(MessageTypeEnum.MessageType.DATA_RESP);
             builder.setData(dataBuilder.build());
             channelsManager.getChannels().writeAndFlush(builder.build());
-            SyncFlag.minerFlag = true;//启动出块
-            return new ResultDto(ResultEnum.SUCCESS.getCode(),!SyncFlag.minerFlag);
+            return new ResultDto(ResultEnum.SUCCESS.getCode(),!SyncFlag.minerFlag);//false 一打开 true 未打开
         }else{
             return new ResultDto(ResultEnum.SYS_ERROR);
         }
