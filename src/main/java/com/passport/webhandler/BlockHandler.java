@@ -336,10 +336,11 @@ public class BlockHandler {
         return blockBuilder;
     }
 
-    public synchronized void produceNextBlock() throws Exception {
+    public void produceNextBlock() throws Exception {
         //当前区块周期
         Optional<Block> lastBlockOptional = dbAccess.getLastBlock();
         if(!lastBlockOptional.isPresent()){
+            logger.info("本地最新高度获取为空");
             return;
         }
         Block block = lastBlockOptional.get();

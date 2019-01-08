@@ -91,6 +91,7 @@ public class BlockSyncREQ extends Strategy {
             }
             //验证区块合法性
             if (!blockHandler.checkBlock(blockLocal)) {
+                logger.info("校验区块异常");
                 return;
             }
             //接收到消息停止定时任务中的重选
