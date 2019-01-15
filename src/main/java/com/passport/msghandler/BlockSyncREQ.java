@@ -67,6 +67,7 @@ public class BlockSyncREQ extends Strategy {
             //区块同步需要按顺序进行
             Optional<Object> lastBlockHeightOptional = dbAccess.getLastBlockHeight();
             if (!lastBlockHeightOptional.isPresent()){
+                logger.info("本地最新高度不存在");
                 return;
             }
             long lastBlockHeight = CastUtils.castLong(lastBlockHeightOptional.get());
@@ -87,6 +88,7 @@ public class BlockSyncREQ extends Strategy {
             Block blockLocal = blockHandler.convertBlockMessage2Block(block);
             //本地是否已经存在此高度区块
             if (dbAccess.getBlock(blockLocal.getBlockHeight()).isPresent()) {
+                logger.info("本地已经存在此高度区块");
                 return;
             }
             //验证区块合法性

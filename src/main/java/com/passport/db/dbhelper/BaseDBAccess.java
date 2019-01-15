@@ -49,8 +49,11 @@ public abstract class BaseDBAccess implements DBAccess {
                 dtoClasses.add(c);
             }
             try {
-                rocksDB = rocksDB.open(new Options().setCreateIfMissing(true).setKeepLogFileNum(2),dataDir);
-
+                Options options = new Options();
+                options.setCreateIfMissing(true);
+                options.setKeepLogFileNum(2);
+                options.setCompressionType(CompressionType.LZ4_COMPRESSION);
+                rocksDB = RocksDB.open(options,dataDir);
                 //添加默认的列族
                 handleMap.put("default", rocksDB.getDefaultColumnFamily());
                 for (String field : fields) {
@@ -95,7 +98,7 @@ public abstract class BaseDBAccess implements DBAccess {
                 //打开数据库  加载旧列族,创建新列族
                 List<ColumnFamilyHandle> handleList = new ArrayList<>();
 //                rocksDB = OptimisticrocksDBDB.open(new DBOptions().setCreateIfMissing(true), dataDir, curHasColumns, handleList);
-                rocksDB = rocksDB.open(new DBOptions().setCreateIfMissing(true).setKeepLogFileNum(2), dataDir, curHasColumns, handleList);
+                rocksDB = RocksDB.open(new DBOptions().setCreateIfMissing(true).setKeepLogFileNum(2), dataDir, curHasColumns, handleList);
 
                 for(ColumnFamilyDescriptor descriptor : curDontHasColumns) {
                     ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
