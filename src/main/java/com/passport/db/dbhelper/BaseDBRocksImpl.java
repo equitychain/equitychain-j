@@ -56,11 +56,7 @@ public class BaseDBRocksImpl extends BaseDBAccess {
     public Optional<Object> getLastBlockHeight() {
         ColumnFamilyHandle handle = handleMap.get(getColName("block", "blockHeight"));
         RocksIterator heightIter;
-//        if (transaction != null) {
-//            heightIter = transaction.getIterator(new ReadOptions(),handle);
-//        }else{
         heightIter = rocksDB.newIterator(handle);
-//        }
         Long height = 0l;
         for (heightIter.seekToFirst(); heightIter.isValid(); heightIter.next()) {
             if (heightIter.key() == null) {

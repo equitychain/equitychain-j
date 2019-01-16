@@ -10,9 +10,7 @@ import com.passport.db.dbhelper.BaseDBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
 import com.passport.enums.TransactionTypeEnum;
-import com.passport.utils.BlockUtils;
-import com.passport.utils.CheckUtils;
-import com.passport.utils.DateUtils;
+import com.passport.utils.*;
 import com.passport.web.TransactionController;
 import com.passport.webhandler.BlockHandler;
 import com.passport.webhandler.TransactionHandler;
@@ -24,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * 监控出块人有没按时出块
@@ -45,7 +43,7 @@ public class MonitoringIfProducerDead {
     @Autowired
     private BlockHandler blockHandler;
     @Autowired
-    private TransactionHandler transactionHandler;
+    private StoryFileUtil storyFileUtil;
 
 //    private Lock lock = new ReentrantLock();
     public void monitor() throws Exception {
@@ -61,12 +59,10 @@ public class MonitoringIfProducerDead {
         }
         Block block = lastBlockOptional.get();
         Long timeStamp = block.getBlockHeader().getTimeStamp();
-//        long currentTimeStamp = NetworkTime.INSTANCE.getWebsiteDateTimeLong();
         long currentTimeStamp = DateUtils.getWebTime();
         if (currentTimeStamp <= timeStamp + Constant.BLOCK_GENERATE_TIMEGAP * 1000) {
             return;
         }
-
         //算出原本应该出块的账户，把这个账户从委托人中剔除
         Long newBlockHeight = block.getBlockHeight();
         int blockCycle = blockUtils.getBlockCycle(newBlockHeight);
@@ -76,33 +72,29 @@ public class MonitoringIfProducerDead {
         }
         Trustee trustee = blockUtils.randomPickBlockProducer(trustees, newBlockHeight+1);
         trusteeHandler.changeStatus(trustee, blockCycle);
-
         //再次选出出块账户
         blockHandler.produceNextBlock();
     }
 //    @Scheduled(cron = "0/1 * * * * ?")
     public void test(){
-        if(!SyncFlag.isNextBlockSyncFlag()){
-            String payAddress = "bxbc6daf9e6d3c2cc1ed995e815f8daeb53dee2a7b";
-            String receiptAddress = "bxdbaac3b141b6d20ce8a056e57e6f29388fd8399b";
-            String value = RandomUtils.nextInt(1,11)+"";
-            String extarData = "测试";
-            String password ="123456";
-            String tradeType = "TRANSFER";
-            String token = "EQU";
-            boolean flag = false;
-            //若流水类型为 委托人注册 或 投票人注册的时候 不校验receiptAddress
-            if (TransactionTypeEnum.TRUSTEE_REGISTER.toString().equals(tradeType)
-                    || TransactionTypeEnum.VOTER_REGISTER.toString().equals(tradeType)) {
-                flag = CheckUtils.checkParamIfEmpty(payAddress, value, extarData);
-            } else {
-                //非空检验
-                flag = CheckUtils.checkParamIfEmpty(payAddress, receiptAddress, value, extarData);
-            }
-            Transaction transaction = transactionHandler.sendTransaction(payAddress, receiptAddress, value, extarData, password, tradeType,token);
-            logger.info("测试定时任务发送流水成功"+transaction);
-        }else{
-            logger.info("需同步完成才能启动定时任务");
-        }
+        Map<String,Object> map = new HashMap<>();
+        String payAddress = "bx85fa7670e2f66024a39a06d2636142d4a7ed6fa3";
+        Set<String> address = storyFileUtil.getAddresses();
+        List<String> list = new ArrayList<>(address);
+        String receiptAddress = list.get(RandomUtils.nextInt(0,list.size()));
+        String value = RandomUtils.nextInt(1,11)+"";
+        String extarData = "测试";
+        String password ="123456";
+        String tradeType = "TRANSFER";
+        String token = "EQU";
+        map.put("payAddress",payAddress);
+        map.put("receiptAddress",receiptAddress);
+        map.put("value",value);
+        map.put("extarData",extarData);
+        map.put("password",password);
+        map.put("tradeType",tradeType);
+        map.put("token",token);
+        String result = HttpUtils.doPost("http://47.75.4.251:8083/transaction/send",map);
+        logger.info("测试定时任务发送流水成功"+result);
     }
 }

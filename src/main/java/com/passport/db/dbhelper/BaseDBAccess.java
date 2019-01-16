@@ -5,6 +5,7 @@ import com.passport.annotations.EntityClaz;
 import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
 import com.passport.constant.Constant;
+import com.passport.utils.Bytes;
 import com.passport.utils.ClassUtil;
 import com.passport.utils.SerializeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -23,95 +24,88 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class BaseDBAccess implements DBAccess {
     ThreadPoolExecutor executor = new ThreadPoolExecutor(100, 100, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1000));
-//    public rocksDB rocksDB;
     public RocksDB rocksDB;
     @Value("${db.dataDir}")
     private String dataDir;
 
+    protected final DBOptions dbOptions = new DBOptions()
+            .setCreateIfMissing(true)
+            .setIncreaseParallelism(10)
+            .setCreateMissingColumnFamilies(true)
+            .setUseDirectIoForFlushAndCompaction(true)
+            .setCompactionReadaheadSize(2 * 1024 * 1024)
+            .setWritableFileMaxBufferSize(1 * 1024 * 10244)
+            .setMaxTotalWalSize(1 * 1024 * 1024)
+            .setKeepLogFileNum(2)
+            .setMaxBackgroundJobs(10)
+            .setMaxOpenFiles(-1);
 
     //列的handler
     protected final Map<String, ColumnFamilyHandle> handleMap = new HashMap<>();
     protected final Set<Class> dtoClasses = new HashSet<>();
 
     protected void initDB() {
+        final List<ColumnFamilyDescriptor> cfDescriptors = new ArrayList<>();
+        final List<ColumnFamilyHandle> columnFamilyHandleList = new ArrayList<>();
+        String fullPath = System.getProperty("user.dir") + "/" + dataDir;
+        ColumnFamilyOptions cfOpts = new ColumnFamilyOptions()
+                .optimizeUniversalStyleCompaction()
+                .setMergeOperatorName("uint64add")
+                .setMaxSuccessiveMerges(64)
+                .setLevel0FileNumCompactionTrigger(8)
+                .setLevel0SlowdownWritesTrigger(16)
+                .setLevel0StopWritesTrigger(24)
+                .setNumLevels(4)
+                .setMaxBytesForLevelBase(512 * 1024 * 1024)
+                .setMaxBytesForLevelMultiplier(8)
+                .setMemtablePrefixBloomSizeRatio(0.1);
+        //数据库目录不存在就创建
+        File directory = new File(fullPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        //load existing column families
         try {
-            //数据库目录不存在就创建
-            File directory = new File(System.getProperty("user.dir") + "/" + dataDir);
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
-            List<String> fields = new ArrayList<>();
-            IndexColumnNames[] indexColumnNames = IndexColumnNames.values();
-            //TODO: 添加字节码,加载dto属性--cannot not read.
-            List<Class<?>> classes = ClassUtil.getClasses("com.passport.core");
-            for(Class c : classes){
-                fields.addAll(getClassCols(c));
-                dtoClasses.add(c);
-            }
-            try {
-                Options options = new Options();
-                options.setCreateIfMissing(true);
-                options.setKeepLogFileNum(2);
-                options.setCompressionType(CompressionType.LZ4_COMPRESSION);
-                rocksDB = RocksDB.open(options,dataDir);
-                //添加默认的列族
-                handleMap.put("default", rocksDB.getDefaultColumnFamily());
-                for (String field : fields) {
-                    ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(field.getBytes());
-                    ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
-                    handleMap.put(field, handle);
-                }
-                for (IndexColumnNames columnNames : indexColumnNames) {
-                    ColumnFamilyHandle indexNameHandle = rocksDB.createColumnFamily(columnNames.getIndexName());
-                    ColumnFamilyHandle indexOverHandle = rocksDB.createColumnFamily(columnNames.getOverAndNextName());
-                    handleMap.put(columnNames.indexName, indexNameHandle);
-                    handleMap.put(columnNames.overAndNextName, indexOverHandle);
-                }
-            } catch (Exception e) {
-                //列集合
-                List<ColumnFamilyDescriptor> curHasColumns = new ArrayList<>();
-                List<ColumnFamilyDescriptor> curDontHasColumns = new ArrayList<>();
-                List<byte[]> curColbyts = RocksDB.listColumnFamilies(new Options(), dataDir);
-                List<String> curColStrs = new ArrayList<>();
-                for (byte[] byts : curColbyts){
-                    curColStrs.add(new String(byts));
-                }
-                ColumnFamilyDescriptor defaultDescriptor = new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY);
-                curHasColumns.add(defaultDescriptor);
-                for (String s : fields) {
-                    ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(s.getBytes());
-                    if(curColStrs.contains(s)) {
-                        curHasColumns.add(descriptor);
-                    }else{
-                        curDontHasColumns.add(descriptor);
-                    }
-                }
-                for (IndexColumnNames names : indexColumnNames) {
-                    if(curColStrs.contains(names.indexName)) {
-                        curHasColumns.add(names.getIndexName());
-                        curHasColumns.add(names.getOverAndNextName());
-                    }else{
-                        curDontHasColumns.add(names.getIndexName());
-                        curDontHasColumns.add(names.getOverAndNextName());
-                    }
-                }
-                //打开数据库  加载旧列族,创建新列族
-                List<ColumnFamilyHandle> handleList = new ArrayList<>();
-//                rocksDB = OptimisticrocksDBDB.open(new DBOptions().setCreateIfMissing(true), dataDir, curHasColumns, handleList);
-                rocksDB = RocksDB.open(new DBOptions().setCreateIfMissing(true).setKeepLogFileNum(2), dataDir, curHasColumns, handleList);
-
-                for(ColumnFamilyDescriptor descriptor : curDontHasColumns) {
-                    ColumnFamilyHandle handle = rocksDB.createColumnFamily(descriptor);
-                    String name = new String(handle.getName());
-                    handleMap.put(name, handle);
-                }
-                for(ColumnFamilyHandle handler : handleList){
-                    String name = new String(handler.getName());
-                    handleMap.put(name, handler);
-                }
-            }
-        } catch (Exception e) {
+            List<byte[]> columnFamilies = RocksDB.listColumnFamilies(new Options(), fullPath);
+            columnFamilies.forEach( cf -> cfDescriptors.add(new ColumnFamilyDescriptor(cf, cfOpts)));
+        } catch (RocksDBException e) {
             e.printStackTrace();
+        }
+        List<String> fields = new ArrayList<>();
+        IndexColumnNames[] indexColumnNames = IndexColumnNames.values();
+        //TODO: 添加字节码,加载dto属性--cannot not read.
+        List<Class<?>> classes = ClassUtil.getClasses("com.passport.core");
+        for(Class c : classes){
+            fields.addAll(getClassCols(c));
+            dtoClasses.add(c);
+        }
+        if(cfDescriptors.isEmpty()) {
+            cfDescriptors.add(new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY, cfOpts));
+            for (String field : fields) {
+                ColumnFamilyDescriptor descriptor = new ColumnFamilyDescriptor(field.getBytes());
+                cfDescriptors.add(descriptor);
+            }
+            for (IndexColumnNames columnNames : indexColumnNames) {
+                cfDescriptors.add(columnNames.getIndexName());
+                cfDescriptors.add(columnNames.getOverAndNextName());
+            }
+        }
+        try {
+            rocksDB = RocksDB.open(dbOptions, fullPath, cfDescriptors, columnFamilyHandleList);
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+            try {
+                rocksDB = RocksDB.open(dbOptions, fullPath, cfDescriptors, columnFamilyHandleList);
+            } catch (RocksDBException e1) {
+                throw new RuntimeException("Failed to create rocks db again.");
+            }
+        }
+        for (int i = 0; i < cfDescriptors.size(); i++) {
+            ColumnFamilyDescriptor columnFamilyDescriptor = cfDescriptors.get(i);
+            if(columnFamilyDescriptor != null) {
+                handleMap.put(Bytes.bytesToString(columnFamilyDescriptor.getName()),
+                        columnFamilyHandleList.get(i));
+            }
         }
     }
 
@@ -214,6 +208,7 @@ public abstract class BaseDBAccess implements DBAccess {
         }
         return null;
     }
+
     protected <T> byte[] getKeyValByDto(T t) throws IllegalAccessException {
         Class tClas = t.getClass();
         if (tClas.isAnnotationPresent(EntityClaz.class)) {
@@ -238,6 +233,7 @@ public abstract class BaseDBAccess implements DBAccess {
         }
         return null;
     }
+
     public final void addObjs(List objs) throws Exception {
         for (Object o : objs) {
              addObj(o);
@@ -614,6 +610,7 @@ public abstract class BaseDBAccess implements DBAccess {
             putByColumnFamilyHandle(handle, ("" + valK).getBytes(), SerializeUtils.serialize(valueList));
         }
     }
+
     protected final void removeIndexesKey(ColumnFamilyHandle handle, byte[] key, byte[] valueItem){
         synchronized (handle) {
             long valK = Long.parseLong(new String(key));
