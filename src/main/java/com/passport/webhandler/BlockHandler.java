@@ -151,25 +151,18 @@ public class BlockHandler {
                                         }
                                         dbAccess.putBlock(blockLocal);
                                         dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
-
-                                        //另开线程执行流水
-                                        blockThread.execute(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                //同时保存区块中的流水到已确认流水列表中
-                                                blockLocal.getTransactions().forEach(transaction -> {
-                                                    TransactionStrategy transactionStrategy = transactionStrategyContext.getTransactionStrategy(new String(transaction.getTradeType()));
-                                                    if(transactionStrategy != null){
-                                                        transactionStrategy.handleTransaction(transaction);
-                                                        try {
-                                                            dbAccess.addIndex(transaction, IndexColumnNames.TRANSTIMEINDEX,transaction.getTime());
-                                                            dbAccess.addIndex(transaction,IndexColumnNames.TRANSBLOCKHEIGHTINDEX,transaction.getBlockHeight());
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                        }
-                                                        dbAccess.putConfirmTransaction(transaction);
-                                                    }
-                                                });
+                                        //同时保存区块中的流水到已确认流水列表中
+                                        blockLocal.getTransactions().forEach(transaction -> {
+                                            TransactionStrategy transactionStrategy = transactionStrategyContext.getTransactionStrategy(new String(transaction.getTradeType()));
+                                            if(transactionStrategy != null){
+                                                transactionStrategy.handleTransaction(transaction);
+                                                try {
+                                                    dbAccess.addIndex(transaction, IndexColumnNames.TRANSTIMEINDEX,transaction.getTime());
+                                                    dbAccess.addIndex(transaction,IndexColumnNames.TRANSBLOCKHEIGHTINDEX,transaction.getBlockHeight());
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                                dbAccess.putConfirmTransaction(transaction);
                                             }
                                         });
                                     }
@@ -180,6 +173,7 @@ public class BlockHandler {
                                 break;
                             }
                         }
+                        blockThread.shutDown();
                 }catch (Exception e){
                     logger.info("synchronization block error", e);
                 }finally {

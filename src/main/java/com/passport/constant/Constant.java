@@ -64,6 +64,8 @@ public interface Constant {
   int INDEX_GROUPSIZE = 1000;
   //主币
   String MAIN_COIN = "EQU";
+  //位数
+  BigDecimal SYMBOL = new BigDecimal(6);
   //投票人奖励流水判断标记
   String VOTER_TRANS_PROPORTION_EXTAR_DATA = "voter trans proportion extarData";
   //投票人奖励比例

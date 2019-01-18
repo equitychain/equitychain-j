@@ -33,12 +33,13 @@ public abstract class BaseDBAccess implements DBAccess {
             .setIncreaseParallelism(10)
             .setCreateMissingColumnFamilies(true)
             .setUseDirectIoForFlushAndCompaction(true)
-            .setCompactionReadaheadSize(2 * 1024 * 1024)
-            .setWritableFileMaxBufferSize(1 * 1024 * 10244)
-            .setMaxTotalWalSize(1 * 1024 * 1024)
+//            .setCompactionReadaheadSize(2 * 1024 * 1024)
+//            .setWritableFileMaxBufferSize(1 * 1024 * 10244)
+//            .setMaxTotalWalSize(1024 * 1024 * 1024)
+            .setMaxBackgroundFlushes(10)
+            .setMaxBackgroundCompactions(10)
             .setKeepLogFileNum(2)
-            .setMaxBackgroundJobs(10)
-            .setMaxOpenFiles(-1);
+            .setMaxBackgroundJobs(10);
 
     //列的handler
     protected final Map<String, ColumnFamilyHandle> handleMap = new HashMap<>();

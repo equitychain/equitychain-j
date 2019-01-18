@@ -7,6 +7,7 @@ package com.passport.enums;
  **/
 public enum TransactionTypeEnum {
     TRANSFER("普通转账"),
+    TOKEN("代币"),
     VOTE("投票"),
     TRUSTEE_REGISTER("受托人注册"),
     TRUSTEE_CANNEL("受托人撤销注册"),
