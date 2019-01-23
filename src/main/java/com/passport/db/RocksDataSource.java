@@ -23,10 +23,18 @@ public class RocksDataSource implements MapDataSource<byte[]> {
 
   private static final Logger logger = LoggerFactory.getLogger(RocksDataSource.class);
 
+<<<<<<< HEAD
+=======
+  static {
+    RocksDB.loadLibrary();
+  }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   private String dbname;
   private RocksDB rocksDB;
   private ReadOptions readOptions;
   private boolean alive;
+<<<<<<< HEAD
 
   /**
    * reset lock
@@ -38,12 +46,23 @@ public class RocksDataSource implements MapDataSource<byte[]> {
     RocksDB.loadLibrary();
   }
 
+=======
+  /**
+   * reset lock
+   **/
+  private ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   public RocksDataSource() {
   }
 
   public RocksDataSource(String dbname) {
     this.dbname = dbname;
+<<<<<<< HEAD
     logger.info("create RocksDB[{}]",dbname);
+=======
+    logger.debug("create RocksDB[{}]", dbname);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   }
 
   @Override
@@ -53,11 +72,23 @@ public class RocksDataSource implements MapDataSource<byte[]> {
 
   @Override
   public void specialInit(DataSourceSettings sourceSettings) {
+<<<<<<< HEAD
     logger.info("RocksDB[{}] init",dbname);
     readWriteLock.writeLock().lock();
     try {
       if (isAlive()) return;
       if (StringUtils.isEmpty(this.dbname)) throw new NullNameException("name is not null");
+=======
+    logger.debug("RocksDB[{}] init", dbname);
+    readWriteLock.writeLock().lock();
+    try {
+      if (isAlive()) {
+        return;
+      }
+      if (StringUtils.isEmpty(this.dbname)) {
+        throw new NullNameException("name is not null");
+      }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       Options options = new Options();
 
@@ -86,8 +117,11 @@ public class RocksDataSource implements MapDataSource<byte[]> {
       readOptions = new ReadOptions().setPrefixSameAsStart(true).setVerifyChecksums(false);
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     } finally {
       readWriteLock.writeLock().unlock();
     }
@@ -95,6 +129,7 @@ public class RocksDataSource implements MapDataSource<byte[]> {
   }
 
   @Override
+<<<<<<< HEAD
   public void setDBName(String name) {
 
   }
@@ -102,6 +137,15 @@ public class RocksDataSource implements MapDataSource<byte[]> {
   @Override
   public String getDBName() {
     return null;
+=======
+  public String getDBName() {
+    return null;
+  }
+
+  @Override
+  public void setDBName(String name) {
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   }
 
   @Override

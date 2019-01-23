@@ -1,5 +1,6 @@
 package com.passport.core;
 
+<<<<<<< HEAD
 import com.passport.annotations.EntityClaz;
 import com.passport.annotations.FaildClaz;
 import com.passport.annotations.KeyField;
@@ -30,6 +31,24 @@ public class Block {
   @KeyField
   @FaildClaz(name = "producer",type = String.class)
   private String producer;
+=======
+import com.passport.utils.rpc.SerializationUtil;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * @author Wu Created by SKINK on 2018/6/20.
+ */
+public class Block {
+
+  private static Logger logger = LoggerFactory.getLogger(Block.class);
+  BlockHeader blockHeader;
+  List<Transaction> transactions;
+  private Long blockSize;
+  private Integer transactionCount;
+  private Long blockHeight;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
   public static Logger getLogger() {
     return logger;
@@ -79,6 +98,7 @@ public class Block {
     this.blockHeight = blockHeight;
   }
 
+<<<<<<< HEAD
   public String getProducer() {
     return producer;
   }
@@ -89,12 +109,21 @@ public class Block {
 
   //计算block对象缺少的字段值,且返回区块hash
   public byte[] calculateFieldValueWithHash(){
+=======
+  //计算block对象缺少的字段值,且返回区块hash
+  public byte[] calculateFieldValueWithHash() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     //生成merkleTree
     MerkleTree merkleTree = new MerkleTree(transactions);
     List<byte[]> bytes = merkleTree.buildMerkleTree();
     //设置merkleRoot
+<<<<<<< HEAD
     if(bytes.size() > 0){
       blockHeader.setHashMerkleRoot(bytes.get(0));
+=======
+    if (bytes.size() > 0) {
+      blockHeader.setHashMerkleRoot(bytes.get(bytes.size() - 1));
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     }
 
     //生成区块hash
@@ -111,6 +140,7 @@ public class Block {
 
     return blockHeader.getHash();
   }
+<<<<<<< HEAD
   public boolean isNullContent(){
     return blockSize == null && blockHeader == null
             && transactionCount==null&& transactions==null;
@@ -132,4 +162,6 @@ public class Block {
             && Arrays.equals(this.blockHeader.getHashMerkleRoot(),block.blockHeader.getHashMerkleRoot())
             && Arrays.equals(this.blockHeader.getHashPrevBlock(),block.blockHeader.getHashPrevBlock());
   }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

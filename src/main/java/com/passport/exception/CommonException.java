@@ -2,6 +2,7 @@ package com.passport.exception;
 
 import com.passport.enums.ResultEnum;
 
+<<<<<<< HEAD
 /**
  * 异常包装
  * @author 作者xujianfeng 
@@ -32,4 +33,27 @@ public class CommonException extends RuntimeException {
 	public ResultEnum getResultEnum() {
 		return resultEnum;
 	}
+=======
+
+public class CommonException extends RuntimeException {
+
+  private static final long serialVersionUID = -65570670763707623L;
+
+  private ResultEnum resultEnum;
+
+
+  public CommonException(ResultEnum resultEnum) {
+    this.resultEnum = resultEnum;
+  }
+
+
+  public CommonException(ResultEnum resultEnum, String originalInfo) {
+    this.resultEnum = resultEnum;
+    this.resultEnum.setOriginalInfo(originalInfo);
+  }
+
+  public ResultEnum getResultEnum() {
+    return resultEnum;
+  }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

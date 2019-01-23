@@ -1,6 +1,7 @@
 package com.passport.db.dbhelper;
 
 import com.google.common.base.Optional;
+<<<<<<< HEAD
 import com.passport.core.*;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
@@ -9,12 +10,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+=======
+import com.passport.core.Account;
+import com.passport.core.Block;
+import com.passport.core.Transaction;
+import java.util.List;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
 /**
  *
  */
 public interface DBAccess {
 
+<<<<<<< HEAD
 	/**
 	 * 往数据库添加|更新一条数据
 	 * @param key
@@ -415,4 +423,65 @@ public interface DBAccess {
 
 	//k线图使用
 	List<Transaction> listTransactions();
+=======
+
+  boolean putLastBlockHeight(Object lastBlock);
+
+  Optional<Object> getLastBlockHeight();
+
+
+  boolean putBlock(Block block);
+
+
+  Optional<Block> getBlock(Object blockHeight);
+
+
+  Optional<Block> getLastBlock();
+
+
+  Optional<List<String>> getNodeList();
+
+
+  boolean putNodeList(List<String> nodes);
+
+
+  boolean put(String key, Object value);
+
+
+  Optional<Object> get(String key);
+
+
+  boolean delete(String key);
+
+
+  <T> List<T> seekByKey(String keyPrefix);
+
+
+  List<Account> listAccounts();
+
+
+  boolean putAccount(Account account);
+
+
+  Optional<Account> getAccount(String address);
+
+
+  boolean putUnconfirmTransaction(Transaction transaction);
+
+
+  Optional<Transaction> getUnconfirmTransaction(String txHash);
+
+
+  public List<Transaction> listUnconfirmTransactions();
+
+
+  boolean putConfirmTransaction(Transaction transaction);
+
+
+  Optional<Transaction> getConfirmTransaction(String txHash);
+
+  Optional<Account> getMinerAccount();
+
+  boolean putMinerAccount(Account account);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

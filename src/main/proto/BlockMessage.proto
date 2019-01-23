@@ -5,6 +5,7 @@ option java_package = "com.passport.proto";
 option java_outer_classname = "BlockMessage";
 
 message Block {
+<<<<<<< HEAD
     int64 blockSize = 1;
     int64 blockNumber = 2;
     int64 blockHeight = 3;
@@ -12,4 +13,11 @@ message Block {
     int32 transactionCount = 5;
     repeated Transaction transactions = 6;
     string producer = 7;
+=======
+  int64 blockSize = 1;
+  int64 blockHeight = 2;
+  BlockHeader blockHeader = 3;
+  int32 transactionCount = 4;
+  repeated Transaction transactions = 5;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

@@ -1,5 +1,6 @@
 package com.passport.msghandler;
 
+<<<<<<< HEAD
 import com.google.common.base.Optional;
 import com.passport.constant.Constant;
 import com.passport.constant.SyncFlag;
@@ -16,10 +17,18 @@ import com.passport.utils.GsonUtils;
 import com.passport.webhandler.BlockHandler;
 import com.passport.webhandler.TransactionHandler;
 import com.passport.webhandler.TrusteeHandler;
+=======
+import com.passport.core.Block;
+import com.passport.db.dbhelper.DBAccess;
+import com.passport.proto.BlockMessage;
+import com.passport.proto.NettyMessage;
+import com.passport.webhandler.BlockHandler;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+<<<<<<< HEAD
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -146,4 +155,35 @@ public class BlockSyncREQ extends Strategy {
             lock.unlock();
         }
     }
+=======
+import org.springframework.stereotype.Component;
+
+
+@Component("DATA_REQ_BLOCK_SYNC")
+public class BlockSyncREQ extends Strategy {
+
+  private static final Logger logger = LoggerFactory.getLogger(BlockSyncREQ.class);
+
+  @Autowired
+  private DBAccess dbAccess;
+  @Autowired
+  private BlockHandler blockHandler;
+
+  public void handleReqMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
+
+    BlockMessage.Block block = message.getData().getBlock();
+    Block blockLocal = blockHandler.convertBlockMessage2Block(block);
+
+    if (dbAccess.getBlock(blockLocal.getBlockHeight()).isPresent()) {
+      return;
+    }
+
+    if (!blockHandler.checkBlock(blockLocal)) {
+      return;
+    }
+
+    dbAccess.putBlock(blockLocal);
+    dbAccess.putLastBlockHeight(blockLocal.getBlockHeight());
+  }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

@@ -1,5 +1,6 @@
 package com.passport.constant;
 
+<<<<<<< HEAD
 /**
  * 加密算法用到的常量
  *
@@ -20,4 +21,14 @@ public interface CryptoConstants {
 	 * 签名算法
 	 */
 	String SIGN_ALGORITHM = "SHA1withECDSA";
+=======
+
+public interface CryptoConstants {
+
+  String KEY_GEN_ALGORITHM = "ECDSA";
+
+  String EC_PARAM_SPEC = "secp256k1";
+
+  String SIGN_ALGORITHM = "SHA1withECDSA";
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

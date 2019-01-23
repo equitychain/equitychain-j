@@ -1,5 +1,6 @@
 package com.passport.constant;
 
+<<<<<<< HEAD
 import com.passport.core.Block;
 import com.passport.core.Trustee;
 import com.passport.utils.DateUtils;
@@ -10,6 +11,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 /**
  * @author Wu Created by SKINK on 2018/6/22.
  */
@@ -21,6 +24,7 @@ public interface Constant {
   Integer BYTE_ADDRESS_LENGTH = 20;
   Integer STRING_ADDRESS_LENGTH = 40;
 
+<<<<<<< HEAD
   //用来存储各个节点同步过来的区块
   //todo 这个队列是个有限队列，用来判断几个节点是否满了，至于多少个，需要更改
   int BLOCK_NODE_COUNT =1;
@@ -74,4 +78,7 @@ public interface Constant {
   int PROPORTION_ACCURACY = 8;
   //主节点资产
   BigDecimal masterBalance = new BigDecimal(6.18*10000*10000);
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

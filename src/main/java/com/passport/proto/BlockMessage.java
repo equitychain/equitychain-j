@@ -4,7 +4,57 @@
 package com.passport.proto;
 
 public final class BlockMessage {
+<<<<<<< HEAD
   private BlockMessage() {}
+=======
+
+  private static final com.google.protobuf.Descriptors.Descriptor
+      internal_static_Block_descriptor;
+  private static final
+  com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_Block_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.FileDescriptor
+      descriptor;
+
+  static {
+    String[] descriptorData = {
+        "\n\022BlockMessage.proto\032\030BlockHeaderMessage" +
+            ".proto\032\030TransactionMessage.proto\"\220\001\n\005Blo" +
+            "ck\022\021\n\tblockSize\030\001 \001(\003\022\023\n\013blockHeight\030\002 \001" +
+            "(\003\022!\n\013blockHeader\030\003 \001(\0132\014.BlockHeader\022\030\n" +
+            "\020transactionCount\030\004 \001(\005\022\"\n\014transactions\030" +
+            "\005 \003(\0132\014.TransactionB\"\n\022com.passport.prot" +
+            "oB\014BlockMessageb\006proto3"
+    };
+    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
+        new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
+    com.google.protobuf.Descriptors.FileDescriptor
+        .internalBuildGeneratedFileFrom(descriptorData,
+            new com.google.protobuf.Descriptors.FileDescriptor[]{
+                BlockHeaderMessage.getDescriptor(),
+                TransactionMessage.getDescriptor(),
+            }, assigner);
+    internal_static_Block_descriptor =
+        getDescriptor().getMessageTypes().get(0);
+    internal_static_Block_fieldAccessorTable = new
+        com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_Block_descriptor,
+        new String[]{"BlockSize", "BlockHeight", "BlockHeader", "TransactionCount",
+            "Transactions",});
+    BlockHeaderMessage.getDescriptor();
+    TransactionMessage.getDescriptor();
+  }
+
+  private BlockMessage() {
+  }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistryLite registry) {
   }
@@ -14,6 +64,15 @@ public final class BlockMessage {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
+<<<<<<< HEAD
+=======
+
+  public static com.google.protobuf.Descriptors.FileDescriptor
+  getDescriptor() {
+    return descriptor;
+  }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   public interface BlockOrBuilder extends
       // @@protoc_insertion_point(interface_extends:Block)
       com.google.protobuf.MessageOrBuilder {
@@ -24,16 +83,21 @@ public final class BlockMessage {
     long getBlockSize();
 
     /**
+<<<<<<< HEAD
      * <code>int64 blockNumber = 2;</code>
      */
     long getBlockNumber();
 
     /**
      * <code>int64 blockHeight = 3;</code>
+=======
+     * <code>int64 blockHeight = 2;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
      */
     long getBlockHeight();
 
     /**
+<<<<<<< HEAD
      * <code>.BlockHeader blockHeader = 4;</code>
      */
     boolean hasBlockHeader();
@@ -43,15 +107,33 @@ public final class BlockMessage {
     BlockHeaderMessage.BlockHeader getBlockHeader();
     /**
      * <code>.BlockHeader blockHeader = 4;</code>
+=======
+     * <code>.BlockHeader blockHeader = 3;</code>
+     */
+    boolean hasBlockHeader();
+
+    /**
+     * <code>.BlockHeader blockHeader = 3;</code>
+     */
+    BlockHeaderMessage.BlockHeader getBlockHeader();
+
+    /**
+     * <code>.BlockHeader blockHeader = 3;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
      */
     BlockHeaderMessage.BlockHeaderOrBuilder getBlockHeaderOrBuilder();
 
     /**
+<<<<<<< HEAD
      * <code>int32 transactionCount = 5;</code>
+=======
+     * <code>int32 transactionCount = 4;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
      */
     int getTransactionCount();
 
     /**
+<<<<<<< HEAD
      * <code>repeated .Transaction transactions = 6;</code>
      */
     java.util.List<TransactionMessage.Transaction>
@@ -92,10 +174,79 @@ public final class BlockMessage {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:Block)
       BlockOrBuilder {
+=======
+     * <code>repeated .Transaction transactions = 5;</code>
+     */
+    java.util.List<TransactionMessage.Transaction>
+    getTransactionsList();
+
+    /**
+     * <code>repeated .Transaction transactions = 5;</code>
+     */
+    TransactionMessage.Transaction getTransactions(int index);
+
+    /**
+     * <code>repeated .Transaction transactions = 5;</code>
+     */
+    int getTransactionsCount();
+
+    /**
+     * <code>repeated .Transaction transactions = 5;</code>
+     */
+    java.util.List<? extends TransactionMessage.TransactionOrBuilder>
+    getTransactionsOrBuilderList();
+
+    /**
+     * <code>repeated .Transaction transactions = 5;</code>
+     */
+    TransactionMessage.TransactionOrBuilder getTransactionsOrBuilder(
+        int index);
+  }
+
+  /**
+   * Protobuf type {@code Block}
+   */
+  public static final class Block extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:Block)
+      BlockOrBuilder {
+
+    public static final int BLOCKSIZE_FIELD_NUMBER = 1;
+    public static final int BLOCKHEIGHT_FIELD_NUMBER = 2;
+    public static final int BLOCKHEADER_FIELD_NUMBER = 3;
+    public static final int TRANSACTIONCOUNT_FIELD_NUMBER = 4;
+    public static final int TRANSACTIONS_FIELD_NUMBER = 5;
+    private static final long serialVersionUID = 0L;
+    // @@protoc_insertion_point(class_scope:Block)
+    private static final BlockMessage.Block DEFAULT_INSTANCE;
+    private static final com.google.protobuf.Parser<Block>
+        PARSER = new com.google.protobuf.AbstractParser<Block>() {
+      public Block parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Block(input, extensionRegistry);
+      }
+    };
+
+    static {
+      DEFAULT_INSTANCE = new BlockMessage.Block();
+    }
+
+    private int bitField0_;
+    private long blockSize_;
+    private long blockHeight_;
+    private BlockHeaderMessage.BlockHeader blockHeader_;
+    private int transactionCount_;
+    private java.util.List<TransactionMessage.Transaction> transactions_;
+    private byte memoizedIsInitialized = -1;
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     // Use Block.newBuilder() to construct.
     private Block(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
+<<<<<<< HEAD
     private Block() {
       blockSize_ = 0L;
       blockNumber_ = 0L;
@@ -110,6 +261,16 @@ public final class BlockMessage {
     getUnknownFields() {
       return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
+=======
+
+    private Block() {
+      blockSize_ = 0L;
+      blockHeight_ = 0L;
+      transactionCount_ = 0;
+      transactions_ = java.util.Collections.emptyList();
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     private Block(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -137,6 +298,7 @@ public final class BlockMessage {
             }
             case 16: {
 
+<<<<<<< HEAD
               blockNumber_ = input.readInt64();
               break;
             }
@@ -146,11 +308,22 @@ public final class BlockMessage {
               break;
             }
             case 34: {
+=======
+              blockHeight_ = input.readInt64();
+              break;
+            }
+            case 26: {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
               BlockHeaderMessage.BlockHeader.Builder subBuilder = null;
               if (blockHeader_ != null) {
                 subBuilder = blockHeader_.toBuilder();
               }
+<<<<<<< HEAD
               blockHeader_ = input.readMessage(BlockHeaderMessage.BlockHeader.parser(), extensionRegistry);
+=======
+              blockHeader_ = input
+                  .readMessage(BlockHeaderMessage.BlockHeader.parser(), extensionRegistry);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
               if (subBuilder != null) {
                 subBuilder.mergeFrom(blockHeader_);
                 blockHeader_ = subBuilder.buildPartial();
@@ -158,26 +331,40 @@ public final class BlockMessage {
 
               break;
             }
+<<<<<<< HEAD
             case 40: {
+=======
+            case 32: {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
               transactionCount_ = input.readInt32();
               break;
             }
+<<<<<<< HEAD
             case 50: {
               if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
                 transactions_ = new java.util.ArrayList<TransactionMessage.Transaction>();
                 mutable_bitField0_ |= 0x00000020;
+=======
+            case 42: {
+              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+                transactions_ = new java.util.ArrayList<TransactionMessage.Transaction>();
+                mutable_bitField0_ |= 0x00000010;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
               }
               transactions_.add(
                   input.readMessage(TransactionMessage.Transaction.parser(), extensionRegistry));
               break;
             }
+<<<<<<< HEAD
             case 58: {
               String s = input.readStringRequireUtf8();
 
               producer_ = s;
               break;
             }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -186,12 +373,17 @@ public final class BlockMessage {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+<<<<<<< HEAD
         if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+=======
+        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           transactions_ = java.util.Collections.unmodifiableList(transactions_);
         }
         makeExtensionsImmutable();
       }
     }
+<<<<<<< HEAD
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return BlockMessage.internal_static_Block_descriptor;
@@ -199,14 +391,130 @@ public final class BlockMessage {
 
     protected FieldAccessorTable
         internalGetFieldAccessorTable() {
+=======
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+    getDescriptor() {
+      return BlockMessage.internal_static_Block_descriptor;
+    }
+
+    public static BlockMessage.Block parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static BlockMessage.Block parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static BlockMessage.Block parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static BlockMessage.Block parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static BlockMessage.Block parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static BlockMessage.Block parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static BlockMessage.Block parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+
+    public static BlockMessage.Block parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static BlockMessage.Block parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static BlockMessage.Block parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static BlockMessage.Block parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+
+    public static BlockMessage.Block parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+
+    public static Builder newBuilder(BlockMessage.Block prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+
+    public static BlockMessage.Block getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    public static com.google.protobuf.Parser<Block> parser() {
+      return PARSER;
+    }
+
+    @Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+    }
+
+    protected FieldAccessorTable
+    internalGetFieldAccessorTable() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       return BlockMessage.internal_static_Block_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               BlockMessage.Block.class, BlockMessage.Block.Builder.class);
     }
 
+<<<<<<< HEAD
     private int bitField0_;
     public static final int BLOCKSIZE_FIELD_NUMBER = 1;
     private long blockSize_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>int64 blockSize = 1;</code>
      */
@@ -214,6 +522,7 @@ public final class BlockMessage {
       return blockSize_;
     }
 
+<<<<<<< HEAD
     public static final int BLOCKNUMBER_FIELD_NUMBER = 2;
     private long blockNumber_;
     /**
@@ -227,19 +536,29 @@ public final class BlockMessage {
     private long blockHeight_;
     /**
      * <code>int64 blockHeight = 3;</code>
+=======
+    /**
+     * <code>int64 blockHeight = 2;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
      */
     public long getBlockHeight() {
       return blockHeight_;
     }
 
+<<<<<<< HEAD
     public static final int BLOCKHEADER_FIELD_NUMBER = 4;
     private BlockHeaderMessage.BlockHeader blockHeader_;
     /**
      * <code>.BlockHeader blockHeader = 4;</code>
+=======
+    /**
+     * <code>.BlockHeader blockHeader = 3;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
      */
     public boolean hasBlockHeader() {
       return blockHeader_ != null;
     }
+<<<<<<< HEAD
     /**
      * <code>.BlockHeader blockHeader = 4;</code>
      */
@@ -248,28 +567,52 @@ public final class BlockMessage {
     }
     /**
      * <code>.BlockHeader blockHeader = 4;</code>
+=======
+
+    /**
+     * <code>.BlockHeader blockHeader = 3;</code>
+     */
+    public BlockHeaderMessage.BlockHeader getBlockHeader() {
+      return blockHeader_ == null ? BlockHeaderMessage.BlockHeader.getDefaultInstance()
+          : blockHeader_;
+    }
+
+    /**
+     * <code>.BlockHeader blockHeader = 3;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
      */
     public BlockHeaderMessage.BlockHeaderOrBuilder getBlockHeaderOrBuilder() {
       return getBlockHeader();
     }
 
+<<<<<<< HEAD
     public static final int TRANSACTIONCOUNT_FIELD_NUMBER = 5;
     private int transactionCount_;
     /**
      * <code>int32 transactionCount = 5;</code>
+=======
+    /**
+     * <code>int32 transactionCount = 4;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
      */
     public int getTransactionCount() {
       return transactionCount_;
     }
 
+<<<<<<< HEAD
     public static final int TRANSACTIONS_FIELD_NUMBER = 6;
     private java.util.List<TransactionMessage.Transaction> transactions_;
     /**
      * <code>repeated .Transaction transactions = 6;</code>
+=======
+    /**
+     * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
      */
     public java.util.List<TransactionMessage.Transaction> getTransactionsList() {
       return transactions_;
     }
+<<<<<<< HEAD
     /**
      * <code>repeated .Transaction transactions = 6;</code>
      */
@@ -279,24 +622,50 @@ public final class BlockMessage {
     }
     /**
      * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+    /**
+     * <code>repeated .Transaction transactions = 5;</code>
+     */
+    public java.util.List<? extends TransactionMessage.TransactionOrBuilder>
+    getTransactionsOrBuilderList() {
+      return transactions_;
+    }
+
+    /**
+     * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
      */
     public int getTransactionsCount() {
       return transactions_.size();
     }
+<<<<<<< HEAD
     /**
      * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+    /**
+     * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
      */
     public TransactionMessage.Transaction getTransactions(int index) {
       return transactions_.get(index);
     }
+<<<<<<< HEAD
     /**
      * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+    /**
+     * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
      */
     public TransactionMessage.TransactionOrBuilder getTransactionsOrBuilder(
         int index) {
       return transactions_.get(index);
     }
 
+<<<<<<< HEAD
     public static final int PRODUCER_FIELD_NUMBER = 7;
     private volatile Object producer_;
     /**
@@ -336,12 +705,23 @@ public final class BlockMessage {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
+=======
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) {
+        return true;
+      }
+      if (isInitialized == 0) {
+        return false;
+      }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       memoizedIsInitialized = 1;
       return true;
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
+<<<<<<< HEAD
                         throws java.io.IOException {
       if (blockSize_ != 0L) {
         output.writeInt64(1, blockSize_);
@@ -363,16 +743,40 @@ public final class BlockMessage {
       }
       if (!getProducerBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 7, producer_);
+=======
+        throws java.io.IOException {
+      if (blockSize_ != 0L) {
+        output.writeInt64(1, blockSize_);
+      }
+      if (blockHeight_ != 0L) {
+        output.writeInt64(2, blockHeight_);
+      }
+      if (blockHeader_ != null) {
+        output.writeMessage(3, getBlockHeader());
+      }
+      if (transactionCount_ != 0) {
+        output.writeInt32(4, transactionCount_);
+      }
+      for (int i = 0; i < transactions_.size(); i++) {
+        output.writeMessage(5, transactions_.get(i));
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       }
     }
 
     public int getSerializedSize() {
       int size = memoizedSize;
+<<<<<<< HEAD
       if (size != -1) return size;
+=======
+      if (size != -1) {
+        return size;
+      }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       size = 0;
       if (blockSize_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
+<<<<<<< HEAD
           .computeInt64Size(1, blockSize_);
       }
       if (blockNumber_ != 0L) {
@@ -397,16 +801,42 @@ public final class BlockMessage {
       }
       if (!getProducerBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, producer_);
+=======
+            .computeInt64Size(1, blockSize_);
+      }
+      if (blockHeight_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeInt64Size(2, blockHeight_);
+      }
+      if (blockHeader_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(3, getBlockHeader());
+      }
+      if (transactionCount_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeInt32Size(4, transactionCount_);
+      }
+      for (int i = 0; i < transactions_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(5, transactions_.get(i));
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       }
       memoizedSize = size;
       return size;
     }
 
+<<<<<<< HEAD
     private static final long serialVersionUID = 0L;
     @Override
     public boolean equals(final Object obj) {
       if (obj == this) {
        return true;
+=======
+    @Override
+    public boolean equals(final Object obj) {
+      if (obj == this) {
+        return true;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       }
       if (!(obj instanceof BlockMessage.Block)) {
         return super.equals(obj);
@@ -416,8 +846,11 @@ public final class BlockMessage {
       boolean result = true;
       result = result && (getBlockSize()
           == other.getBlockSize());
+<<<<<<< HEAD
       result = result && (getBlockNumber()
           == other.getBlockNumber());
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       result = result && (getBlockHeight()
           == other.getBlockHeight());
       result = result && (hasBlockHeader() == other.hasBlockHeader());
@@ -426,6 +859,7 @@ public final class BlockMessage {
             .equals(other.getBlockHeader());
       }
       result = result && (getTransactionCount()
+<<<<<<< HEAD
           == other.getTransactionCount());
       result = result && getTransactionsList()
           .equals(other.getTransactionsList());
@@ -544,6 +978,46 @@ public final class BlockMessage {
     public static Builder newBuilder(BlockMessage.Block prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+=======
+          == other.getTransactionCount());
+      result = result && getTransactionsList()
+          .equals(other.getTransactionsList());
+      return result;
+    }
+
+    @Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + BLOCKSIZE_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getBlockSize());
+      hash = (37 * hash) + BLOCKHEIGHT_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getBlockHeight());
+      if (hasBlockHeader()) {
+        hash = (37 * hash) + BLOCKHEADER_FIELD_NUMBER;
+        hash = (53 * hash) + getBlockHeader().hashCode();
+      }
+      hash = (37 * hash) + TRANSACTIONCOUNT_FIELD_NUMBER;
+      hash = (53 * hash) + getTransactionCount();
+      if (getTransactionsCount() > 0) {
+        hash = (37 * hash) + TRANSACTIONS_FIELD_NUMBER;
+        hash = (53 * hash) + getTransactionsList().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public Builder newBuilderForType() {
+      return newBuilder();
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -555,6 +1029,19 @@ public final class BlockMessage {
       Builder builder = new Builder(parent);
       return builder;
     }
+<<<<<<< HEAD
+=======
+
+    @Override
+    public com.google.protobuf.Parser<Block> getParserForType() {
+      return PARSER;
+    }
+
+    public BlockMessage.Block getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * Protobuf type {@code Block}
      */
@@ -562,6 +1049,7 @@ public final class BlockMessage {
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:Block)
         BlockMessage.BlockOrBuilder {
+<<<<<<< HEAD
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return BlockMessage.internal_static_Block_descriptor;
@@ -573,6 +1061,20 @@ public final class BlockMessage {
             .ensureFieldAccessorsInitialized(
                 BlockMessage.Block.class, BlockMessage.Block.Builder.class);
       }
+=======
+
+      private int bitField0_;
+      private long blockSize_;
+      private long blockHeight_;
+      private BlockHeaderMessage.BlockHeader blockHeader_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          BlockHeaderMessage.BlockHeader, BlockHeaderMessage.BlockHeader.Builder, BlockHeaderMessage.BlockHeaderOrBuilder> blockHeaderBuilder_;
+      private int transactionCount_;
+      private java.util.List<TransactionMessage.Transaction> transactions_ =
+          java.util.Collections.emptyList();
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder> transactionsBuilder_;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       // Construct using com.passport.proto.BlockMessage.Block.newBuilder()
       private Builder() {
@@ -584,18 +1086,44 @@ public final class BlockMessage {
         super(parent);
         maybeForceBuilderInitialization();
       }
+<<<<<<< HEAD
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
           getTransactionsFieldBuilder();
         }
       }
+=======
+
+      public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+        return BlockMessage.internal_static_Block_descriptor;
+      }
+
+      protected FieldAccessorTable
+      internalGetFieldAccessorTable() {
+        return BlockMessage.internal_static_Block_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                BlockMessage.Block.class, BlockMessage.Block.Builder.class);
+      }
+
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+            .alwaysUseFieldBuilders) {
+          getTransactionsFieldBuilder();
+        }
+      }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder clear() {
         super.clear();
         blockSize_ = 0L;
 
+<<<<<<< HEAD
         blockNumber_ = 0L;
 
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         blockHeight_ = 0L;
 
         if (blockHeaderBuilder_ == null) {
@@ -608,17 +1136,28 @@ public final class BlockMessage {
 
         if (transactionsBuilder_ == null) {
           transactions_ = java.util.Collections.emptyList();
+<<<<<<< HEAD
           bitField0_ = (bitField0_ & ~0x00000020);
         } else {
           transactionsBuilder_.clear();
         }
         producer_ = "";
 
+=======
+          bitField0_ = (bitField0_ & ~0x00000010);
+        } else {
+          transactionsBuilder_.clear();
+        }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         return this;
       }
 
       public com.google.protobuf.Descriptors.Descriptor
+<<<<<<< HEAD
           getDescriptorForType() {
+=======
+      getDescriptorForType() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         return BlockMessage.internal_static_Block_descriptor;
       }
 
@@ -639,7 +1178,10 @@ public final class BlockMessage {
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         result.blockSize_ = blockSize_;
+<<<<<<< HEAD
         result.blockNumber_ = blockNumber_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         result.blockHeight_ = blockHeight_;
         if (blockHeaderBuilder_ == null) {
           result.blockHeader_ = blockHeader_;
@@ -648,15 +1190,24 @@ public final class BlockMessage {
         }
         result.transactionCount_ = transactionCount_;
         if (transactionsBuilder_ == null) {
+<<<<<<< HEAD
           if (((bitField0_ & 0x00000020) == 0x00000020)) {
             transactions_ = java.util.Collections.unmodifiableList(transactions_);
             bitField0_ = (bitField0_ & ~0x00000020);
+=======
+          if (((bitField0_ & 0x00000010) == 0x00000010)) {
+            transactions_ = java.util.Collections.unmodifiableList(transactions_);
+            bitField0_ = (bitField0_ & ~0x00000010);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           }
           result.transactions_ = transactions_;
         } else {
           result.transactions_ = transactionsBuilder_.build();
         }
+<<<<<<< HEAD
         result.producer_ = producer_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -665,32 +1216,59 @@ public final class BlockMessage {
       public Builder clone() {
         return (Builder) super.clone();
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           Object value) {
         return (Builder) super.setField(field, value);
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+<<<<<<< HEAD
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof BlockMessage.Block) {
           return mergeFrom((BlockMessage.Block)other);
+=======
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof BlockMessage.Block) {
+          return mergeFrom((BlockMessage.Block) other);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         } else {
           super.mergeFrom(other);
           return this;
@@ -698,6 +1276,7 @@ public final class BlockMessage {
       }
 
       public Builder mergeFrom(BlockMessage.Block other) {
+<<<<<<< HEAD
         if (other == BlockMessage.Block.getDefaultInstance()) return this;
         if (other.getBlockSize() != 0L) {
           setBlockSize(other.getBlockSize());
@@ -705,6 +1284,14 @@ public final class BlockMessage {
         if (other.getBlockNumber() != 0L) {
           setBlockNumber(other.getBlockNumber());
         }
+=======
+        if (other == BlockMessage.Block.getDefaultInstance()) {
+          return this;
+        }
+        if (other.getBlockSize() != 0L) {
+          setBlockSize(other.getBlockSize());
+        }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (other.getBlockHeight() != 0L) {
           setBlockHeight(other.getBlockHeight());
         }
@@ -718,7 +1305,11 @@ public final class BlockMessage {
           if (!other.transactions_.isEmpty()) {
             if (transactions_.isEmpty()) {
               transactions_ = other.transactions_;
+<<<<<<< HEAD
               bitField0_ = (bitField0_ & ~0x00000020);
+=======
+              bitField0_ = (bitField0_ & ~0x00000010);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
             } else {
               ensureTransactionsIsMutable();
               transactions_.addAll(other.transactions_);
@@ -731,19 +1322,29 @@ public final class BlockMessage {
               transactionsBuilder_.dispose();
               transactionsBuilder_ = null;
               transactions_ = other.transactions_;
+<<<<<<< HEAD
               bitField0_ = (bitField0_ & ~0x00000020);
               transactionsBuilder_ =
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getTransactionsFieldBuilder() : null;
+=======
+              bitField0_ = (bitField0_ & ~0x00000010);
+              transactionsBuilder_ =
+                  com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                      getTransactionsFieldBuilder() : null;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
             } else {
               transactionsBuilder_.addAllMessages(other.transactions_);
             }
           }
         }
+<<<<<<< HEAD
         if (!other.getProducer().isEmpty()) {
           producer_ = other.producer_;
           onChanged();
         }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         onChanged();
         return this;
       }
@@ -769,15 +1370,23 @@ public final class BlockMessage {
         }
         return this;
       }
+<<<<<<< HEAD
       private int bitField0_;
 
       private long blockSize_ ;
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>int64 blockSize = 1;</code>
        */
       public long getBlockSize() {
         return blockSize_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>int64 blockSize = 1;</code>
        */
@@ -787,6 +1396,10 @@ public final class BlockMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>int64 blockSize = 1;</code>
        */
@@ -797,6 +1410,7 @@ public final class BlockMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private long blockNumber_ ;
       /**
        * <code>int64 blockNumber = 2;</code>
@@ -826,12 +1440,22 @@ public final class BlockMessage {
       private long blockHeight_ ;
       /**
        * <code>int64 blockHeight = 3;</code>
+=======
+      /**
+       * <code>int64 blockHeight = 2;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public long getBlockHeight() {
         return blockHeight_;
       }
+<<<<<<< HEAD
       /**
        * <code>int64 blockHeight = 3;</code>
+=======
+
+      /**
+       * <code>int64 blockHeight = 2;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder setBlockHeight(long value) {
 
@@ -839,8 +1463,14 @@ public final class BlockMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>int64 blockHeight = 3;</code>
+=======
+
+      /**
+       * <code>int64 blockHeight = 2;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder clearBlockHeight() {
 
@@ -849,25 +1479,42 @@ public final class BlockMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private BlockHeaderMessage.BlockHeader blockHeader_ = null;
       private com.google.protobuf.SingleFieldBuilderV3<
           BlockHeaderMessage.BlockHeader, BlockHeaderMessage.BlockHeader.Builder, BlockHeaderMessage.BlockHeaderOrBuilder> blockHeaderBuilder_;
       /**
        * <code>.BlockHeader blockHeader = 4;</code>
+=======
+      /**
+       * <code>.BlockHeader blockHeader = 3;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public boolean hasBlockHeader() {
         return blockHeaderBuilder_ != null || blockHeader_ != null;
       }
+<<<<<<< HEAD
       /**
        * <code>.BlockHeader blockHeader = 4;</code>
        */
       public BlockHeaderMessage.BlockHeader getBlockHeader() {
         if (blockHeaderBuilder_ == null) {
           return blockHeader_ == null ? BlockHeaderMessage.BlockHeader.getDefaultInstance() : blockHeader_;
+=======
+
+      /**
+       * <code>.BlockHeader blockHeader = 3;</code>
+       */
+      public BlockHeaderMessage.BlockHeader getBlockHeader() {
+        if (blockHeaderBuilder_ == null) {
+          return blockHeader_ == null ? BlockHeaderMessage.BlockHeader.getDefaultInstance()
+              : blockHeader_;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         } else {
           return blockHeaderBuilder_.getMessage();
         }
       }
+<<<<<<< HEAD
       /**
        * <code>.BlockHeader blockHeader = 4;</code>
        */
@@ -880,10 +1527,24 @@ public final class BlockMessage {
           onChanged();
         } else {
           blockHeaderBuilder_.setMessage(value);
+=======
+
+      /**
+       * <code>.BlockHeader blockHeader = 3;</code>
+       */
+      public Builder setBlockHeader(
+          BlockHeaderMessage.BlockHeader.Builder builderForValue) {
+        if (blockHeaderBuilder_ == null) {
+          blockHeader_ = builderForValue.build();
+          onChanged();
+        } else {
+          blockHeaderBuilder_.setMessage(builderForValue.build());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         }
 
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.BlockHeader blockHeader = 4;</code>
        */
@@ -894,18 +1555,44 @@ public final class BlockMessage {
           onChanged();
         } else {
           blockHeaderBuilder_.setMessage(builderForValue.build());
+=======
+
+      /**
+       * <code>.BlockHeader blockHeader = 3;</code>
+       */
+      public Builder setBlockHeader(BlockHeaderMessage.BlockHeader value) {
+        if (blockHeaderBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          blockHeader_ = value;
+          onChanged();
+        } else {
+          blockHeaderBuilder_.setMessage(value);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         }
 
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.BlockHeader blockHeader = 4;</code>
+=======
+
+      /**
+       * <code>.BlockHeader blockHeader = 3;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder mergeBlockHeader(BlockHeaderMessage.BlockHeader value) {
         if (blockHeaderBuilder_ == null) {
           if (blockHeader_ != null) {
             blockHeader_ =
+<<<<<<< HEAD
               BlockHeaderMessage.BlockHeader.newBuilder(blockHeader_).mergeFrom(value).buildPartial();
+=======
+                BlockHeaderMessage.BlockHeader.newBuilder(blockHeader_).mergeFrom(value)
+                    .buildPartial();
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           } else {
             blockHeader_ = value;
           }
@@ -916,8 +1603,14 @@ public final class BlockMessage {
 
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.BlockHeader blockHeader = 4;</code>
+=======
+
+      /**
+       * <code>.BlockHeader blockHeader = 3;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder clearBlockHeader() {
         if (blockHeaderBuilder_ == null) {
@@ -930,16 +1623,28 @@ public final class BlockMessage {
 
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.BlockHeader blockHeader = 4;</code>
+=======
+
+      /**
+       * <code>.BlockHeader blockHeader = 3;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public BlockHeaderMessage.BlockHeader.Builder getBlockHeaderBuilder() {
 
         onChanged();
         return getBlockHeaderFieldBuilder().getBuilder();
       }
+<<<<<<< HEAD
       /**
        * <code>.BlockHeader blockHeader = 4;</code>
+=======
+
+      /**
+       * <code>.BlockHeader blockHeader = 3;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public BlockHeaderMessage.BlockHeaderOrBuilder getBlockHeaderOrBuilder() {
         if (blockHeaderBuilder_ != null) {
@@ -949,6 +1654,7 @@ public final class BlockMessage {
               BlockHeaderMessage.BlockHeader.getDefaultInstance() : blockHeader_;
         }
       }
+<<<<<<< HEAD
       /**
        * <code>.BlockHeader blockHeader = 4;</code>
        */
@@ -961,20 +1667,46 @@ public final class BlockMessage {
                   getBlockHeader(),
                   getParentForChildren(),
                   isClean());
+=======
+
+      /**
+       * <code>.BlockHeader blockHeader = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          BlockHeaderMessage.BlockHeader, BlockHeaderMessage.BlockHeader.Builder, BlockHeaderMessage.BlockHeaderOrBuilder>
+      getBlockHeaderFieldBuilder() {
+        if (blockHeaderBuilder_ == null) {
+          blockHeaderBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              BlockHeaderMessage.BlockHeader, BlockHeaderMessage.BlockHeader.Builder, BlockHeaderMessage.BlockHeaderOrBuilder>(
+              getBlockHeader(),
+              getParentForChildren(),
+              isClean());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           blockHeader_ = null;
         }
         return blockHeaderBuilder_;
       }
 
+<<<<<<< HEAD
       private int transactionCount_ ;
       /**
        * <code>int32 transactionCount = 5;</code>
+=======
+      /**
+       * <code>int32 transactionCount = 4;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public int getTransactionCount() {
         return transactionCount_;
       }
+<<<<<<< HEAD
       /**
        * <code>int32 transactionCount = 5;</code>
+=======
+
+      /**
+       * <code>int32 transactionCount = 4;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder setTransactionCount(int value) {
 
@@ -982,8 +1714,14 @@ public final class BlockMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>int32 transactionCount = 5;</code>
+=======
+
+      /**
+       * <code>int32 transactionCount = 4;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder clearTransactionCount() {
 
@@ -992,6 +1730,7 @@ public final class BlockMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private java.util.List<TransactionMessage.Transaction> transactions_ =
         java.util.Collections.emptyList();
       private void ensureTransactionsIsMutable() {
@@ -1006,6 +1745,17 @@ public final class BlockMessage {
 
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+      private void ensureTransactionsIsMutable() {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+          transactions_ = new java.util.ArrayList<TransactionMessage.Transaction>(transactions_);
+          bitField0_ |= 0x00000010;
+        }
+      }
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public java.util.List<TransactionMessage.Transaction> getTransactionsList() {
         if (transactionsBuilder_ == null) {
@@ -1014,8 +1764,14 @@ public final class BlockMessage {
           return transactionsBuilder_.getMessageList();
         }
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public int getTransactionsCount() {
         if (transactionsBuilder_ == null) {
@@ -1024,8 +1780,14 @@ public final class BlockMessage {
           return transactionsBuilder_.getCount();
         }
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public TransactionMessage.Transaction getTransactions(int index) {
         if (transactionsBuilder_ == null) {
@@ -1034,8 +1796,14 @@ public final class BlockMessage {
           return transactionsBuilder_.getMessage(index);
         }
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder setTransactions(
           int index, TransactionMessage.Transaction value) {
@@ -1051,8 +1819,14 @@ public final class BlockMessage {
         }
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder setTransactions(
           int index, TransactionMessage.Transaction.Builder builderForValue) {
@@ -1065,8 +1839,14 @@ public final class BlockMessage {
         }
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder addTransactions(TransactionMessage.Transaction value) {
         if (transactionsBuilder_ == null) {
@@ -1081,8 +1861,14 @@ public final class BlockMessage {
         }
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder addTransactions(
           int index, TransactionMessage.Transaction value) {
@@ -1098,8 +1884,14 @@ public final class BlockMessage {
         }
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder addTransactions(
           TransactionMessage.Transaction.Builder builderForValue) {
@@ -1112,8 +1904,14 @@ public final class BlockMessage {
         }
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder addTransactions(
           int index, TransactionMessage.Transaction.Builder builderForValue) {
@@ -1126,8 +1924,14 @@ public final class BlockMessage {
         }
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder addAllTransactions(
           Iterable<? extends TransactionMessage.Transaction> values) {
@@ -1141,21 +1945,37 @@ public final class BlockMessage {
         }
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder clearTransactions() {
         if (transactionsBuilder_ == null) {
           transactions_ = java.util.Collections.emptyList();
+<<<<<<< HEAD
           bitField0_ = (bitField0_ & ~0x00000020);
+=======
+          bitField0_ = (bitField0_ & ~0x00000010);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           onChanged();
         } else {
           transactionsBuilder_.clear();
         }
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder removeTransactions(int index) {
         if (transactionsBuilder_ == null) {
@@ -1167,19 +1987,32 @@ public final class BlockMessage {
         }
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public TransactionMessage.Transaction.Builder getTransactionsBuilder(
           int index) {
         return getTransactionsFieldBuilder().getBuilder(index);
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public TransactionMessage.TransactionOrBuilder getTransactionsOrBuilder(
           int index) {
         if (transactionsBuilder_ == null) {
+<<<<<<< HEAD
           return transactions_.get(index);  } else {
           return transactionsBuilder_.getMessageOrBuilder(index);
         }
@@ -1189,27 +2022,53 @@ public final class BlockMessage {
        */
       public java.util.List<? extends TransactionMessage.TransactionOrBuilder>
            getTransactionsOrBuilderList() {
+=======
+          return transactions_.get(index);
+        } else {
+          return transactionsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+       */
+      public java.util.List<? extends TransactionMessage.TransactionOrBuilder>
+      getTransactionsOrBuilderList() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (transactionsBuilder_ != null) {
           return transactionsBuilder_.getMessageOrBuilderList();
         } else {
           return java.util.Collections.unmodifiableList(transactions_);
         }
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public TransactionMessage.Transaction.Builder addTransactionsBuilder() {
         return getTransactionsFieldBuilder().addBuilder(
             TransactionMessage.Transaction.getDefaultInstance());
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public TransactionMessage.Transaction.Builder addTransactionsBuilder(
           int index) {
         return getTransactionsFieldBuilder().addBuilder(
             index, TransactionMessage.Transaction.getDefaultInstance());
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Transaction transactions = 6;</code>
        */
@@ -1227,11 +2086,33 @@ public final class BlockMessage {
                   ((bitField0_ & 0x00000020) == 0x00000020),
                   getParentForChildren(),
                   isClean());
+=======
+
+      /**
+       * <code>repeated .Transaction transactions = 5;</code>
+       */
+      public java.util.List<TransactionMessage.Transaction.Builder>
+      getTransactionsBuilderList() {
+        return getTransactionsFieldBuilder().getBuilderList();
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder>
+      getTransactionsFieldBuilder() {
+        if (transactionsBuilder_ == null) {
+          transactionsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder>(
+              transactions_,
+              ((bitField0_ & 0x00000010) == 0x00000010),
+              getParentForChildren(),
+              isClean());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           transactions_ = null;
         }
         return transactionsBuilder_;
       }
 
+<<<<<<< HEAD
       private Object producer_ = "";
       /**
        * <code>string producer = 7;</code>
@@ -1300,6 +2181,8 @@ public final class BlockMessage {
         onChanged();
         return this;
       }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -1310,6 +2193,7 @@ public final class BlockMessage {
         return this;
       }
 
+<<<<<<< HEAD
 
       // @@protoc_insertion_point(builder_scope:Block)
     }
@@ -1394,6 +2278,11 @@ public final class BlockMessage {
         new String[] { "BlockSize", "BlockNumber", "BlockHeight", "BlockHeader", "TransactionCount", "Transactions", "Producer", });
     BlockHeaderMessage.getDescriptor();
     TransactionMessage.getDescriptor();
+=======
+      // @@protoc_insertion_point(builder_scope:Block)
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   }
 
   // @@protoc_insertion_point(outer_class_scope)

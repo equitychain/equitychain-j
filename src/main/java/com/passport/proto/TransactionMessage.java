@@ -4,6 +4,7 @@
 package com.passport.proto;
 
 public final class TransactionMessage {
+<<<<<<< HEAD
   private TransactionMessage() {}
   public static void registerAllExtensions(
           com.google.protobuf.ExtensionRegistryLite registry) {
@@ -17,6 +18,70 @@ public final class TransactionMessage {
   public interface TransactionOrBuilder extends
           // @@protoc_insertion_point(interface_extends:Transaction)
           com.google.protobuf.MessageOrBuilder {
+=======
+
+  private static final com.google.protobuf.Descriptors.Descriptor
+      internal_static_Transaction_descriptor;
+  private static final
+  com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_Transaction_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.FileDescriptor
+      descriptor;
+
+  static {
+    String[] descriptorData = {
+        "\n\030TransactionMessage.proto\"\304\001\n\013Transacti" +
+            "on\022\014\n\004hash\030\001 \001(\014\022\021\n\tsignature\030\002 \001(\014\022\r\n\005v"
+            +
+            "alue\030\003 \001(\014\022\022\n\npayAddress\030\004 \001(\014\022\026\n\016receip" +
+            "tAddress\030\005 \001(\014\022\020\n\010eggPrice\030\006 \001(\014\022\016\n\006eggM" +
+            "ax\030\007 \001(\014\022\021\n\ttimeStamp\030\010 \001(\014\022\021\n\textarData" +
+            "\030\t \001(\014\022\021\n\tpublicKey\030\n \001(\014B(\n\022com.passpor" +
+            "t.protoB\022TransactionMessageb\006proto3"
+    };
+    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
+        new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
+    com.google.protobuf.Descriptors.FileDescriptor
+        .internalBuildGeneratedFileFrom(descriptorData,
+            new com.google.protobuf.Descriptors.FileDescriptor[]{
+            }, assigner);
+    internal_static_Transaction_descriptor =
+        getDescriptor().getMessageTypes().get(0);
+    internal_static_Transaction_fieldAccessorTable = new
+        com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_Transaction_descriptor,
+        new String[]{"Hash", "Signature", "Value", "PayAddress", "ReceiptAddress", "EggPrice",
+            "EggMax", "TimeStamp", "ExtarData", "PublicKey",});
+  }
+
+  private TransactionMessage() {
+  }
+
+  public static void registerAllExtensions(
+      com.google.protobuf.ExtensionRegistryLite registry) {
+  }
+
+  public static void registerAllExtensions(
+      com.google.protobuf.ExtensionRegistry registry) {
+    registerAllExtensions(
+        (com.google.protobuf.ExtensionRegistryLite) registry);
+  }
+
+  public static com.google.protobuf.Descriptors.FileDescriptor
+  getDescriptor() {
+    return descriptor;
+  }
+
+  public interface TransactionOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Transaction)
+      com.google.protobuf.MessageOrBuilder {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
     /**
      * <code>bytes hash = 1;</code>
@@ -67,6 +132,7 @@ public final class TransactionMessage {
      * <code>bytes publicKey = 10;</code>
      */
     com.google.protobuf.ByteString getPublicKey();
+<<<<<<< HEAD
 
     /**
      * <code>bytes tradeType = 11;</code>
@@ -105,10 +171,64 @@ public final class TransactionMessage {
           com.google.protobuf.GeneratedMessageV3 implements
           // @@protoc_insertion_point(message_implements:Transaction)
           TransactionOrBuilder {
+=======
+  }
+
+  /**
+   * Protobuf type {@code Transaction}
+   */
+  public static final class Transaction extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:Transaction)
+      TransactionOrBuilder {
+
+    public static final int HASH_FIELD_NUMBER = 1;
+    public static final int SIGNATURE_FIELD_NUMBER = 2;
+    public static final int VALUE_FIELD_NUMBER = 3;
+    public static final int PAYADDRESS_FIELD_NUMBER = 4;
+    public static final int RECEIPTADDRESS_FIELD_NUMBER = 5;
+    public static final int EGGPRICE_FIELD_NUMBER = 6;
+    public static final int EGGMAX_FIELD_NUMBER = 7;
+    public static final int TIMESTAMP_FIELD_NUMBER = 8;
+    public static final int EXTARDATA_FIELD_NUMBER = 9;
+    public static final int PUBLICKEY_FIELD_NUMBER = 10;
+    private static final long serialVersionUID = 0L;
+    // @@protoc_insertion_point(class_scope:Transaction)
+    private static final TransactionMessage.Transaction DEFAULT_INSTANCE;
+    private static final com.google.protobuf.Parser<Transaction>
+        PARSER = new com.google.protobuf.AbstractParser<Transaction>() {
+      public Transaction parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Transaction(input, extensionRegistry);
+      }
+    };
+
+    static {
+      DEFAULT_INSTANCE = new TransactionMessage.Transaction();
+    }
+
+    private com.google.protobuf.ByteString hash_;
+    private com.google.protobuf.ByteString signature_;
+    private com.google.protobuf.ByteString value_;
+    private com.google.protobuf.ByteString payAddress_;
+    private com.google.protobuf.ByteString receiptAddress_;
+    private com.google.protobuf.ByteString eggPrice_;
+    private com.google.protobuf.ByteString eggMax_;
+    private com.google.protobuf.ByteString timeStamp_;
+    private com.google.protobuf.ByteString extarData_;
+    private com.google.protobuf.ByteString publicKey_;
+    private byte memoizedIsInitialized = -1;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     // Use Transaction.newBuilder() to construct.
     private Transaction(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     private Transaction() {
       hash_ = com.google.protobuf.ByteString.EMPTY;
       signature_ = com.google.protobuf.ByteString.EMPTY;
@@ -120,6 +240,7 @@ public final class TransactionMessage {
       timeStamp_ = com.google.protobuf.ByteString.EMPTY;
       extarData_ = com.google.protobuf.ByteString.EMPTY;
       publicKey_ = com.google.protobuf.ByteString.EMPTY;
+<<<<<<< HEAD
       tradeType_ = com.google.protobuf.ByteString.EMPTY;
       blockHeight_ = com.google.protobuf.ByteString.EMPTY;
       eggUsed_ = com.google.protobuf.ByteString.EMPTY;
@@ -137,6 +258,14 @@ public final class TransactionMessage {
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
+=======
+    }
+
+    private Transaction(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       this();
       int mutable_bitField0_ = 0;
       try {
@@ -203,6 +332,7 @@ public final class TransactionMessage {
               publicKey_ = input.readBytes();
               break;
             }
+<<<<<<< HEAD
             case 90: {
 
               tradeType_ = input.readBytes();
@@ -233,17 +363,24 @@ public final class TransactionMessage {
               token_ = input.readBytes();
               break;
             }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
+<<<<<<< HEAD
                 e).setUnfinishedMessage(this);
+=======
+            e).setUnfinishedMessage(this);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       } finally {
         makeExtensionsImmutable();
       }
     }
+<<<<<<< HEAD
     public static final com.google.protobuf.Descriptors.Descriptor
     getDescriptor() {
       return com.passport.proto.TransactionMessage.internal_static_Transaction_descriptor;
@@ -258,6 +395,124 @@ public final class TransactionMessage {
 
     public static final int HASH_FIELD_NUMBER = 1;
     private com.google.protobuf.ByteString hash_;
+=======
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+    getDescriptor() {
+      return TransactionMessage.internal_static_Transaction_descriptor;
+    }
+
+    public static TransactionMessage.Transaction parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static TransactionMessage.Transaction parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static TransactionMessage.Transaction parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static TransactionMessage.Transaction parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static TransactionMessage.Transaction parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static TransactionMessage.Transaction parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static TransactionMessage.Transaction parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+
+    public static TransactionMessage.Transaction parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static TransactionMessage.Transaction parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static TransactionMessage.Transaction parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static TransactionMessage.Transaction parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+
+    public static TransactionMessage.Transaction parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+
+    public static Builder newBuilder(TransactionMessage.Transaction prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+
+    public static TransactionMessage.Transaction getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    public static com.google.protobuf.Parser<Transaction> parser() {
+      return PARSER;
+    }
+
+    @Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+    }
+
+    protected FieldAccessorTable
+    internalGetFieldAccessorTable() {
+      return TransactionMessage.internal_static_Transaction_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              TransactionMessage.Transaction.class, TransactionMessage.Transaction.Builder.class);
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>bytes hash = 1;</code>
      */
@@ -265,8 +520,11 @@ public final class TransactionMessage {
       return hash_;
     }
 
+<<<<<<< HEAD
     public static final int SIGNATURE_FIELD_NUMBER = 2;
     private com.google.protobuf.ByteString signature_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>bytes signature = 2;</code>
      */
@@ -274,8 +532,11 @@ public final class TransactionMessage {
       return signature_;
     }
 
+<<<<<<< HEAD
     public static final int VALUE_FIELD_NUMBER = 3;
     private com.google.protobuf.ByteString value_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>bytes value = 3;</code>
      */
@@ -283,8 +544,11 @@ public final class TransactionMessage {
       return value_;
     }
 
+<<<<<<< HEAD
     public static final int PAYADDRESS_FIELD_NUMBER = 4;
     private com.google.protobuf.ByteString payAddress_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>bytes payAddress = 4;</code>
      */
@@ -292,8 +556,11 @@ public final class TransactionMessage {
       return payAddress_;
     }
 
+<<<<<<< HEAD
     public static final int RECEIPTADDRESS_FIELD_NUMBER = 5;
     private com.google.protobuf.ByteString receiptAddress_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>bytes receiptAddress = 5;</code>
      */
@@ -301,8 +568,11 @@ public final class TransactionMessage {
       return receiptAddress_;
     }
 
+<<<<<<< HEAD
     public static final int EGGPRICE_FIELD_NUMBER = 6;
     private com.google.protobuf.ByteString eggPrice_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>bytes eggPrice = 6;</code>
      */
@@ -310,8 +580,11 @@ public final class TransactionMessage {
       return eggPrice_;
     }
 
+<<<<<<< HEAD
     public static final int EGGMAX_FIELD_NUMBER = 7;
     private com.google.protobuf.ByteString eggMax_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>bytes eggMax = 7;</code>
      */
@@ -319,8 +592,11 @@ public final class TransactionMessage {
       return eggMax_;
     }
 
+<<<<<<< HEAD
     public static final int TIMESTAMP_FIELD_NUMBER = 8;
     private com.google.protobuf.ByteString timeStamp_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>bytes timeStamp = 8;</code>
      */
@@ -328,8 +604,11 @@ public final class TransactionMessage {
       return timeStamp_;
     }
 
+<<<<<<< HEAD
     public static final int EXTARDATA_FIELD_NUMBER = 9;
     private com.google.protobuf.ByteString extarData_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>bytes extarData = 9;</code>
      */
@@ -337,8 +616,11 @@ public final class TransactionMessage {
       return extarData_;
     }
 
+<<<<<<< HEAD
     public static final int PUBLICKEY_FIELD_NUMBER = 10;
     private com.google.protobuf.ByteString publicKey_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>bytes publicKey = 10;</code>
      */
@@ -346,6 +628,7 @@ public final class TransactionMessage {
       return publicKey_;
     }
 
+<<<<<<< HEAD
     public static final int TRADETYPE_FIELD_NUMBER = 11;
     private com.google.protobuf.ByteString tradeType_;
     /**
@@ -405,13 +688,27 @@ public final class TransactionMessage {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
+=======
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) {
+        return true;
+      }
+      if (isInitialized == 0) {
+        return false;
+      }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       memoizedIsInitialized = 1;
       return true;
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
+<<<<<<< HEAD
             throws java.io.IOException {
+=======
+        throws java.io.IOException {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       if (!hash_.isEmpty()) {
         output.writeBytes(1, hash_);
       }
@@ -442,6 +739,7 @@ public final class TransactionMessage {
       if (!publicKey_.isEmpty()) {
         output.writeBytes(10, publicKey_);
       }
+<<<<<<< HEAD
       if (!tradeType_.isEmpty()) {
         output.writeBytes(11, tradeType_);
       }
@@ -460,15 +758,24 @@ public final class TransactionMessage {
       if (!token_.isEmpty()) {
         output.writeBytes(16, token_);
       }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     }
 
     public int getSerializedSize() {
       int size = memoizedSize;
+<<<<<<< HEAD
       if (size != -1) return size;
+=======
+      if (size != -1) {
+        return size;
+      }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       size = 0;
       if (!hash_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
+<<<<<<< HEAD
                 .computeBytesSize(1, hash_);
       }
       if (!signature_.isEmpty()) {
@@ -530,11 +837,51 @@ public final class TransactionMessage {
       if (!token_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
                 .computeBytesSize(16, token_);
+=======
+            .computeBytesSize(1, hash_);
+      }
+      if (!signature_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(2, signature_);
+      }
+      if (!value_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(3, value_);
+      }
+      if (!payAddress_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(4, payAddress_);
+      }
+      if (!receiptAddress_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(5, receiptAddress_);
+      }
+      if (!eggPrice_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(6, eggPrice_);
+      }
+      if (!eggMax_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(7, eggMax_);
+      }
+      if (!timeStamp_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(8, timeStamp_);
+      }
+      if (!extarData_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(9, extarData_);
+      }
+      if (!publicKey_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(10, publicKey_);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       }
       memoizedSize = size;
       return size;
     }
 
+<<<<<<< HEAD
     private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
@@ -583,6 +930,43 @@ public final class TransactionMessage {
     }
 
     @java.lang.Override
+=======
+    @Override
+    public boolean equals(final Object obj) {
+      if (obj == this) {
+        return true;
+      }
+      if (!(obj instanceof TransactionMessage.Transaction)) {
+        return super.equals(obj);
+      }
+      TransactionMessage.Transaction other = (TransactionMessage.Transaction) obj;
+
+      boolean result = true;
+      result = result && getHash()
+          .equals(other.getHash());
+      result = result && getSignature()
+          .equals(other.getSignature());
+      result = result && getValue()
+          .equals(other.getValue());
+      result = result && getPayAddress()
+          .equals(other.getPayAddress());
+      result = result && getReceiptAddress()
+          .equals(other.getReceiptAddress());
+      result = result && getEggPrice()
+          .equals(other.getEggPrice());
+      result = result && getEggMax()
+          .equals(other.getEggMax());
+      result = result && getTimeStamp()
+          .equals(other.getTimeStamp());
+      result = result && getExtarData()
+          .equals(other.getExtarData());
+      result = result && getPublicKey()
+          .equals(other.getPublicKey());
+      return result;
+    }
+
+    @Override
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     public int hashCode() {
       if (memoizedHashCode != 0) {
         return memoizedHashCode;
@@ -609,6 +993,7 @@ public final class TransactionMessage {
       hash = (53 * hash) + getExtarData().hashCode();
       hash = (37 * hash) + PUBLICKEY_FIELD_NUMBER;
       hash = (53 * hash) + getPublicKey().hashCode();
+<<<<<<< HEAD
       hash = (37 * hash) + TRADETYPE_FIELD_NUMBER;
       hash = (53 * hash) + getTradeType().hashCode();
       hash = (37 * hash) + BLOCKHEIGHT_FIELD_NUMBER;
@@ -621,11 +1006,14 @@ public final class TransactionMessage {
       hash = (53 * hash) + getStatus().hashCode();
       hash = (37 * hash) + TOKEN_FIELD_NUMBER;
       hash = (53 * hash) + getToken().hashCode();
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
     }
 
+<<<<<<< HEAD
     public static com.passport.proto.TransactionMessage.Transaction parseFrom(
             java.nio.ByteBuffer data)
             throws com.google.protobuf.InvalidProtocolBufferException {
@@ -714,10 +1102,38 @@ public final class TransactionMessage {
       Builder builder = new Builder(parent);
       return builder;
     }
+=======
+    public Builder newBuilderForType() {
+      return newBuilder();
+    }
+
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @Override
+    protected Builder newBuilderForType(
+        BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+
+    @Override
+    public com.google.protobuf.Parser<Transaction> getParserForType() {
+      return PARSER;
+    }
+
+    public TransactionMessage.Transaction getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * Protobuf type {@code Transaction}
      */
     public static final class Builder extends
+<<<<<<< HEAD
             com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
             // @@protoc_insertion_point(builder_implements:Transaction)
             com.passport.proto.TransactionMessage.TransactionOrBuilder {
@@ -732,6 +1148,22 @@ public final class TransactionMessage {
                 .ensureFieldAccessorsInitialized(
                         com.passport.proto.TransactionMessage.Transaction.class, com.passport.proto.TransactionMessage.Transaction.Builder.class);
       }
+=======
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Transaction)
+        TransactionMessage.TransactionOrBuilder {
+
+      private com.google.protobuf.ByteString hash_ = com.google.protobuf.ByteString.EMPTY;
+      private com.google.protobuf.ByteString signature_ = com.google.protobuf.ByteString.EMPTY;
+      private com.google.protobuf.ByteString value_ = com.google.protobuf.ByteString.EMPTY;
+      private com.google.protobuf.ByteString payAddress_ = com.google.protobuf.ByteString.EMPTY;
+      private com.google.protobuf.ByteString receiptAddress_ = com.google.protobuf.ByteString.EMPTY;
+      private com.google.protobuf.ByteString eggPrice_ = com.google.protobuf.ByteString.EMPTY;
+      private com.google.protobuf.ByteString eggMax_ = com.google.protobuf.ByteString.EMPTY;
+      private com.google.protobuf.ByteString timeStamp_ = com.google.protobuf.ByteString.EMPTY;
+      private com.google.protobuf.ByteString extarData_ = com.google.protobuf.ByteString.EMPTY;
+      private com.google.protobuf.ByteString publicKey_ = com.google.protobuf.ByteString.EMPTY;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       // Construct using com.passport.proto.TransactionMessage.Transaction.newBuilder()
       private Builder() {
@@ -739,6 +1171,7 @@ public final class TransactionMessage {
       }
 
       private Builder(
+<<<<<<< HEAD
               com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
@@ -748,6 +1181,31 @@ public final class TransactionMessage {
                 .alwaysUseFieldBuilders) {
         }
       }
+=======
+          BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+
+      public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+        return TransactionMessage.internal_static_Transaction_descriptor;
+      }
+
+      protected FieldAccessorTable
+      internalGetFieldAccessorTable() {
+        return TransactionMessage.internal_static_Transaction_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                TransactionMessage.Transaction.class, TransactionMessage.Transaction.Builder.class);
+      }
+
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+            .alwaysUseFieldBuilders) {
+        }
+      }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder clear() {
         super.clear();
         hash_ = com.google.protobuf.ByteString.EMPTY;
@@ -770,6 +1228,7 @@ public final class TransactionMessage {
 
         publicKey_ = com.google.protobuf.ByteString.EMPTY;
 
+<<<<<<< HEAD
         tradeType_ = com.google.protobuf.ByteString.EMPTY;
 
         blockHeight_ = com.google.protobuf.ByteString.EMPTY;
@@ -782,11 +1241,14 @@ public final class TransactionMessage {
 
         token_ = com.google.protobuf.ByteString.EMPTY;
 
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         return this;
       }
 
       public com.google.protobuf.Descriptors.Descriptor
       getDescriptorForType() {
+<<<<<<< HEAD
         return com.passport.proto.TransactionMessage.internal_static_Transaction_descriptor;
       }
 
@@ -796,14 +1258,30 @@ public final class TransactionMessage {
 
       public com.passport.proto.TransactionMessage.Transaction build() {
         com.passport.proto.TransactionMessage.Transaction result = buildPartial();
+=======
+        return TransactionMessage.internal_static_Transaction_descriptor;
+      }
+
+      public TransactionMessage.Transaction getDefaultInstanceForType() {
+        return TransactionMessage.Transaction.getDefaultInstance();
+      }
+
+      public TransactionMessage.Transaction build() {
+        TransactionMessage.Transaction result = buildPartial();
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
+<<<<<<< HEAD
       public com.passport.proto.TransactionMessage.Transaction buildPartial() {
         com.passport.proto.TransactionMessage.Transaction result = new com.passport.proto.TransactionMessage.Transaction(this);
+=======
+      public TransactionMessage.Transaction buildPartial() {
+        TransactionMessage.Transaction result = new TransactionMessage.Transaction(this);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         result.hash_ = hash_;
         result.signature_ = signature_;
         result.value_ = value_;
@@ -814,12 +1292,15 @@ public final class TransactionMessage {
         result.timeStamp_ = timeStamp_;
         result.extarData_ = extarData_;
         result.publicKey_ = publicKey_;
+<<<<<<< HEAD
         result.tradeType_ = tradeType_;
         result.blockHeight_ = blockHeight_;
         result.eggUsed_ = eggUsed_;
         result.nonce_ = nonce_;
         result.status_ = status_;
         result.token_ = token_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         onBuilt();
         return result;
       }
@@ -827,6 +1308,7 @@ public final class TransactionMessage {
       public Builder clone() {
         return (Builder) super.clone();
       }
+<<<<<<< HEAD
       public Builder setField(
               com.google.protobuf.Descriptors.FieldDescriptor field,
               Object value) {
@@ -853,14 +1335,55 @@ public final class TransactionMessage {
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof com.passport.proto.TransactionMessage.Transaction) {
           return mergeFrom((com.passport.proto.TransactionMessage.Transaction)other);
+=======
+
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof TransactionMessage.Transaction) {
+          return mergeFrom((TransactionMessage.Transaction) other);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
+<<<<<<< HEAD
       public Builder mergeFrom(com.passport.proto.TransactionMessage.Transaction other) {
         if (other == com.passport.proto.TransactionMessage.Transaction.getDefaultInstance()) return this;
+=======
+      public Builder mergeFrom(TransactionMessage.Transaction other) {
+        if (other == TransactionMessage.Transaction.getDefaultInstance()) {
+          return this;
+        }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (other.getHash() != com.google.protobuf.ByteString.EMPTY) {
           setHash(other.getHash());
         }
@@ -891,6 +1414,7 @@ public final class TransactionMessage {
         if (other.getPublicKey() != com.google.protobuf.ByteString.EMPTY) {
           setPublicKey(other.getPublicKey());
         }
+<<<<<<< HEAD
         if (other.getTradeType() != com.google.protobuf.ByteString.EMPTY) {
           setTradeType(other.getTradeType());
         }
@@ -909,6 +1433,8 @@ public final class TransactionMessage {
         if (other.getToken() != com.google.protobuf.ByteString.EMPTY) {
           setToken(other.getToken());
         }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         onChanged();
         return this;
       }
@@ -918,6 +1444,7 @@ public final class TransactionMessage {
       }
 
       public Builder mergeFrom(
+<<<<<<< HEAD
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws java.io.IOException {
@@ -926,6 +1453,16 @@ public final class TransactionMessage {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.passport.proto.TransactionMessage.Transaction) e.getUnfinishedMessage();
+=======
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        TransactionMessage.Transaction parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (TransactionMessage.Transaction) e.getUnfinishedMessage();
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -935,13 +1472,20 @@ public final class TransactionMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString hash_ = com.google.protobuf.ByteString.EMPTY;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes hash = 1;</code>
        */
       public com.google.protobuf.ByteString getHash() {
         return hash_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes hash = 1;</code>
        */
@@ -954,6 +1498,10 @@ public final class TransactionMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes hash = 1;</code>
        */
@@ -964,13 +1512,20 @@ public final class TransactionMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString signature_ = com.google.protobuf.ByteString.EMPTY;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes signature = 2;</code>
        */
       public com.google.protobuf.ByteString getSignature() {
         return signature_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes signature = 2;</code>
        */
@@ -983,6 +1538,10 @@ public final class TransactionMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes signature = 2;</code>
        */
@@ -993,13 +1552,20 @@ public final class TransactionMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString value_ = com.google.protobuf.ByteString.EMPTY;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes value = 3;</code>
        */
       public com.google.protobuf.ByteString getValue() {
         return value_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes value = 3;</code>
        */
@@ -1012,6 +1578,10 @@ public final class TransactionMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes value = 3;</code>
        */
@@ -1022,13 +1592,20 @@ public final class TransactionMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString payAddress_ = com.google.protobuf.ByteString.EMPTY;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes payAddress = 4;</code>
        */
       public com.google.protobuf.ByteString getPayAddress() {
         return payAddress_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes payAddress = 4;</code>
        */
@@ -1041,6 +1618,10 @@ public final class TransactionMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes payAddress = 4;</code>
        */
@@ -1051,13 +1632,20 @@ public final class TransactionMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString receiptAddress_ = com.google.protobuf.ByteString.EMPTY;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes receiptAddress = 5;</code>
        */
       public com.google.protobuf.ByteString getReceiptAddress() {
         return receiptAddress_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes receiptAddress = 5;</code>
        */
@@ -1070,6 +1658,10 @@ public final class TransactionMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes receiptAddress = 5;</code>
        */
@@ -1080,13 +1672,20 @@ public final class TransactionMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString eggPrice_ = com.google.protobuf.ByteString.EMPTY;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes eggPrice = 6;</code>
        */
       public com.google.protobuf.ByteString getEggPrice() {
         return eggPrice_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes eggPrice = 6;</code>
        */
@@ -1099,6 +1698,10 @@ public final class TransactionMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes eggPrice = 6;</code>
        */
@@ -1109,13 +1712,20 @@ public final class TransactionMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString eggMax_ = com.google.protobuf.ByteString.EMPTY;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes eggMax = 7;</code>
        */
       public com.google.protobuf.ByteString getEggMax() {
         return eggMax_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes eggMax = 7;</code>
        */
@@ -1128,6 +1738,10 @@ public final class TransactionMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes eggMax = 7;</code>
        */
@@ -1138,13 +1752,20 @@ public final class TransactionMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString timeStamp_ = com.google.protobuf.ByteString.EMPTY;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes timeStamp = 8;</code>
        */
       public com.google.protobuf.ByteString getTimeStamp() {
         return timeStamp_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes timeStamp = 8;</code>
        */
@@ -1157,6 +1778,10 @@ public final class TransactionMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes timeStamp = 8;</code>
        */
@@ -1167,13 +1792,20 @@ public final class TransactionMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString extarData_ = com.google.protobuf.ByteString.EMPTY;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes extarData = 9;</code>
        */
       public com.google.protobuf.ByteString getExtarData() {
         return extarData_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes extarData = 9;</code>
        */
@@ -1186,6 +1818,10 @@ public final class TransactionMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes extarData = 9;</code>
        */
@@ -1196,13 +1832,20 @@ public final class TransactionMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString publicKey_ = com.google.protobuf.ByteString.EMPTY;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes publicKey = 10;</code>
        */
       public com.google.protobuf.ByteString getPublicKey() {
         return publicKey_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes publicKey = 10;</code>
        */
@@ -1215,6 +1858,10 @@ public final class TransactionMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes publicKey = 10;</code>
        */
@@ -1225,6 +1872,7 @@ public final class TransactionMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString tradeType_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>bytes tradeType = 11;</code>
@@ -1400,10 +2048,15 @@ public final class TransactionMessage {
       }
       public final Builder setUnknownFields(
               final com.google.protobuf.UnknownFieldSet unknownFields) {
+=======
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         return this;
       }
 
       public final Builder mergeUnknownFields(
+<<<<<<< HEAD
               final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
       }
@@ -1490,6 +2143,15 @@ public final class TransactionMessage {
             com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
             internal_static_Transaction_descriptor,
             new java.lang.String[] { "Hash", "Signature", "Value", "PayAddress", "ReceiptAddress", "EggPrice", "EggMax", "TimeStamp", "ExtarData", "PublicKey", "TradeType", "BlockHeight", "EggUsed", "Nonce", "Status", "Token", });
+=======
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:Transaction)
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   }
 
   // @@protoc_insertion_point(outer_class_scope)

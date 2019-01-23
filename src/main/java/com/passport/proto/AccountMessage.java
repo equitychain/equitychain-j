@@ -4,7 +4,49 @@
 package com.passport.proto;
 
 public final class AccountMessage {
+<<<<<<< HEAD
   private AccountMessage() {}
+=======
+
+  private static final com.google.protobuf.Descriptors.Descriptor
+      internal_static_Account_descriptor;
+  private static final
+  com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_Account_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.FileDescriptor
+      descriptor;
+
+  static {
+    String[] descriptorData = {
+        "\n\024AccountMessage.proto\"?\n\007Account\022\017\n\007add" +
+            "ress\030\001 \001(\014\022\022\n\nprivateKey\030\002 \001(\014\022\017\n\007balanc" +
+            "e\030\003 \001(\014B$\n\022com.passport.protoB\016AccountMe" +
+            "ssageb\006proto3"
+    };
+    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
+        new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
+    com.google.protobuf.Descriptors.FileDescriptor
+        .internalBuildGeneratedFileFrom(descriptorData,
+            new com.google.protobuf.Descriptors.FileDescriptor[]{
+            }, assigner);
+    internal_static_Account_descriptor =
+        getDescriptor().getMessageTypes().get(0);
+    internal_static_Account_fieldAccessorTable = new
+        com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_Account_descriptor,
+        new String[]{"Address", "PrivateKey", "Balance",});
+  }
+
+  private AccountMessage() {
+  }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistryLite registry) {
   }
@@ -14,6 +56,15 @@ public final class AccountMessage {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
+<<<<<<< HEAD
+=======
+
+  public static com.google.protobuf.Descriptors.FileDescriptor
+  getDescriptor() {
+    return descriptor;
+  }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   public interface AccountOrBuilder extends
       // @@protoc_insertion_point(interface_extends:Account)
       com.google.protobuf.MessageOrBuilder {
@@ -32,6 +83,7 @@ public final class AccountMessage {
      * <code>bytes balance = 3;</code>
      */
     com.google.protobuf.ByteString getBalance();
+<<<<<<< HEAD
 
     /**
      * <code>bytes token = 4;</code>
@@ -45,14 +97,56 @@ public final class AccountMessage {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:Account)
       AccountOrBuilder {
+=======
+  }
+
+  /**
+   * Protobuf type {@code Account}
+   */
+  public static final class Account extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:Account)
+      AccountOrBuilder {
+
+    public static final int ADDRESS_FIELD_NUMBER = 1;
+    public static final int PRIVATEKEY_FIELD_NUMBER = 2;
+    public static final int BALANCE_FIELD_NUMBER = 3;
+    private static final long serialVersionUID = 0L;
+    // @@protoc_insertion_point(class_scope:Account)
+    private static final AccountMessage.Account DEFAULT_INSTANCE;
+    private static final com.google.protobuf.Parser<Account>
+        PARSER = new com.google.protobuf.AbstractParser<Account>() {
+      public Account parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Account(input, extensionRegistry);
+      }
+    };
+
+    static {
+      DEFAULT_INSTANCE = new AccountMessage.Account();
+    }
+
+    private com.google.protobuf.ByteString address_;
+    private com.google.protobuf.ByteString privateKey_;
+    private com.google.protobuf.ByteString balance_;
+    private byte memoizedIsInitialized = -1;
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     // Use Account.newBuilder() to construct.
     private Account(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     private Account() {
       address_ = com.google.protobuf.ByteString.EMPTY;
       privateKey_ = com.google.protobuf.ByteString.EMPTY;
       balance_ = com.google.protobuf.ByteString.EMPTY;
+<<<<<<< HEAD
       token_ = com.google.protobuf.ByteString.EMPTY;
     }
 
@@ -60,6 +154,8 @@ public final class AccountMessage {
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
       return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     }
     private Account(
         com.google.protobuf.CodedInputStream input,
@@ -96,11 +192,14 @@ public final class AccountMessage {
               balance_ = input.readBytes();
               break;
             }
+<<<<<<< HEAD
             case 34: {
 
               token_ = input.readBytes();
               break;
             }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -112,6 +211,7 @@ public final class AccountMessage {
         makeExtensionsImmutable();
       }
     }
+<<<<<<< HEAD
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return AccountMessage.internal_static_Account_descriptor;
@@ -119,13 +219,129 @@ public final class AccountMessage {
 
     protected FieldAccessorTable
         internalGetFieldAccessorTable() {
+=======
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+    getDescriptor() {
+      return AccountMessage.internal_static_Account_descriptor;
+    }
+
+    public static AccountMessage.Account parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static AccountMessage.Account parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static AccountMessage.Account parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static AccountMessage.Account parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static AccountMessage.Account parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static AccountMessage.Account parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static AccountMessage.Account parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+
+    public static AccountMessage.Account parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static AccountMessage.Account parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static AccountMessage.Account parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static AccountMessage.Account parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+
+    public static AccountMessage.Account parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+
+    public static Builder newBuilder(AccountMessage.Account prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+
+    public static AccountMessage.Account getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    public static com.google.protobuf.Parser<Account> parser() {
+      return PARSER;
+    }
+
+    @Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+    }
+
+    protected FieldAccessorTable
+    internalGetFieldAccessorTable() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       return AccountMessage.internal_static_Account_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               AccountMessage.Account.class, AccountMessage.Account.Builder.class);
     }
 
+<<<<<<< HEAD
     public static final int ADDRESS_FIELD_NUMBER = 1;
     private com.google.protobuf.ByteString address_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>bytes address = 1;</code>
      */
@@ -133,8 +349,11 @@ public final class AccountMessage {
       return address_;
     }
 
+<<<<<<< HEAD
     public static final int PRIVATEKEY_FIELD_NUMBER = 2;
     private com.google.protobuf.ByteString privateKey_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>bytes privateKey = 2;</code>
      */
@@ -142,8 +361,11 @@ public final class AccountMessage {
       return privateKey_;
     }
 
+<<<<<<< HEAD
     public static final int BALANCE_FIELD_NUMBER = 3;
     private com.google.protobuf.ByteString balance_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>bytes balance = 3;</code>
      */
@@ -151,6 +373,7 @@ public final class AccountMessage {
       return balance_;
     }
 
+<<<<<<< HEAD
     public static final int TOKEN_FIELD_NUMBER = 4;
     private com.google.protobuf.ByteString token_;
     /**
@@ -165,13 +388,27 @@ public final class AccountMessage {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
+=======
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) {
+        return true;
+      }
+      if (isInitialized == 0) {
+        return false;
+      }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       memoizedIsInitialized = 1;
       return true;
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
+<<<<<<< HEAD
                         throws java.io.IOException {
+=======
+        throws java.io.IOException {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       if (!address_.isEmpty()) {
         output.writeBytes(1, address_);
       }
@@ -181,18 +418,28 @@ public final class AccountMessage {
       if (!balance_.isEmpty()) {
         output.writeBytes(3, balance_);
       }
+<<<<<<< HEAD
       if (!token_.isEmpty()) {
         output.writeBytes(4, token_);
       }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     }
 
     public int getSerializedSize() {
       int size = memoizedSize;
+<<<<<<< HEAD
       if (size != -1) return size;
+=======
+      if (size != -1) {
+        return size;
+      }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       size = 0;
       if (!address_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
+<<<<<<< HEAD
           .computeBytesSize(1, address_);
       }
       if (!privateKey_.isEmpty()) {
@@ -206,16 +453,34 @@ public final class AccountMessage {
       if (!token_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(4, token_);
+=======
+            .computeBytesSize(1, address_);
+      }
+      if (!privateKey_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(2, privateKey_);
+      }
+      if (!balance_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(3, balance_);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       }
       memoizedSize = size;
       return size;
     }
 
+<<<<<<< HEAD
     private static final long serialVersionUID = 0L;
     @Override
     public boolean equals(final Object obj) {
       if (obj == this) {
        return true;
+=======
+    @Override
+    public boolean equals(final Object obj) {
+      if (obj == this) {
+        return true;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       }
       if (!(obj instanceof AccountMessage.Account)) {
         return super.equals(obj);
@@ -229,8 +494,11 @@ public final class AccountMessage {
           .equals(other.getPrivateKey());
       result = result && getBalance()
           .equals(other.getBalance());
+<<<<<<< HEAD
       result = result && getToken()
           .equals(other.getToken());
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       return result;
     }
 
@@ -247,13 +515,17 @@ public final class AccountMessage {
       hash = (53 * hash) + getPrivateKey().hashCode();
       hash = (37 * hash) + BALANCE_FIELD_NUMBER;
       hash = (53 * hash) + getBalance().hashCode();
+<<<<<<< HEAD
       hash = (37 * hash) + TOKEN_FIELD_NUMBER;
       hash = (53 * hash) + getToken().hashCode();
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
     }
 
+<<<<<<< HEAD
     public static AccountMessage.Account parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -331,6 +603,12 @@ public final class AccountMessage {
     public static Builder newBuilder(AccountMessage.Account prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+=======
+    public Builder newBuilderForType() {
+      return newBuilder();
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -342,6 +620,19 @@ public final class AccountMessage {
       Builder builder = new Builder(parent);
       return builder;
     }
+<<<<<<< HEAD
+=======
+
+    @Override
+    public com.google.protobuf.Parser<Account> getParserForType() {
+      return PARSER;
+    }
+
+    public AccountMessage.Account getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * Protobuf type {@code Account}
      */
@@ -349,6 +640,7 @@ public final class AccountMessage {
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:Account)
         AccountMessage.AccountOrBuilder {
+<<<<<<< HEAD
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return AccountMessage.internal_static_Account_descriptor;
@@ -360,6 +652,12 @@ public final class AccountMessage {
             .ensureFieldAccessorsInitialized(
                 AccountMessage.Account.class, AccountMessage.Account.Builder.class);
       }
+=======
+
+      private com.google.protobuf.ByteString address_ = com.google.protobuf.ByteString.EMPTY;
+      private com.google.protobuf.ByteString privateKey_ = com.google.protobuf.ByteString.EMPTY;
+      private com.google.protobuf.ByteString balance_ = com.google.protobuf.ByteString.EMPTY;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       // Construct using com.passport.proto.AccountMessage.Account.newBuilder()
       private Builder() {
@@ -371,11 +669,33 @@ public final class AccountMessage {
         super(parent);
         maybeForceBuilderInitialization();
       }
+<<<<<<< HEAD
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
         }
       }
+=======
+
+      public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+        return AccountMessage.internal_static_Account_descriptor;
+      }
+
+      protected FieldAccessorTable
+      internalGetFieldAccessorTable() {
+        return AccountMessage.internal_static_Account_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                AccountMessage.Account.class, AccountMessage.Account.Builder.class);
+      }
+
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+            .alwaysUseFieldBuilders) {
+        }
+      }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder clear() {
         super.clear();
         address_ = com.google.protobuf.ByteString.EMPTY;
@@ -384,13 +704,20 @@ public final class AccountMessage {
 
         balance_ = com.google.protobuf.ByteString.EMPTY;
 
+<<<<<<< HEAD
         token_ = com.google.protobuf.ByteString.EMPTY;
 
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         return this;
       }
 
       public com.google.protobuf.Descriptors.Descriptor
+<<<<<<< HEAD
           getDescriptorForType() {
+=======
+      getDescriptorForType() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         return AccountMessage.internal_static_Account_descriptor;
       }
 
@@ -411,7 +738,10 @@ public final class AccountMessage {
         result.address_ = address_;
         result.privateKey_ = privateKey_;
         result.balance_ = balance_;
+<<<<<<< HEAD
         result.token_ = token_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         onBuilt();
         return result;
       }
@@ -419,32 +749,59 @@ public final class AccountMessage {
       public Builder clone() {
         return (Builder) super.clone();
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           Object value) {
         return (Builder) super.setField(field, value);
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+<<<<<<< HEAD
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof AccountMessage.Account) {
           return mergeFrom((AccountMessage.Account)other);
+=======
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof AccountMessage.Account) {
+          return mergeFrom((AccountMessage.Account) other);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         } else {
           super.mergeFrom(other);
           return this;
@@ -452,7 +809,13 @@ public final class AccountMessage {
       }
 
       public Builder mergeFrom(AccountMessage.Account other) {
+<<<<<<< HEAD
         if (other == AccountMessage.Account.getDefaultInstance()) return this;
+=======
+        if (other == AccountMessage.Account.getDefaultInstance()) {
+          return this;
+        }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (other.getAddress() != com.google.protobuf.ByteString.EMPTY) {
           setAddress(other.getAddress());
         }
@@ -462,9 +825,12 @@ public final class AccountMessage {
         if (other.getBalance() != com.google.protobuf.ByteString.EMPTY) {
           setBalance(other.getBalance());
         }
+<<<<<<< HEAD
         if (other.getToken() != com.google.protobuf.ByteString.EMPTY) {
           setToken(other.getToken());
         }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         onChanged();
         return this;
       }
@@ -491,25 +857,41 @@ public final class AccountMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString address_ = com.google.protobuf.ByteString.EMPTY;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes address = 1;</code>
        */
       public com.google.protobuf.ByteString getAddress() {
         return address_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes address = 1;</code>
        */
       public Builder setAddress(com.google.protobuf.ByteString value) {
         if (value == null) {
+<<<<<<< HEAD
     throw new NullPointerException();
   }
+=======
+          throw new NullPointerException();
+        }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
         address_ = value;
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes address = 1;</code>
        */
@@ -520,25 +902,41 @@ public final class AccountMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString privateKey_ = com.google.protobuf.ByteString.EMPTY;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes privateKey = 2;</code>
        */
       public com.google.protobuf.ByteString getPrivateKey() {
         return privateKey_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes privateKey = 2;</code>
        */
       public Builder setPrivateKey(com.google.protobuf.ByteString value) {
         if (value == null) {
+<<<<<<< HEAD
     throw new NullPointerException();
   }
+=======
+          throw new NullPointerException();
+        }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
         privateKey_ = value;
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes privateKey = 2;</code>
        */
@@ -549,25 +947,41 @@ public final class AccountMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString balance_ = com.google.protobuf.ByteString.EMPTY;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes balance = 3;</code>
        */
       public com.google.protobuf.ByteString getBalance() {
         return balance_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes balance = 3;</code>
        */
       public Builder setBalance(com.google.protobuf.ByteString value) {
         if (value == null) {
+<<<<<<< HEAD
     throw new NullPointerException();
   }
+=======
+          throw new NullPointerException();
+        }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
         balance_ = value;
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>bytes balance = 3;</code>
        */
@@ -578,6 +992,7 @@ public final class AccountMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.ByteString token_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>bytes token = 4;</code>
@@ -606,6 +1021,8 @@ public final class AccountMessage {
         onChanged();
         return this;
       }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -616,6 +1033,7 @@ public final class AccountMessage {
         return this;
       }
 
+<<<<<<< HEAD
 
       // @@protoc_insertion_point(builder_scope:Account)
     }
@@ -692,6 +1110,11 @@ public final class AccountMessage {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Account_descriptor,
         new String[] { "Address", "PrivateKey", "Balance", "Token", });
+=======
+      // @@protoc_insertion_point(builder_scope:Account)
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   }
 
   // @@protoc_insertion_point(outer_class_scope)

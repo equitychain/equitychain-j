@@ -4,6 +4,7 @@
 package com.passport.proto;
 
 public final class NettyData {
+<<<<<<< HEAD
   private NettyData() {}
   public static void registerAllExtensions(
           com.google.protobuf.ExtensionRegistryLite registry) {
@@ -17,20 +18,100 @@ public final class NettyData {
   public interface DataOrBuilder extends
           // @@protoc_insertion_point(interface_extends:Data)
           com.google.protobuf.MessageOrBuilder {
+=======
+
+  private static final com.google.protobuf.Descriptors.Descriptor
+      internal_static_Data_descriptor;
+  private static final
+  com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_Data_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.FileDescriptor
+      descriptor;
+
+  static {
+    String[] descriptorData = {
+        "\n\017NettyData.proto\032\016DataType.proto\032\022Block" +
+            "Message.proto\032\024AccountMessage.proto\032\030Tra" +
+            "nsactionMessage.proto\"\224\001\n\004Data\022\033\n\010dataTy" +
+            "pe\030\001 \001(\0162\t.DataType\022\025\n\005block\030\002 \001(\0132\006.Blo" +
+            "ck\022\032\n\010accounts\030\003 \003(\0132\010.Account\022\031\n\007accoun" +
+            "t\030\004 \001(\0132\010.Account\022!\n\013transaction\030\005 \001(\0132\014" +
+            ".TransactionB\037\n\022com.passport.protoB\tNett" +
+            "yDatab\006proto3"
+    };
+    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
+        new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
+    com.google.protobuf.Descriptors.FileDescriptor
+        .internalBuildGeneratedFileFrom(descriptorData,
+            new com.google.protobuf.Descriptors.FileDescriptor[]{
+                DataTypeEnum.getDescriptor(),
+                BlockMessage.getDescriptor(),
+                AccountMessage.getDescriptor(),
+                TransactionMessage.getDescriptor(),
+            }, assigner);
+    internal_static_Data_descriptor =
+        getDescriptor().getMessageTypes().get(0);
+    internal_static_Data_fieldAccessorTable = new
+        com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_Data_descriptor,
+        new String[]{"DataType", "Block", "Accounts", "Account", "Transaction",});
+    DataTypeEnum.getDescriptor();
+    BlockMessage.getDescriptor();
+    AccountMessage.getDescriptor();
+    TransactionMessage.getDescriptor();
+  }
+
+  private NettyData() {
+  }
+
+  public static void registerAllExtensions(
+      com.google.protobuf.ExtensionRegistryLite registry) {
+  }
+
+  public static void registerAllExtensions(
+      com.google.protobuf.ExtensionRegistry registry) {
+    registerAllExtensions(
+        (com.google.protobuf.ExtensionRegistryLite) registry);
+  }
+
+  public static com.google.protobuf.Descriptors.FileDescriptor
+  getDescriptor() {
+    return descriptor;
+  }
+
+  public interface DataOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Data)
+      com.google.protobuf.MessageOrBuilder {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
     /**
      * <code>.DataType dataType = 1;</code>
      */
     int getDataTypeValue();
+<<<<<<< HEAD
     /**
      * <code>.DataType dataType = 1;</code>
      */
     com.passport.proto.DataTypeEnum.DataType getDataType();
+=======
+
+    /**
+     * <code>.DataType dataType = 1;</code>
+     */
+    DataTypeEnum.DataType getDataType();
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
     /**
      * <code>.Block block = 2;</code>
      */
     boolean hasBlock();
+<<<<<<< HEAD
     /**
      * <code>.Block block = 2;</code>
      */
@@ -39,20 +120,44 @@ public final class NettyData {
      * <code>.Block block = 2;</code>
      */
     com.passport.proto.BlockMessage.BlockOrBuilder getBlockOrBuilder();
+=======
+
+    /**
+     * <code>.Block block = 2;</code>
+     */
+    BlockMessage.Block getBlock();
+
+    /**
+     * <code>.Block block = 2;</code>
+     */
+    BlockMessage.BlockOrBuilder getBlockOrBuilder();
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
     /**
      * <code>repeated .Account accounts = 3;</code>
      */
+<<<<<<< HEAD
     java.util.List<com.passport.proto.AccountMessage.Account>
     getAccountsList();
     /**
      * <code>repeated .Account accounts = 3;</code>
      */
     com.passport.proto.AccountMessage.Account getAccounts(int index);
+=======
+    java.util.List<AccountMessage.Account>
+    getAccountsList();
+
+    /**
+     * <code>repeated .Account accounts = 3;</code>
+     */
+    AccountMessage.Account getAccounts(int index);
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>repeated .Account accounts = 3;</code>
      */
     int getAccountsCount();
+<<<<<<< HEAD
     /**
      * <code>repeated .Account accounts = 3;</code>
      */
@@ -150,6 +255,90 @@ public final class NettyData {
           com.google.protobuf.GeneratedMessageV3 implements
           // @@protoc_insertion_point(message_implements:Data)
           DataOrBuilder {
+=======
+
+    /**
+     * <code>repeated .Account accounts = 3;</code>
+     */
+    java.util.List<? extends AccountMessage.AccountOrBuilder>
+    getAccountsOrBuilderList();
+
+    /**
+     * <code>repeated .Account accounts = 3;</code>
+     */
+    AccountMessage.AccountOrBuilder getAccountsOrBuilder(
+        int index);
+
+    /**
+     * <code>.Account account = 4;</code>
+     */
+    boolean hasAccount();
+
+    /**
+     * <code>.Account account = 4;</code>
+     */
+    AccountMessage.Account getAccount();
+
+    /**
+     * <code>.Account account = 4;</code>
+     */
+    AccountMessage.AccountOrBuilder getAccountOrBuilder();
+
+    /**
+     * <code>.Transaction transaction = 5;</code>
+     */
+    boolean hasTransaction();
+
+    /**
+     * <code>.Transaction transaction = 5;</code>
+     */
+    TransactionMessage.Transaction getTransaction();
+
+    /**
+     * <code>.Transaction transaction = 5;</code>
+     */
+    TransactionMessage.TransactionOrBuilder getTransactionOrBuilder();
+  }
+
+  /**
+   * Protobuf type {@code Data}
+   */
+  public static final class Data extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:Data)
+      DataOrBuilder {
+
+    public static final int DATATYPE_FIELD_NUMBER = 1;
+    public static final int BLOCK_FIELD_NUMBER = 2;
+    public static final int ACCOUNTS_FIELD_NUMBER = 3;
+    public static final int ACCOUNT_FIELD_NUMBER = 4;
+    public static final int TRANSACTION_FIELD_NUMBER = 5;
+    private static final long serialVersionUID = 0L;
+    // @@protoc_insertion_point(class_scope:Data)
+    private static final NettyData.Data DEFAULT_INSTANCE;
+    private static final com.google.protobuf.Parser<Data>
+        PARSER = new com.google.protobuf.AbstractParser<Data>() {
+      public Data parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Data(input, extensionRegistry);
+      }
+    };
+
+    static {
+      DEFAULT_INSTANCE = new NettyData.Data();
+    }
+
+    private int bitField0_;
+    private int dataType_;
+    private BlockMessage.Block block_;
+    private java.util.List<AccountMessage.Account> accounts_;
+    private AccountMessage.Account account_;
+    private TransactionMessage.Transaction transaction_;
+    private byte memoizedIsInitialized = -1;
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     // Use Data.newBuilder() to construct.
     private Data(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -157,6 +346,7 @@ public final class NettyData {
     private Data() {
       dataType_ = 0;
       accounts_ = java.util.Collections.emptyList();
+<<<<<<< HEAD
       blocks_ = java.util.Collections.emptyList();
       trustee_ = java.util.Collections.emptyList();
       blockHeight_ = 0L;
@@ -171,6 +361,14 @@ public final class NettyData {
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
+=======
+    }
+
+    private Data(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       this();
       int mutable_bitField0_ = 0;
       try {
@@ -194,11 +392,19 @@ public final class NettyData {
               break;
             }
             case 18: {
+<<<<<<< HEAD
               com.passport.proto.BlockMessage.Block.Builder subBuilder = null;
               if (block_ != null) {
                 subBuilder = block_.toBuilder();
               }
               block_ = input.readMessage(com.passport.proto.BlockMessage.Block.parser(), extensionRegistry);
+=======
+              BlockMessage.Block.Builder subBuilder = null;
+              if (block_ != null) {
+                subBuilder = block_.toBuilder();
+              }
+              block_ = input.readMessage(BlockMessage.Block.parser(), extensionRegistry);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
               if (subBuilder != null) {
                 subBuilder.mergeFrom(block_);
                 block_ = subBuilder.buildPartial();
@@ -208,6 +414,7 @@ public final class NettyData {
             }
             case 26: {
               if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+<<<<<<< HEAD
                 accounts_ = new java.util.ArrayList<com.passport.proto.AccountMessage.Account>();
                 mutable_bitField0_ |= 0x00000004;
               }
@@ -230,6 +437,21 @@ public final class NettyData {
                 subBuilder = account_.toBuilder();
               }
               account_ = input.readMessage(com.passport.proto.AccountMessage.Account.parser(), extensionRegistry);
+=======
+                accounts_ = new java.util.ArrayList<AccountMessage.Account>();
+                mutable_bitField0_ |= 0x00000004;
+              }
+              accounts_.add(
+                  input.readMessage(AccountMessage.Account.parser(), extensionRegistry));
+              break;
+            }
+            case 34: {
+              AccountMessage.Account.Builder subBuilder = null;
+              if (account_ != null) {
+                subBuilder = account_.toBuilder();
+              }
+              account_ = input.readMessage(AccountMessage.Account.parser(), extensionRegistry);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
               if (subBuilder != null) {
                 subBuilder.mergeFrom(account_);
                 account_ = subBuilder.buildPartial();
@@ -237,12 +459,22 @@ public final class NettyData {
 
               break;
             }
+<<<<<<< HEAD
             case 50: {
               com.passport.proto.TransactionMessage.Transaction.Builder subBuilder = null;
               if (transaction_ != null) {
                 subBuilder = transaction_.toBuilder();
               }
               transaction_ = input.readMessage(com.passport.proto.TransactionMessage.Transaction.parser(), extensionRegistry);
+=======
+            case 42: {
+              TransactionMessage.Transaction.Builder subBuilder = null;
+              if (transaction_ != null) {
+                subBuilder = transaction_.toBuilder();
+              }
+              transaction_ = input
+                  .readMessage(TransactionMessage.Transaction.parser(), extensionRegistry);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
               if (subBuilder != null) {
                 subBuilder.mergeFrom(transaction_);
                 transaction_ = subBuilder.buildPartial();
@@ -250,6 +482,7 @@ public final class NettyData {
 
               break;
             }
+<<<<<<< HEAD
             case 58: {
               if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
                 trustee_ = new java.util.ArrayList<com.passport.proto.TrusteeMessage.Trustee>();
@@ -264,17 +497,24 @@ public final class NettyData {
               blockHeight_ = input.readInt64();
               break;
             }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
+<<<<<<< HEAD
                 e).setUnfinishedMessage(this);
+=======
+            e).setUnfinishedMessage(this);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       } finally {
         if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
           accounts_ = java.util.Collections.unmodifiableList(accounts_);
         }
+<<<<<<< HEAD
         if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
           blocks_ = java.util.Collections.unmodifiableList(blocks_);
         }
@@ -299,12 +539,134 @@ public final class NettyData {
     private int bitField0_;
     public static final int DATATYPE_FIELD_NUMBER = 1;
     private int dataType_;
+=======
+        makeExtensionsImmutable();
+      }
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+    getDescriptor() {
+      return NettyData.internal_static_Data_descriptor;
+    }
+
+    public static NettyData.Data parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static NettyData.Data parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static NettyData.Data parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static NettyData.Data parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static NettyData.Data parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static NettyData.Data parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static NettyData.Data parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+
+    public static NettyData.Data parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static NettyData.Data parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static NettyData.Data parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static NettyData.Data parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+
+    public static NettyData.Data parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+
+    public static Builder newBuilder(NettyData.Data prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+
+    public static NettyData.Data getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    public static com.google.protobuf.Parser<Data> parser() {
+      return PARSER;
+    }
+
+    @Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+    }
+
+    protected FieldAccessorTable
+    internalGetFieldAccessorTable() {
+      return NettyData.internal_static_Data_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              NettyData.Data.class, NettyData.Data.Builder.class);
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>.DataType dataType = 1;</code>
      */
     public int getDataTypeValue() {
       return dataType_;
     }
+<<<<<<< HEAD
     /**
      * <code>.DataType dataType = 1;</code>
      */
@@ -315,12 +677,24 @@ public final class NettyData {
 
     public static final int BLOCK_FIELD_NUMBER = 2;
     private com.passport.proto.BlockMessage.Block block_;
+=======
+
+    /**
+     * <code>.DataType dataType = 1;</code>
+     */
+    public DataTypeEnum.DataType getDataType() {
+      DataTypeEnum.DataType result = DataTypeEnum.DataType.valueOf(dataType_);
+      return result == null ? DataTypeEnum.DataType.UNRECOGNIZED : result;
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>.Block block = 2;</code>
      */
     public boolean hasBlock() {
       return block_ != null;
     }
+<<<<<<< HEAD
     /**
      * <code>.Block block = 2;</code>
      */
@@ -349,12 +723,45 @@ public final class NettyData {
     getAccountsOrBuilderList() {
       return accounts_;
     }
+=======
+
+    /**
+     * <code>.Block block = 2;</code>
+     */
+    public BlockMessage.Block getBlock() {
+      return block_ == null ? BlockMessage.Block.getDefaultInstance() : block_;
+    }
+
+    /**
+     * <code>.Block block = 2;</code>
+     */
+    public BlockMessage.BlockOrBuilder getBlockOrBuilder() {
+      return getBlock();
+    }
+
+    /**
+     * <code>repeated .Account accounts = 3;</code>
+     */
+    public java.util.List<AccountMessage.Account> getAccountsList() {
+      return accounts_;
+    }
+
+    /**
+     * <code>repeated .Account accounts = 3;</code>
+     */
+    public java.util.List<? extends AccountMessage.AccountOrBuilder>
+    getAccountsOrBuilderList() {
+      return accounts_;
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>repeated .Account accounts = 3;</code>
      */
     public int getAccountsCount() {
       return accounts_.size();
     }
+<<<<<<< HEAD
     /**
      * <code>repeated .Account accounts = 3;</code>
      */
@@ -408,10 +815,31 @@ public final class NettyData {
     private com.passport.proto.AccountMessage.Account account_;
     /**
      * <code>.Account account = 5;</code>
+=======
+
+    /**
+     * <code>repeated .Account accounts = 3;</code>
+     */
+    public AccountMessage.Account getAccounts(int index) {
+      return accounts_.get(index);
+    }
+
+    /**
+     * <code>repeated .Account accounts = 3;</code>
+     */
+    public AccountMessage.AccountOrBuilder getAccountsOrBuilder(
+        int index) {
+      return accounts_.get(index);
+    }
+
+    /**
+     * <code>.Account account = 4;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
      */
     public boolean hasAccount() {
       return account_ != null;
     }
+<<<<<<< HEAD
     /**
      * <code>.Account account = 5;</code>
      */
@@ -429,10 +857,30 @@ public final class NettyData {
     private com.passport.proto.TransactionMessage.Transaction transaction_;
     /**
      * <code>.Transaction transaction = 6;</code>
+=======
+
+    /**
+     * <code>.Account account = 4;</code>
+     */
+    public AccountMessage.Account getAccount() {
+      return account_ == null ? AccountMessage.Account.getDefaultInstance() : account_;
+    }
+
+    /**
+     * <code>.Account account = 4;</code>
+     */
+    public AccountMessage.AccountOrBuilder getAccountOrBuilder() {
+      return getAccount();
+    }
+
+    /**
+     * <code>.Transaction transaction = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
      */
     public boolean hasTransaction() {
       return transaction_ != null;
     }
+<<<<<<< HEAD
     /**
      * <code>.Transaction transaction = 6;</code>
      */
@@ -495,14 +943,45 @@ public final class NettyData {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
+=======
+
+    /**
+     * <code>.Transaction transaction = 5;</code>
+     */
+    public TransactionMessage.Transaction getTransaction() {
+      return transaction_ == null ? TransactionMessage.Transaction.getDefaultInstance()
+          : transaction_;
+    }
+
+    /**
+     * <code>.Transaction transaction = 5;</code>
+     */
+    public TransactionMessage.TransactionOrBuilder getTransactionOrBuilder() {
+      return getTransaction();
+    }
+
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) {
+        return true;
+      }
+      if (isInitialized == 0) {
+        return false;
+      }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       memoizedIsInitialized = 1;
       return true;
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
+<<<<<<< HEAD
             throws java.io.IOException {
       if (dataType_ != com.passport.proto.DataTypeEnum.DataType.HEART_BEAT.getNumber()) {
+=======
+        throws java.io.IOException {
+      if (dataType_ != DataTypeEnum.DataType.HEART_BEAT.getNumber()) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         output.writeEnum(1, dataType_);
       }
       if (block_ != null) {
@@ -511,6 +990,7 @@ public final class NettyData {
       for (int i = 0; i < accounts_.size(); i++) {
         output.writeMessage(3, accounts_.get(i));
       }
+<<<<<<< HEAD
       for (int i = 0; i < blocks_.size(); i++) {
         output.writeMessage(4, blocks_.get(i));
       }
@@ -525,11 +1005,19 @@ public final class NettyData {
       }
       if (blockHeight_ != 0L) {
         output.writeInt64(8, blockHeight_);
+=======
+      if (account_ != null) {
+        output.writeMessage(4, getAccount());
+      }
+      if (transaction_ != null) {
+        output.writeMessage(5, getTransaction());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       }
     }
 
     public int getSerializedSize() {
       int size = memoizedSize;
+<<<<<<< HEAD
       if (size != -1) return size;
 
       size = 0;
@@ -564,11 +1052,38 @@ public final class NettyData {
       if (blockHeight_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
                 .computeInt64Size(8, blockHeight_);
+=======
+      if (size != -1) {
+        return size;
+      }
+
+      size = 0;
+      if (dataType_ != DataTypeEnum.DataType.HEART_BEAT.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeEnumSize(1, dataType_);
+      }
+      if (block_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(2, getBlock());
+      }
+      for (int i = 0; i < accounts_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(3, accounts_.get(i));
+      }
+      if (account_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(4, getAccount());
+      }
+      if (transaction_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(5, getTransaction());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       }
       memoizedSize = size;
       return size;
     }
 
+<<<<<<< HEAD
     private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
@@ -579,12 +1094,24 @@ public final class NettyData {
         return super.equals(obj);
       }
       com.passport.proto.NettyData.Data other = (com.passport.proto.NettyData.Data) obj;
+=======
+    @Override
+    public boolean equals(final Object obj) {
+      if (obj == this) {
+        return true;
+      }
+      if (!(obj instanceof NettyData.Data)) {
+        return super.equals(obj);
+      }
+      NettyData.Data other = (NettyData.Data) obj;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       boolean result = true;
       result = result && dataType_ == other.dataType_;
       result = result && (hasBlock() == other.hasBlock());
       if (hasBlock()) {
         result = result && getBlock()
+<<<<<<< HEAD
                 .equals(other.getBlock());
       }
       result = result && getAccountsList()
@@ -595,10 +1122,21 @@ public final class NettyData {
       if (hasAccount()) {
         result = result && getAccount()
                 .equals(other.getAccount());
+=======
+            .equals(other.getBlock());
+      }
+      result = result && getAccountsList()
+          .equals(other.getAccountsList());
+      result = result && (hasAccount() == other.hasAccount());
+      if (hasAccount()) {
+        result = result && getAccount()
+            .equals(other.getAccount());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       }
       result = result && (hasTransaction() == other.hasTransaction());
       if (hasTransaction()) {
         result = result && getTransaction()
+<<<<<<< HEAD
                 .equals(other.getTransaction());
       }
       result = result && getTrusteeList()
@@ -609,6 +1147,14 @@ public final class NettyData {
     }
 
     @java.lang.Override
+=======
+            .equals(other.getTransaction());
+      }
+      return result;
+    }
+
+    @Override
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     public int hashCode() {
       if (memoizedHashCode != 0) {
         return memoizedHashCode;
@@ -625,10 +1171,13 @@ public final class NettyData {
         hash = (37 * hash) + ACCOUNTS_FIELD_NUMBER;
         hash = (53 * hash) + getAccountsList().hashCode();
       }
+<<<<<<< HEAD
       if (getBlocksCount() > 0) {
         hash = (37 * hash) + BLOCKS_FIELD_NUMBER;
         hash = (53 * hash) + getBlocksList().hashCode();
       }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       if (hasAccount()) {
         hash = (37 * hash) + ACCOUNT_FIELD_NUMBER;
         hash = (53 * hash) + getAccount().hashCode();
@@ -637,6 +1186,7 @@ public final class NettyData {
         hash = (37 * hash) + TRANSACTION_FIELD_NUMBER;
         hash = (53 * hash) + getTransaction().hashCode();
       }
+<<<<<<< HEAD
       if (getTrusteeCount() > 0) {
         hash = (37 * hash) + TRUSTEE_FIELD_NUMBER;
         hash = (53 * hash) + getTrusteeList().hashCode();
@@ -644,11 +1194,14 @@ public final class NettyData {
       hash = (37 * hash) + BLOCKHEIGHT_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
               getBlockHeight());
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
     }
 
+<<<<<<< HEAD
     public static com.passport.proto.NettyData.Data parseFrom(
             java.nio.ByteBuffer data)
             throws com.google.protobuf.InvalidProtocolBufferException {
@@ -737,10 +1290,38 @@ public final class NettyData {
       Builder builder = new Builder(parent);
       return builder;
     }
+=======
+    public Builder newBuilderForType() {
+      return newBuilder();
+    }
+
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @Override
+    protected Builder newBuilderForType(
+        BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+
+    @Override
+    public com.google.protobuf.Parser<Data> getParserForType() {
+      return PARSER;
+    }
+
+    public NettyData.Data getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * Protobuf type {@code Data}
      */
     public static final class Builder extends
+<<<<<<< HEAD
             com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
             // @@protoc_insertion_point(builder_implements:Data)
             com.passport.proto.NettyData.DataOrBuilder {
@@ -755,6 +1336,27 @@ public final class NettyData {
                 .ensureFieldAccessorsInitialized(
                         com.passport.proto.NettyData.Data.class, com.passport.proto.NettyData.Data.Builder.class);
       }
+=======
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Data)
+        NettyData.DataOrBuilder {
+
+      private int bitField0_;
+      private int dataType_ = 0;
+      private BlockMessage.Block block_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          BlockMessage.Block, BlockMessage.Block.Builder, BlockMessage.BlockOrBuilder> blockBuilder_;
+      private java.util.List<AccountMessage.Account> accounts_ =
+          java.util.Collections.emptyList();
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          AccountMessage.Account, AccountMessage.Account.Builder, AccountMessage.AccountOrBuilder> accountsBuilder_;
+      private AccountMessage.Account account_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          AccountMessage.Account, AccountMessage.Account.Builder, AccountMessage.AccountOrBuilder> accountBuilder_;
+      private TransactionMessage.Transaction transaction_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder> transactionBuilder_;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       // Construct using com.passport.proto.NettyData.Data.newBuilder()
       private Builder() {
@@ -762,6 +1364,7 @@ public final class NettyData {
       }
 
       private Builder(
+<<<<<<< HEAD
               com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
@@ -774,6 +1377,32 @@ public final class NettyData {
           getTrusteeFieldBuilder();
         }
       }
+=======
+          BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+
+      public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+        return NettyData.internal_static_Data_descriptor;
+      }
+
+      protected FieldAccessorTable
+      internalGetFieldAccessorTable() {
+        return NettyData.internal_static_Data_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                NettyData.Data.class, NettyData.Data.Builder.class);
+      }
+
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+            .alwaysUseFieldBuilders) {
+          getAccountsFieldBuilder();
+        }
+      }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder clear() {
         super.clear();
         dataType_ = 0;
@@ -790,12 +1419,15 @@ public final class NettyData {
         } else {
           accountsBuilder_.clear();
         }
+<<<<<<< HEAD
         if (blocksBuilder_ == null) {
           blocks_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00000008);
         } else {
           blocksBuilder_.clear();
         }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (accountBuilder_ == null) {
           account_ = null;
         } else {
@@ -808,6 +1440,7 @@ public final class NettyData {
           transaction_ = null;
           transactionBuilder_ = null;
         }
+<<<<<<< HEAD
         if (trusteeBuilder_ == null) {
           trustee_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00000040);
@@ -816,11 +1449,14 @@ public final class NettyData {
         }
         blockHeight_ = 0L;
 
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         return this;
       }
 
       public com.google.protobuf.Descriptors.Descriptor
       getDescriptorForType() {
+<<<<<<< HEAD
         return com.passport.proto.NettyData.internal_static_Data_descriptor;
       }
 
@@ -830,14 +1466,30 @@ public final class NettyData {
 
       public com.passport.proto.NettyData.Data build() {
         com.passport.proto.NettyData.Data result = buildPartial();
+=======
+        return NettyData.internal_static_Data_descriptor;
+      }
+
+      public NettyData.Data getDefaultInstanceForType() {
+        return NettyData.Data.getDefaultInstance();
+      }
+
+      public NettyData.Data build() {
+        NettyData.Data result = buildPartial();
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
+<<<<<<< HEAD
       public com.passport.proto.NettyData.Data buildPartial() {
         com.passport.proto.NettyData.Data result = new com.passport.proto.NettyData.Data(this);
+=======
+      public NettyData.Data buildPartial() {
+        NettyData.Data result = new NettyData.Data(this);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         result.dataType_ = dataType_;
@@ -855,6 +1507,7 @@ public final class NettyData {
         } else {
           result.accounts_ = accountsBuilder_.build();
         }
+<<<<<<< HEAD
         if (blocksBuilder_ == null) {
           if (((bitField0_ & 0x00000008) == 0x00000008)) {
             blocks_ = java.util.Collections.unmodifiableList(blocks_);
@@ -864,6 +1517,8 @@ public final class NettyData {
         } else {
           result.blocks_ = blocksBuilder_.build();
         }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (accountBuilder_ == null) {
           result.account_ = account_;
         } else {
@@ -874,6 +1529,7 @@ public final class NettyData {
         } else {
           result.transaction_ = transactionBuilder_.build();
         }
+<<<<<<< HEAD
         if (trusteeBuilder_ == null) {
           if (((bitField0_ & 0x00000040) == 0x00000040)) {
             trustee_ = java.util.Collections.unmodifiableList(trustee_);
@@ -884,6 +1540,8 @@ public final class NettyData {
           result.trustee_ = trusteeBuilder_.build();
         }
         result.blockHeight_ = blockHeight_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -892,6 +1550,7 @@ public final class NettyData {
       public Builder clone() {
         return (Builder) super.clone();
       }
+<<<<<<< HEAD
       public Builder setField(
               com.google.protobuf.Descriptors.FieldDescriptor field,
               Object value) {
@@ -918,14 +1577,55 @@ public final class NettyData {
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof com.passport.proto.NettyData.Data) {
           return mergeFrom((com.passport.proto.NettyData.Data)other);
+=======
+
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof NettyData.Data) {
+          return mergeFrom((NettyData.Data) other);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
+<<<<<<< HEAD
       public Builder mergeFrom(com.passport.proto.NettyData.Data other) {
         if (other == com.passport.proto.NettyData.Data.getDefaultInstance()) return this;
+=======
+      public Builder mergeFrom(NettyData.Data other) {
+        if (other == NettyData.Data.getDefaultInstance()) {
+          return this;
+        }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (other.dataType_ != 0) {
           setDataTypeValue(other.getDataTypeValue());
         }
@@ -951,13 +1651,19 @@ public final class NettyData {
               accounts_ = other.accounts_;
               bitField0_ = (bitField0_ & ~0x00000004);
               accountsBuilder_ =
+<<<<<<< HEAD
                       com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                               getAccountsFieldBuilder() : null;
+=======
+                  com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                      getAccountsFieldBuilder() : null;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
             } else {
               accountsBuilder_.addAllMessages(other.accounts_);
             }
           }
         }
+<<<<<<< HEAD
         if (blocksBuilder_ == null) {
           if (!other.blocks_.isEmpty()) {
             if (blocks_.isEmpty()) {
@@ -984,12 +1690,15 @@ public final class NettyData {
             }
           }
         }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (other.hasAccount()) {
           mergeAccount(other.getAccount());
         }
         if (other.hasTransaction()) {
           mergeTransaction(other.getTransaction());
         }
+<<<<<<< HEAD
         if (trusteeBuilder_ == null) {
           if (!other.trustee_.isEmpty()) {
             if (trustee_.isEmpty()) {
@@ -1019,6 +1728,8 @@ public final class NettyData {
         if (other.getBlockHeight() != 0L) {
           setBlockHeight(other.getBlockHeight());
         }
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         onChanged();
         return this;
       }
@@ -1028,6 +1739,7 @@ public final class NettyData {
       }
 
       public Builder mergeFrom(
+<<<<<<< HEAD
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws java.io.IOException {
@@ -1036,6 +1748,16 @@ public final class NettyData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.passport.proto.NettyData.Data) e.getUnfinishedMessage();
+=======
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        NettyData.Data parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (NettyData.Data) e.getUnfinishedMessage();
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -1044,15 +1766,23 @@ public final class NettyData {
         }
         return this;
       }
+<<<<<<< HEAD
       private int bitField0_;
 
       private int dataType_ = 0;
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.DataType dataType = 1;</code>
        */
       public int getDataTypeValue() {
         return dataType_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.DataType dataType = 1;</code>
        */
@@ -1061,6 +1791,7 @@ public final class NettyData {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.DataType dataType = 1;</code>
        */
@@ -1072,6 +1803,21 @@ public final class NettyData {
        * <code>.DataType dataType = 1;</code>
        */
       public Builder setDataType(com.passport.proto.DataTypeEnum.DataType value) {
+=======
+
+      /**
+       * <code>.DataType dataType = 1;</code>
+       */
+      public DataTypeEnum.DataType getDataType() {
+        DataTypeEnum.DataType result = DataTypeEnum.DataType.valueOf(dataType_);
+        return result == null ? DataTypeEnum.DataType.UNRECOGNIZED : result;
+      }
+
+      /**
+       * <code>.DataType dataType = 1;</code>
+       */
+      public Builder setDataType(DataTypeEnum.DataType value) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (value == null) {
           throw new NullPointerException();
         }
@@ -1080,6 +1826,10 @@ public final class NettyData {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.DataType dataType = 1;</code>
        */
@@ -1090,25 +1840,39 @@ public final class NettyData {
         return this;
       }
 
+<<<<<<< HEAD
       private com.passport.proto.BlockMessage.Block block_ = null;
       private com.google.protobuf.SingleFieldBuilderV3<
               com.passport.proto.BlockMessage.Block, com.passport.proto.BlockMessage.Block.Builder, com.passport.proto.BlockMessage.BlockOrBuilder> blockBuilder_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.Block block = 2;</code>
        */
       public boolean hasBlock() {
         return blockBuilder_ != null || block_ != null;
       }
+<<<<<<< HEAD
       /**
        * <code>.Block block = 2;</code>
        */
       public com.passport.proto.BlockMessage.Block getBlock() {
         if (blockBuilder_ == null) {
           return block_ == null ? com.passport.proto.BlockMessage.Block.getDefaultInstance() : block_;
+=======
+
+      /**
+       * <code>.Block block = 2;</code>
+       */
+      public BlockMessage.Block getBlock() {
+        if (blockBuilder_ == null) {
+          return block_ == null ? BlockMessage.Block.getDefaultInstance() : block_;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         } else {
           return blockBuilder_.getMessage();
         }
       }
+<<<<<<< HEAD
       /**
        * <code>.Block block = 2;</code>
        */
@@ -1121,10 +1885,24 @@ public final class NettyData {
           onChanged();
         } else {
           blockBuilder_.setMessage(value);
+=======
+
+      /**
+       * <code>.Block block = 2;</code>
+       */
+      public Builder setBlock(
+          BlockMessage.Block.Builder builderForValue) {
+        if (blockBuilder_ == null) {
+          block_ = builderForValue.build();
+          onChanged();
+        } else {
+          blockBuilder_.setMessage(builderForValue.build());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         }
 
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.Block block = 2;</code>
        */
@@ -1135,10 +1913,26 @@ public final class NettyData {
           onChanged();
         } else {
           blockBuilder_.setMessage(builderForValue.build());
+=======
+
+      /**
+       * <code>.Block block = 2;</code>
+       */
+      public Builder setBlock(BlockMessage.Block value) {
+        if (blockBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          block_ = value;
+          onChanged();
+        } else {
+          blockBuilder_.setMessage(value);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         }
 
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.Block block = 2;</code>
        */
@@ -1147,6 +1941,17 @@ public final class NettyData {
           if (block_ != null) {
             block_ =
                     com.passport.proto.BlockMessage.Block.newBuilder(block_).mergeFrom(value).buildPartial();
+=======
+
+      /**
+       * <code>.Block block = 2;</code>
+       */
+      public Builder mergeBlock(BlockMessage.Block value) {
+        if (blockBuilder_ == null) {
+          if (block_ != null) {
+            block_ =
+                BlockMessage.Block.newBuilder(block_).mergeFrom(value).buildPartial();
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           } else {
             block_ = value;
           }
@@ -1157,6 +1962,10 @@ public final class NettyData {
 
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.Block block = 2;</code>
        */
@@ -1171,29 +1980,53 @@ public final class NettyData {
 
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.Block block = 2;</code>
        */
       public com.passport.proto.BlockMessage.Block.Builder getBlockBuilder() {
+=======
+
+      /**
+       * <code>.Block block = 2;</code>
+       */
+      public BlockMessage.Block.Builder getBlockBuilder() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
         onChanged();
         return getBlockFieldBuilder().getBuilder();
       }
+<<<<<<< HEAD
       /**
        * <code>.Block block = 2;</code>
        */
       public com.passport.proto.BlockMessage.BlockOrBuilder getBlockOrBuilder() {
+=======
+
+      /**
+       * <code>.Block block = 2;</code>
+       */
+      public BlockMessage.BlockOrBuilder getBlockOrBuilder() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (blockBuilder_ != null) {
           return blockBuilder_.getMessageOrBuilder();
         } else {
           return block_ == null ?
+<<<<<<< HEAD
                   com.passport.proto.BlockMessage.Block.getDefaultInstance() : block_;
         }
       }
+=======
+              BlockMessage.Block.getDefaultInstance() : block_;
+        }
+      }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.Block block = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
+<<<<<<< HEAD
               com.passport.proto.BlockMessage.Block, com.passport.proto.BlockMessage.Block.Builder, com.passport.proto.BlockMessage.BlockOrBuilder>
       getBlockFieldBuilder() {
         if (blockBuilder_ == null) {
@@ -1202,20 +2035,37 @@ public final class NettyData {
                   getBlock(),
                   getParentForChildren(),
                   isClean());
+=======
+          BlockMessage.Block, BlockMessage.Block.Builder, BlockMessage.BlockOrBuilder>
+      getBlockFieldBuilder() {
+        if (blockBuilder_ == null) {
+          blockBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              BlockMessage.Block, BlockMessage.Block.Builder, BlockMessage.BlockOrBuilder>(
+              getBlock(),
+              getParentForChildren(),
+              isClean());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           block_ = null;
         }
         return blockBuilder_;
       }
 
+<<<<<<< HEAD
       private java.util.List<com.passport.proto.AccountMessage.Account> accounts_ =
               java.util.Collections.emptyList();
       private void ensureAccountsIsMutable() {
         if (!((bitField0_ & 0x00000004) == 0x00000004)) {
           accounts_ = new java.util.ArrayList<com.passport.proto.AccountMessage.Account>(accounts_);
+=======
+      private void ensureAccountsIsMutable() {
+        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+          accounts_ = new java.util.ArrayList<AccountMessage.Account>(accounts_);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           bitField0_ |= 0x00000004;
         }
       }
 
+<<<<<<< HEAD
       private com.google.protobuf.RepeatedFieldBuilderV3<
               com.passport.proto.AccountMessage.Account, com.passport.proto.AccountMessage.Account.Builder, com.passport.proto.AccountMessage.AccountOrBuilder> accountsBuilder_;
 
@@ -1223,12 +2073,22 @@ public final class NettyData {
        * <code>repeated .Account accounts = 3;</code>
        */
       public java.util.List<com.passport.proto.AccountMessage.Account> getAccountsList() {
+=======
+      /**
+       * <code>repeated .Account accounts = 3;</code>
+       */
+      public java.util.List<AccountMessage.Account> getAccountsList() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (accountsBuilder_ == null) {
           return java.util.Collections.unmodifiableList(accounts_);
         } else {
           return accountsBuilder_.getMessageList();
         }
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>repeated .Account accounts = 3;</code>
        */
@@ -1239,21 +2099,37 @@ public final class NettyData {
           return accountsBuilder_.getCount();
         }
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Account accounts = 3;</code>
        */
       public com.passport.proto.AccountMessage.Account getAccounts(int index) {
+=======
+
+      /**
+       * <code>repeated .Account accounts = 3;</code>
+       */
+      public AccountMessage.Account getAccounts(int index) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (accountsBuilder_ == null) {
           return accounts_.get(index);
         } else {
           return accountsBuilder_.getMessage(index);
         }
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>repeated .Account accounts = 3;</code>
        */
       public Builder setAccounts(
+<<<<<<< HEAD
               int index, com.passport.proto.AccountMessage.Account value) {
+=======
+          int index, AccountMessage.Account value) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (accountsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -1266,11 +2142,19 @@ public final class NettyData {
         }
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>repeated .Account accounts = 3;</code>
        */
       public Builder setAccounts(
+<<<<<<< HEAD
               int index, com.passport.proto.AccountMessage.Account.Builder builderForValue) {
+=======
+          int index, AccountMessage.Account.Builder builderForValue) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (accountsBuilder_ == null) {
           ensureAccountsIsMutable();
           accounts_.set(index, builderForValue.build());
@@ -1280,10 +2164,18 @@ public final class NettyData {
         }
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Account accounts = 3;</code>
        */
       public Builder addAccounts(com.passport.proto.AccountMessage.Account value) {
+=======
+
+      /**
+       * <code>repeated .Account accounts = 3;</code>
+       */
+      public Builder addAccounts(AccountMessage.Account value) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (accountsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -1296,11 +2188,19 @@ public final class NettyData {
         }
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>repeated .Account accounts = 3;</code>
        */
       public Builder addAccounts(
+<<<<<<< HEAD
               int index, com.passport.proto.AccountMessage.Account value) {
+=======
+          int index, AccountMessage.Account value) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (accountsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -1313,11 +2213,19 @@ public final class NettyData {
         }
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>repeated .Account accounts = 3;</code>
        */
       public Builder addAccounts(
+<<<<<<< HEAD
               com.passport.proto.AccountMessage.Account.Builder builderForValue) {
+=======
+          AccountMessage.Account.Builder builderForValue) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (accountsBuilder_ == null) {
           ensureAccountsIsMutable();
           accounts_.add(builderForValue.build());
@@ -1327,11 +2235,19 @@ public final class NettyData {
         }
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>repeated .Account accounts = 3;</code>
        */
       public Builder addAccounts(
+<<<<<<< HEAD
               int index, com.passport.proto.AccountMessage.Account.Builder builderForValue) {
+=======
+          int index, AccountMessage.Account.Builder builderForValue) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (accountsBuilder_ == null) {
           ensureAccountsIsMutable();
           accounts_.add(index, builderForValue.build());
@@ -1341,21 +2257,37 @@ public final class NettyData {
         }
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>repeated .Account accounts = 3;</code>
        */
       public Builder addAllAccounts(
+<<<<<<< HEAD
               java.lang.Iterable<? extends com.passport.proto.AccountMessage.Account> values) {
         if (accountsBuilder_ == null) {
           ensureAccountsIsMutable();
           com.google.protobuf.AbstractMessageLite.Builder.addAll(
                   values, accounts_);
+=======
+          Iterable<? extends AccountMessage.Account> values) {
+        if (accountsBuilder_ == null) {
+          ensureAccountsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, accounts_);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           onChanged();
         } else {
           accountsBuilder_.addAllMessages(values);
         }
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>repeated .Account accounts = 3;</code>
        */
@@ -1369,6 +2301,10 @@ public final class NettyData {
         }
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>repeated .Account accounts = 3;</code>
        */
@@ -1382,6 +2318,7 @@ public final class NettyData {
         }
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Account accounts = 3;</code>
        */
@@ -1403,6 +2340,33 @@ public final class NettyData {
        * <code>repeated .Account accounts = 3;</code>
        */
       public java.util.List<? extends com.passport.proto.AccountMessage.AccountOrBuilder>
+=======
+
+      /**
+       * <code>repeated .Account accounts = 3;</code>
+       */
+      public AccountMessage.Account.Builder getAccountsBuilder(
+          int index) {
+        return getAccountsFieldBuilder().getBuilder(index);
+      }
+
+      /**
+       * <code>repeated .Account accounts = 3;</code>
+       */
+      public AccountMessage.AccountOrBuilder getAccountsOrBuilder(
+          int index) {
+        if (accountsBuilder_ == null) {
+          return accounts_.get(index);
+        } else {
+          return accountsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+
+      /**
+       * <code>repeated .Account accounts = 3;</code>
+       */
+      public java.util.List<? extends AccountMessage.AccountOrBuilder>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       getAccountsOrBuilderList() {
         if (accountsBuilder_ != null) {
           return accountsBuilder_.getMessageOrBuilderList();
@@ -1410,6 +2374,7 @@ public final class NettyData {
           return java.util.Collections.unmodifiableList(accounts_);
         }
       }
+<<<<<<< HEAD
       /**
        * <code>repeated .Account accounts = 3;</code>
        */
@@ -1442,11 +2407,50 @@ public final class NettyData {
                   ((bitField0_ & 0x00000004) == 0x00000004),
                   getParentForChildren(),
                   isClean());
+=======
+
+      /**
+       * <code>repeated .Account accounts = 3;</code>
+       */
+      public AccountMessage.Account.Builder addAccountsBuilder() {
+        return getAccountsFieldBuilder().addBuilder(
+            AccountMessage.Account.getDefaultInstance());
+      }
+
+      /**
+       * <code>repeated .Account accounts = 3;</code>
+       */
+      public AccountMessage.Account.Builder addAccountsBuilder(
+          int index) {
+        return getAccountsFieldBuilder().addBuilder(
+            index, AccountMessage.Account.getDefaultInstance());
+      }
+
+      /**
+       * <code>repeated .Account accounts = 3;</code>
+       */
+      public java.util.List<AccountMessage.Account.Builder>
+      getAccountsBuilderList() {
+        return getAccountsFieldBuilder().getBuilderList();
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          AccountMessage.Account, AccountMessage.Account.Builder, AccountMessage.AccountOrBuilder>
+      getAccountsFieldBuilder() {
+        if (accountsBuilder_ == null) {
+          accountsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              AccountMessage.Account, AccountMessage.Account.Builder, AccountMessage.AccountOrBuilder>(
+              accounts_,
+              ((bitField0_ & 0x00000004) == 0x00000004),
+              getParentForChildren(),
+              isClean());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           accounts_ = null;
         }
         return accountsBuilder_;
       }
 
+<<<<<<< HEAD
       private java.util.List<com.passport.proto.BlockMessage.Block> blocks_ =
               java.util.Collections.emptyList();
       private void ensureBlocksIsMutable() {
@@ -1710,6 +2714,45 @@ public final class NettyData {
        * <code>.Account account = 5;</code>
        */
       public Builder setAccount(com.passport.proto.AccountMessage.Account value) {
+=======
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public boolean hasAccount() {
+        return accountBuilder_ != null || account_ != null;
+      }
+
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public AccountMessage.Account getAccount() {
+        if (accountBuilder_ == null) {
+          return account_ == null ? AccountMessage.Account.getDefaultInstance() : account_;
+        } else {
+          return accountBuilder_.getMessage();
+        }
+      }
+
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public Builder setAccount(
+          AccountMessage.Account.Builder builderForValue) {
+        if (accountBuilder_ == null) {
+          account_ = builderForValue.build();
+          onChanged();
+        } else {
+          accountBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public Builder setAccount(AccountMessage.Account value) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (accountBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -1722,6 +2765,7 @@ public final class NettyData {
 
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.Account account = 5;</code>
        */
@@ -1744,6 +2788,17 @@ public final class NettyData {
           if (account_ != null) {
             account_ =
                     com.passport.proto.AccountMessage.Account.newBuilder(account_).mergeFrom(value).buildPartial();
+=======
+
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public Builder mergeAccount(AccountMessage.Account value) {
+        if (accountBuilder_ == null) {
+          if (account_ != null) {
+            account_ =
+                AccountMessage.Account.newBuilder(account_).mergeFrom(value).buildPartial();
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           } else {
             account_ = value;
           }
@@ -1754,8 +2809,14 @@ public final class NettyData {
 
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.Account account = 5;</code>
+=======
+
+      /**
+       * <code>.Account account = 4;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder clearAccount() {
         if (accountBuilder_ == null) {
@@ -1768,22 +2829,39 @@ public final class NettyData {
 
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.Account account = 5;</code>
        */
       public com.passport.proto.AccountMessage.Account.Builder getAccountBuilder() {
+=======
+
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public AccountMessage.Account.Builder getAccountBuilder() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
         onChanged();
         return getAccountFieldBuilder().getBuilder();
       }
+<<<<<<< HEAD
       /**
        * <code>.Account account = 5;</code>
        */
       public com.passport.proto.AccountMessage.AccountOrBuilder getAccountOrBuilder() {
+=======
+
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      public AccountMessage.AccountOrBuilder getAccountOrBuilder() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (accountBuilder_ != null) {
           return accountBuilder_.getMessageOrBuilder();
         } else {
           return account_ == null ?
+<<<<<<< HEAD
                   com.passport.proto.AccountMessage.Account.getDefaultInstance() : account_;
         }
       }
@@ -1799,30 +2877,65 @@ public final class NettyData {
                   getAccount(),
                   getParentForChildren(),
                   isClean());
+=======
+              AccountMessage.Account.getDefaultInstance() : account_;
+        }
+      }
+
+      /**
+       * <code>.Account account = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          AccountMessage.Account, AccountMessage.Account.Builder, AccountMessage.AccountOrBuilder>
+      getAccountFieldBuilder() {
+        if (accountBuilder_ == null) {
+          accountBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              AccountMessage.Account, AccountMessage.Account.Builder, AccountMessage.AccountOrBuilder>(
+              getAccount(),
+              getParentForChildren(),
+              isClean());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           account_ = null;
         }
         return accountBuilder_;
       }
 
+<<<<<<< HEAD
       private com.passport.proto.TransactionMessage.Transaction transaction_ = null;
       private com.google.protobuf.SingleFieldBuilderV3<
               com.passport.proto.TransactionMessage.Transaction, com.passport.proto.TransactionMessage.Transaction.Builder, com.passport.proto.TransactionMessage.TransactionOrBuilder> transactionBuilder_;
       /**
        * <code>.Transaction transaction = 6;</code>
+=======
+      /**
+       * <code>.Transaction transaction = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public boolean hasTransaction() {
         return transactionBuilder_ != null || transaction_ != null;
       }
+<<<<<<< HEAD
       /**
        * <code>.Transaction transaction = 6;</code>
        */
       public com.passport.proto.TransactionMessage.Transaction getTransaction() {
         if (transactionBuilder_ == null) {
           return transaction_ == null ? com.passport.proto.TransactionMessage.Transaction.getDefaultInstance() : transaction_;
+=======
+
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      public TransactionMessage.Transaction getTransaction() {
+        if (transactionBuilder_ == null) {
+          return transaction_ == null ? TransactionMessage.Transaction.getDefaultInstance()
+              : transaction_;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         } else {
           return transactionBuilder_.getMessage();
         }
       }
+<<<<<<< HEAD
       /**
        * <code>.Transaction transaction = 6;</code>
        */
@@ -1835,10 +2948,24 @@ public final class NettyData {
           onChanged();
         } else {
           transactionBuilder_.setMessage(value);
+=======
+
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      public Builder setTransaction(
+          TransactionMessage.Transaction.Builder builderForValue) {
+        if (transactionBuilder_ == null) {
+          transaction_ = builderForValue.build();
+          onChanged();
+        } else {
+          transactionBuilder_.setMessage(builderForValue.build());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         }
 
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.Transaction transaction = 6;</code>
        */
@@ -1849,10 +2976,26 @@ public final class NettyData {
           onChanged();
         } else {
           transactionBuilder_.setMessage(builderForValue.build());
+=======
+
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      public Builder setTransaction(TransactionMessage.Transaction value) {
+        if (transactionBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          transaction_ = value;
+          onChanged();
+        } else {
+          transactionBuilder_.setMessage(value);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         }
 
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.Transaction transaction = 6;</code>
        */
@@ -1861,6 +3004,18 @@ public final class NettyData {
           if (transaction_ != null) {
             transaction_ =
                     com.passport.proto.TransactionMessage.Transaction.newBuilder(transaction_).mergeFrom(value).buildPartial();
+=======
+
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      public Builder mergeTransaction(TransactionMessage.Transaction value) {
+        if (transactionBuilder_ == null) {
+          if (transaction_ != null) {
+            transaction_ =
+                TransactionMessage.Transaction.newBuilder(transaction_).mergeFrom(value)
+                    .buildPartial();
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           } else {
             transaction_ = value;
           }
@@ -1871,8 +3026,14 @@ public final class NettyData {
 
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.Transaction transaction = 6;</code>
+=======
+
+      /**
+       * <code>.Transaction transaction = 5;</code>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
        */
       public Builder clearTransaction() {
         if (transactionBuilder_ == null) {
@@ -1885,22 +3046,39 @@ public final class NettyData {
 
         return this;
       }
+<<<<<<< HEAD
       /**
        * <code>.Transaction transaction = 6;</code>
        */
       public com.passport.proto.TransactionMessage.Transaction.Builder getTransactionBuilder() {
+=======
+
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      public TransactionMessage.Transaction.Builder getTransactionBuilder() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
         onChanged();
         return getTransactionFieldBuilder().getBuilder();
       }
+<<<<<<< HEAD
       /**
        * <code>.Transaction transaction = 6;</code>
        */
       public com.passport.proto.TransactionMessage.TransactionOrBuilder getTransactionOrBuilder() {
+=======
+
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      public TransactionMessage.TransactionOrBuilder getTransactionOrBuilder() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (transactionBuilder_ != null) {
           return transactionBuilder_.getMessageOrBuilder();
         } else {
           return transaction_ == null ?
+<<<<<<< HEAD
                   com.passport.proto.TransactionMessage.Transaction.getDefaultInstance() : transaction_;
         }
       }
@@ -1916,11 +3094,30 @@ public final class NettyData {
                   getTransaction(),
                   getParentForChildren(),
                   isClean());
+=======
+              TransactionMessage.Transaction.getDefaultInstance() : transaction_;
+        }
+      }
+
+      /**
+       * <code>.Transaction transaction = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder>
+      getTransactionFieldBuilder() {
+        if (transactionBuilder_ == null) {
+          transactionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              TransactionMessage.Transaction, TransactionMessage.Transaction.Builder, TransactionMessage.TransactionOrBuilder>(
+              getTransaction(),
+              getParentForChildren(),
+              isClean());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           transaction_ = null;
         }
         return transactionBuilder_;
       }
 
+<<<<<<< HEAD
       private java.util.List<com.passport.proto.TrusteeMessage.Trustee> trustee_ =
               java.util.Collections.emptyList();
       private void ensureTrusteeIsMutable() {
@@ -2188,10 +3385,15 @@ public final class NettyData {
       }
       public final Builder setUnknownFields(
               final com.google.protobuf.UnknownFieldSet unknownFields) {
+=======
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         return this;
       }
 
       public final Builder mergeUnknownFields(
+<<<<<<< HEAD
               final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
       }
@@ -2288,6 +3490,15 @@ public final class NettyData {
     com.passport.proto.AccountMessage.getDescriptor();
     com.passport.proto.TransactionMessage.getDescriptor();
     com.passport.proto.TrusteeMessage.getDescriptor();
+=======
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:Data)
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   }
 
   // @@protoc_insertion_point(outer_class_scope)

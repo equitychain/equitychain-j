@@ -3,6 +3,7 @@ option java_package = "com.passport.proto";
 option java_outer_classname = "TransactionMessage";
 
 message Transaction {
+<<<<<<< HEAD
     bytes hash = 1;
     bytes signature = 2;
     bytes value = 3;
@@ -19,4 +20,16 @@ message Transaction {
     bytes nonce = 14;
     bytes status = 15;
     bytes token = 16;
+=======
+  bytes hash = 1;
+  bytes signature = 2;
+  bytes value = 3;
+  bytes payAddress = 4;
+  bytes receiptAddress = 5;
+  bytes eggPrice = 6;
+  bytes eggMax = 7;
+  bytes timeStamp = 8;
+  bytes extarData = 9;
+  bytes publicKey = 10;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

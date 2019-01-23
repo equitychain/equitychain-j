@@ -3,8 +3,14 @@ option java_package = "com.passport.proto";
 option java_outer_classname = "AccountMessage";
 
 message Account {
+<<<<<<< HEAD
     bytes address = 1;
     bytes privateKey = 2;
     bytes balance = 3;
     bytes token = 4;
+=======
+  bytes address = 1;
+  bytes privateKey = 2;
+  bytes balance = 3;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

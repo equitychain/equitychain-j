@@ -3,8 +3,15 @@ option java_package = "com.passport.proto";
 option java_outer_classname = "MessageTypeEnum";
 
 enum MessageType {
+<<<<<<< HEAD
     DATA_REQ = 0;
     DATA_RESP = 1;
     HEARTBEAT_REQ = 2;
     HEARTBEAT_RESP = 3;
+=======
+  DATA_REQ = 0;
+  DATA_RESP = 1;
+  HEARTBEAT_REQ = 2;
+  HEARTBEAT_RESP = 3;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

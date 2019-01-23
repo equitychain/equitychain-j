@@ -5,6 +5,7 @@ package com.passport.db;
  */
 public class DataSourceSettings {
 
+<<<<<<< HEAD
   private int maxOpenFiles = 32;
   private int maxThreads = 1;
 
@@ -14,6 +15,17 @@ public class DataSourceSettings {
 
   public static synchronized DataSourceSettings getInstance(){
     if (instance == null){
+=======
+  private static DataSourceSettings instance = null;
+  private int maxOpenFiles = 32;
+  private int maxThreads = 1;
+
+  private DataSourceSettings() {
+  }
+
+  public static synchronized DataSourceSettings getInstance() {
+    if (instance == null) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       instance = new DataSourceSettings();
     }
     return instance;

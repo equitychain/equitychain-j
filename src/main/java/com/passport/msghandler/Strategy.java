@@ -3,6 +3,7 @@ package com.passport.msghandler;
 import com.passport.proto.NettyMessage;
 import io.netty.channel.ChannelHandlerContext;
 
+<<<<<<< HEAD
 /**
  * 消息分类处理
  * @author: xujianfeng
@@ -23,4 +24,15 @@ public abstract class Strategy {
      * @param message
      */
     void handleMsg(ChannelHandlerContext ctx, NettyMessage.Message message) throws Exception {}
+=======
+
+public abstract class Strategy {
+
+  void handleReqMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
+  }
+
+
+  void handleRespMsg(ChannelHandlerContext ctx, NettyMessage.Message message) {
+  }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

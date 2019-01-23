@@ -1,11 +1,15 @@
 package com.passport.web;
 
+<<<<<<< HEAD
 import com.passport.constant.Constant;
 import com.passport.constant.SyncFlag;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 import com.passport.core.Transaction;
 import com.passport.db.dbhelper.DBAccess;
 import com.passport.dto.ResultDto;
 import com.passport.enums.ResultEnum;
+<<<<<<< HEAD
 import com.passport.enums.TransactionTypeEnum;
 import com.passport.exception.CommonException;
 import com.passport.utils.CheckUtils;
@@ -272,4 +276,41 @@ public class TransactionController {
         }
         return new ResultDto(ResultEnum.SUCCESS.getCode(),transactions);
     }
+=======
+import com.passport.utils.CheckUtils;
+import com.passport.webhandler.TransactionHandler;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+
+@RestController
+@RequestMapping("/transaction")
+public class TransactionController {
+
+  @Autowired
+  private DBAccess dbAccess;
+  @Autowired
+  private TransactionHandler transactionHandler;
+
+  @PostMapping("/send")
+  public ResultDto send(HttpServletRequest request) throws Exception {
+    String payAddress = request.getParameter("payAddress");
+    String receiptAddress = request.getParameter("receiptAddress");
+    String value = request.getParameter("value");
+    String extarData = request.getParameter("extarData");
+    String password = request.getParameter("password");
+
+    boolean flag = CheckUtils.checkParamIfEmpty(payAddress, receiptAddress, value, extarData);
+    if (flag) {
+      return new ResultDto(ResultEnum.PARAMS_LOSTOREMPTY);
+    }
+
+    Transaction transaction = transactionHandler
+        .sendTransaction(payAddress, receiptAddress, value, extarData, password);
+    return new ResultDto(ResultEnum.SUCCESS.getCode(), transaction);
+  }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

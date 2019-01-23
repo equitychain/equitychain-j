@@ -5,6 +5,11 @@ option java_package = "com.passport.proto";
 option java_outer_classname = "NettyMessage";
 
 message Message {
+<<<<<<< HEAD
     MessageType messageType = 1;
     Data data = 2;
+=======
+  MessageType messageType = 1;
+  Data data = 2;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

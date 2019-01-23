@@ -4,6 +4,7 @@ import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtostuffIOUtil;
 import io.protostuff.Schema;
 import io.protostuff.runtime.RuntimeSchema;
+<<<<<<< HEAD
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 
@@ -15,15 +16,27 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author: xujianfeng
  * @create: 2018-07-05 17:21
  **/
+=======
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.objenesis.Objenesis;
+import org.objenesis.ObjenesisStd;
+
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 public class SerializationUtil {
 
   private static final Map<Class<?>, Schema<?>> cachedSchema = new ConcurrentHashMap<>();
 
   private static final Objenesis objenesis = new ObjenesisStd(true);
 
+<<<<<<< HEAD
   /**
    * 序列化（对象 -> 字节数组）
    */
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   @SuppressWarnings("unchecked")
   public static <T> byte[] serialize(T obj) {
     Class<T> cls = (Class<T>) obj.getClass();
@@ -38,9 +51,12 @@ public class SerializationUtil {
     }
   }
 
+<<<<<<< HEAD
   /**
    * 反序列化（字节数组 -> 对象）
    */
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   public static <T> T deserialize(byte[] data, Class<T> cls) {
     try {
       T message = objenesis.newInstance(cls);

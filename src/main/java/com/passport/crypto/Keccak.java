@@ -7,7 +7,11 @@ import java.util.Arrays;
  */
 public class Keccak extends AbstractDigest {
 
+<<<<<<< HEAD
   private static final long[] RC = new long[] {
+=======
+  private static final long[] RC = new long[]{
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       0x0000000000000001L, 0x0000000000008082L, 0x800000000000808aL,
       0x8000000080008000L, 0x000000000000808bL, 0x0000000080000001L,
       0x8000000080008081L, 0x8000000000008009L, 0x000000000000008aL,
@@ -17,7 +21,11 @@ public class Keccak extends AbstractDigest {
       0x000000000000800aL, 0x800000008000000aL, 0x8000000080008081L,
       0x8000000000008080L, 0x0000000080000001L, 0x8000000080008008L
   };
+<<<<<<< HEAD
   private static final int[] R = new int[] {
+=======
+  private static final int[] R = new int[]{
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       0, 1, 62, 28, 27, 36, 44, 6, 55, 20, 3, 10, 43,
       25, 39, 41, 45, 15, 21, 8, 18, 2, 61, 56, 14
   };
@@ -34,12 +42,18 @@ public class Keccak extends AbstractDigest {
    * Creates a new ready to use {@code Keccak}.
    *
    * @param length the digest length (in bytes).
+<<<<<<< HEAD
    *
    * @throws IllegalArgumentException if {@code length} is not one of 28,
    *	32, 48 or 64.
    */
   Keccak(int length)
   {
+=======
+   * @throws IllegalArgumentException if {@code length} is not one of 28, 32, 48 or 64.
+   */
+  Keccak(int length) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     super("Keccak-" + length * 8, length);
     checkCondition(length == 28 || length == 32
         || length == 48 || length == 64);
@@ -97,8 +111,12 @@ public class Keccak extends AbstractDigest {
     return Arrays.copyOf(tmp, length());
   }
 
+<<<<<<< HEAD
   private void addPadding()
   {
+=======
+  private void addPadding() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     if (bufferLen + 1 == buffer.length) {
       buffer[bufferLen] = (byte) 0x81;
     } else {
@@ -110,8 +128,12 @@ public class Keccak extends AbstractDigest {
     }
   }
 
+<<<<<<< HEAD
   private void processBuffer()
   {
+=======
+  private void processBuffer() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     for (int i = 0; i < buffer.length; i += 8) {
       A[i >>> 3] ^= LittleEndian.decodeLong(buffer, i);
     }
@@ -119,15 +141,23 @@ public class Keccak extends AbstractDigest {
     bufferLen = 0;
   }
 
+<<<<<<< HEAD
   private void keccakf()
   {
+=======
+  private void keccakf() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     for (int n = 0; n < 24; n++) {
       round(n);
     }
   }
 
+<<<<<<< HEAD
   private void round(int n)
   {
+=======
+  private void round(int n) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     for (int x = 0; x < 5; x++) {
       C[x] = A[index(x, 0)] ^ A[index(x, 1)] ^ A[index(x, 2)]
           ^ A[index(x, 3)] ^ A[index(x, 4)];
@@ -153,6 +183,7 @@ public class Keccak extends AbstractDigest {
     A[0] ^= RC[n];
   }
 
+<<<<<<< HEAD
   private long rot(long w, int r)
   {
     return Long.rotateLeft(w, r);
@@ -170,6 +201,21 @@ public class Keccak extends AbstractDigest {
 
   private void checkCondition(boolean condition)
   {
+=======
+  private long rot(long w, int r) {
+    return Long.rotateLeft(w, r);
+  }
+
+  private int index(int x) {
+    return x < 0 ? index(x + 5) : x % 5;
+  }
+
+  private int index(int x, int y) {
+    return index(x) + 5 * index(y);
+  }
+
+  private void checkCondition(boolean condition) {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     if (!condition) {
       throw new IllegalArgumentException();
     }

@@ -3,8 +3,15 @@ option java_package = "com.passport.proto";
 option java_outer_classname = "BlockHeaderMessage";
 
 message BlockHeader {
+<<<<<<< HEAD
     int64 timeStamp = 1;
     bytes hashPrevBlock = 2;
     bytes hashMerkleRoot = 3;
     bytes hash = 4;
+=======
+  int64 timeStamp = 1;
+  bytes hashPrevBlock = 2;
+  bytes hashMerkleRoot = 3;
+  bytes hash = 4;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

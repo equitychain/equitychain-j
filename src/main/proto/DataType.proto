@@ -3,6 +3,7 @@ option java_package = "com.passport.proto";
 option java_outer_classname = "DataTypeEnum";
 
 enum DataType {
+<<<<<<< HEAD
     HEART_BEAT = 0;
     NEXT_BLOCK_SYNC = 1;
     ACCOUNTLIST_SYNC = 2;
@@ -12,4 +13,12 @@ enum DataType {
     ACCOUNTIP_SYNC = 6;
     ACCOUNT_MINER = 7;
     TRUSTEE_SYNC = 8;
+=======
+  HEART_BEAT = 0;
+  NEXT_BLOCK_SYNC = 1;
+  ACCOUNTLIST_SYNC = 2;
+  ACCOUNT_SYNC = 3;
+  SEND_TRANSACTION = 4;
+  BLOCK_SYNC = 5;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

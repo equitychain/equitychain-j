@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <configuration debug="false" scan="true" scanPeriod="10 seconds">
     <!--<include resource="org/springframework/boot/logging/logback/base.xml"/>-->
     <!--<include resource="org/springframework/boot/logging/logback/console-appender.xml"/>-->
@@ -117,5 +118,11 @@
         <appender-ref ref="warn_file"/>
         <appender-ref ref="error_file"/>
     </root>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/base.xml"/>
+  <logger level="INFO" name="org.springframework.web"/>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
 </configuration>

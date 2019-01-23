@@ -5,4 +5,7 @@
 /target
 /passportjDir/
 /keystore/
+<<<<<<< HEAD
 /src/test/java/com/passport/wallet/
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4

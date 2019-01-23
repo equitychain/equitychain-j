@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<<<<<<< HEAD
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+=======
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://maven.apache.org/POM/4.0.0"
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -8,9 +13,15 @@
   <artifactId>passportj-core</artifactId>
   <version>1.0</version>
 
+<<<<<<< HEAD
   <name>passportj-core</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.bcp.vip</url>
+=======
+  <name>equitychain-j-core</name>
+
+  <url>http://www.equchain.com</url>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -32,6 +43,7 @@
       <name>spring-plugins</name>
       <url>http://repo.spring.io/plugins-release</url>
     </repository>
+<<<<<<< HEAD
     <repository>
       <id>hq-repository</id>
       <name>HQ Repository</name>
@@ -43,6 +55,8 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   </repositories>
 
   <dependencies>
@@ -51,6 +65,7 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-websocket</artifactId>
     </dependency>
+<<<<<<< HEAD
     <!--<dependency>-->
       <!--<groupId>org.springframework.boot</groupId>-->
       <!--<artifactId>spring-boot-starter-web</artifactId>-->
@@ -77,10 +92,14 @@
       <artifactId>undertow-servlet</artifactId>
       <version>1.3.24.Final</version>
     </dependency>
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
     </dependency>
+<<<<<<< HEAD
     <!--<dependency>-->
       <!--<groupId>org.rocksdb</groupId>-->
       <!--<artifactId>rocksdbjni-repair</artifactId>-->
@@ -92,11 +111,21 @@
       <artifactId>rocksdbjni</artifactId>
       <version>5.17.2</version>
     </dependency>
+=======
+
+    <dependency>
+      <groupId>org.rocksdb</groupId>
+      <artifactId>rocksdbjni</artifactId>
+      <version>5.13.4</version>
+    </dependency>
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     <dependency>
       <groupId>org.xerial.snappy</groupId>
       <artifactId>snappy-java</artifactId>
       <version>1.1.7.2</version>
     </dependency>
+<<<<<<< HEAD
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
@@ -104,6 +133,29 @@
     </dependency>
 
     <dependency>
+=======
+
+
+    <!--<dependency>
+      <groupId>org.ethereum</groupId>
+      <artifactId>leveldbjni-all</artifactId>
+      <version>1.18.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.iq80.leveldb</groupId>
+      <artifactId>leveldb</artifactId>
+      <version>0.10</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.iq80.leveldb</groupId>
+      <artifactId>leveldb-api</artifactId>
+      <version>0.10</version>
+    </dependency>-->
+
+    <dependency>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       <groupId>com.madgag.spongycastle</groupId>
       <artifactId>core</artifactId>
       <version>1.58.0.0</version>
@@ -120,6 +172,15 @@
       <artifactId>guava</artifactId>
       <version>25.1-jre</version>
     </dependency>
+<<<<<<< HEAD
+=======
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -213,17 +274,33 @@
       <artifactId>commons-io</artifactId>
       <version>2.5</version>
     </dependency>
+<<<<<<< HEAD
       <dependency>
           <groupId>org.springframework</groupId>
           <artifactId>spring-websocket</artifactId>
           <version>5.0.4.RELEASE</version>
       </dependency>
+=======
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-websocket</artifactId>
+      <version>5.0.4.RELEASE</version>
+    </dependency>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
       <version>4.3.11.RELEASE</version>
     </dependency>
     <dependency>
+<<<<<<< HEAD
+=======
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-test</artifactId>
+      <version>1.5.7.RELEASE</version>
+    </dependency>
+    <dependency>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       <groupId>com.esotericsoftware</groupId>
       <artifactId>kryo</artifactId>
       <version>4.0.1</version>
@@ -233,6 +310,7 @@
       <artifactId>bcprov-jdk15on</artifactId>
       <version>1.59</version>
     </dependency>
+<<<<<<< HEAD
       <dependency>
           <groupId>com.alibaba</groupId>
           <artifactId>fastjson</artifactId>
@@ -252,6 +330,8 @@
       <version>1.2.31</version>
     </dependency>
 
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   </dependencies>
 
   <build>
@@ -262,12 +342,20 @@
         <version>1.5.0.Final</version>
       </extension>
     </extensions>
+<<<<<<< HEAD
     <pluginManagement>
+=======
+    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       <plugins>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
           <version>3.0.0</version>
         </plugin>
+<<<<<<< HEAD
+=======
+        <!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
           <version>3.0.2</version>
@@ -302,6 +390,7 @@
           <fork>true</fork>
         </configuration>
       </plugin>
+<<<<<<< HEAD
       <!--<plugin>-->
         <!--<groupId>org.xolstice.maven.plugins</groupId>-->
         <!--<artifactId>protobuf-maven-plugin</artifactId>-->
@@ -351,4 +440,26 @@
     </pluginRepository>
   </pluginRepositories>
 
+=======
+      <!--<plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <version>0.5.1</version>
+        <configuration>
+          <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+          <pluginId>grpc-java</pluginId>
+          <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}}:exe:${os.detected.classifier}</pluginArtifact>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>compile-custom</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>-->
+    </plugins>
+  </build>
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 </project>

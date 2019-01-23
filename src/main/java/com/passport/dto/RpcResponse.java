@@ -1,5 +1,6 @@
 package com.passport.dto;
 
+<<<<<<< HEAD
 /**
  * RPC响应封装
  * @author: xujianfeng
@@ -13,6 +14,16 @@ public class RpcResponse {
   /**
    * 是否带有异常
    */
+=======
+
+public class RpcResponse {
+
+  private String requestId;
+  private Exception exception;
+  private Object result;
+
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   public boolean hasException() {
     return exception != null;
   }

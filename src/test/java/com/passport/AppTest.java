@@ -1,5 +1,6 @@
 package com.passport;
 
+<<<<<<< HEAD
 import com.alibaba.fastjson.JSONObject;
 import com.passport.core.Trustee;
 import com.passport.db.dbhelper.BaseDBAccess;
@@ -17,10 +18,14 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+=======
+import org.junit.Test;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
 /**
  * Unit test for simple App.
  */
+<<<<<<< HEAD
 public class AppTest 
 {
     /**
@@ -47,4 +52,26 @@ public class AppTest
             System.out.println(list.get(i));
         }
     }
+=======
+public class AppTest {
+
+  /**
+   * Rigorous Test :-)
+   */
+  @Test
+  public void shouldAnswerWithTrue() throws Exception {
+        /*File file = new File("./keystore");
+        if(!file.exists()){
+            file.mkdir();
+        }
+        System.out.println(file.getPath());
+        ECKeyPair keyPair = WalletUtils.generateNewWalletFile("hq123456", file, true);
+        Account account = new Account(keyPair.getAddress(), keyPair.exportPrivateKey(), BigDecimal.ZERO);
+        System.out.println(GsonUtils.toJson(account));
+
+        Credentials credentials = Credentials.create(keyPair.exportPrivateKey());
+        System.out.println(credentials.getAddress());*/
+
+  }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 }

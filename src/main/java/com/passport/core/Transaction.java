@@ -1,6 +1,7 @@
 package com.passport.core;
 
 
+<<<<<<< HEAD
 
 import com.passport.annotations.EntityClaz;
 import com.passport.annotations.FaildClaz;
@@ -13,10 +14,20 @@ import java.math.BigInteger;
 import static com.passport.constant.Constant.BYTE_ADDRESS_LENGTH;
 import static com.passport.constant.Constant.BYTE_HASH_LENGTH;
 
+=======
+import static com.passport.constant.Constant.BYTE_ADDRESS_LENGTH;
+import static com.passport.constant.Constant.BYTE_HASH_LENGTH;
+
+import java.math.BigInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
 /**
  * @author Wu Created by SKINK on 2018/6/20.
  */
+<<<<<<< HEAD
 @EntityClaz(name = "transaction")
 public class Transaction {
 
@@ -65,6 +76,57 @@ public class Transaction {
 
   @FaildClaz(name = "token",type = byte[].class)
   private byte[] token;
+=======
+public class Transaction {
+
+  private static final BigInteger DEFAULT_EGG_PRICE = new BigInteger("100000000");
+  private static final BigInteger DEFAULT_EGG_AMOUNT = new BigInteger("18000");
+  private static Logger logger = LoggerFactory.getLogger(Transaction.class);
+  private Integer nonce;
+
+  //32 byte
+  private byte[] hash;
+
+  private byte[] signature;
+
+  private byte[] value;
+
+  private byte[] payAddress;
+
+  private byte[] receiptAddress;
+
+  private byte[] eggPrice;
+
+  private byte[] eggMax;
+
+  private byte[] time;
+
+  private byte[] extarData;
+
+  private byte[] publicKey;
+
+  private byte[] eggUsed;
+
+  private Integer status;
+
+  public Transaction(Integer nonce, byte[] hash, byte[] signature, byte[] value, byte[] payAddress,
+      byte[] receiptAddress, byte[] eggPrice, byte[] eggMax, byte[] time, byte[] extarData) {
+    this.nonce = nonce;
+    this.hash = hash;
+    this.signature = signature;
+    this.value = value;
+    this.payAddress = payAddress;
+    this.receiptAddress = receiptAddress;
+    this.eggPrice = eggPrice;
+    this.eggMax = eggMax;
+    this.time = time;
+    this.extarData = extarData;
+  }
+
+  public Transaction() {
+
+  }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
   public Integer getNonce() {
     return nonce;
@@ -170,6 +232,7 @@ public class Transaction {
     this.status = status;
   }
 
+<<<<<<< HEAD
   public byte[] getTradeType() {
     return tradeType;
   }
@@ -222,5 +285,17 @@ public class Transaction {
     if (this.hash.length != BYTE_HASH_LENGTH) logger.info("1");
     if(this.payAddress.length != BYTE_ADDRESS_LENGTH) logger.info("2");
     if(this.receiptAddress.length != BYTE_ADDRESS_LENGTH) logger.info("3");
+=======
+  private void validate() {
+    if (this.hash.length != BYTE_HASH_LENGTH) {
+      logger.info("1");
+    }
+    if (this.payAddress.length != BYTE_ADDRESS_LENGTH) {
+      logger.info("2");
+    }
+    if (this.receiptAddress.length != BYTE_ADDRESS_LENGTH) {
+      logger.info("3");
+    }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   }
 }

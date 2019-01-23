@@ -4,7 +4,38 @@
 package com.passport.proto;
 
 public final class MessageTypeEnum {
+<<<<<<< HEAD
   private MessageTypeEnum() {}
+=======
+
+  private static com.google.protobuf.Descriptors.FileDescriptor
+      descriptor;
+
+  static {
+    String[] descriptorData = {
+        "\n\021MessageType.proto*Q\n\013MessageType\022\014\n\010DA" +
+            "TA_REQ\020\000\022\r\n\tDATA_RESP\020\001\022\021\n\rHEARTBEAT_REQ" +
+            "\020\002\022\022\n\016HEARTBEAT_RESP\020\003B%\n\022com.passport.p" +
+            "rotoB\017MessageTypeEnumb\006proto3"
+    };
+    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
+        new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
+    com.google.protobuf.Descriptors.FileDescriptor
+        .internalBuildGeneratedFileFrom(descriptorData,
+            new com.google.protobuf.Descriptors.FileDescriptor[]{
+            }, assigner);
+  }
+
+  private MessageTypeEnum() {
+  }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistryLite registry) {
   }
@@ -14,6 +45,15 @@ public final class MessageTypeEnum {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
+<<<<<<< HEAD
+=======
+
+  public static com.google.protobuf.Descriptors.FileDescriptor
+  getDescriptor() {
+    return descriptor;
+  }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   /**
    * Protobuf enum {@code MessageType}
    */
@@ -35,8 +75,12 @@ public final class MessageTypeEnum {
      * <code>HEARTBEAT_RESP = 3;</code>
      */
     HEARTBEAT_RESP(3),
+<<<<<<< HEAD
     UNRECOGNIZED(-1),
     ;
+=======
+    UNRECOGNIZED(-1),;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
     /**
      * <code>DATA_REQ = 0;</code>
@@ -54,6 +98,7 @@ public final class MessageTypeEnum {
      * <code>HEARTBEAT_RESP = 3;</code>
      */
     public static final int HEARTBEAT_RESP_VALUE = 3;
+<<<<<<< HEAD
 
 
     public final int getNumber() {
@@ -62,6 +107,20 @@ public final class MessageTypeEnum {
             "Can't get the number of an unknown enum value.");
       }
       return value;
+=======
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        MessageType> internalValueMap =
+        new com.google.protobuf.Internal.EnumLiteMap<MessageType>() {
+          public MessageType findValueByNumber(int number) {
+            return MessageType.forNumber(number);
+          }
+        };
+    private static final MessageType[] VALUES = values();
+    private final int value;
+
+    private MessageType(int value) {
+      this.value = value;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     }
 
     /**
@@ -74,15 +133,29 @@ public final class MessageTypeEnum {
 
     public static MessageType forNumber(int value) {
       switch (value) {
+<<<<<<< HEAD
         case 0: return DATA_REQ;
         case 1: return DATA_RESP;
         case 2: return HEARTBEAT_REQ;
         case 3: return HEARTBEAT_RESP;
         default: return null;
+=======
+        case 0:
+          return DATA_REQ;
+        case 1:
+          return DATA_RESP;
+        case 2:
+          return HEARTBEAT_REQ;
+        case 3:
+          return HEARTBEAT_RESP;
+        default:
+          return null;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       }
     }
 
     public static com.google.protobuf.Internal.EnumLiteMap<MessageType>
+<<<<<<< HEAD
         internalGetValueMap() {
       return internalValueMap;
     }
@@ -109,11 +182,26 @@ public final class MessageTypeEnum {
 
     private static final MessageType[] VALUES = values();
 
+=======
+    internalGetValueMap() {
+      return internalValueMap;
+    }
+
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+    getDescriptor() {
+      return MessageTypeEnum.getDescriptor().getEnumTypes().get(0);
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     public static MessageType valueOf(
         com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
       if (desc.getType() != getDescriptor()) {
         throw new IllegalArgumentException(
+<<<<<<< HEAD
           "EnumValueDescriptor is not for this type.");
+=======
+            "EnumValueDescriptor is not for this type.");
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       }
       if (desc.getIndex() == -1) {
         return UNRECOGNIZED;
@@ -121,6 +209,7 @@ public final class MessageTypeEnum {
       return VALUES[desc.getIndex()];
     }
 
+<<<<<<< HEAD
     private final int value;
 
     private MessageType(int value) {
@@ -156,6 +245,27 @@ public final class MessageTypeEnum {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
+=======
+    public final int getNumber() {
+      if (this == UNRECOGNIZED) {
+        throw new IllegalArgumentException(
+            "Can't get the number of an unknown enum value.");
+      }
+      return value;
+    }
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+    getValueDescriptor() {
+      return getDescriptor().getValues().get(ordinal());
+    }
+
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+    getDescriptorForType() {
+      return getDescriptor();
+    }
+
+    // @@protoc_insertion_point(enum_scope:MessageType)
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   }
 
   // @@protoc_insertion_point(outer_class_scope)

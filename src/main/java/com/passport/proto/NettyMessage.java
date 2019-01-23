@@ -4,7 +4,54 @@
 package com.passport.proto;
 
 public final class NettyMessage {
+<<<<<<< HEAD
   private NettyMessage() {}
+=======
+
+  private static final com.google.protobuf.Descriptors.Descriptor
+      internal_static_Message_descriptor;
+  private static final
+  com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_Message_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.FileDescriptor
+      descriptor;
+
+  static {
+    String[] descriptorData = {
+        "\n\022NettyMessage.proto\032\021MessageType.proto\032" +
+            "\017NettyData.proto\"A\n\007Message\022!\n\013messageTy" +
+            "pe\030\001 \001(\0162\014.MessageType\022\023\n\004data\030\002 \001(\0132\005.D" +
+            "ataB\"\n\022com.passport.protoB\014NettyMessageb" +
+            "\006proto3"
+    };
+    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
+        new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
+    com.google.protobuf.Descriptors.FileDescriptor
+        .internalBuildGeneratedFileFrom(descriptorData,
+            new com.google.protobuf.Descriptors.FileDescriptor[]{
+                MessageTypeEnum.getDescriptor(),
+                NettyData.getDescriptor(),
+            }, assigner);
+    internal_static_Message_descriptor =
+        getDescriptor().getMessageTypes().get(0);
+    internal_static_Message_fieldAccessorTable = new
+        com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_Message_descriptor,
+        new String[]{"MessageType", "Data",});
+    MessageTypeEnum.getDescriptor();
+    NettyData.getDescriptor();
+  }
+
+  private NettyMessage() {
+  }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistryLite registry) {
   }
@@ -14,6 +61,15 @@ public final class NettyMessage {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
+<<<<<<< HEAD
+=======
+
+  public static com.google.protobuf.Descriptors.FileDescriptor
+  getDescriptor() {
+    return descriptor;
+  }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   public interface MessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:Message)
       com.google.protobuf.MessageOrBuilder {
@@ -22,6 +78,10 @@ public final class NettyMessage {
      * <code>.MessageType messageType = 1;</code>
      */
     int getMessageTypeValue();
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>.MessageType messageType = 1;</code>
      */
@@ -31,15 +91,24 @@ public final class NettyMessage {
      * <code>.Data data = 2;</code>
      */
     boolean hasData();
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>.Data data = 2;</code>
      */
     NettyData.Data getData();
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>.Data data = 2;</code>
      */
     NettyData.DataOrBuilder getDataOrBuilder();
   }
+<<<<<<< HEAD
   /**
    * Protobuf type {@code Message}
    */
@@ -47,10 +116,45 @@ public final class NettyMessage {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:Message)
       MessageOrBuilder {
+=======
+
+  /**
+   * Protobuf type {@code Message}
+   */
+  public static final class Message extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:Message)
+      MessageOrBuilder {
+
+    public static final int MESSAGETYPE_FIELD_NUMBER = 1;
+    public static final int DATA_FIELD_NUMBER = 2;
+    private static final long serialVersionUID = 0L;
+    // @@protoc_insertion_point(class_scope:Message)
+    private static final NettyMessage.Message DEFAULT_INSTANCE;
+    private static final com.google.protobuf.Parser<Message>
+        PARSER = new com.google.protobuf.AbstractParser<Message>() {
+      public Message parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Message(input, extensionRegistry);
+      }
+    };
+
+    static {
+      DEFAULT_INSTANCE = new NettyMessage.Message();
+    }
+
+    private int messageType_;
+    private NettyData.Data data_;
+    private byte memoizedIsInitialized = -1;
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     // Use Message.newBuilder() to construct.
     private Message(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
+<<<<<<< HEAD
     private Message() {
       messageType_ = 0;
     }
@@ -60,6 +164,12 @@ public final class NettyMessage {
     getUnknownFields() {
       return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
+=======
+
+    private Message() {
+      messageType_ = 0;
+    }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     private Message(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -110,6 +220,7 @@ public final class NettyMessage {
         makeExtensionsImmutable();
       }
     }
+<<<<<<< HEAD
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return NettyMessage.internal_static_Message_descriptor;
@@ -117,19 +228,139 @@ public final class NettyMessage {
 
     protected FieldAccessorTable
         internalGetFieldAccessorTable() {
+=======
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+    getDescriptor() {
+      return NettyMessage.internal_static_Message_descriptor;
+    }
+
+    public static NettyMessage.Message parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static NettyMessage.Message parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static NettyMessage.Message parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static NettyMessage.Message parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static NettyMessage.Message parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static NettyMessage.Message parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static NettyMessage.Message parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+
+    public static NettyMessage.Message parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static NettyMessage.Message parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static NettyMessage.Message parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static NettyMessage.Message parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+
+    public static NettyMessage.Message parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+
+    public static Builder newBuilder(NettyMessage.Message prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+
+    public static NettyMessage.Message getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    public static com.google.protobuf.Parser<Message> parser() {
+      return PARSER;
+    }
+
+    @Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+    }
+
+    protected FieldAccessorTable
+    internalGetFieldAccessorTable() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       return NettyMessage.internal_static_Message_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               NettyMessage.Message.class, NettyMessage.Message.Builder.class);
     }
 
+<<<<<<< HEAD
     public static final int MESSAGETYPE_FIELD_NUMBER = 1;
     private int messageType_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>.MessageType messageType = 1;</code>
      */
     public int getMessageTypeValue() {
       return messageType_;
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>.MessageType messageType = 1;</code>
      */
@@ -138,20 +369,31 @@ public final class NettyMessage {
       return result == null ? MessageTypeEnum.MessageType.UNRECOGNIZED : result;
     }
 
+<<<<<<< HEAD
     public static final int DATA_FIELD_NUMBER = 2;
     private NettyData.Data data_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>.Data data = 2;</code>
      */
     public boolean hasData() {
       return data_ != null;
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>.Data data = 2;</code>
      */
     public NettyData.Data getData() {
       return data_ == null ? NettyData.Data.getDefaultInstance() : data_;
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * <code>.Data data = 2;</code>
      */
@@ -159,18 +401,33 @@ public final class NettyMessage {
       return getData();
     }
 
+<<<<<<< HEAD
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
+=======
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) {
+        return true;
+      }
+      if (isInitialized == 0) {
+        return false;
+      }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       memoizedIsInitialized = 1;
       return true;
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
+<<<<<<< HEAD
                         throws java.io.IOException {
+=======
+        throws java.io.IOException {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       if (messageType_ != MessageTypeEnum.MessageType.DATA_REQ.getNumber()) {
         output.writeEnum(1, messageType_);
       }
@@ -181,26 +438,47 @@ public final class NettyMessage {
 
     public int getSerializedSize() {
       int size = memoizedSize;
+<<<<<<< HEAD
       if (size != -1) return size;
+=======
+      if (size != -1) {
+        return size;
+      }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       size = 0;
       if (messageType_ != MessageTypeEnum.MessageType.DATA_REQ.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
+<<<<<<< HEAD
           .computeEnumSize(1, messageType_);
       }
       if (data_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getData());
+=======
+            .computeEnumSize(1, messageType_);
+      }
+      if (data_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(2, getData());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       }
       memoizedSize = size;
       return size;
     }
 
+<<<<<<< HEAD
     private static final long serialVersionUID = 0L;
     @Override
     public boolean equals(final Object obj) {
       if (obj == this) {
        return true;
+=======
+    @Override
+    public boolean equals(final Object obj) {
+      if (obj == this) {
+        return true;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       }
       if (!(obj instanceof NettyMessage.Message)) {
         return super.equals(obj);
@@ -235,6 +513,7 @@ public final class NettyMessage {
       return hash;
     }
 
+<<<<<<< HEAD
     public static NettyMessage.Message parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -312,6 +591,12 @@ public final class NettyMessage {
     public static Builder newBuilder(NettyMessage.Message prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+=======
+    public Builder newBuilderForType() {
+      return newBuilder();
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -323,6 +608,19 @@ public final class NettyMessage {
       Builder builder = new Builder(parent);
       return builder;
     }
+<<<<<<< HEAD
+=======
+
+    @Override
+    public com.google.protobuf.Parser<Message> getParserForType() {
+      return PARSER;
+    }
+
+    public NettyMessage.Message getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
     /**
      * Protobuf type {@code Message}
      */
@@ -330,6 +628,7 @@ public final class NettyMessage {
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:Message)
         NettyMessage.MessageOrBuilder {
+<<<<<<< HEAD
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return NettyMessage.internal_static_Message_descriptor;
@@ -341,6 +640,13 @@ public final class NettyMessage {
             .ensureFieldAccessorsInitialized(
                 NettyMessage.Message.class, NettyMessage.Message.Builder.class);
       }
+=======
+
+      private int messageType_ = 0;
+      private NettyData.Data data_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          NettyData.Data, NettyData.Data.Builder, NettyData.DataOrBuilder> dataBuilder_;
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
 
       // Construct using com.passport.proto.NettyMessage.Message.newBuilder()
       private Builder() {
@@ -352,11 +658,33 @@ public final class NettyMessage {
         super(parent);
         maybeForceBuilderInitialization();
       }
+<<<<<<< HEAD
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
         }
       }
+=======
+
+      public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+        return NettyMessage.internal_static_Message_descriptor;
+      }
+
+      protected FieldAccessorTable
+      internalGetFieldAccessorTable() {
+        return NettyMessage.internal_static_Message_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                NettyMessage.Message.class, NettyMessage.Message.Builder.class);
+      }
+
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+            .alwaysUseFieldBuilders) {
+        }
+      }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder clear() {
         super.clear();
         messageType_ = 0;
@@ -371,7 +699,11 @@ public final class NettyMessage {
       }
 
       public com.google.protobuf.Descriptors.Descriptor
+<<<<<<< HEAD
           getDescriptorForType() {
+=======
+      getDescriptorForType() {
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         return NettyMessage.internal_static_Message_descriptor;
       }
 
@@ -402,32 +734,59 @@ public final class NettyMessage {
       public Builder clone() {
         return (Builder) super.clone();
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           Object value) {
         return (Builder) super.setField(field, value);
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+<<<<<<< HEAD
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof NettyMessage.Message) {
           return mergeFrom((NettyMessage.Message)other);
+=======
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof NettyMessage.Message) {
+          return mergeFrom((NettyMessage.Message) other);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         } else {
           super.mergeFrom(other);
           return this;
@@ -435,7 +794,13 @@ public final class NettyMessage {
       }
 
       public Builder mergeFrom(NettyMessage.Message other) {
+<<<<<<< HEAD
         if (other == NettyMessage.Message.getDefaultInstance()) return this;
+=======
+        if (other == NettyMessage.Message.getDefaultInstance()) {
+          return this;
+        }
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         if (other.messageType_ != 0) {
           setMessageTypeValue(other.getMessageTypeValue());
         }
@@ -468,13 +833,20 @@ public final class NettyMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private int messageType_ = 0;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.MessageType messageType = 1;</code>
        */
       public int getMessageTypeValue() {
         return messageType_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.MessageType messageType = 1;</code>
        */
@@ -483,6 +855,10 @@ public final class NettyMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.MessageType messageType = 1;</code>
        */
@@ -490,6 +866,10 @@ public final class NettyMessage {
         MessageTypeEnum.MessageType result = MessageTypeEnum.MessageType.valueOf(messageType_);
         return result == null ? MessageTypeEnum.MessageType.UNRECOGNIZED : result;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.MessageType messageType = 1;</code>
        */
@@ -502,6 +882,10 @@ public final class NettyMessage {
         onChanged();
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.MessageType messageType = 1;</code>
        */
@@ -512,15 +896,22 @@ public final class NettyMessage {
         return this;
       }
 
+<<<<<<< HEAD
       private NettyData.Data data_ = null;
       private com.google.protobuf.SingleFieldBuilderV3<
           NettyData.Data, NettyData.Data.Builder, NettyData.DataOrBuilder> dataBuilder_;
+=======
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.Data data = 2;</code>
        */
       public boolean hasData() {
         return dataBuilder_ != null || data_ != null;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.Data data = 2;</code>
        */
@@ -531,6 +922,7 @@ public final class NettyMessage {
           return dataBuilder_.getMessage();
         }
       }
+<<<<<<< HEAD
       /**
        * <code>.Data data = 2;</code>
        */
@@ -543,10 +935,8 @@ public final class NettyMessage {
           onChanged();
         } else {
           dataBuilder_.setMessage(value);
-        }
+=======
 
-        return this;
-      }
       /**
        * <code>.Data data = 2;</code>
        */
@@ -557,10 +947,45 @@ public final class NettyMessage {
           onChanged();
         } else {
           dataBuilder_.setMessage(builderForValue.build());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
         }
 
         return this;
       }
+<<<<<<< HEAD
+      /**
+       * <code>.Data data = 2;</code>
+       */
+      public Builder setData(
+          NettyData.Data.Builder builderForValue) {
+        if (dataBuilder_ == null) {
+          data_ = builderForValue.build();
+          onChanged();
+        } else {
+          dataBuilder_.setMessage(builderForValue.build());
+=======
+
+      /**
+       * <code>.Data data = 2;</code>
+       */
+      public Builder setData(NettyData.Data value) {
+        if (dataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          data_ = value;
+          onChanged();
+        } else {
+          dataBuilder_.setMessage(value);
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
+        }
+
+        return this;
+      }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.Data data = 2;</code>
        */
@@ -568,7 +993,11 @@ public final class NettyMessage {
         if (dataBuilder_ == null) {
           if (data_ != null) {
             data_ =
+<<<<<<< HEAD
               NettyData.Data.newBuilder(data_).mergeFrom(value).buildPartial();
+=======
+                NettyData.Data.newBuilder(data_).mergeFrom(value).buildPartial();
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           } else {
             data_ = value;
           }
@@ -579,6 +1008,10 @@ public final class NettyMessage {
 
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.Data data = 2;</code>
        */
@@ -593,6 +1026,10 @@ public final class NettyMessage {
 
         return this;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.Data data = 2;</code>
        */
@@ -601,6 +1038,10 @@ public final class NettyMessage {
         onChanged();
         return getDataFieldBuilder().getBuilder();
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.Data data = 2;</code>
        */
@@ -612,11 +1053,16 @@ public final class NettyMessage {
               NettyData.Data.getDefaultInstance() : data_;
         }
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       /**
        * <code>.Data data = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           NettyData.Data, NettyData.Data.Builder, NettyData.DataOrBuilder>
+<<<<<<< HEAD
           getDataFieldBuilder() {
         if (dataBuilder_ == null) {
           dataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -624,10 +1070,23 @@ public final class NettyMessage {
                   getData(),
                   getParentForChildren(),
                   isClean());
+=======
+      getDataFieldBuilder() {
+        if (dataBuilder_ == null) {
+          dataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              NettyData.Data, NettyData.Data.Builder, NettyData.DataOrBuilder>(
+              getData(),
+              getParentForChildren(),
+              isClean());
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
           data_ = null;
         }
         return dataBuilder_;
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -638,6 +1097,7 @@ public final class NettyMessage {
         return this;
       }
 
+<<<<<<< HEAD
 
       // @@protoc_insertion_point(builder_scope:Message)
     }
@@ -719,6 +1179,11 @@ public final class NettyMessage {
         new String[] { "MessageType", "Data", });
     MessageTypeEnum.getDescriptor();
     NettyData.getDescriptor();
+=======
+      // @@protoc_insertion_point(builder_scope:Message)
+    }
+
+>>>>>>> a1abf2231ceadb16c3538774fc50b7415b1816d4
   }
 
   // @@protoc_insertion_point(outer_class_scope)
